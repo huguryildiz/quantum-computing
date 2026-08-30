@@ -160,7 +160,7 @@ window.C1 = [
 /* ---------------- front matter ---------------- */
 {t:'title', kicker:'Quantum Computing', text:'Quantum Computing',
  sub:'Lecture notes for the software half of the course: what a quantum state is, what can be done to it, what a measurement returns, and what an algorithm has to arrange before that measurement is worth making.',
- meta:[['Covers','Chapter 1'],['Level','Undergraduate'],
+ meta:[['Covers','Chapters 1 and 2'],['Level','Undergraduate'],
        ['Assumed background','Linear algebra over the real numbers, and some Python']]},
 
 {t:'h3', text:'How to read these notes'},
@@ -171,7 +171,10 @@ window.C1 = [
 {t:'toc', items:[
  ['1','The mathematics of quantum states',
   'States as complex columns; bras and the inner product; length, orthogonality and overlap; orthonormal bases. Amplitude and phase, and the difference between a global and a relative one. Outer products, projectors and the resolution of the identity. Gram–Schmidt. The tensor product and where the exponential comes from. The adjoint, Hermitian and unitary operators, and the exponential that joins them. Eigenvectors, the spectral theorem and functions of an operator. Dirac notation.',
-  'NC CH2.1 · NC CH2.2.7']
+  'NC CH2.1 · NC CH2.2.7'],
+ ['2','States, measurement and dynamics',
+  'The Born rule, and why choosing a measurement basis is choosing an experiment. Projective measurement, the state it leaves behind, and the general measurement an imperfect readout is. Observables, means and spreads. Compatibility, the commutator, and the uncertainty relation. The Pauli algebra and a measurement along any direction. Evolution, stationary states and why a gate is an exponential. What a finite run of shots is worth.',
+  'NC CH2.2, NC CH2.1.3, NC CH2.1.9']
 ]},
 
 {t:'page'},

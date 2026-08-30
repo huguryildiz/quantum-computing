@@ -35,7 +35,8 @@
    would be an empty frame. */
 CONTENT.CHAPTERS = [
   { n:'0', module:'M0', title:'The frame of the course', flat:true },
-  { n:'1', module:'M1', title:'The mathematics of quantum states' }
+  { n:'1', module:'M1', title:'The mathematics of quantum states' },
+  { n:'2', module:'M2', title:'States, measurement and dynamics' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -73,6 +74,27 @@ CONTENT.SECTIONS = {
         'm1-eig','m1-spectral','m1-fofa'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
     { n:'1.9', title:'Summary and practice',              ids:['m1-synth','m1-shapes'] }
+  ],
+
+  /* Chapter 2 carries the other two postulates. The measurement sections come
+     before the dynamics one, which is the order the source lectures use and
+     also the order a reader needs: every statement about evolution in this
+     course is eventually checked by a measurement, and the measurement rule
+     has to be in hand before that check means anything. */
+  M2: [
+    { n:'2.0', title:'Opening',                           ids:['m2-open'] },
+    { n:'2.1', title:'The Born rule',                     ids:[
+        'm2-born','m2-bases','m2-distinguish','m2-lab-c'] },
+    { n:'2.2', title:'Projective measurement',            ids:[
+        'm2-proj','m2-collapse','m2-povm'] },
+    { n:'2.3', title:'Observables',                       ids:['m2-obs','m2-var'] },
+    { n:'2.4', title:'Compatibility and uncertainty',     ids:['m2-comm','m2-uncert'] },
+    { n:'2.5', title:'The Pauli algebra',                 ids:[
+        'm2-pauli','m2-paulialg','m2-ndotsigma'] },
+    { n:'2.6', title:'Dynamics',                          ids:[
+        'm2-schrod','m2-stationary','m2-gate','m2-lab-d'] },
+    { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
+    { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
   ]
 
 };
@@ -128,7 +150,32 @@ CONTENT.BOOK = {
   'm1-eig':'2.1.5',
   'm1-spectral':'2.1.6',
   'm1-fofa':'2.1.8',
-  'm1-dirac':'2.1'
+  'm1-dirac':'2.1',
+
+  /* Chapter 2 is the book's section 2.2, the postulates, with three excursions
+     back into 2.1: the Pauli matrices are defined there, and so are the
+     commutator and the uncertainty relation that follows it.
+
+     Four scenes carry no anchor. `m2-shots` is one: finite-shot estimation is
+     statistics rather than quantum mechanics and the book does not develop it
+     where this chapter needs it. The opening, the summary and the question
+     taxonomy have no counterpart, and neither do the two laboratories. */
+  'm2-born':'2.2.3',
+  'm2-bases':'2.2.5',
+  'm2-distinguish':'2.2.4',
+  'm2-proj':'2.2.5',
+  'm2-collapse':'2.2.5',
+  'm2-povm':'2.2.6',
+  'm2-obs':'2.2.5',
+  'm2-var':'2.2.5',
+  'm2-comm':'2.1.9',
+  'm2-uncert':'2.1.9',
+  'm2-pauli':'2.1.3',
+  'm2-paulialg':'2.1.3',
+  'm2-ndotsigma':'2.2.5',
+  'm2-schrod':'2.2.2',
+  'm2-stationary':'2.2.2',
+  'm2-gate':'2.2.2'
 };
 
 /* ---- derivation --------------------------------------------------------

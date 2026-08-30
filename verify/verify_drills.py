@@ -28,7 +28,7 @@ from scipy.linalg import expm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
-from qops import (H, I2, KET0, KET1, KETM, KETP, X,           # noqa: E402
+from qops import (H, I2, KET0, KET1, KETM, KETP, X, Z,        # noqa: E402
                   dev, inner, outer, unitarity)
 
 R2 = 1 / math.sqrt(2)
@@ -325,6 +325,114 @@ def _d120_half_turn_is_minus_identity():
     return dev(expm(-1j * G20 * t), -I2)
 
 
+
+# ── Module 2 ────────────────────────────────────────────────────────────────
+
+YM = np.array([[0, -1j], [1j, 0]], dtype=complex)
+
+
+def _m2_state(theta, phi):
+    """The angle parameterisation, built by two rotations rather than written."""
+    psi = expm(-1j * phi * np.array([[1, 0], [0, -1]], dtype=complex) / 2) @ \
+        expm(-1j * theta * YM / 2) @ KET0
+    return psi / np.exp(1j * np.angle(psi[0])) if abs(psi[0]) > 1e-12 else psi
+
+
+def _m2_r(psi):
+    Zm = np.array([[1, 0], [0, -1]], dtype=complex)
+    return np.array([float(np.real(np.vdot(psi, M @ psi))) for M in (X, YM, Zm)])
+
+
+def _m2_p(psi, ket):
+    return abs(inner(ket, psi)) ** 2
+
+
+def _m2_mean(A, psi):
+    return float(np.real(np.vdot(psi, A @ psi)))
+
+
+def _m2_var(A, psi):
+    return _m2_mean(A @ A, psi) - _m2_mean(A, psi) ** 2
+
+
+PSI_D0708 = np.array([math.sqrt(3) / 2, 0.5], dtype=complex)
+H_D209 = np.array([[2, 1 - 1j], [1 + 1j, 3]], dtype=complex)
+PSI_D209 = np.array([1, 1j], dtype=complex) / math.sqrt(2)
+
+
+def _d205_sequence_agrees():
+    """The probability that a third Z measurement agrees with the first, with an
+    X measurement in between. Followed branch by branch rather than argued."""
+    total = 0.0
+    for mid in (KETP, KETM):
+        p_mid = _m2_p(KET0, mid)
+        post = mid                       # a rank-one projector leaves the basis vector
+        total += p_mid * _m2_p(post, KET0)
+    return total
+
+
+def _d206_invert(reported, eps):
+    return (reported - eps) / (1 - 2 * eps)
+
+
+def _d209_probability_of_larger_eigenvalue():
+    """p(4) from the projector of that eigenvalue, not from inverting the mean."""
+    w, V = np.linalg.eigh(H_D209)
+    k = int(np.argmax(w))
+    P = np.outer(V[:, k], V[:, k].conj())
+    return float(np.real(np.vdot(PSI_D209, P @ PSI_D209)))
+
+
+def _d211_shifted_eigenvalue(sign):
+    B = 3 * np.array([[1, 0], [0, -1]], dtype=complex) + 2 * I2
+    w = np.linalg.eigvalsh(B)
+    return float(w[-1] if sign > 0 else w[0])
+
+
+def _d213_prob_plus(omega, t):
+    H = omega * np.array([[1, 0], [0, -1]], dtype=complex) / 2
+    return abs(inner(KETP, expm(-1j * H * t) @ KETP)) ** 2
+
+
+def _d215_population(omega, t):
+    H = omega * X / 2
+    return abs(inner(KET1, expm(-1j * H * t) @ KET0)) ** 2
+
+
+def _d215_pi_pulse_dev(omega):
+    """U at the flip time is -iX, up to nothing at all."""
+    t = math.pi / omega
+    return dev(expm(-1j * (omega * X / 2) * t), -1j * X)
+
+
+def _d216_population(omega_x, delta, t):
+    H = (omega_x * X + delta * np.array([[1, 0], [0, -1]], dtype=complex)) / 2
+    return abs(inner(KET1, expm(-1j * H * t) @ KET0)) ** 2
+
+
+def _d216_ceiling(omega_x, delta):
+    ts = np.linspace(0.0, 200.0, 10001)
+    return max(_d216_population(omega_x, delta, float(t)) for t in ts)
+
+
+def _se_probability(p, n):
+    return math.sqrt(p * (1 - p) / n)
+
+
+def _se_pauli(mean, n):
+    return math.sqrt((1 - mean ** 2) / n)
+
+
+def _shots_for(target, mean):
+    return (1 - mean ** 2) / target ** 2
+
+
+def _d220_meanZ(t):
+    H = 2 * X / 2
+    psi = expm(-1j * H * t) @ KET0
+    return _m2_mean(np.array([[1, 0], [0, -1]], dtype=complex), psi)
+
+
 CHECKS = [
     {"name": "D1-01 squared overlap", "stated": 0.5,
      "derive": _d101_squared_overlap, "rtol": 1e-12},
@@ -441,8 +549,173 @@ CHECKS = [
      "derive": _d120_quarter_turn_is_unitary, "atol": 1e-14},
     {"name": "D1-20 twice that time gives minus the identity", "stated": 0.0,
      "derive": _d120_half_turn_is_minus_identity, "atol": 1e-14},
+
+    # ---- D2-01 to D2-03 ------------------------------------------------
+    {"name": "D2-01 p(0)", "stated": 0.36,
+     "derive": lambda: _m2_p(np.array([3, 4j], dtype=complex) / 5, KET0),
+     "rtol": 1e-12},
+    {"name": "D2-01 p(+) in the X basis", "stated": 0.5,
+     "derive": lambda: _m2_p(np.array([3, 4j], dtype=complex) / 5, KETP),
+     "rtol": 1e-12},
+    {"name": "D2-01 the Bloch vector has length one", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(
+         _m2_r(np.array([3, 4j], dtype=complex) / 5))), "rtol": 1e-12},
+    {"name": "D2-01 <Y> for that state", "stated": 0.96,
+     "derive": lambda: _m2_mean(YM, np.array([3, 4j], dtype=complex) / 5),
+     "rtol": 1e-12},
+    {"name": "D2-02 p(+1) at sixty degrees", "stated": 0.75,
+     "derive": lambda: (1 + math.cos(math.pi / 3)) / 2, "rtol": 1e-12},
+    {"name": "D2-02 a fair coin at ninety degrees", "stated": 0.5,
+     "derive": lambda: (1 + math.cos(math.pi / 2)) / 2, "rtol": 1e-12},
+    {"name": "D2-03 p(+) in X for |+i>", "stated": 0.5,
+     "derive": lambda: _m2_p(np.array([1, 1j], dtype=complex) / math.sqrt(2),
+                             KETP), "rtol": 1e-12},
+    {"name": "D2-03 the Bloch vector is (0,1,0)", "stated": 1.0,
+     "derive": lambda: _m2_mean(YM, np.array([1, 1j], dtype=complex) / math.sqrt(2)),
+     "rtol": 1e-12},
+
+    # ---- D2-04 to D2-06 ------------------------------------------------
+    {"name": "D2-04 p(+) in the X basis", "stated": 0.9330,
+     "derive": lambda: _m2_p(PSI_D0708, KETP), "rtol": 1e-4},
+    {"name": "D2-04 p(-) in the X basis", "stated": 0.0670,
+     "derive": lambda: _m2_p(PSI_D0708, KETM), "rtol": 1e-3},
+    {"name": "D2-04 the two add to one", "stated": 1.0,
+     "derive": lambda: _m2_p(PSI_D0708, KETP) + _m2_p(PSI_D0708, KETM),
+     "rtol": 1e-12},
+    {"name": "D2-04 a Z measurement after the + outcome", "stated": 0.5,
+     "derive": lambda: _m2_p(KETP, KET0), "rtol": 1e-12},
+    {"name": "D2-05 the third Z agrees with the first", "stated": 0.5,
+     "derive": _d205_sequence_agrees, "rtol": 1e-12},
+    {"name": "D2-06 a perfect report on |0>", "stated": 0.95,
+     "derive": lambda: 1 - 0.05, "rtol": 1e-12},
+    {"name": "D2-06 the corrected estimate", "stated": 0.6333,
+     "derive": lambda: _d206_invert(0.62, 0.05), "rtol": 1e-3},
+    {"name": "D2-06 the error amplification", "stated": 1.111,
+     "derive": lambda: 1 / (1 - 2 * 0.05), "rtol": 1e-3},
+
+    # ---- D2-07 to D2-09 ------------------------------------------------
+    {"name": "D2-07 <Z>", "stated": 0.5,
+     "derive": lambda: _m2_mean(np.array([[1, 0], [0, -1]], dtype=complex),
+                                PSI_D0708), "rtol": 1e-12},
+    {"name": "D2-07 <X>", "stated": math.sqrt(3) / 2,
+     "derive": lambda: _m2_mean(X, PSI_D0708), "rtol": 1e-12},
+    {"name": "D2-07 <Y>", "stated": 0.0,
+     "derive": lambda: _m2_mean(YM, PSI_D0708), "atol": 1e-15},
+    {"name": "D2-07 the Bloch vector has length one", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(_m2_r(PSI_D0708))), "rtol": 1e-12},
+    {"name": "D2-08 Var(Z)", "stated": 0.75,
+     "derive": lambda: _m2_var(np.array([[1, 0], [0, -1]], dtype=complex),
+                               PSI_D0708), "rtol": 1e-12},
+    {"name": "D2-08 Var(X)", "stated": 0.25,
+     "derive": lambda: _m2_var(X, PSI_D0708), "rtol": 1e-12},
+    {"name": "D2-08 the two variances add to one", "stated": 1.0,
+     "derive": lambda: _m2_var(X, PSI_D0708)
+         + _m2_var(np.array([[1, 0], [0, -1]], dtype=complex), PSI_D0708),
+     "rtol": 1e-12},
+    {"name": "D2-08 the bound is empty here", "stated": 0.0,
+     "derive": lambda: abs(_m2_mean(YM, PSI_D0708)), "atol": 1e-15},
+    {"name": "D2-09 <H>", "stated": 3.5,
+     "derive": lambda: _m2_mean(H_D209, PSI_D209), "rtol": 1e-12},
+    {"name": "D2-09 <H squared>", "stated": 13.5,
+     "derive": lambda: _m2_mean(H_D209 @ H_D209, PSI_D209), "rtol": 1e-12},
+    {"name": "D2-09 Var(H)", "stated": 1.25,
+     "derive": lambda: _m2_var(H_D209, PSI_D209), "rtol": 1e-10},
+    {"name": "D2-09 larger eigenvalue", "stated": 4.0,
+     "derive": lambda: float(np.linalg.eigvalsh(H_D209)[-1]), "rtol": 1e-12},
+    {"name": "D2-09 smaller eigenvalue", "stated": 1.0,
+     "derive": lambda: float(np.linalg.eigvalsh(H_D209)[0]), "rtol": 1e-12},
+    {"name": "D2-09 the probability of the larger one", "stated": 5 / 6,
+     "derive": _d209_probability_of_larger_eigenvalue, "rtol": 1e-10},
+
+    # ---- D2-10 to D2-12 ------------------------------------------------
+    {"name": "D2-10 [X,Y] = 2iZ", "stated": 0.0,
+     "derive": lambda: dev(X @ YM - YM @ X,
+                           2j * np.array([[1, 0], [0, -1]], dtype=complex)),
+     "atol": 1e-15},
+    {"name": "D2-10 X and Y anticommute", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(X @ YM + YM @ X)), "atol": 1e-15},
+    {"name": "D2-11 Z commutes with 3Z + 2I", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         Z @ (3 * Z + 2 * I2) - (3 * Z + 2 * I2) @ Z)), "atol": 1e-15},
+    {"name": "D2-11 the larger eigenvalue of 3Z + 2I", "stated": 5.0,
+     "derive": lambda: _d211_shifted_eigenvalue(+1), "rtol": 1e-12},
+    {"name": "D2-11 the smaller one", "stated": -1.0,
+     "derive": lambda: _d211_shifted_eigenvalue(-1), "rtol": 1e-12},
+    {"name": "D2-12 <Y> on |+i>", "stated": 1.0,
+     "derive": lambda: _m2_mean(YM, np.array([1, 1j], dtype=complex) / math.sqrt(2)),
+     "rtol": 1e-12},
+    {"name": "D2-12 the product of the two spreads", "stated": 1.0,
+     "derive": lambda: math.sqrt(_m2_var(X, np.array([1, 1j], dtype=complex) / math.sqrt(2)))
+         * math.sqrt(_m2_var(np.array([[1, 0], [0, -1]], dtype=complex),
+                             np.array([1, 1j], dtype=complex) / math.sqrt(2))),
+     "rtol": 1e-12},
+    {"name": "D2-12 the bound is saturated", "stated": 0.0,
+     "derive": lambda: abs(
+         math.sqrt(_m2_var(X, np.array([1, 1j], dtype=complex) / math.sqrt(2)))
+         * math.sqrt(_m2_var(np.array([[1, 0], [0, -1]], dtype=complex),
+                             np.array([1, 1j], dtype=complex) / math.sqrt(2)))
+         - abs(_m2_mean(YM, np.array([1, 1j], dtype=complex) / math.sqrt(2)))),
+     "atol": 1e-12},
+
+    # ---- D2-13 to D2-16 ------------------------------------------------
+    {"name": "D2-13 P(+) at omega t = 0", "stated": 1.0,
+     "derive": lambda: _d213_prob_plus(1.0, 0.0), "rtol": 1e-12},
+    {"name": "D2-13 P(+) vanishes at omega t = pi", "stated": 0.0,
+     "derive": lambda: _d213_prob_plus(1.0, math.pi), "atol": 1e-25},
+    {"name": "D2-13 P(+) returns at omega t = 2 pi", "stated": 1.0,
+     "derive": lambda: _d213_prob_plus(1.0, 2 * math.pi), "rtol": 1e-10},
+    {"name": "D2-14 the beat period for a unit splitting", "stated": 2 * math.pi,
+     "derive": lambda: 2 * math.pi / 1.0, "rtol": 1e-12},
+    {"name": "D2-15 P(1) at the pi pulse", "stated": 1.0,
+     "derive": lambda: _d215_population(1.0, math.pi), "rtol": 1e-10},
+    {"name": "D2-15 P(1) at the half pulse", "stated": 0.5,
+     "derive": lambda: _d215_population(1.0, math.pi / 2), "rtol": 1e-10},
+    {"name": "D2-15 U at the pi pulse is -iX", "stated": 0.0,
+     "derive": lambda: _d215_pi_pulse_dev(1.0), "atol": 1e-14},
+    {"name": "D2-16 the generalised rate", "stated": math.sqrt(2),
+     "derive": lambda: math.hypot(1.0, 1.0), "rtol": 1e-12},
+    {"name": "D2-16 the ceiling of the population", "stated": 0.5,
+     "derive": lambda: _d216_ceiling(1.0, 1.0), "rtol": 1e-4},
+    {"name": "D2-16 the first time it reaches it", "stated": 2.2214,
+     "derive": lambda: math.pi / math.sqrt(2), "rtol": 1e-4},
+    {"name": "D2-16 a resonant pi pulse, applied detuned", "stated": 0.3166,
+     "derive": lambda: _d216_population(1.0, 1.0, math.pi), "rtol": 1e-3},
+
+    # ---- D2-17 to D2-20 ------------------------------------------------
+    {"name": "D2-17 standard error at N = 10000", "stated": 0.005,
+     "derive": lambda: _se_probability(0.5, 10000), "rtol": 1e-12},
+    {"name": "D2-17 shots for a standard error of 0.001", "stated": 250000.0,
+     "derive": lambda: 0.25 / 0.001 ** 2, "rtol": 1e-9},
+    {"name": "D2-18 p(+1) for <X> = 0.8", "stated": 0.9,
+     "derive": lambda: (1 + 0.8) / 2, "rtol": 1e-12},
+    {"name": "D2-18 standard error at N = 1000", "stated": 0.019,
+     "derive": lambda: _se_pauli(0.8, 1000), "rtol": 2e-3},
+    {"name": "D2-18 shots for a standard error of 0.01", "stated": 3600.0,
+     "derive": lambda: _shots_for(0.01, 0.8), "rtol": 1e-9},
+    {"name": "D2-18 the two routes agree", "stated": 0.0,
+     "derive": lambda: abs(_se_pauli(0.8, 1000) - 2 * _se_probability(0.9, 1000)),
+     "atol": 1e-15},
+    {"name": "D2-19 the x component of the Bloch vector", "stated": 0.5,
+     "derive": lambda: float(_m2_r(_m2_state(math.pi / 2, math.pi / 3))[0]),
+     "rtol": 1e-10},
+    {"name": "D2-19 the y component", "stated": math.sqrt(3) / 2,
+     "derive": lambda: float(_m2_r(_m2_state(math.pi / 2, math.pi / 3))[1]),
+     "rtol": 1e-10},
+    {"name": "D2-19 p(+) for an X measurement", "stated": 0.75,
+     "derive": lambda: _m2_p(_m2_state(math.pi / 2, math.pi / 3), KETP),
+     "rtol": 1e-10},
+    {"name": "D2-19 shots for a standard error of 0.02", "stated": 1875.0,
+     "derive": lambda: _shots_for(0.02, 0.5), "rtol": 1e-9},
+    {"name": "D2-20 P(1) at t = pi/4 with Omega = 2", "stated": 0.5,
+     "derive": lambda: _d215_population(2.0, math.pi / 4), "rtol": 1e-10},
+    {"name": "D2-20 <Z> there", "stated": 0.0,
+     "derive": lambda: _d220_meanZ(math.pi / 4), "atol": 1e-14},
+    {"name": "D2-20 <Z> at t = 0", "stated": 1.0,
+     "derive": lambda: _d220_meanZ(0.0), "rtol": 1e-12},
+    {"name": "D2-20 shots for a standard error of 0.05", "stated": 400.0,
+     "derive": lambda: _shots_for(0.05, 0.0), "rtol": 1e-9},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_drills — chapter 1 worked solutions")
+    main(CHECKS, "verify_drills — chapters 1 and 2, worked solutions")

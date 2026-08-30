@@ -285,6 +285,135 @@ def _entrywise_exponential_negative_eigenvalue():
     return float(np.min(np.linalg.eigvalsh(wrong)))
 
 
+
+# ── Module 2 ────────────────────────────────────────────────────────────────
+# The postulates: the Born rule, projective measurement, observables,
+# compatibility, the Pauli algebra, evolution, and finite-shot estimation.
+
+
+def _m2_state(theta, phi):
+    """cos(theta/2)|0> + e^{i phi} sin(theta/2)|1>, built by two rotations.
+
+    The scenes write the coefficients down. Here the same state is produced by
+    turning |0> about y and then about z with `expm`, so the parameterisation is
+    a consequence of the generators rather than an assumption.
+    """
+    Ymat = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    Zmat = np.array([[1, 0], [0, -1]], dtype=complex)
+    psi = expm(-1j * phi * Zmat / 2) @ expm(-1j * theta * Ymat / 2) @ KET0
+    return psi / np.exp(1j * np.angle(psi[0])) if abs(psi[0]) > 1e-12 else psi
+
+
+def _m2_bloch(psi):
+    """The three Pauli means, from the sandwiches rather than from the angles."""
+    Ymat = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    return np.array([float(np.real(np.vdot(psi, M @ psi))) for M in (X, Ymat, Z)])
+
+
+def _m2_born(psi, ket):
+    return abs(inner(ket, psi)) ** 2
+
+
+def _m2_post_measurement(psi, ket):
+    """||P|psi>/sqrt(p) - |ket>||: zero when the update rule lands exactly on
+    the basis vector, which is what a rank-one projector must do."""
+    P = outer(ket, ket)
+    p = float(np.real(np.vdot(psi, P @ psi)))
+    out = (P @ psi) / math.sqrt(p)
+    out = out / np.exp(1j * np.angle(out[np.argmax(np.abs(out))]))
+    return dev(out, ket)
+
+
+def _m2_readout(q, eps):
+    """The reported probability of 0 through a symmetric readout, from the
+    effect operator rather than from the line the scene prints."""
+    E0 = (1 - eps) * outer(KET0, KET0) + eps * outer(KET1, KET1)
+    psi = np.array([math.sqrt(q), math.sqrt(1 - q)], dtype=complex)
+    return float(np.real(np.vdot(psi, E0 @ psi)))
+
+
+def _m2_expectation(A, psi):
+    return float(np.real(np.vdot(psi, A @ psi)))
+
+
+def _m2_variance(A, psi):
+    return _m2_expectation(A @ A, psi) - _m2_expectation(A, psi) ** 2
+
+
+def _m2_commutator_dev(A, B, claim):
+    return dev(A @ B - B @ A, claim)
+
+
+def _m2_pauli_product_dev():
+    """The cyclic rule, checked on all nine ordered pairs at once."""
+    Ymat = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    S = [X, Ymat, Z]
+    eps = np.zeros((3, 3, 3))
+    for (i, j, k) in ((0, 1, 2), (1, 2, 0), (2, 0, 1)):
+        eps[i, j, k] = 1.0
+        eps[i, k, j] = -1.0
+    worst = 0.0
+    for i in range(3):
+        for j in range(3):
+            claim = (1.0 if i == j else 0.0) * I2 + 1j * sum(
+                eps[i, j, k] * S[k] for k in range(3))
+            worst = max(worst, dev(S[i] @ S[j], claim))
+    return worst
+
+
+def _m2_axis_projector_dev(n):
+    """P_+ = (I + n.sigma)/2 is a projector: check P^2 = P."""
+    Ymat = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    ns = n[0] * X + n[1] * Ymat + n[2] * Z
+    Pp = (I2 + ns) / 2
+    return dev(Pp @ Pp, Pp)
+
+
+def _m2_axis_probability(n, theta, phi):
+    """p(+) from the projector, against (1 + n.r)/2 from the Bloch vector."""
+    Ymat = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    psi = _m2_state(theta, phi)
+    ns = n[0] * X + n[1] * Ymat + n[2] * Z
+    Pp = (I2 + ns) / 2
+    return float(np.real(np.vdot(psi, Pp @ psi)))
+
+
+def _m2_evolve(H, psi, t):
+    return expm(-1j * H * t) @ psi
+
+
+def _m2_beat(omega, t):
+    """P(+) for |+> under H = (omega/2) Z, from the matrices."""
+    H = omega * Z / 2
+    return abs(inner(KETP, _m2_evolve(H, KETP, t))) ** 2
+
+
+def _m2_stationary_dev(omega, t):
+    """An energy eigenstate differs from itself by a global phase only, so the
+    probability of every outcome of every measurement is unchanged."""
+    H = omega * Z / 2
+    out = _m2_evolve(H, KET0, t)
+    return abs(abs(inner(KETP, out)) ** 2 - abs(inner(KETP, KET0)) ** 2)
+
+
+def _m2_driven_population(omega_x, delta, t):
+    """P(1) under H = (Omega_x X + Delta Z)/2, from expm rather than from the
+    closed form the scene derives."""
+    H = (omega_x * X + delta * Z) / 2
+    return abs(inner(KET1, _m2_evolve(H, KET0, t))) ** 2
+
+
+def _m2_driven_ceiling(omega_x, delta):
+    """The largest population the drive ever reaches, found by sampling the
+    evolution rather than by quoting (Omega_x/Omega)^2."""
+    ts = np.linspace(0.0, 200.0, 400001)
+    return max(_m2_driven_population(omega_x, delta, float(t)) for t in ts[::40])
+
+
+def _m2_standard_error(p, n):
+    return math.sqrt(p * (1 - p) / n)
+
+
 CHECKS = [
     # ---- 1.1 -----------------------------------------------------------
     {"name": "1.1.1 squared length of (2+i, 1-3i)", "stated": 15.0,
@@ -390,8 +519,112 @@ CHECKS = [
     {"name": "1.7.3 the entrywise answer has a negative eigenvalue",
      "stated": -1.7183, "derive": _entrywise_exponential_negative_eigenvalue,
      "rtol": 1e-4},
+
+    # ---- 2.1 -----------------------------------------------------------
+    {"name": "2.1.1 p(0) for (3, 4i)/5", "stated": 0.36,
+     "derive": lambda: _m2_born(np.array([3, 4j], dtype=complex) / 5, KET0),
+     "rtol": 1e-12},
+    {"name": "2.1.1 p(1) for the same state", "stated": 0.64,
+     "derive": lambda: _m2_born(np.array([3, 4j], dtype=complex) / 5, KET1),
+     "rtol": 1e-12},
+    {"name": "2.1.1 the two probabilities add to one", "stated": 1.0,
+     "derive": lambda: sum(_m2_born(np.array([3, 4j], dtype=complex) / 5, k)
+                           for k in (KET0, KET1)), "rtol": 1e-12},
+    {"name": "2.1.3 best guess probability for orthogonal states", "stated": 1.0,
+     "derive": lambda: 0.5 * (1 + math.sin(math.pi / 2)), "rtol": 1e-12},
+    {"name": "2.1.3 and for identical states", "stated": 0.5,
+     "derive": lambda: 0.5 * (1 + math.sin(0.0)), "rtol": 1e-12},
+
+    # ---- 2.2 -----------------------------------------------------------
+    {"name": "2.2.2 p(0) for (1, 2)/sqrt5", "stated": 0.2,
+     "derive": lambda: _m2_born(np.array([1, 2], dtype=complex) / math.sqrt(5),
+                                KET0), "rtol": 1e-12},
+    {"name": "2.2.2 the update rule lands on |0> exactly", "stated": 0.0,
+     "derive": lambda: _m2_post_measurement(
+         np.array([1, 2], dtype=complex) / math.sqrt(5), KET0), "atol": 1e-14},
+    {"name": "2.2.3 a perfect readout reports the truth", "stated": 0.7,
+     "derive": lambda: _m2_readout(0.7, 0.0), "rtol": 1e-12},
+    {"name": "2.2.3 a readout at eps = 0.05 on q = 0.7", "stated": 0.05 + 0.9 * 0.7,
+     "derive": lambda: _m2_readout(0.7, 0.05), "rtol": 1e-12},
+    {"name": "2.2.3 at eps = 1/2 it reports one half whatever q is",
+     "stated": 0.5, "derive": lambda: _m2_readout(0.83, 0.5), "rtol": 1e-12},
+
+    # ---- 2.3 -----------------------------------------------------------
+    {"name": "2.3.1 <Z> for (2, 1)/sqrt5", "stated": 0.6,
+     "derive": lambda: _m2_expectation(
+         Z, np.array([2, 1], dtype=complex) / math.sqrt(5)), "rtol": 1e-12},
+    {"name": "2.3.2 Var(Z) on |+>", "stated": 1.0,
+     "derive": lambda: _m2_variance(Z, KETP), "rtol": 1e-12},
+    {"name": "2.3.2 Var(Z) on |0>", "stated": 0.0,
+     "derive": lambda: _m2_variance(Z, KET0), "atol": 1e-15},
+
+    # ---- 2.4 -----------------------------------------------------------
+    {"name": "2.4.1 [X, Z] = -2iY", "stated": 0.0,
+     "derive": lambda: _m2_commutator_dev(
+         X, Z, -2j * np.array([[0, -1j], [1j, 0]], dtype=complex)),
+     "atol": 1e-15},
+    {"name": "2.4.2 the Robertson bound is met at theta = pi/2, phi = pi/4",
+     "stated": 0.0,
+     "derive": lambda: (
+         math.sqrt(_m2_variance(X, _m2_state(math.pi / 2, math.pi / 4)))
+         * math.sqrt(_m2_variance(Z, _m2_state(math.pi / 2, math.pi / 4)))
+         - abs(_m2_expectation(np.array([[0, -1j], [1j, 0]], dtype=complex),
+                               _m2_state(math.pi / 2, math.pi / 4)))),
+     "atol": 1e-12},
+    {"name": "2.4.2 the bound vanishes on |0>", "stated": 0.0,
+     "derive": lambda: abs(_m2_expectation(
+         np.array([[0, -1j], [1j, 0]], dtype=complex), KET0)), "atol": 1e-15},
+
+    # ---- 2.5 -----------------------------------------------------------
+    {"name": "2.5.1 every Pauli squares to the identity", "stated": 0.0,
+     "derive": lambda: max(dev(M @ M, I2) for M in
+                           (X, np.array([[0, -1j], [1j, 0]], dtype=complex), Z)),
+     "atol": 1e-15},
+    {"name": "2.5.1 every Pauli is traceless", "stated": 0.0,
+     "derive": lambda: max(abs(complex(np.trace(M))) for M in
+                           (X, np.array([[0, -1j], [1j, 0]], dtype=complex), Z)),
+     "atol": 1e-15},
+    {"name": "2.5.1 every Pauli has eigenvalues +1 and -1", "stated": 0.0,
+     "derive": lambda: max(abs(abs(float(l)) - 1.0)
+                           for M in (X, np.array([[0, -1j], [1j, 0]], dtype=complex), Z)
+                           for l in np.linalg.eigvalsh(M)), "atol": 1e-14},
+    {"name": "2.5.2 the cyclic product rule, on all nine ordered pairs",
+     "stated": 0.0, "derive": _m2_pauli_product_dev, "atol": 1e-15},
+    {"name": "2.5.3 (I + n.sigma)/2 is a projector", "stated": 0.0,
+     "derive": lambda: _m2_axis_projector_dev(
+         np.array([0.6, 0.0, 0.8])), "atol": 1e-15},
+    {"name": "2.5.3 p(+) along z for |0> is one", "stated": 1.0,
+     "derive": lambda: _m2_axis_probability(
+         np.array([0.0, 0.0, 1.0]), 0.0, 0.0), "rtol": 1e-12},
+    {"name": "2.5.3 p(+) at sixty degrees off the state", "stated": 0.75,
+     "derive": lambda: _m2_axis_probability(
+         np.array([math.sin(math.pi / 3), 0.0, math.cos(math.pi / 3)]), 0.0, 0.0),
+     "rtol": 1e-12},
+
+    # ---- 2.6 -----------------------------------------------------------
+    {"name": "2.6.1 P(0) under H = (omega/2)Z is one half for all t",
+     "stated": 0.5,
+     "derive": lambda: abs(inner(KET0, _m2_evolve(Z / 2, KETP, 1.7))) ** 2,
+     "rtol": 1e-12},
+    {"name": "2.6.2 an energy eigenstate is stationary", "stated": 0.0,
+     "derive": lambda: _m2_stationary_dev(1.0, 3.3), "atol": 1e-14},
+    {"name": "2.6.2 the beat returns at omega t = 2 pi", "stated": 1.0,
+     "derive": lambda: _m2_beat(1.0, 2 * math.pi), "rtol": 1e-10},
+    {"name": "2.6.2 and vanishes at omega t = pi", "stated": 0.0,
+     "derive": lambda: _m2_beat(1.0, math.pi), "atol": 1e-25},
+    {"name": "2.6.3 a resonant pi pulse flips the qubit", "stated": 1.0,
+     "derive": lambda: _m2_driven_population(1.0, 0.0, math.pi), "rtol": 1e-10},
+    {"name": "2.6.3 the ceiling at equal drive and detuning", "stated": 0.5,
+     "derive": lambda: _m2_driven_ceiling(1.0, 1.0), "rtol": 1e-4},
+
+    # ---- 2.7 -----------------------------------------------------------
+    {"name": "2.7.1 standard error at p = 1/2 and N = 1000", "stated": 0.0158,
+     "derive": lambda: _m2_standard_error(0.5, 1000), "rtol": 2e-3},
+    {"name": "2.7.1 the worst case is 1/(2 sqrt N)", "stated": 0.0,
+     "derive": lambda: abs(_m2_standard_error(0.5, 4096) - 1 / (2 * 64)),
+     "atol": 1e-15},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_scenes — chapter 1 teaching scenes")
+    main(CHECKS, "verify_scenes — chapters 1 and 2, teaching scenes")
