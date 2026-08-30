@@ -14,7 +14,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.1',
+    version:'0.2',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
