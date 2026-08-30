@@ -1,0 +1,27 @@
+Quantum Computing — an interactive lecture artifact
+Copyright (c) 2026 Hüseyin Uğur Yıldız
+
+This work is an adaptation. Its syllabus, its sequence of topics and the
+technical content it teaches are derived from:
+
+    Quantum Computing Lectures
+    Copyright (c) 2026 Aleksandr Krasnok
+    https://github.com/AlexKrasnok/quantum-computing-lectures
+    Educational materials licensed under Creative Commons Attribution 4.0
+    International (CC BY 4.0); accompanying code under the terms stated in
+    that repository's LICENSE.
+
+The adaptation consists of rewriting that course as a stepped, self-contained
+HTML artifact with generated figures, interactive laboratories and worked
+practice questions, and of writing the prose at the level of a second-year
+undergraduate reader. No text, figure or code file from the original is
+reproduced verbatim in this repository's build sources.
+
+Changes made are recorded in the git history of this repository.
+
+The presentation engine — the scene renderer, the plotting primitives, the
+laboratory kit and the eleven verification gates — is carried forward from the
+author's own earlier lecture artifact and is unrelated to the work cited above.
+
+KaTeX (https://katex.org) is vendored into the built artifact under the MIT
+License, Copyright (c) 2013-2020 Khan Academy and other contributors.

@@ -1,0 +1,32 @@
+# Third-party and oversized source material. Never redistributed, never in history.
+source/
+
+# Generated intermediates and derived editions. Only the artifact and the lecture
+# notes PDF are tracked; the other three editions are rebuilt from the sources.
+dist/Lecture_Notes.html
+dist/Student_Workbook.*
+dist/Instructor_Solutions.*
+dist/Formula_Reference.*
+
+# Local working area, not student-facing. The commands that drive production
+# live here too, and they are instructions to whoever is building this rather
+# than part of what is built — the same reason AGENTS.md and CLAUDE.md are out.
+.claude/
+
+# Local toolchain and scratch output.
+.venv/
+node_modules/
+shots/
+shots-m/
+pages/
+textclash.json
+__pycache__/
+.pytest_cache/
+
+.DS_Store
+.vercel
+
+# Working notes for the agents that build this, not part of what is published.
+AGENTS.md
+CLAUDE.md
+.Codex/notes/
