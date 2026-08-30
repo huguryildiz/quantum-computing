@@ -163,19 +163,23 @@ function figPhaseBars(){
    keeps. The two pieces are drawn as a right angle because that is the only
    property being claimed. */
 function figProject(){
-  const a = P.Axes({w:520,h:280,xr:[-0.25,1.45],yr:[-0.80,1.15],
+  /* One unit is 118.97 px each way: 342 px of data width over an x span of
+     2.875, and 232 px of data height over a y span of 1.95. The right angle
+     between the two pieces is the only thing this figure claims, and under an
+     anisotropic scale it would not be drawn as one. */
+  const a = P.Axes({w:400,h:290,xr:[-0.35,2.525],yr:[-0.85,1.10],
     pad:{l:32,r:26,t:26,b:32}, xticksOverride:[], yticksOverride:[],
     grid:false, zeroAxes:true, arrows:false});
   a.poly([[0,0],[1.15,1.15]],{color:C.grid,width:1.4,dash:'5 5'});
   a.poly([[0,0],[R2,R2]],{color:C.h,width:2.4});
   a.point(R2,R2,{color:C.h,r:5});
-  a.note(R2+0.04,R2+0.05,'|u\\rangle',{fs:14,color:C.h,tex:true});
+  a.note(R2,R2,'|u\\rangle',{fs:14,color:C.h,dx:12,dy:-8,tex:true});
   a.poly([[0,0],[1,0]],{color:C.in,width:2.6});
   a.point(1,0,{color:C.in,r:6});
   a.note(1,0,'|v\\rangle',{fs:14,color:C.in,dx:10,dy:28,tex:true});
   a.poly([[0,0],[0.5,0.5]],{color:C.out,width:3.2});
   a.point(0.5,0.5,{color:C.out,r:6});
-  a.note(0.16,0.44,'P|v\\rangle',{fs:14,color:C.out,tex:true});
+  a.note(0.5,0.5,'P|v\\rangle',{fs:14,color:C.out,anchor:'end',dx:-12,dy:-10,tex:true});
   a.poly([[0.5,0.5],[1,0]],{color:C.mid,width:2.2,dash:'4 4'});
   a.note(0.80,0.36,'(I-P)|v\\rangle',{fs:13,color:C.mid,tex:true});
   return a.svg();
@@ -203,7 +207,9 @@ function figResolve(){
    not rotated onto a right angle; the part of it that was already along the
    first is removed, and what is left is at a right angle by construction. */
 function figGram(){
-  const a = P.Axes({w:520,h:282,xr:[-0.3,1.55],yr:[-0.90,1.25],
+  /* Isotropic, for the same reason as the projector figure: the right angle
+     between what was removed and what was left is the proof. */
+  const a = P.Axes({w:400,h:300,xr:[-0.4,2.780],yr:[-0.95,1.30],
     pad:{l:32,r:26,t:26,b:32}, xticksOverride:[], yticksOverride:[],
     grid:false, zeroAxes:true, arrows:false});
   a.poly([[0,0],[1,1]],{color:C.in,width:2.6});
@@ -211,13 +217,15 @@ function figGram(){
   a.note(1,1,'v_{1}',{fs:14,color:C.in,dx:12,dy:-8,tex:true});
   a.poly([[0,0],[1,0]],{color:C.mid,width:2.6});
   a.point(1,0,{color:C.mid,r:6});
-  a.note(1.04,0.07,'v_{2}',{fs:14,color:C.mid,tex:true});
+  a.note(1,0,'v_{2}',{fs:14,color:C.mid,dx:12,dy:-8,tex:true});
   a.poly([[0,0],[0.5,0.5]],{color:C.h,width:3.2});
-  a.note(0.10,0.42,'\\langle e_{1}|v_{2}\\rangle\\,e_{1}',{fs:13,color:C.h,tex:true});
+  /* Above the line the two vectors share, and ending short of it: below it
+     is where the dashed guide and the second vector both are. */
+  a.note(0.45,0.62,'\\langle e_{1}|v_{2}\\rangle\\,e_{1}',{fs:13,color:C.h,anchor:'end',tex:true});
   a.poly([[0.5,0.5],[1,0]],{color:C.grid,width:1.4,dash:'4 4'});
   a.poly([[0,0],[0.5,-0.5]],{color:C.out,width:3});
   a.point(0.5,-0.5,{color:C.out,r:6});
-  a.note(0.54,-0.58,'u_{2}=v_{2}-\\langle e_{1}|v_{2}\\rangle\\,e_{1}',{fs:13,color:C.out,tex:true});
+  a.note(0.5,-0.5,'u_{2}=v_{2}-\\langle e_{1}|v_{2}\\rangle\\,e_{1}',{fs:13,color:C.out,dx:14,dy:26,tex:true});
   return a.svg();
 }
 
@@ -261,7 +269,11 @@ function figSpectrum(){
    vector; a unitary sends it to itself, and a map that is merely invertible
    sends it to an ellipse. */
 function figUnitCircle(){
-  const a = P.Axes({w:520,h:286,xr:[-2.2,2.2],yr:[-1.6,1.6],
+  /* Exactly isotropic — 368 px over an x span of 4.6 and 184 px over a y span
+     of 2.3, both 80 px to the unit. This is the one figure in the chapter that
+     cannot survive anything else: it is a circle beside an ellipse, and under
+     an anisotropic scale the circle is drawn as an ellipse too. */
+  const a = P.Axes({w:438,h:250,xr:[-2.3,2.3],yr:[-1.15,1.15],
     pad:{l:44,r:26,t:26,b:40}, xtarget:4, ytarget:4});
   const N = 240, circ=[], ell=[];
   for(let i=0;i<=N;i++){
@@ -271,8 +283,8 @@ function figUnitCircle(){
   }
   a.poly(circ,{color:C.in,width:2.6});
   a.poly(ell,{color:C.err,width:2.2,dash:'5 4'});
-  a.note(0.05,1.14,'U\\,:\\; \\text{the circle}',{fs:13,color:C.in,tex:true});
-  a.note(-2.0,-1.3,'M\\,:\\; \\text{an ellipse}',{fs:13,color:C.err,tex:true});
+  a.note(-2.25,0.74,'U\\,:\\; \\text{the circle}',{fs:13,color:C.in,tex:true});
+  a.note(-2.25,-1.05,'M\\,:\\; \\text{an ellipse}',{fs:13,color:C.err,tex:true});
   return a.svg();
 }
 
@@ -339,7 +351,9 @@ function figSpectral(){
    eigenvalues sit on the real axis; the exponential moves each one onto the
    unit circle, by its own angle. */
 function figFunction(){
-  const a = P.Axes({w:550,h:270,xr:[-1.6,3.5],yr:[-1.5,1.5],
+  /* Isotropic: the unit circle has to be drawn round, because the whole claim
+     is that the exponential sends each eigenvalue onto it. */
+  const a = P.Axes({w:452,h:270,xr:[-1.6,3.5],yr:[-1.35,1.35],
     xlabel:'\\operatorname{Re}', ylabel:'\\operatorname{Im}',
     pad:{l:56,r:26,t:30,b:44}, xtarget:5, ytarget:4});
   const N=240, circ=[];
@@ -669,11 +683,11 @@ const SC = [
   src:'L2 · projectors and the resolution of identity', steps:3, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projector, and the part of a state it keeps'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
     {t:'body', html:'<p>Take the outer product of a normalised state with itself. The result is called a <b>projector</b>:</p>'},
     {t:'eq', key:true, tex:'P_{u} = |u\\rangle\\langle u|, \\qquad \\langle u|u\\rangle = 1'},
-    {t:'body', html:'<p>It has two properties, and both are one line. It is its own adjoint, $P_{u}^{\\dagger}=P_{u}$, because reversing an outer product swaps two copies of the same state. And applying it twice is the same as applying it once:</p>'},
-    {t:'eq', tex:'P_{u}^{2} = |u\\rangle\\underbrace{\\langle u|u\\rangle}_{=\\,1}\\langle u| = |u\\rangle\\langle u| = P_{u}'},
+    {t:'body', html:'<p>It has two properties and both are one line. It is its own adjoint, because reversing an outer product swaps two copies of the same state; and applying it twice is the same as applying it once:</p>'},
+    {t:'eq', tex:'P_{u}^{2} = |u\\rangle\\underbrace{\\langle u|u\\rangle}_{=\\,1}\\langle u| = P_{u}'},
     {t:'reveal', at:1, items:[
       {t:'small', html:'An operator with $P^{2}=P$ can only have eigenvalues $0$ and $1$, since $\\lambda^{2}=\\lambda$. Those two numbers are "kept" and "discarded", and in Chapter 2 they become the two things a measurement can report.'}
     ]}
@@ -683,13 +697,12 @@ const SC = [
     {t:'reveal', at:2, items:[
       {t:'wex', rows:[
         ['Given', '$|u\\rangle=|+\\rangle$ and $|v\\rangle=|0\\rangle$.'],
-        ['Work', '$\\langle +|0\\rangle = 1/\\sqrt2$, so $P|0\\rangle = \\tfrac{1}{\\sqrt2}|+\\rangle = \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)$.'],
-        ['Answer', 'A vector of length $1/\\sqrt2$, not of length one.'],
+        ['Work', '$\\langle +|0\\rangle = 1/\\sqrt2$, so $P|0\\rangle = \\tfrac{1}{\\sqrt2}|+\\rangle = \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)$, of length $1/\\sqrt2$.'],
         ['Check', 'The discarded part is $(I-P)|0\\rangle=\\tfrac{1}{\\sqrt2}|-\\rangle$, orthogonal to it because $\\langle+|-\\rangle=0$.']
       ]}
     ]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'A projector does not preserve length', html:'The output above has length $1/\\sqrt2$, not $1$. That is not a mistake in the arithmetic and it is not a state that has to be renormalised on the spot: the lost length is exactly the probability of the other outcome. Renormalising is a separate step, and Chapter 2 says when it is done and when it is not.'}
+      {t:'note', kind:'err', head:'A projector does not preserve length', html:'The output has length $1/\\sqrt2$, not $1$, and that is not an arithmetic slip: the lost length is exactly the probability of the other outcome. Renormalising is a separate step, and Chapter 2 says when it is taken.'}
     ]}
   ]}
 ]},
@@ -730,7 +743,7 @@ const SC = [
   src:'L2 · constructing an orthonormal basis', steps:3, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Gram-Schmidt: making an orthonormal basis out of what you have'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
     {t:'body', html:'<p>Given independent vectors $v_{1},\\ldots,v_{k}$, the <b>Gram–Schmidt procedure</b> produces an orthonormal set spanning the same space. Each step removes from the next vector everything that already lies along the vectors already built, then divides by the length of what is left:</p>'},
     {t:'eq', key:true, tex:'u_{j} = v_{j} - \\sum_{i<j}\\langle e_{i}|v_{j}\\rangle\\,e_{i}, \\qquad e_{j} = \\frac{u_{j}}{\\|u_{j}\\|}'},
     {t:'body', html:'<p>The subtraction is the whole idea, and the picture beside it is the whole proof: what is left after removing the component along $e_{1}$ has no component along $e_{1}$, so it is orthogonal to it.</p>'},
@@ -738,8 +751,7 @@ const SC = [
       {t:'wex', rows:[
         ['Given', '$v_{1}=(1,1)$ and $v_{2}=(1,0)$, real.'],
         ['Step 1', '$\\|v_{1}\\|=\\sqrt2$, so $e_{1}=\\tfrac{1}{\\sqrt2}(1,1)$.'],
-        ['Step 2', '$\\langle e_{1}|v_{2}\\rangle = \\tfrac{1}{\\sqrt2}$, so $u_{2}=(1,0)-\\tfrac{1}{\\sqrt2}\\cdot\\tfrac{1}{\\sqrt2}(1,1)=(\\tfrac12,-\\tfrac12)$.'],
-        ['Answer', '$\\|u_{2}\\|=\\tfrac{1}{\\sqrt2}$, so $e_{2}=\\tfrac{1}{\\sqrt2}(1,-1)$.'],
+        ['Step 2', '$\\langle e_{1}|v_{2}\\rangle = \\tfrac{1}{\\sqrt2}$, so $u_{2}=(1,0)-\\tfrac12(1,1)=(\\tfrac12,-\\tfrac12)$, of length $\\tfrac{1}{\\sqrt2}$, and $e_{2}=\\tfrac{1}{\\sqrt2}(1,-1)$.'],
         ['Check', '$\\langle e_{1}|e_{2}\\rangle = \\tfrac12(1-1)=0$ and both have length one. The pair is $|+\\rangle$ and $|-\\rangle$ in disguise.']
       ]}
     ]}
@@ -747,10 +759,10 @@ const SC = [
     {t:'fig', frame:true, svg:()=>figGram(),
       caption:'One step of the procedure. The amber arrow is the part of $v_{2}$ that already lies along $e_{1}$; removing it leaves $u_{2}$, which is at a right angle to $e_{1}$ by construction and only has to be scaled to length one.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'warn', head:'Where it breaks on a computer', html:'If two input vectors are nearly parallel, the subtraction cancels almost everything and $u_{j}$ is a small difference of large numbers. Rounding error, which was negligible in the inputs, is then a large fraction of the result, and the "orthonormal" vectors come out neither orthogonal nor normal. Laboratory B is this failure, driven by the reader.'}
+      {t:'note', kind:'warn', head:'Where it breaks on a computer', html:'If two input vectors are nearly parallel the subtraction cancels almost everything, and $u_{j}$ is a small difference of large numbers. Rounding error, negligible in the inputs, is then a large fraction of the result, and the "orthonormal" vectors come out neither orthogonal nor normal. Laboratory B is this failure, driven by the reader.'}
     ]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'What is used instead', html:'A QR factorisation computes the same orthonormal span by a different arithmetic route and loses far less. In NumPy that is <code>np.linalg.qr</code>, and the columns of $Q$ are the orthonormal set. Gram–Schmidt stays the right thing to know because it says <b>what</b> is being computed; QR is the right thing to run because it says how.'}
+      {t:'note', kind:'ok', head:'What is used instead', html:'A QR factorisation computes the same span by a different arithmetic route and loses far less; in NumPy that is <code>np.linalg.qr</code>. Gram–Schmidt stays the right thing to know because it says <b>what</b> is computed; QR is the right thing to run because it says how.'}
     ]}
   ]}
 ]},
@@ -1053,32 +1065,29 @@ const SC = [
   src:'L3 · spectral projectors and functions of an operator', steps:4, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'A function of an operator acts on its eigenvalues'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Once an operator is written as eigenvalues times projectors, a function of it means one thing and only one thing: apply the function to the eigenvalues and leave the projectors alone.</p>'},
+  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
+    {t:'body', html:'<p>Once an operator is written as eigenvalues times projectors, a function of it means one thing only: apply the function to the eigenvalues and leave the projectors alone.</p>'},
     {t:'eq', key:true, tex:'f(A) = \\sum_{k} f(\\lambda_{k})\\,P_{k}'},
     {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>This is a definition that agrees with the obvious one wherever the obvious one exists. For a power, $A^{2}=\\sum_{j,k}\\lambda_{j}\\lambda_{k}P_{j}P_{k}$, and $P_{j}P_{k}=\\delta_{jk}P_{k}$ collapses the double sum:</p>'},
-      {t:'eq', tex:'A^{2} = \\sum_{k}\\lambda_{k}^{2}P_{k}'},
-      {t:'small', html:'Every power therefore follows the rule, so every power series does too. That is the argument, and it is why the definition may be used for functions with no series at all, such as a square root.'}
+      {t:'body', html:'<p>The definition agrees with the obvious one wherever the obvious one exists. For a power, $A^{2}=\\sum_{j,k}\\lambda_{j}\\lambda_{k}P_{j}P_{k}$, and $P_{j}P_{k}=\\delta_{jk}P_{k}$ collapses the double sum to $\\sum_{k}\\lambda_{k}^{2}P_{k}$. Every power therefore follows the rule, so every power series does — which is why the definition may be used for functions with no series at all, such as a square root.</p>'}
     ]},
     {t:'reveal', at:2, items:[
       {t:'body', html:'<p>The case this course needs constantly is the exponential. With $A=\\sum_{k}\\lambda_{k}P_{k}$,</p>'},
       {t:'eq', key:true, tex:'e^{-iAt} = \\sum_{k} e^{-i\\lambda_{k}t}\\,P_{k}'}
+    ]},
+    {t:'reveal', at:4, items:[
+      {t:'note', kind:'err', head:'The mistake this scene exists to stop', html:'$e^{A}$ is <b>not</b> the matrix of $e^{A_{jk}}$. Entry by entry, $A$ above would give $\\begin{bmatrix}e^{2}&e\\\\e&e^{2}\\end{bmatrix}$, with eigenvalues $e^{2}\\pm e$; the correct answer has $e^{3}$ and $e^{1}$. The two agree only for a diagonal matrix, so checking on one teaches the wrong lesson.'}
     ]}
   ], right:[
     {t:'fig', frame:true, svg:()=>figFunction(),
       caption:'The exponential, drawn on the eigenvalues it acts on. Each eigenvalue sits on the real axis; the map sends it to a point of unit modulus at angle $-\\lambda t$. The projectors do not move, so the operator is fully described by two points on a circle.'},
     {t:'reveal', at:3, items:[
       {t:'wex', rows:[
-        ['Given', '$A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$ again, and a time $t$.'],
+        ['Given', '$A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$ again, with eigenvalues $3$ on $|+\\rangle$ and $1$ on $|-\\rangle$.'],
         ['Method', 'Exponentiate each eigenvalue; keep the projectors.'],
-        ['Work', 'The eigenvalues are $3$ and $1$, on $|+\\rangle$ and $|-\\rangle$.'],
         ['Answer', '$e^{-iAt} = e^{-3it}\\,|+\\rangle\\langle+| \\;+\\; e^{-it}\\,|-\\rangle\\langle-|$.'],
         ['Check', 'At $t=0$ both factors are one and the sum is $P_{+}+P_{-}=I$. Each factor has modulus one at every $t$, so the result is unitary, which it must be because $A$ is Hermitian.']
       ]}
-    ]},
-    {t:'reveal', at:4, items:[
-      {t:'note', kind:'err', head:'The mistake this scene exists to stop', html:'$e^{A}$ is <b>not</b> the matrix of $e^{A_{jk}}$. For $A$ above, exponentiating entry by entry gives $\\begin{bmatrix}e^{2}&e\\\\e&e^{2}\\end{bmatrix}$, whose eigenvalues are $e^{2}\\pm e$; the correct answer has eigenvalues $e^{3}$ and $e^{1}$. The two agree only for a diagonal matrix, and a student who checks on one will be misled about all the others.'}
     ]}
   ]}
 ]},
