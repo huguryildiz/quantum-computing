@@ -39,8 +39,11 @@ from scipy.linalg import expm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
-from qops import (H, I2, KET0, KET1, KETM, KETP, X, Z,        # noqa: E402
-                  dev, hermiticity, inner, outer, unitarity)
+from qops import (BELL_PHI_P, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
+                  X, Y, Z, amp_damp, bloch, channel, dev, direction,
+                  hermiticity, inner, kron, ndotsigma, outer,
+                  partial_trace, phase_flip, proj, purity, unitarity,
+                  von_neumann)
 
 # ── 1.1 Vectors, dual vectors and the inner product ─────────────────────────
 
@@ -414,6 +417,128 @@ def _m2_standard_error(p, n):
     return math.sqrt(p * (1 - p) / n)
 
 
+
+# ── chapter 3 · mixed states and entanglement ───────────────────────────────
+#
+# Every route below is a second one. The scenes reach a purity from the entries
+# of a matrix; here it is read off eigenvalues. The scenes read a reduced state
+# off a block structure; here it is the sum over (I (x) <j|) of the definition.
+# The scenes apply a channel entry by entry; here the Kraus matrices are
+# multiplied out. The scenes assemble a CHSH value from cosines; here the
+# four-by-four operators are built and traced against the state.
+
+
+def _m3_rho_of(psi):
+    return proj(np.asarray(psi, dtype=complex))
+
+
+_M3_MIX = 0.5 * proj(KET0) + 0.5 * proj(KETP)     # the running example of 3.1
+
+
+def _m3_mean(rho, A):
+    return float(np.trace(np.asarray(rho) @ np.asarray(A)).real)
+
+
+def _m3_mean_by_branches(A):
+    """The same expectation value as a classical average over the two branches
+    of the preparation, which is the route the scene checks itself by."""
+    return 0.5 * float(np.vdot(KET0, A @ KET0).real) \
+         + 0.5 * float(np.vdot(KETP, A @ KETP).real)
+
+
+def _m3_min_eigenvalue(M):
+    return float(np.linalg.eigvalsh(np.asarray(M, dtype=complex))[0])
+
+
+def _m3_purity_from_eigenvalues(rho):
+    lam = np.linalg.eigvalsh(np.asarray(rho, dtype=complex))
+    return float(sum(l ** 2 for l in lam))
+
+
+def _m3_damped(gamma, rho=None):
+    """|+> through amplitude damping, with the Kraus operators multiplied out
+    rather than the two entry rules the scene states applied."""
+    return channel(amp_damp(gamma), proj(KETP) if rho is None else rho)
+
+
+def _m3_damp_coherence(gamma):
+    return abs(_m3_damped(gamma)[0, 1])
+
+
+def _m3_dephased(p):
+    return channel(phase_flip(p), proj(KETP))
+
+
+def _m3_t2_from(t1, tphi):
+    return 1.0 / (1.0 / (2.0 * t1) + 1.0 / tphi)
+
+
+def _m3_reduced(psi, keep=0):
+    return partial_trace(proj(np.asarray(psi, dtype=complex)), keep)
+
+
+_M3_UNEQUAL = np.array([math.sqrt(3) / 2, 0, 0, 0.5], dtype=complex)   # 3.6.2
+
+
+def _m3_schmidt_by_svd(psi):
+    """The Schmidt coefficients through the singular values of the coefficient
+    matrix, which is the other of the two routes the chapter gives."""
+    C = np.asarray(psi, dtype=complex).reshape(2, 2)
+    return np.sort(np.linalg.svd(C, compute_uv=False) ** 2)[::-1]
+
+
+def _m3_svd_matches_trace(psi):
+    """How far the SVD route is from the partial-trace route. Zero is the
+    claim the chapter makes when it says the two agree."""
+    lam_svd = _m3_schmidt_by_svd(psi)
+    lam_tr = np.sort(np.linalg.eigvalsh(_m3_reduced(psi)))[::-1]
+    return float(np.max(np.abs(lam_svd - lam_tr)))
+
+
+def _m3_corr(psi, na, nb):
+    """<(n.sigma) (x) (m.sigma)> from the four-by-four operator."""
+    M = kron(ndotsigma(na), ndotsigma(nb))
+    return float(np.vdot(psi, M @ psi).real)
+
+
+def _m3_chsh(psi, a0, a1, b0, b1):
+    d = [direction(a0), direction(a1), direction(b0), direction(b1)]
+    return (_m3_corr(psi, d[0], d[2]) + _m3_corr(psi, d[0], d[3])
+            + _m3_corr(psi, d[1], d[2]) - _m3_corr(psi, d[1], d[3]))
+
+
+def _m3_nosignal(deg):
+    """The reduced state of the first qubit after the second is measured along
+    `deg` and the outcome is not looked at, minus the reduced state before.
+    Zero for every angle is what no signalling says."""
+    rho = proj(BELL_PHI_P)
+    n = ndotsigma(direction(deg))
+    after = np.zeros((4, 4), dtype=complex)
+    for sign in (+1, -1):
+        P = kron(I2, 0.5 * (I2 + sign * n))
+        after += P @ rho @ P
+    return dev(partial_trace(after, 0), partial_trace(rho, 0))
+
+
+def _m3_more_coherence_than_population():
+    """The smallest gap between the surviving coherence and the surviving
+    population over the whole range of the damping parameter. The figure
+    caption claims it is never negative."""
+    gs = np.linspace(0.0, 1.0, 2001)
+    return min(abs(_m3_damped(float(g))[0, 1]) - _m3_damped(float(g))[1, 1].real
+               for g in gs)
+
+
+def _m3_binary_entropy_max():
+    """The largest value of the two-term Schmidt entropy, found by sampling
+    rather than by quoting that it sits at one half."""
+    best = 0.0
+    for l in np.linspace(1e-9, 1 - 1e-9, 200001):
+        rho = np.diag([l, 1 - l]).astype(complex)
+        best = max(best, von_neumann(rho))
+    return best
+
+
 CHECKS = [
     # ---- 1.1 -----------------------------------------------------------
     {"name": "1.1.1 squared length of (2+i, 1-3i)", "stated": 15.0,
@@ -623,8 +748,152 @@ CHECKS = [
     {"name": "2.7.1 the worst case is 1/(2 sqrt N)", "stated": 0.0,
      "derive": lambda: abs(_m2_standard_error(0.5, 4096) - 1 / (2 * 64)),
      "atol": 1e-15},
+
+    # ---- 3.1 -----------------------------------------------------------
+    {"name": "3.1.1 the coherence of (|0> + i|1>)/sqrt2 is -i/2", "stated": -0.5,
+     "derive": lambda: _m3_rho_of((KET0 + 1j * KET1) / math.sqrt(2))[0, 1].imag,
+     "rtol": 1e-12},
+    {"name": "3.1.1 a pure state satisfies rho^2 = rho", "stated": 0.0,
+     "derive": lambda: dev(_m3_rho_of((KET0 + 1j * KET1) / math.sqrt(2)) @
+                           _m3_rho_of((KET0 + 1j * KET1) / math.sqrt(2)),
+                           _m3_rho_of((KET0 + 1j * KET1) / math.sqrt(2))),
+     "atol": 1e-14},
+    {"name": "3.1.2 the failing eigenvalue of [[.5,.8],[.8,.5]]", "stated": -0.3,
+     "derive": lambda: _m3_min_eigenvalue([[0.5, 0.8], [0.8, 0.5]]), "rtol": 1e-12},
+    {"name": "3.1.2 the coherence a fair diagonal allows", "stated": 0.5,
+     "derive": lambda: math.sqrt(0.5 * 0.5), "rtol": 1e-15},
+    {"name": "3.1.3 <Z> of the running mixture", "stated": 0.5,
+     "derive": lambda: _m3_mean(_M3_MIX, Z), "rtol": 1e-12},
+    {"name": "3.1.3 <X> of the running mixture", "stated": 0.5,
+     "derive": lambda: _m3_mean(_M3_MIX, X), "rtol": 1e-12},
+    {"name": "3.1.3 <Y> of the running mixture", "stated": 0.0,
+     "derive": lambda: _m3_mean(_M3_MIX, Y), "atol": 1e-15},
+    {"name": "3.1.3 the trace route and the branch route agree", "stated": 0.0,
+     "derive": lambda: abs(_m3_mean(_M3_MIX, Z) - _m3_mean_by_branches(Z)),
+     "atol": 1e-15},
+    {"name": "3.1.4 the two ensembles of I/2 are one operator", "stated": 0.0,
+     "derive": lambda: dev(0.5 * proj(KET0) + 0.5 * proj(KET1),
+                           0.5 * proj(KETP) + 0.5 * proj(KETM)),
+     "atol": 1e-15},
+
+    # ---- 3.2 -----------------------------------------------------------
+    {"name": "3.2.1 purity of the running mixture", "stated": 0.75,
+     "derive": lambda: _m3_purity_from_eigenvalues(_M3_MIX), "rtol": 1e-12},
+    {"name": "3.2.1 its larger eigenvalue", "stated": 0.854,
+     "derive": lambda: float(np.linalg.eigvalsh(_M3_MIX)[1]), "rtol": 1e-3},
+    # The scene quotes both eigenvalues to three decimal places, so the
+    # tolerance here is the rounding that quotation allows and no more:
+    # 0.0005 against 0.146 is 3.4e-3.
+    {"name": "3.2.1 its smaller eigenvalue", "stated": 0.146,
+     "derive": lambda: float(np.linalg.eigvalsh(_M3_MIX)[0]), "rtol": 3.5e-3},
+    {"name": "3.2.2 the length of its Bloch vector", "stated": math.sqrt(0.5),
+     "derive": lambda: float(np.linalg.norm(bloch(_M3_MIX))), "rtol": 1e-12},
+    {"name": "3.2.2 purity from the length agrees with Tr rho^2", "stated": 0.0,
+     "derive": lambda: abs(0.5 * (1 + float(np.linalg.norm(bloch(_M3_MIX))) ** 2)
+                           - purity(_M3_MIX)),
+     "atol": 1e-14},
+
+    # ---- 3.3 -----------------------------------------------------------
+    {"name": "3.3.1 the damping Kraus operators are complete", "stated": 0.0,
+     "derive": lambda: dev(sum(K.conj().T @ K for K in amp_damp(0.37)), I2),
+     "atol": 1e-15},
+    {"name": "3.3.2 the coherence of |+> after half damping", "stated": 0.3536,
+     "derive": lambda: _m3_damp_coherence(0.5), "rtol": 2e-4},
+    {"name": "3.3.2 the purity of |+> after half damping", "stated": 0.875,
+     "derive": lambda: purity(_m3_damped(0.5)), "rtol": 1e-12},
+    {"name": "3.3.2 full damping sends every state to |0>", "stated": 0.0,
+     "derive": lambda: dev(_m3_damped(1.0, _M3_MIX), proj(KET0)), "atol": 1e-14},
+    {"name": "3.3.2 the coherence never falls below the population",
+     "stated": 0.0, "derive": _m3_more_coherence_than_population, "atol": 5e-4},
+    {"name": "3.3.3 dephasing multiplies the coherence by 1 - 2p",
+     "stated": 0.25,
+     "derive": lambda: abs(_m3_dephased(0.25)[0, 1]), "rtol": 1e-12},
+    {"name": "3.3.3 at p = 1/2 what is left is the diagonal part", "stated": 0.0,
+     "derive": lambda: dev(_m3_dephased(0.5), np.diag(np.diag(proj(KETP)))),
+     "atol": 1e-15},
+    {"name": "3.3.3 at p = 1 the channel is the gate Z", "stated": 0.0,
+     "derive": lambda: dev(_m3_dephased(1.0), Z @ proj(KETP) @ Z), "atol": 1e-15},
+
+    # ---- 3.4 -----------------------------------------------------------
+    {"name": "3.4.1 T2 = 1.5 T1 needs a pure dephasing time of 6 T1",
+     "stated": 1.5, "derive": lambda: _m3_t2_from(1.0, 6.0), "rtol": 1e-12},
+    {"name": "3.4.1 with no pure dephasing T2 is exactly 2 T1", "stated": 2.0,
+     "derive": lambda: _m3_t2_from(1.0, 1e12), "rtol": 1e-11},
+
+    # ---- 3.5 -----------------------------------------------------------
+    {"name": "3.5.2 the reduced state of a Bell pair is I/2", "stated": 0.0,
+     "derive": lambda: dev(_m3_reduced(BELL_PHI_P), I2 / 2), "atol": 1e-15},
+    {"name": "3.5.3 the Bell pair itself is pure", "stated": 1.0,
+     "derive": lambda: purity(proj(BELL_PHI_P)), "rtol": 1e-12},
+    {"name": "3.5.3 each half has purity one half", "stated": 0.5,
+     "derive": lambda: purity(_m3_reduced(BELL_PHI_P)), "rtol": 1e-12},
+    {"name": "3.5.3 a product pair has a pure half", "stated": 1.0,
+     "derive": lambda: purity(_m3_reduced(np.kron(KETP, KET0))), "rtol": 1e-12},
+
+    # ---- 3.6 -----------------------------------------------------------
+    {"name": "3.6.1 the four equal amplitudes are |+> (x) |+>", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         np.full(4, 0.5, dtype=complex) - np.kron(KETP, KETP))),
+     "atol": 1e-15},
+    {"name": "3.6.1 the separability determinant of a Bell state", "stated": 0.5,
+     "derive": lambda: abs(BELL_PHI_P[0] * BELL_PHI_P[3]
+                           - BELL_PHI_P[1] * BELL_PHI_P[2]),
+     "rtol": 1e-12},
+    {"name": "3.6.2 the larger Schmidt coefficient of the lopsided pair",
+     "stated": 0.75,
+     "derive": lambda: float(np.linalg.eigvalsh(_m3_reduced(_M3_UNEQUAL))[1]),
+     "rtol": 1e-12},
+    {"name": "3.6.2 the purity of its reduced state", "stated": 0.625,
+     "derive": lambda: purity(_m3_reduced(_M3_UNEQUAL)), "rtol": 1e-12},
+    {"name": "3.6.3 the SVD route and the partial trace agree", "stated": 0.0,
+     "derive": lambda: _m3_svd_matches_trace(_M3_UNEQUAL), "atol": 1e-14},
+
+    # ---- 3.7 -----------------------------------------------------------
+    {"name": "3.7.1 the entropy of the lopsided pair, in bits", "stated": 0.811,
+     "derive": lambda: von_neumann(_m3_reduced(_M3_UNEQUAL)), "rtol": 1e-3},
+    {"name": "3.7.1 a Bell pair carries one ebit", "stated": 1.0,
+     "derive": lambda: von_neumann(_m3_reduced(BELL_PHI_P)), "rtol": 1e-12},
+    {"name": "3.7.1 a product pair carries none", "stated": 0.0,
+     "derive": lambda: von_neumann(_m3_reduced(np.kron(KETP, KET0))),
+     "atol": 1e-9},
+    {"name": "3.7.1 one bit is the most two qubits can carry", "stated": 1.0,
+     "derive": _m3_binary_entropy_max, "rtol": 1e-8},
+
+    # ---- 3.8 -----------------------------------------------------------
+    {"name": "3.8.1 <X (x) X> on the Bell state", "stated": 1.0,
+     "derive": lambda: float(np.vdot(BELL_PHI_P,
+                                     kron(X, X) @ BELL_PHI_P).real),
+     "rtol": 1e-12},
+    {"name": "3.8.1 <Y (x) Y> on the Bell state", "stated": -1.0,
+     "derive": lambda: float(np.vdot(BELL_PHI_P,
+                                     kron(Y, Y) @ BELL_PHI_P).real),
+     "rtol": 1e-12},
+    {"name": "3.8.1 <Z (x) Z> on the Bell state", "stated": 1.0,
+     "derive": lambda: float(np.vdot(BELL_PHI_P,
+                                     kron(Z, Z) @ BELL_PHI_P).real),
+     "rtol": 1e-12},
+    {"name": "3.8.1 <X (x) X> on the classical mixture", "stated": 0.0,
+     "derive": lambda: float(np.trace(
+         (0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+          + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex)))
+         @ kron(X, X)).real),
+     "atol": 1e-15},
+    {"name": "3.8.3 the CHSH value at the four stated directions",
+     "stated": 2 * math.sqrt(2),
+     "derive": lambda: _m3_chsh(BELL_PHI_P, 0.0, 90.0, 45.0, -45.0),
+     "rtol": 1e-12},
+    {"name": "3.8.3 the caption's symmetric family peaks at 45 degrees",
+     "stated": 2 * math.sqrt(2),
+     "derive": lambda: max(_m3_chsh(BELL_PHI_P, 0.0, 90.0, f, -f)
+                           for f in np.linspace(0.0, 90.0, 9001)),
+     "rtol": 1e-6},
+    {"name": "3.8.4 no local measurement moves the other reduced state",
+     "stated": 0.0,
+     "derive": lambda: max(_m3_nosignal(float(d))
+                           for d in np.linspace(0.0, 180.0, 181)),
+     "atol": 1e-14},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_scenes — chapters 1 and 2, teaching scenes")
+    main(CHECKS, "verify_scenes — chapters 1 to 3, teaching scenes")

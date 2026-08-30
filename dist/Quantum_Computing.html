@@ -1829,7 +1829,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.3',
+    version:'0.4',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
@@ -1932,14 +1932,14 @@ const CONTENT = {
     shots:{ s:'N_{\\text{shots}}', d:'The number of repetitions a circuit is run for. A probability read from $N$ shots carries a standard error of about $\\sqrt{p(1-p)/N}$, which is sampling noise and not physical noise.' },
 
     /* Chapter 3 — mixed states and entanglement */
-    rho:{ s:'\\rho', d:'Density operator: positive semidefinite, Hermitian, unit trace. It describes a state that is either genuinely mixed or a piece of a larger entangled state.' },
-    purity:{ s:'\\operatorname{Tr}\\rho^2', d:'Purity. Equal to one for a pure state and as low as $1/d$ for the maximally mixed state of dimension $d$.' },
-    kraus:{ s:'\\mathcal{E}(\\rho)=\\sum_k K_k\\rho K_k^{\\dagger}', d:'A quantum channel in Kraus form, with $\\sum_k K_k^{\\dagger}K_k=I$. This is what a gate becomes once the system is no longer closed.' },
-    ptrace:{ s:'\\operatorname{Tr}_B', d:'Partial trace: the operation that answers "what is the state of $A$ alone". Its result is mixed exactly when $A$ and $B$ are entangled.' },
-    schmidt:{ s:'\\lambda_i', d:'Schmidt coefficients of a bipartite pure state. One non-zero coefficient means the state is a product; more than one means it is entangled.' },
-    vn:{ s:'S(\\rho)', d:'Von Neumann entropy, $-\\operatorname{Tr}\\rho\\log_2\\rho$, in bits. For a pure state it is zero, and for the reduced state of an entangled pair it is how much entanglement the pair carries.' },
-    bell:{ s:'|\\Phi^{\\pm}\\rangle,\\;|\\Psi^{\\pm}\\rangle', d:'The four Bell states: an orthonormal basis of two qubits in which every state is maximally entangled.' },
-    tone:{ s:'T_1,\\;T_2', d:'Relaxation and dephasing times. $T_1$ is how long a population survives, $T_2$ how long a relative phase does, and $T_2\\le 2T_1$ always.' },
+    rho:{ s:'\\rho', d:'Density operator: positive semidefinite, Hermitian, unit trace. It describes a state that is either genuinely mixed or a piece of a larger entangled state.', go:'m3-rho' },
+    purity:{ s:'\\operatorname{Tr}\\rho^2', d:'Purity. Equal to one for a pure state and as low as $1/d$ for the maximally mixed state of dimension $d$.', go:'m3-purity' },
+    kraus:{ s:'\\mathcal{E}(\\rho)=\\sum_k K_k\\rho K_k^{\\dagger}', d:'A quantum channel in Kraus form, with $\\sum_k K_k^{\\dagger}K_k=I$. This is what a gate becomes once the system is no longer closed.', go:'m3-kraus' },
+    ptrace:{ s:'\\operatorname{Tr}_B', d:'Partial trace: the operation that answers "what is the state of $A$ alone". Its result is mixed exactly when $A$ and $B$ are entangled.', go:'m3-ptrace' },
+    schmidt:{ s:'\\lambda_i', d:'Schmidt coefficients of a bipartite pure state. One non-zero coefficient means the state is a product; more than one means it is entangled.', go:'m3-schmidt' },
+    vn:{ s:'S(\\rho)', d:'Von Neumann entropy, $-\\operatorname{Tr}\\rho\\log_2\\rho$, in bits. For a pure state it is zero, and for the reduced state of an entangled pair it is how much entanglement the pair carries.', go:'m3-entropy' },
+    bell:{ s:'|\\Phi^{\\pm}\\rangle,\\;|\\Psi^{\\pm}\\rangle', d:'The four Bell states: an orthonormal basis of two qubits in which every state is maximally entangled.', go:'m3-bell' },
+    tone:{ s:'T_1,\\;T_2', d:'Relaxation and dephasing times. $T_1$ is how long a population survives, $T_2$ how long a relative phase does, and $T_2\\le 2T_1$ always.', go:'m3-t1t2' },
 
     /* Chapter 4 — the Bloch sphere and quantum gates */
     bloch:{ s:'\\mathbf{r}', d:'Bloch vector, $r_a=\\operatorname{Tr}(\\rho\\,\\sigma_a)$ for $a=x,y,z$. Its length is one for a pure state and less for a mixed one, so the sphere is really a ball.' },
@@ -3806,6 +3806,307 @@ Object.assign(LABS, (function(){
   })();
 
   return { C, D };
+})());
+
+</script>
+<script>
+/* ==== 73_labs_m3.js ==== */
+/* ==========================================================================
+   Module 3 laboratories.
+
+   E · A channel applied to the ball of states — the reader chooses a pure
+       input and one of the three elementary qubit channels, and watches both
+       the state and the whole set of states deform. The rim of the ball is
+       carried along point by point, so the contraction is visible as a shape
+       rather than asserted as a number.
+   F · CHSH — four measurement directions in one plane, the four correlations
+       they produce on a Bell pair, and the one number they combine into,
+       against the bound no model with pre-existing values can pass.
+
+   Both compute from the definitions at interaction time. Every Bloch-plane
+   figure here is isotropic — equal pixels to the unit on both axes — because
+   in both laboratories an angle and the roundness of a circle are the claim
+   being made, and an anisotropic frame would draw a false one.
+   ========================================================================== */
+Object.assign(LABS, (function(){
+  const T = LABS.KIT.T, fmt = LABS.KIT.F;
+  const P = PLOT;
+  const D2R = Math.PI/180;
+
+  /* A square Bloch-plane frame: 300 px over a span of 3.00 on both axes, so
+     one unit is 100 px in either direction and the rim is a circle. */
+  const disc = () => P.Axes({w:360,h:360,xr:[-1.5,1.5],yr:[-1.5,1.5],
+    pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+    grid:false, zeroAxes:false, arrows:false});
+
+  /* The frame of every such figure: the rim of the ball and the two axes it is
+     read against. Drawn first, so the data sits over it. */
+  function frame(a){
+    const ring=[]; for(let i=0;i<=200;i++){ const t=2*Math.PI*i/200;
+      ring.push([Math.sin(t),Math.cos(t)]); }
+    a.poly(ring,{color:P.COL.grid,width:1.5});
+    a.poly([[-1.3,0],[1.3,0]],{color:P.COL.rule,width:1.1});
+    a.poly([[0,-1.3],[0,1.3]],{color:P.COL.rule,width:1.1});
+    /* The two axis names sit past the far end of every arm — an arm reaches at
+       most radius 1.28 — and off the axes themselves, so no measurement
+       direction can ever land on one. */
+    a.note(1.42,-0.20,'x',{fs:13,color:P.COL.muted,anchor:'middle',tex:true});
+    a.note(0.20,1.42,'z',{fs:13,color:P.COL.muted,anchor:'middle',tex:true});
+    return a;
+  }
+
+  /* =======================================================================
+     E · A CHANNEL APPLIED TO THE BALL OF STATES
+
+     The input is the pure state at polar angle theta in the z-x plane, so its
+     Bloch vector is (sin theta, 0, cos theta). Each channel is applied as its
+     action on that vector, derived once from the Kraus operators:
+
+        depolarising      r -> (1 - p) r
+        amplitude damping (rx, rz) -> (sqrt(1-p) rx,  p + (1-p) rz)
+        phase damping     rx -> (1 - 2p) rx,   rz unchanged
+
+     Nothing is tabulated: the rim of the ball is the image of the unit circle
+     under the same map, computed point by point.
+     ======================================================================= */
+  const E = (() => {
+    let st = { theta:60, str:50, chan:'depol' };
+
+    const par = () => st.str/100;
+
+    /* One channel, acting on a Bloch vector in the plane. The strength is an
+       argument rather than read from the state, so the purity curve can be
+       drawn at every strength without the control moving. */
+    function act(rx, rz, p){
+      if(st.chan==='depol') return [(1-p)*rx, (1-p)*rz];
+      if(st.chan==='damp')  return [Math.sqrt(1-p)*rx, p + (1-p)*rz];
+      return [(1-2*p)*rx, rz];
+    }
+
+    /* The purity of a qubit state from the length of its vector. */
+    const pur = (rx,rz) => 0.5*(1 + rx*rx + rz*rz);
+
+    const NAME = { depol:'depolarising', damp:'amplitude damping', phase:'phase damping' };
+
+    function draw(root){
+      const th = st.theta*D2R;
+      const ix = Math.sin(th), iz = Math.cos(th);
+      const out = act(ix, iz, par());
+      const ox = out[0], oz = out[1];
+      const len = Math.hypot(ox, oz);
+      const gamma = pur(ox, oz);
+      const lo = 0.5*(1-len), hi = 0.5*(1+len);
+
+      /* ---- the ball, its image, and the two states ---- */
+      const a = frame(disc());
+      const img=[]; for(let i=0;i<=200;i++){ const t=2*Math.PI*i/200;
+        const q = act(Math.sin(t), Math.cos(t), par()); img.push([q[0], q[1]]); }
+      a.poly(img,{color:P.COL.h,width:2.0});
+      a.poly([[0,0],[ix,iz]],{color:P.COL.in,width:2.6});
+      a.point(ix,iz,{color:P.COL.in,r:6});
+      a.note(ix,iz,'\\text{in}',{fs:13,color:P.COL.in,dx:9,dy:-6,tex:true});
+      a.poly([[0,0],[ox,oz]],{color:P.COL.out,width:2.6});
+      a.point(ox,oz,{color:P.COL.out,r:6});
+      a.note(ox,oz,'\\text{out}',{fs:13,color:P.COL.out,dx:9,dy:16,tex:true});
+      a.point(0,0,{color:P.COL.err,r:4});
+
+      /* ---- purity against the strength, for this input and this channel ---- */
+      const b = P.Axes({w:430,h:300,xr:[0,1],yr:[0.35,1.08],
+        xlabel:'\\text{strength}', ylabel:'\\operatorname{Tr}\\rho^{2}',
+        pad:{l:66,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+      b.curve(u => { const q = act(ix, iz, u); return pur(q[0], q[1]); },
+        {color:P.COL.in, width:2.4, n:220});
+      b.hline(0.5,{color:P.COL.err,width:1.4,dash:'4 4'});
+      b.vline(par(),{color:P.COL.h,width:1.6,dash:'3 4'});
+      b.point(par(), gamma, {color:P.COL.h, r:6});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${a.svg()}${b.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>Channel</dt><dd>${NAME[st.chan]}</dd></div>
+        <div><dt>Strength</dt><dd>${fmt(par(),3)}</dd></div>
+        <div><dt>Input vector</dt><dd>(${fmt(ix,3)}, 0, ${fmt(iz,3)})</dd></div>
+        <div><dt>Output vector</dt><dd>(${fmt(ox,3)}, 0, ${fmt(oz,3)})</dd></div>
+        <div><dt>Length out</dt><dd>${fmt(len,4)}</dd></div>
+        <div><dt>Purity out</dt><dd class="${gamma>0.999?'okv':'warnv'}">${fmt(gamma,5)}</dd></div>
+        <div><dt>Eigenvalues</dt><dd>${fmt(hi,4)}, ${fmt(lo,4)}</dd></div>
+        <div><dt>Still a state</dt><dd class="${len<=1+1e-9?'okv':'warnv'}">${len<=1+1e-9?'yes':'no'}</dd></div>`;
+
+      const fixed = st.chan==='depol'
+        ? `<div class="note ok"><span class="note-h">One fixed point, at the centre</span>
+             The amber curve is the whole ball after the channel: a circle of radius
+             ${T(fmt(1-par(),3),false)}, shrunk towards ${T('I/2',false)} and not moved anywhere.
+             Every direction is treated alike, so the only state this channel leaves alone is the
+             centre itself. At full strength the ball collapses to that one point and every input
+             gives the same output, which is a channel that has destroyed everything.</div>`
+        : st.chan==='damp'
+        ? `<div class="note warn"><span class="note-h">One fixed point, at the top</span>
+             The ball shrinks and its centre climbs towards ${T('|0\\rangle',false)}: the channel
+             takes energy out and has nowhere to put it back. The only state it leaves alone is
+             ${T('|0\\rangle',false)} itself, at the top of the rim. The image is an ellipse rather
+             than a circle, because the two directions shrink by different amounts —
+             ${T('\\sqrt{1-p}',false)} across and ${T('1-p',false)} along ${T('z',false)} — and it
+             is pushed upwards by ${T('r_{z}\\mapsto p+(1-p)r_{z}',false)}.</div>`
+        : `<div class="note warn"><span class="note-h">A whole line of fixed points</span>
+             The vertical component never moves, so every state on the ${T('z',false)} axis is left
+             exactly as it was and the ball is squashed onto that axis rather than towards a point.
+             This is why a qubit resting in ${T('|0\\rangle',false)} or ${T('|1\\rangle',false)} is
+             untouched by any amount of dephasing, and a qubit in
+             ${T('|{+}\\rangle',false)} is destroyed by it. Past
+             ${T('p=\\tfrac12',false)} the width grows again with the sign reversed: at
+             ${T('p=1',false)} the channel is the gate ${T('Z',false)} and nothing has been lost.</div>`;
+      root.querySelector('.verdict').innerHTML = fixed;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+      root.querySelectorAll('[data-seg=chan]').forEach(x=>
+        x.setAttribute('aria-pressed', String(x.dataset.val===st.chan)));
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Channel <span class="seg">
+                <button data-seg="chan" data-val="depol">Depolarising</button>
+                <button data-seg="chan" data-val="damp">Damping</button>
+                <button data-seg="chan" data-val="phase">Dephasing</button></span></label></div>
+              <div class="ctrl"><label>Input polar angle θ, degrees <span class="val" data-out="theta">60</span></label>
+                <input type="range" data-v="theta" min="0" max="180" step="5" value="60"></div>
+              <div class="ctrl"><label>Strength, per cent <span class="val" data-out="str">50</span></label>
+                <input type="range" data-v="str" min="0" max="100" step="1" value="50"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      root.addEventListener('click', e=>{ const x=e.target.closest('[data-seg=chan]'); if(!x) return;
+        st.chan = x.dataset.val; draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     F · CHSH: FOUR ANGLES AND ONE NUMBER
+
+     Both parties hold one qubit of |Phi+> and each measures along a direction
+     in the z-x plane at angle a from z, so n = (sin a, 0, cos a). For that
+     state
+
+        <(n.sigma) (x) (m.sigma)> = n_x m_x - n_y m_y + n_z m_z = cos(a - b)
+
+     and the CHSH combination is assembled from four such correlations. Both
+     bounds drawn on the sweep are constants of the subject and not of this
+     laboratory: 2 for any model with pre-existing values, 2 sqrt 2 for
+     quantum mechanics.
+     ======================================================================= */
+  const F = (() => {
+    let st = { a0:0, a1:90, b0:45, b1:-45 };
+
+    const corr = (a,b) => Math.cos((a-b)*D2R);
+    const chsh = (a0,a1,b0,b1) =>
+      corr(a0,b0) + corr(a0,b1) + corr(a1,b0) - corr(a1,b1);
+
+    function draw(root){
+      const { a0, a1, b0, b1 } = st;
+      const E00 = corr(a0,b0), E01 = corr(a0,b1),
+            E10 = corr(a1,b0), E11 = corr(a1,b1);
+      const S = E00 + E01 + E10 - E11;
+      const TS = 2*Math.SQRT2;
+
+      /* ---- the four directions, drawn where they actually point ---- */
+      const a = frame(disc());
+      const arms = [[a0,'A_{0}',P.COL.in],[a1,'A_{1}',P.COL.mid],
+                    [b0,'B_{0}',P.COL.h],[b1,'B_{1}',P.COL.out]];
+      arms.forEach(([ang,lab,col],k)=>{
+        const x = Math.sin(ang*D2R), z = Math.cos(ang*D2R);
+        const r = 1.00 - 0.06*k;
+        a.poly([[0,0],[x*r,z*r]],{color:col,width:2.6});
+        a.point(x*r,z*r,{color:col,r:5});
+        /* the name sits beyond the end of its own arm, so it never lands on
+           the marker or on any other arm, which all stop at radius one */
+        a.note(x*(r+0.28), z*(r+0.28), lab, {fs:13,color:col,anchor:'middle',dy:5,tex:true});
+      });
+
+      /* ---- S as the first of the second party's two settings is swept ---- */
+      const b = P.Axes({w:430,h:300,xr:[-180,180],yr:[-3.2,3.2],
+        xlabel:'B_{0}\\,(\\text{degrees})', ylabel:'S',
+        pad:{l:60,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+      b.curve(u => chsh(a0,a1,u,b1), {color:P.COL.in, width:2.4, n:420});
+      b.hline(2,{color:P.COL.err,width:1.6,dash:'5 4'});
+      b.hline(-2,{color:P.COL.err,width:1.6,dash:'5 4'});
+      b.hline(TS,{color:P.COL.out,width:1.2,dash:'2 4'});
+      b.hline(-TS,{color:P.COL.out,width:1.2,dash:'2 4'});
+      b.vline(b0,{color:P.COL.h,width:1.6,dash:'3 4'});
+      b.point(b0, S, {color:P.COL.h, r:6});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${a.svg()}${b.svg()}</div>`;
+
+      const beats = Math.abs(S) > 2 + 1e-12;
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>⟨A₀B₀⟩</dt><dd>${fmt(E00,4)}</dd></div>
+        <div><dt>⟨A₀B₁⟩</dt><dd>${fmt(E01,4)}</dd></div>
+        <div><dt>⟨A₁B₀⟩</dt><dd>${fmt(E10,4)}</dd></div>
+        <div><dt>⟨A₁B₁⟩</dt><dd>${fmt(E11,4)}</dd></div>
+        <div><dt>S</dt><dd class="${beats?'okv':'warnv'}">${fmt(S,5)}</dd></div>
+        <div><dt>Classical bound</dt><dd>2</dd></div>
+        <div><dt>Largest S allowed</dt><dd>${fmt(TS,5)}</dd></div>
+        <div><dt>Beats the bound</dt><dd class="${beats?'okv':'warnv'}">${beats?'yes':'no'}</dd></div>`;
+
+      const near = Math.abs(Math.abs(S) - TS) < 1e-3;
+      const verdict = near
+        ? `<div class="note ok"><span class="note-h">As far as quantum mechanics goes</span>
+             ${T('|S|=2\\sqrt2\\approx 2.8284',false)}, the largest value any quantum state and any
+             measurements can produce. Every one of the four correlations has modulus
+             ${T(fmt(Math.abs(E00),4),false)} here, and three of them add while the fourth is
+             subtracted. Note that no correlation is ${T('\\pm1',false)}: the maximum is not reached
+             by making any single term certain.</div>`
+        : beats
+        ? `<div class="note ok"><span class="note-h">Past the bound, and by how much</span>
+             ${T('|S|='+fmt(Math.abs(S),4),false)} against a classical ceiling of
+             ${T('2',false)}. No assignment of four values ${T('\\pm1',false)} fixed before the
+             settings were chosen reaches this, so the four outcomes did not exist together. The
+             sweep shows how much of the circle does this: the violation is not a knife edge, which
+             is what makes the experiment possible at all.</div>`
+        : `<div class="note warn"><span class="note-h">Inside the classical bound</span>
+             ${T('|S|='+fmt(Math.abs(S),4),false)} is at most ${T('2',false)}, so these four
+             settings prove nothing — a model with pre-existing values reproduces them. That is not
+             a statement about the state, which is the same Bell pair throughout. Bad angles hide a
+             real violation, and finding good ones is a genuine part of running the experiment.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>A₀ angle, degrees <span class="val" data-out="a0">0</span></label>
+                <input type="range" data-v="a0" min="-180" max="180" step="5" value="0"></div>
+              <div class="ctrl"><label>A₁ angle, degrees <span class="val" data-out="a1">90</span></label>
+                <input type="range" data-v="a1" min="-180" max="180" step="5" value="90"></div>
+              <div class="ctrl"><label>B₀ angle, degrees <span class="val" data-out="b0">45</span></label>
+                <input type="range" data-v="b0" min="-180" max="180" step="5" value="45"></div>
+              <div class="ctrl"><label>B₁ angle, degrees <span class="val" data-out="b1">-45</span></label>
+                <input type="range" data-v="b1" min="-180" max="180" step="5" value="-45"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  return { E, F };
 })());
 
 </script>
@@ -6322,6 +6623,1128 @@ window.SCENES_M2 = SC;
 
 </script>
 <script>
+/* ==== 84_scenes_m3.js ==== */
+/* ==========================================================================
+   Module 3 — Mixed states and entanglement.
+
+   Chapters 1 and 2 assumed the system is alone and its state is one vector.
+   Both assumptions fail as soon as a qubit sits next to anything else, and
+   this chapter replaces the vector with an operator that survives.
+
+   Four things in here are the ones students get wrong, and each has a scene of
+   its own. A density operator does not remember which preparation produced it,
+   so two different stories about the same matrix are the same physics. A part
+   of a pure whole is genuinely mixed, and that mixedness is not noise and not
+   ignorance about a classical fact. A channel is not a mistake in the theory;
+   it is what a unitary looks like when part of the world is ignored. And a
+   Bell correlation is not a signal: the reduced state of one qubit does not
+   move when the other is measured, and no message crosses.
+
+   The chapter is written so that it can be read after chapter 4 as well as
+   before it, which is what the course map promises. Nothing in it needs the
+   Bloch sphere; where a picture of the ball helps, it is drawn as a
+   cross-section and derived from the three Pauli means chapter 2 already has.
+   ========================================================================== */
+(function(){
+const P = PLOT, C = P.COL;
+const R2 = Math.SQRT1_2;
+
+/* ---------------------------------------------------------------- figures --
+   Each is a function, so the palette is the one in force when it is drawn. */
+
+/* Why a vector is not enough: one pure state of a pair, and the part of it
+   that has no vector of its own. */
+function figWhy(){
+  return P.blocks({w:740,h:210,items:[
+    {t:'box',x:40,y:44,w:300,h:110,label:''},
+    {t:'box',x:70,y:70,w:110,h:58,label:'A',tex:true,fs:16,color:C.in},
+    {t:'box',x:200,y:70,w:110,h:58,label:'B',tex:true,fs:16,color:C.mid},
+    {t:'text',x:190,y:32,label:'one pure state of the pair',fs:12},
+    {t:'arrow',x1:340,y1:99,x2:440,y2:99,label:'ignore B'},
+    {t:'box',x:440,y:70,w:170,h:58,label:'\\rho_{A}',tex:true,fs:18,color:C.out},
+    {t:'text',x:525,y:180,label:'a matrix, because no vector describes it',fs:12},
+    {t:'text',x:190,y:180,label:'a vector describes this',fs:12}
+  ]});
+}
+
+/* The one-qubit density matrix, with its four entries named. The diagonal is
+   what a computational-basis reading returns; the off-diagonal is what an X or
+   a Y reading sees, and it is the only place a relative phase survives. */
+function figRho(){
+  return P.blocks({w:740,h:250,items:[
+    {t:'box',x:200,y:46,w:150,h:70,label:'p_{0}',tex:true,fs:18,color:C.in},
+    {t:'box',x:350,y:46,w:150,h:70,label:'c',tex:true,fs:18,color:C.mid},
+    {t:'box',x:200,y:116,w:150,h:70,label:'c^{*}',tex:true,fs:18,color:C.mid},
+    {t:'box',x:350,y:116,w:150,h:70,label:'p_{1}',tex:true,fs:18,color:C.in},
+    {t:'text',x:275,y:36,label:'|0\\rangle',tex:true,fs:13},
+    {t:'text',x:425,y:36,label:'|1\\rangle',tex:true,fs:13},
+    {t:'text',x:190,y:88,anchor:'end',label:'\\langle 0|',tex:true,fs:13},
+    {t:'text',x:190,y:158,anchor:'end',label:'\\langle 1|',tex:true,fs:13},
+    {t:'text',x:275,y:222,label:'populations',fs:12,color:C.in},
+    {t:'text',x:425,y:222,label:'coherences',fs:12,color:C.mid},
+    {t:'text',x:520,y:80,anchor:'start',label:'what a Z reading returns',fs:12},
+    {t:'text',x:520,y:158,anchor:'start',label:'what an X or Y reading sees',fs:12}
+  ]});
+}
+
+/* Which qubit matrices are states. With a real coherence the condition is one
+   inequality, and the region it cuts out is a half disc. Isotropic, because
+   the shape of that region is the claim. */
+function figPhysical(){
+  /* 400 px over an x span of 1.60 and 150 px over a y span of 0.60: both
+     250 px to the unit, so the boundary is a genuine half circle. */
+  const a = P.Axes({w:480,h:224,xr:[-0.30,1.30],yr:[-0.05,0.55],
+    pad:{l:56,r:24,t:30,b:44},
+    xticksOverride:[0,0.25,0.5,0.75,1], yticksOverride:[0,0.25,0.5],
+    grid:false, zeroAxes:true, arrows:false});
+  a.area(p => Math.sqrt(Math.max(0,p*(1-p))), 0, 1, {color:C.dec.in});
+  const arc=[]; for(let i=0;i<=160;i++){ const p=i/160; arc.push([p, Math.sqrt(Math.max(0,p*(1-p)))]); }
+  a.poly(arc,{color:C.in,width:2.4});
+  a.point(0.55,0.20,{color:C.out,r:6});
+  a.note(0.55,0.20,'\\text{a state}',{fs:12.5,color:C.out,dx:12,dy:26,tex:true});
+  a.point(0.85,0.45,{color:C.err,r:6});
+  a.note(1.00,0.45,'\\text{not a state}',{fs:12.5,color:C.err,dy:5,tex:true});
+  a.note(1.26,0,'p_{0}',{fs:13,color:C.ink,anchor:'end',dy:34,tex:true});
+  a.note(-0.28,0.30,'|c|',{fs:13,color:C.ink,dy:0,tex:true});
+  return a.svg();
+}
+
+/* Purity against the mixing of two orthogonal states. One at the ends, one
+   half in the middle, and never below it for a qubit. */
+function figPurity(){
+  const a = P.Axes({w:560,h:250,xr:[0,1],yr:[0.35,1.08],
+    xlabel:'p', ylabel:'\\operatorname{Tr}\\rho^{2}',
+    pad:{l:64,r:24,t:26,b:46}, xtarget:4, ytarget:4});
+  a.curve(p => (1-p)*(1-p) + p*p, {color:C.in, width:2.4});
+  a.hline(0.5,{color:C.err, width:1.4, dash:'4 4'});
+  a.point(0.5,0.5,{color:C.err,r:6});
+  a.note(0.5,0.5,'\\text{maximally mixed}',{fs:12.5,color:C.err,anchor:'middle',dy:-12,tex:true});
+  a.point(0,1,{color:C.out,r:6});
+  a.point(1,1,{color:C.out,r:6});
+  return a.svg();
+}
+
+/* A cross-section of the set of qubit states: the disc of Bloch vectors, with
+   a pure state on the rim, a mixed one inside and the maximally mixed state at
+   the centre. Isotropic, because the rim is a circle and the length of the
+   vector is the whole quantity. */
+function figBall(){
+  /* 400 px over an x span of 5.52 and 174 px over a y span of 2.40: both
+     72.5 px to the unit, so the rim is round. The frame is far wider than the
+     ball needs, and the three labels go in the space beside it. */
+  const a = P.Axes({w:452,h:226,xr:[-2.76,2.76],yr:[-1.20,1.20],
+    pad:{l:26,r:26,t:26,b:26}, xticksOverride:[], yticksOverride:[],
+    grid:false, zeroAxes:false, arrows:false});
+  const ring=[]; for(let i=0;i<=200;i++){ const t=2*Math.PI*i/200; ring.push([Math.cos(t),Math.sin(t)]); }
+  a.poly(ring,{color:C.grid,width:1.6});
+  a.poly([[-1.18,0],[1.18,0]],{color:C.rule,width:1.1});
+  a.poly([[0,-1.18],[0,1.18]],{color:C.rule,width:1.1});
+  const pu=[Math.cos(0.9),Math.sin(0.9)];
+  a.poly([[0,0],pu],{color:C.in,width:2.6});
+  a.point(pu[0],pu[1],{color:C.in,r:6});
+  a.note(pu[0],pu[1],'\\text{pure}',{fs:13,color:C.in,dx:10,dy:-6,tex:true});
+  const mx=[0.46*Math.cos(-0.6),0.46*Math.sin(-0.6)];
+  a.poly([[0,0],mx],{color:C.mid,width:2.6});
+  a.point(mx[0],mx[1],{color:C.mid,r:6});
+  a.note(mx[0],mx[1],'\\text{mixed}',{fs:13,color:C.mid,dx:10,dy:16,tex:true});
+  a.point(0,0,{color:C.err,r:6});
+  a.note(0,0,'I/2',{fs:13,color:C.err,dx:-10,dy:-12,tex:true,anchor:'end'});
+  a.note(1.22,0,'x',{fs:13,color:C.muted,dx:6,dy:18,tex:true});
+  a.note(0,1.10,'z',{fs:13,color:C.muted,dx:8,tex:true});
+  return a.svg();
+}
+
+/* A channel, drawn as what it is: a unitary on the system together with
+   whatever it touches, and then the rest ignored. */
+function figKraus(){
+  return P.blocks({w:740,h:220,items:[
+    {t:'box',x:20,y:40,w:110,h:56,label:'\\rho',tex:true,fs:18,color:C.in},
+    {t:'box',x:20,y:120,w:110,h:56,label:'environment',fs:12},
+    {t:'arrow',x1:130,y1:68,x2:190,y2:68},
+    {t:'arrow',x1:130,y1:148,x2:190,y2:148},
+    {t:'box',x:190,y:40,w:150,h:136,label:'one unitary',fs:14,color:C.h},
+    {t:'arrow',x1:340,y1:108,x2:400,y2:108},
+    {t:'box',x:400,y:80,w:140,h:56,label:'\\operatorname{Tr}_{E}',tex:true,fs:16},
+    {t:'arrow',x1:540,y1:108,x2:600,y2:108},
+    {t:'box',x:600,y:80,w:120,h:56,label:'\\mathcal{E}(\\rho)',tex:true,fs:16,color:C.out},
+    {t:'text',x:370,y:206,label:'nothing is broken here: a channel is a unitary with part of the world ignored',fs:12}
+  ]});
+}
+
+/* Amplitude damping: the population flows one way and the coherence follows a
+   square root, so a half-damped qubit keeps more coherence than population. */
+function figDamp(){
+  const a = P.Axes({w:560,h:250,xr:[0,1],yr:[0,0.78],
+    xlabel:'\\gamma', ylabel:'\\text{value}',
+    pad:{l:64,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  a.curve(g => 0.5*(1-g), {color:C.in, width:2.4});
+  a.curve(g => 0.5*Math.sqrt(1-g), {color:C.mid, width:2.2, dash:'5 4'});
+  /* The names go in the strip above both curves, which nothing reaches. */
+  a.note(0.30,0.70,'\\rho_{11}',{fs:13,color:C.in,tex:true});
+  a.note(0.62,0.70,'|\\rho_{01}|',{fs:13,color:C.mid,tex:true});
+  return a.svg();
+}
+
+/* Phase damping: the populations do not move at all and the coherence is
+   multiplied by 1 - 2p, which vanishes at one half. */
+function figDephase(){
+  const a = P.Axes({w:560,h:250,xr:[0,1],yr:[0,0.78],
+    xlabel:'p', ylabel:'\\text{value}',
+    pad:{l:64,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  a.curve(() => 0.5, {color:C.in, width:2.4});
+  a.curve(p => 0.5*Math.abs(1-2*p), {color:C.mid, width:2.2, dash:'5 4'});
+  a.point(0.5,0,{color:C.err,r:6});
+  a.note(0.5,0.20,'\\text{coherence gone}',{fs:12.5,color:C.err,anchor:'middle',tex:true});
+  a.note(0.05,0.70,'\\rho_{00},\\rho_{11}',{fs:13,color:C.in,tex:true});
+  a.note(0.80,0.70,'|\\rho_{01}|',{fs:13,color:C.mid,tex:true});
+  return a.svg();
+}
+
+/* Relaxation and dephasing in time, with the ceiling the model imposes on the
+   coherence drawn beside the coherence itself. */
+function figT1T2(){
+  const T2 = 1.5;
+  const a = P.Axes({w:560,h:250,xr:[0,4],yr:[0,1.35],
+    xlabel:'t/T_{1}', ylabel:'\\text{value}',
+    pad:{l:64,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  a.curve(t => Math.exp(-t), {color:C.in, width:2.4});
+  a.curve(t => Math.exp(-t/T2), {color:C.mid, width:2.2, dash:'5 4'});
+  a.curve(t => Math.exp(-t/2), {color:C.grid, width:1.6});
+  /* Three names in one row above everything drawn; all three curves are below
+     0.45 past t = 1.2, so the strip is empty. */
+  a.note(1.15,1.22,'\\rho_{11}',{fs:13,color:C.in,tex:true});
+  a.note(1.95,1.22,'|\\rho_{01}|',{fs:13,color:C.mid,tex:true});
+  a.note(2.85,1.22,'T_{2}=2T_{1}',{fs:12.5,color:C.muted,tex:true});
+  return a.svg();
+}
+
+/* Two qubits: which entry of the column belongs to which pair of bits, under
+   the ordering this course fixes. */
+function figOrder(){
+  const rows = [['|00\\rangle','c_{0}','q_{1}=0,\\,q_{0}=0'],
+                ['|01\\rangle','c_{1}','q_{1}=0,\\,q_{0}=1'],
+                ['|10\\rangle','c_{2}','q_{1}=1,\\,q_{0}=0'],
+                ['|11\\rangle','c_{3}','q_{1}=1,\\,q_{0}=1']];
+  const items = [];
+  rows.forEach(([k,c,d],i)=>{
+    const y = 24 + i*46;
+    items.push({t:'text',x:250,y:y+30,anchor:'end',label:k,tex:true,fs:15});
+    items.push({t:'box',x:268,y:y,w:110,h:40,label:c,tex:true,fs:15,
+      color:i===0?C.in:i===3?C.out:C.mid});
+    items.push({t:'text',x:400,y:y+28,anchor:'start',label:d,tex:true,fs:13});
+  });
+  items.push({t:'text',x:370,y:236,label:'the left qubit is the most significant, so the index is two q1 plus q0',fs:12});
+  return P.blocks({w:740,h:252,items});
+}
+
+/* The partial trace on two qubits, read off the block structure of the joint
+   matrix. Two different reductions, two different operations on the blocks. */
+function figPtrace(){
+  const B=[['M_{00}',60,40],['M_{01}',175,40],['M_{10}',60,150],['M_{11}',175,150]];
+  const items = B.map(([l,x,y])=>({t:'box',x,y,w:105,h:90,label:l,tex:true,fs:15,
+    color:(l==='M_{00}'||l==='M_{11}')?C.in:C.mid}));
+  items.push({t:'text',x:170,y:24,label:'the joint matrix, in blocks',fs:12});
+  items.push({t:'arrow',x1:300,y1:85,x2:370,y2:85});
+  items.push({t:'text',x:380,y:92,anchor:'start',
+    label:'\\rho_{A}=\\begin{bmatrix}\\mathrm{Tr}\\,M_{00}&\\mathrm{Tr}\\,M_{01}\\\\ \\mathrm{Tr}\\,M_{10}&\\mathrm{Tr}\\,M_{11}\\end{bmatrix}',tex:true,fs:13});
+  items.push({t:'text',x:380,y:126,anchor:'start',label:'the trace of each block',fs:12});
+  items.push({t:'arrow',x1:300,y1:195,x2:370,y2:195});
+  items.push({t:'text',x:380,y:202,anchor:'start',label:'\\rho_{B}=M_{00}+M_{11}',tex:true,fs:14});
+  items.push({t:'text',x:380,y:234,anchor:'start',label:'the sum of the diagonal blocks',fs:12});
+  return P.blocks({w:760,h:262,items});
+}
+
+/* A pure pair whose halves are mixed, beside a product pair whose halves are
+   not. Purity is the quantity, and it is computed from the states. */
+function figLocal(){
+  const a = P.Axes({w:560,h:250,xr:[-0.7,3.7],yr:[0,1.14],
+    ylabel:'\\operatorname{Tr}\\rho^{2}', pad:{l:64,r:24,t:30,b:62},
+    xticksOverride:[], ytarget:4});
+  const bar=(n,v,f,l)=>{ a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6}); };
+  bar(0,1,C.dec.in,C.in);   bar(1,0.5,C.dec.err,C.err);
+  bar(2,1,C.dec.in,C.in);   bar(3,1,C.dec.out,C.out);
+  [['pair',0],['half',1],['pair',2],['half',3]].forEach(([t,k])=>
+    a.note(k,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24}));
+  a.note(0.5,0,'|\\Phi^{+}\\rangle',{fs:14,color:C.in,anchor:'middle',dy:48,tex:true});
+  a.note(2.5,0,'|{+}\\rangle\\otimes|0\\rangle',{fs:14,color:C.out,anchor:'middle',dy:48,tex:true});
+  return a.svg();
+}
+
+/* The two Schmidt coefficients of cos(t)|00> + sin(t)|11>, against t. They
+   cross where the state is maximally entangled and one of them vanishes where
+   it is a product. */
+function figSchmidt(){
+  const a = P.Axes({w:560,h:250,xr:[0,Math.PI/2],yr:[0,1.10],
+    xlabel:'\\theta', ylabel:'\\lambda',
+    pad:{l:60,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  a.curve(t => Math.cos(t)**2, {color:C.in, width:2.4});
+  a.curve(t => Math.sin(t)**2, {color:C.mid, width:2.2, dash:'5 4'});
+  a.vline(Math.PI/4,{color:C.err,width:1.6,dash:'3 4'});
+  a.note(Math.PI/4+0.06,1.02,'\\text{maximally entangled}',{fs:12,color:C.err,tex:true});
+  /* Each name sits in the band between the two curves on its own side, where
+     one of them is above 0.77 and the other below 0.24. */
+  a.note(0.25,0.45,'\\lambda_{1}',{fs:13,color:C.in,tex:true});
+  a.note(1.10,0.45,'\\lambda_{2}',{fs:13,color:C.mid,tex:true});
+  return a.svg();
+}
+
+/* How the Schmidt coefficients are actually computed: reshape, then one
+   singular value decomposition. */
+function figSVD(){
+  return P.blocks({w:740,h:220,items:[
+    {t:'box',x:20,y:56,w:150,h:70,label:'c_{0},c_{1},c_{2},c_{3}',tex:true,fs:14,color:C.in},
+    {t:'arrow',x1:170,y1:91,x2:250,y2:91,label:'reshape'},
+    {t:'box',x:250,y:56,w:170,h:70,label:'C=\\begin{bmatrix}c_{0}&c_{1}\\\\c_{2}&c_{3}\\end{bmatrix}',tex:true,fs:14,color:C.h},
+    {t:'arrow',x1:420,y1:91,x2:500,y2:91,label:'SVD'},
+    {t:'box',x:500,y:56,w:210,h:70,label:'s_{1}\\ge s_{2}\\ge 0',tex:true,fs:15,color:C.out},
+    {t:'text',x:95,y:160,label:'the amplitudes',fs:12},
+    {t:'text',x:335,y:160,label:'rows are qubit 1, columns qubit 0',fs:12},
+    {t:'text',x:605,y:160,label:'the Schmidt coefficients',fs:12},
+    {t:'text',x:370,y:200,label:'the number of non-zero singular values is the Schmidt rank',fs:12}
+  ]});
+}
+
+/* The entropy of a two-term Schmidt spectrum. Zero at the ends, where the
+   state is a product, and one bit in the middle. */
+function figEntropy(){
+  const h = l => (l<=0||l>=1) ? 0 : -l*Math.log2(l) - (1-l)*Math.log2(1-l);
+  const a = P.Axes({w:560,h:250,xr:[0,1],yr:[0,1.12],
+    xlabel:'\\lambda_{1}', ylabel:'S\\,(\\text{bits})',
+    pad:{l:64,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  a.curve(h, {color:C.in, width:2.4});
+  a.point(0.5,1,{color:C.out,r:6});
+  a.note(0.5,1,'\\text{one ebit}',{fs:12.5,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.point(0,0,{color:C.err,r:5});
+  a.point(1,0,{color:C.err,r:5});
+  a.note(0.86,0,'\\text{product}',{fs:12.5,color:C.err,anchor:'middle',dy:-12,tex:true});
+  return a.svg();
+}
+
+/* The three Pauli correlations of the Bell state, beside those of the
+   classical mixture that has the same reduced states. */
+function figBell(){
+  const a = P.Axes({w:560,h:260,xr:[-0.7,5.7],yr:[-1.30,1.62],
+    ylabel:'\\langle \\sigma\\otimes\\sigma\\rangle', pad:{l:64,r:24,t:30,b:62},
+    xticksOverride:[], yticksOverride:[-1,-0.5,0.5,1]});
+  const bar=(n,v,f,l)=>{ a.rect(n-0.26,0,n+0.26,v,{fill:f});
+    a.poly([[n-0.26,v],[n+0.26,v]],{color:l,width:2.6}); };
+  bar(0,1,C.dec.in,C.in);   bar(1,-1,C.dec.in,C.in);   bar(2,1,C.dec.in,C.in);
+  bar(3,0,C.dec.err,C.err); bar(4,0,C.dec.err,C.err);  bar(5,1,C.dec.err,C.err);
+  [['XX',0],['YY',1],['ZZ',2],['XX',3],['YY',4],['ZZ',5]].forEach(([t,k])=>
+    a.note(k,0,t,{fs:12,color:C.muted,anchor:'middle',dy:k<3?(k===1?-16:24):24}));
+  /* Both group names go in the strip above the tallest bar, so neither can
+     land on the geometry it is naming. */
+  a.note(1,1.40,'|\\Phi^{+}\\rangle',{fs:14,color:C.in,anchor:'middle',tex:true});
+  a.note(4,1.40,'\\text{classical mixture}',{fs:13,color:C.err,anchor:'middle',tex:true});
+  return a.svg();
+}
+
+/* The assumption a Bell inequality tests: that the four answers exist together
+   before anyone chooses which two to ask for. */
+function figChshBox(){
+  const rows = [['a_{0}=\\pm1',10],['a_{1}=\\pm1',66],['b_{0}=\\pm1',122],['b_{1}=\\pm1',178]];
+  const items = [
+    {t:'box',x:30,y:80,w:120,h:58,label:'\\lambda',tex:true,fs:18,color:C.mid},
+    {t:'text',x:90,y:60,label:'whatever fixed the run',fs:12}
+  ];
+  rows.forEach(([l,y],i)=>{
+    items.push({t:'arrow',x1:150,y1:109,x2:250,y2:y+22});
+    items.push({t:'box',x:250,y:y,w:130,h:44,label:l,tex:true,fs:14,color:C.in});
+  });
+  items.push({t:'text',x:400,y:100,anchor:'start',
+    label:'a_{0}(b_{0}+b_{1}) + a_{1}(b_{0}-b_{1}) = \\pm 2',tex:true,fs:15});
+  items.push({t:'text',x:400,y:132,anchor:'start',label:'one bracket is zero, the other is two',fs:12});
+  items.push({t:'text',x:370,y:248,label:'no assignment of four values escapes the range, so no average does either',fs:12});
+  return P.blocks({w:760,h:262,items});
+}
+
+/* The CHSH combination for one family of measurement angles, against the
+   classical bound and the largest value quantum mechanics allows. */
+function figCHSH(){
+  const a = P.Axes({w:560,h:260,xr:[0,90],yr:[0,3.2],
+    xlabel:'\\varphi\\,(\\text{degrees})', ylabel:'S',
+    pad:{l:60,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  const d = Math.PI/180;
+  a.curve(f => 2*(Math.cos(f*d)+Math.sin(f*d)), {color:C.in, width:2.4});
+  a.hline(2,{color:C.err, width:1.8, dash:'5 4'});
+  a.hline(2*Math.SQRT2,{color:C.out, width:1.4, dash:'2 4'});
+  a.point(45,2*Math.SQRT2,{color:C.out,r:6});
+  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(8,1.28,'\\text{classical bound}',{fs:12.5,color:C.err,tex:true});
+  return a.svg();
+}
+
+/* What one party sees, for three settings of the other. Nothing moves, which
+   is the whole content of no signalling. */
+function figNoSig(){
+  const a = P.Axes({w:560,h:250,xr:[-0.7,5.7],yr:[0,1.12],
+    ylabel:'\\text{probability for A}', pad:{l:64,r:24,t:30,b:62},
+    xticksOverride:[], ytarget:4});
+  const bar=(n,f,l)=>{ a.rect(n-0.26,0,n+0.26,0.5,{fill:f});
+    a.poly([[n-0.26,0.5],[n+0.26,0.5]],{color:l,width:2.6}); };
+  [0,1].forEach(k=>bar(k,C.dec.in,C.in));
+  [2,3].forEach(k=>bar(k,C.dec.mid,C.mid));
+  [4,5].forEach(k=>bar(k,C.dec.out,C.out));
+  [['+1',0],['-1',1],['+1',2],['-1',3],['+1',4],['-1',5]].forEach(([t,k])=>
+    a.note(k,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24}));
+  a.note(0.5,0,'B\\text{ measures }Z',{fs:12.5,color:C.in,anchor:'middle',dy:48,tex:true});
+  a.note(2.5,0,'B\\text{ measures }X',{fs:12.5,color:C.mid,anchor:'middle',dy:48,tex:true});
+  a.note(4.5,0,'B\\text{ does nothing}',{fs:12.5,color:C.out,anchor:'middle',dy:48,tex:true});
+  return a.svg();
+}
+
+/* The chapter as one ladder: each step drops an assumption the step before it
+   was resting on. */
+function figLadder(){
+  return P.blocks({w:740,h:180,items:[
+    {t:'box',x:20,y:44,w:150,h:60,label:'|\\psi\\rangle',tex:true,fs:17,color:C.in},
+    {t:'arrow',x1:170,y1:74,x2:222,y2:74},
+    {t:'box',x:222,y:44,w:150,h:60,label:'\\rho',tex:true,fs:17,color:C.mid},
+    {t:'arrow',x1:372,y1:74,x2:424,y2:74},
+    {t:'box',x:424,y:44,w:150,h:60,label:'\\mathcal{E}(\\rho)',tex:true,fs:16,color:C.h},
+    {t:'arrow',x1:574,y1:74,x2:626,y2:74},
+    {t:'box',x:626,y:44,w:100,h:60,label:'\\operatorname{Tr}_{B}',tex:true,fs:16,color:C.out},
+    {t:'text',x:95,y:132,label:'alone and known',fs:12},
+    {t:'text',x:297,y:132,label:'unknown, or a part',fs:12},
+    {t:'text',x:499,y:132,label:'no longer closed',fs:12},
+    {t:'text',x:676,y:132,label:'no longer whole',fs:12},
+    {t:'text',x:370,y:166,label:'each step drops an assumption the one before it was resting on',fs:12}
+  ]});
+}
+
+const SC = [
+
+/* ---------------------------------------------------------------- 3.0.1 -- */
+{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Two situations no state vector describes',
+  objective:'Name the two situations in which a pure state vector cannot be written, and say what replaces it.',
+  keywords:'mixed state density operator open system subsystem ignorance entanglement module 3 overview',
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:2, blocks:[
+  {t:'eyebrow', text:'Module 3 · Mixed states and entanglement'},
+  {t:'title', text:'Two situations no state vector describes'},
+  {t:'lede', text:'Every state so far has been one normalised vector. That is enough only while the system is alone and the preparation is known exactly. Two ordinary situations break it, and both are the normal case rather than the exception.'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p><b>The preparation is not known.</b> A device emits $|0\\rangle$ half the time and $|1\\rangle$ the other half, and nobody records which. That is not the superposition $\\left(|0\\rangle+|1\\rangle\\right)/\\sqrt2$: the superposition gives a certain answer in the $X$ basis and this device gives a coin there. The two are different physics and no single vector tells them apart.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p><b>The system is part of something larger.</b> Two qubits can be in a pure state of the pair while neither one has a vector of its own. Chapter 2 ended on a version of this: a measurement whose result was thrown away leaves a system that no vector describes.</p>'},
+      {t:'note', kind:'def', head:'What replaces the vector', html:'One matrix, the <b>density operator</b> $\\rho$. It is built out of the same objects chapter 1 already has — outer products of states — and it covers the pure case as well, so nothing is lost by using it everywhere.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figWhy(),
+      caption:'A pure state of a pair, and the half of it that has no vector. This is not a failure of the mathematics and not an approximation: no vector exists that gives the right answer to every measurement on $A$ alone, and a matrix does.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'warn', head:'The two cases feel different and are not', html:'The first is ignorance about a classical fact and the second is not — the pair is completely known. Yet the two produce the same matrix for the part, and every prediction about that part agrees. This chapter shows why that is a feature: what can be predicted is exactly what the matrix carries, and nothing more.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.1.1 -- */
+{ id:'m3-rho', module:'M3', nav:'The density operator', title:'The density operator, and what its four entries are',
+  objective:'Write the density operator of a pure state and of a mixture, and name the meaning of each entry.',
+  keywords:'density operator density matrix outer product ensemble populations coherences mixture pure state',
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · The density operator'},
+  {t:'title', text:'The density operator, and what its four entries are'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>For a pure state the definition is one outer product, and chapter 1 built that construction already:</p>'},
+    {t:'eq', key:true, tex:'\\rho_{\\psi} = |\\psi\\rangle\\langle\\psi|'},
+    {t:'body', html:'<p>For a preparation that produces $|\\psi_{i}\\rangle$ with classical probability $p_{i}$, the operator is the weighted sum of those:</p>'},
+    {t:'eq', key:true, tex:'\\rho = \\sum_{i} p_{i}\\,|\\psi_{i}\\rangle\\langle\\psi_{i}|, \\qquad p_{i}\\ge 0, \\qquad \\sum_{i} p_{i} = 1'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The weights are ordinary probabilities: they describe a classical coin deciding which state was made, and they are added, not superposed. A superposition of two states is a third state; a mixture of two states is neither of them and is not a vector at all.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figRho(),
+      caption:'The four entries of a one-qubit density matrix. The diagonal holds the probabilities a computational-basis reading returns. The off-diagonal holds the coherence, and it is the only place a relative phase survives — which is why an $X$ or a $Y$ reading is the one that sees it.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\psi\\rangle=\\tfrac{1}{\\sqrt2}\\left(|0\\rangle+i|1\\rangle\\right)$.'],
+        ['Work', '$c_{0}=1/\\sqrt2$ and $c_{1}=i/\\sqrt2$, so $c_{0}c_{1}^{*}=-i/2$.'],
+        ['Answer', '$\\rho=\\tfrac12\\begin{bmatrix}1&-i\\\\i&1\\end{bmatrix}$.'],
+        ['Check', 'The trace is one, and $\\rho^{2}=\\rho$, which is what a pure state must satisfy.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'ok', head:'The global phase disappears by itself', html:'Replacing $|\\psi\\rangle$ by $e^{i\\gamma}|\\psi\\rangle$ leaves $\\rho$ unchanged, because the two phases meet as $e^{i\\gamma}e^{-i\\gamma}$. The convention of chapter 1 — that a global phase is not physical — stops being a convention here and becomes a property of the object. The relative phase, in the off-diagonal entry, survives untouched.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.1.2 -- */
+{ id:'m3-physical', module:'M3', nav:'Which matrices are states', title:'Which matrices are physical states, and which are not',
+  objective:'Test a candidate matrix against the three conditions and say which one a given matrix fails.',
+  keywords:'hermitian positive semidefinite trace one physical density matrix eigenvalues test coherence bound',
+  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · The density operator'},
+  {t:'title', text:'Which matrices are physical states, and which are not'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Not every square matrix is a state. Three conditions are needed, and each one is there to protect a probability:</p>'},
+    {t:'eq', key:true, tex:'\\rho = \\rho^{\\dagger}, \\qquad \\rho \\succeq 0, \\qquad \\operatorname{Tr}\\rho = 1'},
+    {t:'body', html:'<p>Hermiticity makes every expectation value real. Positivity, meaning $\\langle v|\\rho|v\\rangle\\ge 0$ for every $|v\\rangle$, makes every probability non-negative. Unit trace makes them add to one. Together the eigenvalues of $\\rho$ are a probability distribution.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>For one qubit the three collapse to one inequality on the coherence. With $\\rho_{00}=p_{0}$ and $\\rho_{11}=1-p_{0}$, positivity says the determinant is not negative:</p>'},
+      {t:'eq', tex:'\\left|\\rho_{01}\\right|^{2} \\;\\le\\; p_{0}\\left(1-p_{0}\\right)'},
+      {t:'small', html:'So the coherence is capped by the populations, and a state whose populations are lopsided cannot carry much of it. That is a real physical statement, not bookkeeping: a nearly-certain qubit is nearly incoherent.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figPhysical(),
+      caption:'Every one-qubit matrix with a real coherence, drawn as a point. The shaded half disc is the physical region and the curve is its edge, where the matrix is pure. The point above the curve is Hermitian and has trace one, and is still not a state.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$M=\\begin{bmatrix}0.5&0.8\\\\0.8&0.5\\end{bmatrix}$. Is it a state?'],
+        ['Work', 'It is Hermitian and its trace is one, so the first two tests pass. Its eigenvalues are $0.5\\pm 0.8$.'],
+        ['Answer', 'No: one eigenvalue is $-0.3$, so $M\\succeq 0$ fails.'],
+        ['Check', 'The inequality says the same thing faster: $|\\rho_{01}|$ may be at most $\\sqrt{0.5\\times 0.5}=0.5$, and $0.8$ is larger.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'Two tests are not three', html:'Hermitian with unit trace is easy to arrange and means nothing on its own. Positivity is the condition that is actually restrictive, and it is the one skipped: a matrix estimated from noisy measured data very often fails it by a small amount, and every tomography routine has to project back onto the physical set. A reported state with a negative eigenvalue is a report that has not finished.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.1.3 -- */
+{ id:'m3-expect', module:'M3', nav:'Predictions from the matrix', title:'Every prediction, from one trace',
+  objective:'Compute an outcome probability and an expectation value from a density operator.',
+  keywords:'trace rho A expectation probability povm effects cyclicity born rule mixed state prediction',
+  src:'L6 · expectation values and measurement probabilities', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · The density operator'},
+  {t:'title', text:'Every prediction, from one trace'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The Born rule and the expectation value of chapter 2 both have one-line replacements, and both work for pure and mixed states without a change of case:</p>'},
+    {t:'eq', key:true, tex:'\\langle A\\rangle = \\operatorname{Tr}\\left(\\rho A\\right), \\qquad p(m) = \\operatorname{Tr}\\left(\\rho E_{m}\\right)'},
+    {t:'body', html:'<p>The derivation is one move — the trace does not care about the order of a product, as long as the order is only rotated:</p>'},
+    {t:'eq', tex:'\\operatorname{Tr}\\left(|\\psi\\rangle\\langle\\psi|A\\right) = \\langle\\psi|A|\\psi\\rangle'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'Apply that term by term to $\\rho=\\sum_{i}p_{i}|\\psi_{i}\\rangle\\langle\\psi_{i}|$ and the result is $\\sum_{i}p_{i}\\langle\\psi_{i}|A|\\psi_{i}\\rangle$: the quantum average inside each branch, then the classical average over branches. Two kinds of uncertainty, one formula, and the formula never says which is which.'}
+    ]}
+  ], right:[
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$\\rho=\\tfrac12|0\\rangle\\langle 0|+\\tfrac12|{+}\\rangle\\langle {+}|$.'],
+        ['Work', 'The matrix is $\\begin{bmatrix}0.75&0.25\\\\0.25&0.25\\end{bmatrix}$.'],
+        ['Answer', '$\\langle Z\\rangle=0.75-0.25=0.5$ and $\\langle X\\rangle=0.25+0.25=0.5$, while $\\langle Y\\rangle=0$.'],
+        ['Check', 'By branches: $\\langle Z\\rangle=\\tfrac12(1)+\\tfrac12(0)=0.5$ and $\\langle X\\rangle=\\tfrac12(0)+\\tfrac12(1)=0.5$. Same numbers, and no matrix was multiplied.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'ok', head:'This is the whole reason the object is useful', html:'$\\rho$ carries exactly what is needed to predict every measurement on the system and nothing else. It is not a shorthand for a longer story about which state was really made; it is the complete answer to every question that can be asked of the system alone. The next scene is the sharpest form of that statement.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.1.4 -- */
+{ id:'m3-ensemble', module:'M3', nav:'Ensembles are not unique', title:'One matrix, many preparations, and no experiment between them',
+  objective:'Show two different ensembles with the same density operator and say what follows.',
+  keywords:'ensemble decomposition not unique maximally mixed identity over two operationally identical preparation',
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · The density operator'},
+  {t:'title', text:'One matrix, many preparations, and no experiment between them'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A density operator does not remember how it was made. The plainest example is the maximally mixed qubit, which two very different devices produce:</p>'},
+    {t:'eq', key:true, tex:'\\frac{I}{2} = \\tfrac12\\left(|0\\rangle\\langle 0| + |1\\rangle\\langle 1|\\right) = \\tfrac12\\left(|{+}\\rangle\\langle {+}| + |{-}\\rangle\\langle {-}|\\right)'},
+    {t:'body', html:'<p>One device flips a coin and emits $|0\\rangle$ or $|1\\rangle$. The other flips a coin and emits $|{+}\\rangle$ or $|{-}\\rangle$. The matrices are equal, so by the last scene every prediction about them is equal too.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'What "operationally identical" means', html:'No measurement, no sequence of measurements, and no number of copies distinguishes the two devices. They are the same state of knowledge about the system, whatever the engineer who built them believes. Where two preparations give different matrices, some measurement tells them apart; where they give the same matrix, none does.'}
+    ]}
+  ], right:[
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', 'The two devices above, and a $Z$ measurement.'],
+        ['Work', 'The first gives $0$ or $1$ with probability $\\tfrac12$ each, directly. The second emits $|{\\pm}\\rangle$, and each of those gives $0$ or $1$ with probability $\\tfrac12$.'],
+        ['Answer', 'The same distribution, $\\tfrac12$ and $\\tfrac12$.'],
+        ['Check', 'Now try $X$. The second device gives a certain answer inside each branch, but the branch itself was a coin, so the answer is a coin again. Every basis is a coin, which is exactly what $I/2$ says.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Where this is misread', html:'"The qubit really was in $|0\\rangle$ or $|1\\rangle$, we just do not know which" is a story, not a fact, and the second device shows it is not forced. Nothing in the mathematics picks a preferred decomposition, and no experiment does either. The matrix is the physics; the ensemble behind it is a description of a laboratory.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.2.1 -- */
+{ id:'m3-purity', module:'M3', nav:'Purity', title:'Purity: one number that says how mixed a state is',
+  objective:'Compute the purity of a state and place it between its two bounds.',
+  keywords:'purity trace rho squared bounds maximally mixed pure state rank one idempotent dimension',
+  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Purity and the ball'},
+  {t:'title', text:'Purity: one number that says how mixed a state is'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The single most useful number about a density operator is the trace of its square:</p>'},
+    {t:'eq', key:true, tex:'\\gamma = \\operatorname{Tr}\\left(\\rho^{2}\\right) = \\sum_{k}\\lambda_{k}^{2}, \\qquad \\frac{1}{d} \\le \\gamma \\le 1'},
+    {t:'body', html:'<p>The upper bound is reached exactly by pure states, where one eigenvalue is one and the rest are zero — equivalently $\\rho^{2}=\\rho$, or $\\rho$ has rank one. The lower bound belongs to the maximally mixed state $I/d$, whose eigenvalues are all $1/d$.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'Purity is cheap to compute and needs no diagonalisation: $\\operatorname{Tr}(\\rho^{2})$ is the sum of the squared moduli of all the entries. For one qubit that is $p_{0}^{2}+p_{1}^{2}+2|\\rho_{01}|^{2}$, and it can be read off the matrix by eye.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figPurity(),
+      caption:'The purity of the mixture $(1-p)|0\\rangle\\langle 0| + p|1\\rangle\\langle 1|$. It is one at both ends, where the preparation is certain, and one half in the middle, where the coin is fair. For a qubit nothing can go below one half.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$\\rho=\\begin{bmatrix}0.75&0.25\\\\0.25&0.25\\end{bmatrix}$, the state of the last section.'],
+        ['Work', '$0.75^{2}+0.25^{2}+2(0.25)^{2}=0.5625+0.0625+0.125$.'],
+        ['Answer', '$\\gamma=0.75$: mixed, but much closer to pure than to $I/2$.'],
+        ['Check', 'Its eigenvalues are about $0.854$ and $0.146$, and $0.854^{2}+0.146^{2}=0.75$. Two routes, one number.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Purity does not identify a state', html:'It is one number and a qubit state needs three. For a qubit the trace and the purity fix the two eigenvalues but say nothing about the eigenbasis, so a whole family of states shares one purity. In three dimensions and above even the spectrum is not pinned down by it. Purity says <b>how</b> mixed, never <b>which</b> state.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.2.2 -- */
+{ id:'m3-ball', module:'M3', nav:'The ball of qubit states', title:'A qubit state is a vector of length at most one',
+  objective:'Write a qubit density operator in the Pauli basis and read purity off the length of its vector.',
+  keywords:'bloch vector ball pauli expansion length purity eigenvalues mixed inside sphere surface qubit',
+  src:'L6 · example: a pure qubit', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Purity and the ball'},
+  {t:'title', text:'A qubit state is a vector of length at most one'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The three Pauli means chapter 2 collected into a vector are not a summary of a qubit state: they <b>are</b> the state. The four matrices $I,X,Y,Z$ span every two-by-two matrix, and the trace condition fixes the coefficient of $I$.</p>'},
+    {t:'eq', key:true, tex:'\\rho = \\tfrac12\\left(I + \\mathbf{r}\\cdot\\boldsymbol\\sigma\\right), \\qquad r_{a} = \\operatorname{Tr}\\left(\\rho\\,\\sigma_{a}\\right)'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', key:true, tex:'\\lambda_{\\pm} = \\tfrac12\\left(1 \\pm \\left|\\mathbf{r}\\right|\\right), \\qquad \\operatorname{Tr}\\rho^{2} = \\tfrac12\\left(1 + \\left|\\mathbf{r}\\right|^{2}\\right)',
+        note:'Positivity is now the single statement $|\\mathbf{r}|\\le 1$, so the set of qubit states is a solid ball: pure states on the surface, mixed states inside, $I/2$ at the centre.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figBall(),
+      caption:'A flat cross-section through that ball. A pure state reaches the rim, a mixed one falls short, and $I/2$ sits at the centre with no direction at all. Chapter 4 draws the whole sphere; here only the length matters.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$\\rho=\\begin{bmatrix}0.75&0.25\\\\0.25&0.25\\end{bmatrix}$ again.'],
+        ['Work', '$r_{z}=0.5$, $r_{x}=2(0.25)=0.5$, $r_{y}=0$, so $|\\mathbf{r}|=\\sqrt{0.5}\\approx 0.707$.'],
+        ['Check', '$\\tfrac12(1+0.5)=0.75$, the purity of the last scene, and $\\lambda_{\\pm}=0.854,\\,0.146$ as before.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'The centre is not half way between $|0\\rangle$ and $|1\\rangle$', html:'$\\left(|0\\rangle+|1\\rangle\\right)/\\sqrt2$ is $|{+}\\rangle$, a pure state on the rim. The centre is the <b>mixture</b> of $|0\\rangle$ and $|1\\rangle$. Adding vectors and adding matrices are different operations, and this is the picture in which the difference is impossible to miss.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.3.1 -- */
+{ id:'m3-kraus', module:'M3', nav:'Quantum channels', title:'A channel: what a unitary looks like from inside',
+  objective:'State the Kraus form of a channel and check that it preserves the trace.',
+  keywords:'quantum channel kraus operators cptp completely positive trace preserving operator sum environment',
+  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Quantum channels'},
+  {t:'title', text:'A channel: what a unitary looks like from inside'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Chapter 2 said a closed system evolves by a unitary. A qubit on a chip is not closed. The evolution of an open system is a <b>quantum channel</b>, and every channel can be written as a sum of terms of one shape:</p>'},
+    {t:'eq', key:true, tex:'\\mathcal{E}(\\rho) = \\sum_{k} K_{k}\\,\\rho\\,K_{k}^{\\dagger}, \\qquad \\sum_{k} K_{k}^{\\dagger}K_{k} = I'},
+    {t:'body', html:'<p>The second condition is what keeps the trace at one. Check it directly: $\\operatorname{Tr}\\mathcal{E}(\\rho)=\\sum_{k}\\operatorname{Tr}\\left(K_{k}^{\\dagger}K_{k}\\rho\\right)=\\operatorname{Tr}\\rho$, using the same rotation of the trace as before. A unitary is the one-term case, $K_{0}=U$.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The reason this form is general rather than convenient is the figure: couple the system to an environment, run one unitary on the pair, then ignore the environment. Every $K_{k}$ is one column of that unitary as seen from one final environment state, and every channel arises this way.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figKraus(),
+      caption:'A channel, drawn as what it is. Nothing in the theory has been weakened: the whole is still a closed system running a unitary. What makes the map on $\\rho$ non-unitary is only that part of the result is never looked at.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Completely positive, not merely positive', html:'A channel must send states to states even when the system is one half of an entangled pair that it is applied to alone. That is a stronger requirement than sending states to states on its own, and it is the reason for the word <b>completely</b>. The Kraus form builds it in; a map written down by hand may satisfy the weaker condition and fail this one.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'The operators are not the channel', html:'Two different sets of Kraus operators can describe the same channel — they are related by a unitary mixing of the set — so the number of terms and their individual form are not physical. Only the map $\\rho\\mapsto\\mathcal{E}(\\rho)$ is. Reading one Kraus operator as "what really happened to the qubit" is reading a choice of coordinates as a fact.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.3.2 -- */
+{ id:'m3-damp', module:'M3', nav:'Amplitude damping', title:'Amplitude damping: energy leaves, and the coherence follows',
+  objective:'Apply the amplitude-damping Kraus operators and say what happens to each entry.',
+  keywords:'amplitude damping relaxation energy loss spontaneous emission kraus population coherence square root',
+  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Quantum channels'},
+  {t:'title', text:'Amplitude damping: energy leaves, and the coherence follows'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A qubit in its upper level can emit and fall to the lower one. The channel that describes this has two Kraus operators, with $\\gamma$ the probability that the emission happens:</p>'},
+    {t:'eq', key:true, tex:'K_{0}=\\begin{bmatrix}1&0\\\\0&\\sqrt{1-\\gamma}\\end{bmatrix}, \\qquad K_{1}=\\begin{bmatrix}0&\\sqrt{\\gamma}\\\\0&0\\end{bmatrix}'},
+    {t:'body', html:'<p>Multiplying out gives the effect entry by entry, and this is the whole content of the channel:</p>'},
+    {t:'eq', key:true, tex:'\\rho_{11} \\mapsto (1-\\gamma)\\,\\rho_{11}, \\qquad \\rho_{01} \\mapsto \\sqrt{1-\\gamma}\\;\\rho_{01}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'$K_{1}$ is not a matrix any unitary could be: it sends $|1\\rangle$ to $|0\\rangle$ and $|0\\rangle$ to nothing. It describes the branch in which a photon was emitted, and the branch is not reversible because the photon is gone. The two branches together do preserve the trace.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figDamp(),
+      caption:'The upper population and the coherence of $|{+}\\rangle$ under this channel. The population falls linearly in $\\gamma$ and the coherence falls as its square root, so at every partial damping there is more coherence left than population.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|{+}\\rangle$, so $\\rho=\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, with $\\gamma=\\tfrac12$.'],
+        ['Work', '$\\rho_{11}\\to 0.25$, so $\\rho_{00}\\to 0.75$, and $\\rho_{01}\\to \\sqrt{0.5}\\times 0.5 \\approx 0.3536$.'],
+        ['Answer', '$\\rho\\to\\begin{bmatrix}0.75&0.354\\\\0.354&0.25\\end{bmatrix}$, of purity $0.875$.'],
+        ['Check', 'By the Bloch vector: $r_{z}=0.5$, $r_{x}=0.707$, so $|\\mathbf{r}|^{2}=0.75$ and $\\tfrac12(1+0.75)=0.875$. The state has moved off the rim and towards $|0\\rangle$, which is where all the population ends up.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'ok', head:'This channel has a fixed point and the next one does not', html:'Run amplitude damping to $\\gamma=1$ and every state becomes $|0\\rangle$, whatever it was. That is why it is the model of relaxation towards a cold equilibrium: it does not merely destroy information, it drives the qubit to one particular state. Dephasing, next, destroys just as much and drives the qubit nowhere.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.3.3 -- */
+{ id:'m3-dephase', module:'M3', nav:'Dephasing', title:'Dephasing: the populations never move and the phase is lost anyway',
+  objective:'Apply the phase-flip channel and identify what it does and does not change.',
+  keywords:'dephasing phase flip channel decoherence coherence populations unchanged measured and ignored basis',
+  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Quantum channels'},
+  {t:'title', text:'Dephasing: the populations never move and the phase is lost anyway'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The other elementary channel applies $Z$ with probability $p$ and does nothing otherwise:</p>'},
+    {t:'eq', key:true, tex:'\\mathcal{E}_{Z}(\\rho) = (1-p)\\,\\rho + p\\,Z\\rho Z'},
+    {t:'body', html:'<p>$Z$ leaves the diagonal alone and flips the sign of the off-diagonal, so the two branches add to leave the populations untouched and shrink the coherence:</p>'},
+    {t:'eq', key:true, tex:'\\rho_{00},\\rho_{11} \\;\\text{unchanged}, \\qquad \\rho_{01} \\mapsto (1-2p)\\,\\rho_{01}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'At $p=\\tfrac12$ the coherence is gone completely and the state is the diagonal part of what it was. At $p=1$ the channel is just $Z$, a perfectly good gate: the coherence is back at full size with a sign change. So the destruction is greatest in the middle and not at the end.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figDephase(),
+      caption:'The populations and the coherence of $|{+}\\rangle$ under the phase-flip channel. The populations are a flat line at one half at every $p$. Only the coherence moves, and it is what carries every interference effect in this course.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'This is chapter 2\u2019s unrecorded measurement', html:'Measuring $Z$ and throwing the result away is exactly $p=\\tfrac12$ here: $\\rho\\mapsto |0\\rangle\\langle 0|\\rho|0\\rangle\\langle 0| + |1\\rangle\\langle 1|\\rho|1\\rangle\\langle 1|$, the diagonal part. The promise made at the end of chapter 2 is now kept, and the answer needed no new postulate — only the matrix.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Decoherence is basis-dependent and often misstated', html:'This channel destroys coherence <b>in the $Z$ basis</b> and does nothing at all to a state that is already diagonal there. A qubit sitting in $|0\\rangle$ is untouched by any amount of dephasing. "The environment destroys superpositions" is only true once the basis is named, and naming it is what the engineering of a qubit is about.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.L1 --- */
+{ id:'m3-lab-e', module:'M3', nav:'Laboratory E', title:'Laboratory E · A channel applied to the ball of states',
+  objective:'Let the reader choose a state and a channel and watch the ball of states deform.',
+  keywords:'laboratory channel bloch ball depolarising amplitude damping dephasing purity contraction fixed point',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 3 · Quantum channels'},
+  {t:'title', text:'Laboratory E · A channel applied to the ball of states'},
+  {t:'small', html:'The left panel is the flat cross-section of the ball again, with the chosen input state and where the channel sends it, and with the whole rim carried along so the deformation of the set is visible. The right panel follows the purity as the strength is turned up. Find the state each channel leaves alone, and notice that two of the three channels have one and the third has a whole line of them.'},
+  {t:'lab', id:'E'}
+]},
+
+/* ---------------------------------------------------------------- 3.4.1 -- */
+{ id:'m3-t1t2', module:'M3', nav:'T1 and T2', title:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$',
+  objective:'Write the two exponential decays and derive the inequality between their times.',
+  keywords:'T1 T2 relaxation dephasing lindblad master equation exponential decay coherence time inequality echo',
+  src:'L6 · Markovian relaxation and dephasing', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Relaxation and dephasing'},
+  {t:'title', text:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The two channels of the last two scenes, applied continuously rather than once, give two exponentials with two time constants:</p>'},
+    {t:'eq', key:true, tex:'\\rho_{11}(t) = \\rho_{11}^{\\mathrm{eq}} + \\left[\\rho_{11}(0)-\\rho_{11}^{\\mathrm{eq}}\\right]e^{-t/T_{1}}, \\qquad \\rho_{01}(t) = e^{-t/T_{2}}\\,\\rho_{01}(0)'},
+    {t:'body', html:'<p>$T_{1}$ is how long a population survives and $T_{2}$ how long a relative phase does. They are not independent, because losing the population also destroys the coherence: the damping scene showed the coherence going as $\\sqrt{1-\\gamma}$, which is half the rate on a logarithmic scale.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>Adding a separate pure-dephasing rate $1/T_{\\phi}$ on top of that gives the standard relation, and the inequality is what it forces:</p>'},
+      {t:'eq', key:true, tex:'\\frac{1}{T_{2}} = \\frac{1}{2T_{1}} + \\frac{1}{T_{\\phi}} \\qquad\\Longrightarrow\\qquad T_{2} \\le 2T_{1}'},
+      {t:'small', html:'The equality holds when there is no pure dephasing at all, so $T_{2}=2T_{1}$ is the best a qubit can do and every real device is below it.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figT1T2(),
+      caption:'The population and the coherence against time, in units of $T_{1}$, for a device with $T_{2}=1.5\\,T_{1}$. The faint curve is the ceiling $T_{2}=2T_{1}$: no coherence may decay more slowly than that, whatever else is done.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Where these numbers come from', html:'They are the time constants of a Markovian model — the Lindblad equation — in which the environment has no memory. That model is a good description of many devices and a bad one of some. Reporting a $T_{1}$ and a $T_{2}$ is reporting the parameters of a fitted model, and a decay that is not exponential does not have them.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'$T_{2}$ and $T_{2}^{*}$ are different measurements', html:'$T_{2}^{*}$ is the decay seen in a plain interference experiment, and it includes drift of the qubit frequency between one run and the next. A spin echo reverses that drift and returns a longer $T_{2}$. Quoting one where the other was measured overstates or understates the device by a large factor, and the two are routinely confused.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.5.1 -- */
+{ id:'m3-order', module:'M3', nav:'Two qubits, and their order', title:'Two qubits, and the ordering that silently breaks results',
+  objective:'Write a two-qubit state in the fixed ordering and locate each amplitude.',
+  keywords:'two qubits tensor product basis ordering convention kronecker significant bit index product state',
+  src:'L6 · composite systems and tensor products', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Two systems'},
+  {t:'title', text:'Two qubits, and the ordering that silently breaks results'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Chapter 1 built the tensor product; here is the first place two qubits are actually written down. A general two-qubit pure state has four amplitudes:</p>'},
+    {t:'eq', key:true, tex:'|\\psi\\rangle = c_{0}|00\\rangle + c_{1}|01\\rangle + c_{2}|10\\rangle + c_{3}|11\\rangle'},
+    {t:'body', html:'<p>The product of two single-qubit states is the special case in which the four amplitudes factor:</p>'},
+    {t:'eq', tex:'\\begin{bmatrix}a\\\\b\\end{bmatrix}\\otimes\\begin{bmatrix}c\\\\d\\end{bmatrix} = \\begin{bmatrix}ac\\\\ad\\\\bc\\\\bd\\end{bmatrix}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'Read that column and the ordering is visible: the left factor changes the amplitude in pairs and the right factor changes it every entry. The left factor is the more significant bit, so entry $x$ of the column is the amplitude of the bit string $x$ written in binary.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figOrder(),
+      caption:'Which entry belongs to which pair of bits, under the ordering this course fixes: $|q_{1}q_{0}\\rangle$, with entry $x$ carrying the amplitude of $|x\\rangle$. Circuit drawings later put $q_{0}$ at the top, which is a drawing convention and not a second ordering.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'err', head:'This is the convention that fails silently', html:'A library that counts qubits the other way builds $\\begin{bmatrix}ac\\\\bc\\\\ad\\\\bd\\end{bmatrix}$ from the same two states. Nothing raises an error, the norm is still one, and every number downstream describes a different state. Two of the four entries agree, which is why the mistake survives a quick check. Whenever a state crosses from one piece of software to another, print the four amplitudes and look at them.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'def', head:'And the same for operators', html:'An operation on the first qubit alone is $A\\otimes I$, and on the second alone $I\\otimes B$. Those two commute, because they act on different factors. That is the formal version of a plain statement: doing something to one qubit and doing something to the other are independent, whatever the joint state is.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.5.2 -- */
+{ id:'m3-ptrace', module:'M3', nav:'The partial trace', title:'The partial trace: the state of one system alone',
+  objective:'Compute a partial trace by the block rule and say what characterises it.',
+  keywords:'partial trace reduced density operator subsystem block matrix trace out marginal characterisation',
+  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Two systems'},
+  {t:'title', text:'The partial trace: the state of one system alone'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Given a joint state $\\rho_{AB}$, the operation that answers "what is the state of $A$ by itself" is the <b>partial trace</b>:</p>'},
+    {t:'eq', key:true, tex:'\\rho_{A} = \\operatorname{Tr}_{B}\\left(\\rho_{AB}\\right) = \\sum_{j}\\left(I_{A}\\otimes\\langle j|\\right)\\rho_{AB}\\left(I_{A}\\otimes|j\\rangle\\right)'},
+    {t:'body', html:'<p>It does not depend on which basis $\\{|j\\rangle\\}$ of $B$ is used, and it is the only operation with the property that makes it the right answer:</p>'},
+    {t:'eq', key:true, tex:'\\operatorname{Tr}\\left(\\rho_{A}A\\right) = \\operatorname{Tr}\\left[\\rho_{AB}\\left(A\\otimes I_{B}\\right)\\right] \\quad\\text{for every }A'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'That line is the definition worth remembering. $\\rho_{A}$ is whatever reproduces every measurement performed on $A$ alone. It is not an approximation and it is not an average over anything: it is the exact state for that class of questions, and there is exactly one operator that does the job.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figPtrace(),
+      caption:'The rule for two qubits, read off the block structure. Cut the four-by-four matrix into four two-by-two blocks: the traces of the blocks are $\\rho_{A}$, and the sum of the two diagonal blocks is $\\rho_{B}$. Two different operations, and getting them the wrong way round is the usual slip.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\Phi^{+}\\rangle=\\tfrac{1}{\\sqrt2}\\left(|00\\rangle+|11\\rangle\\right)$.'],
+        ['Work', '$\\rho_{AB}$ has entries $\\tfrac12$ at the four corners of the four-by-four and zero elsewhere. Its diagonal blocks are $\\tfrac12|0\\rangle\\langle 0|$ and $\\tfrac12|1\\rangle\\langle 1|$; the off-diagonal blocks are traceless.'],
+        ['Answer', '$\\rho_{A}=\\rho_{B}=I/2$.'],
+        ['Check', 'Every measurement on one qubit of a Bell pair is a fair coin, in every basis. That is the same statement, and it is what the next scene is about.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'A partial trace loses information and cannot be undone', html:'Two very different joint states can share a reduced state — the Bell pair and a plain classical mixture of $|00\\rangle$ and $|11\\rangle$ both give $I/2$ on each side. So $\\rho_{A}$ and $\\rho_{B}$ together do not determine $\\rho_{AB}$, and everything that distinguishes those two joint states lives in the correlations the partial trace threw away.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.5.3 -- */
+{ id:'m3-local', module:'M3', nav:'A pure whole with mixed parts', title:'A pure pair whose halves are as mixed as a state can be',
+  objective:'Show that a maximally entangled pair has maximally mixed parts and say what that rules out.',
+  keywords:'entanglement local mixedness reduced state maximally mixed pure joint state purity contrast product',
+  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Two systems'},
+  {t:'title', text:'A pure pair whose halves are as mixed as a state can be'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The last scene computed it; this scene is about what it means. For $|\\Phi^{+}\\rangle$ the pair is pure — it is one vector, known exactly, with purity one — and each half is $I/2$, the most mixed state a qubit has.</p>'},
+    {t:'eq', key:true, tex:'\\operatorname{Tr}\\rho_{AB}^{2} = 1, \\qquad \\operatorname{Tr}\\rho_{A}^{2} = \\tfrac12'},
+    {t:'body', html:'<p>Nothing about the pair is unknown, and yet everything about each qubit is. That cannot happen for classical systems: if a joint description is certain then so is each part of it.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'A working definition of entanglement', html:'A pure joint state is <b>entangled</b> exactly when its reduced states are mixed. Complete knowledge of the whole together with incomplete knowledge of the parts is not a paradox to be resolved; it is the definition, and the next section turns it into a number.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figLocal(),
+      caption:'Purity of the pair and of one half, for a maximally entangled state and for a product state. The product pair is pure and so is its half. The entangled pair is just as pure and its half is at the bottom of the range.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'ok', head:'Where a mixed state comes from', html:'There are now two sources and they are not distinguishable from inside. Either a classical coin decided the preparation, or the qubit is entangled with something else and that something else is not being looked at. On real hardware the second is usually the honest description: the qubit is entangled with its environment, and $\\rho$ is what is left after tracing the environment out.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'What this does not license', html:'"Each qubit is really in $|0\\rangle$ or $|1\\rangle$ and the pair is correlated" is the classical mixture of the last scene. It has the same two reduced states and it is a different joint state, with different correlations in every basis but $Z$. The chapter closes by measuring exactly that difference.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.6.1 -- */
+{ id:'m3-sep', module:'M3', nav:'Product or entangled', title:'Separable or entangled: the test on four amplitudes',
+  objective:'Decide whether a two-qubit pure state factors, and factor it when it does.',
+  keywords:'separable product state entangled test determinant factor amplitudes bipartite pure mixed convex',
+  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
+  {t:'title', text:'Separable or entangled: the test on four amplitudes'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A bipartite pure state is <b>separable</b> when it is a product, and <b>entangled</b> when it is not. For two qubits the test is one line of algebra: comparing the product form of the last section with a general state,</p>'},
+    {t:'eq', key:true, tex:'|\\psi\\rangle \\text{ is a product} \\iff c_{0}c_{3} - c_{1}c_{2} = 0'},
+    {t:'body', html:'<p>It is the determinant of the two-by-two array of amplitudes, and it vanishes exactly when the four numbers factor as $ac,\\,ad,\\,bc,\\,bd$.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>Applied to the two standard examples:</p>'},
+      {t:'eq', tex:'\\tfrac{1}{\\sqrt2}\\left(|01\\rangle+|11\\rangle\\right) = |{+}\\rangle\\otimes|1\\rangle, \\qquad \\tfrac{1}{\\sqrt2}\\left(|00\\rangle+|11\\rangle\\right) \\ne |\\alpha\\rangle\\otimes|\\beta\\rangle'},
+      {t:'small', html:'The first has $c_{0}c_{3}-c_{1}c_{2}=0-0=0$ and factors. The second has $\\tfrac12-0=\\tfrac12$ and does not, for any choice of the two single-qubit states whatever.'}
+    ]}
+  ], right:[
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\psi\\rangle=\\tfrac12\\left(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle\\right)$.'],
+        ['Work', '$c_{0}c_{3}-c_{1}c_{2}=\\tfrac14-\\tfrac14=0$, so it is a product.'],
+        ['Answer', 'Factoring, $a=b=c=d=1/\\sqrt2$: the state is $|{+}\\rangle\\otimes|{+}\\rangle$.'],
+        ['Check', 'The reduced state of either qubit is $|{+}\\rangle\\langle{+}|$, which is pure — the signature of a product state, and a second route to the same answer.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'For mixed states the word means something weaker', html:'A mixed $\\rho_{AB}$ is called separable when it is a mixture of products, $\\sum_{i}p_{i}\\rho_{A}^{(i)}\\otimes\\rho_{B}^{(i)}$ — not when it is itself one product. Deciding whether a given mixed state can be written that way is hard in general, and no test as short as the determinant exists. Everything in this chapter that has a clean answer is about <b>pure</b> bipartite states.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.6.2 -- */
+{ id:'m3-schmidt', module:'M3', nav:'The Schmidt decomposition', title:'The Schmidt decomposition: two bases in which the state is diagonal',
+  objective:'State the Schmidt decomposition and read the entanglement off its rank.',
+  keywords:'schmidt decomposition coefficients rank orthonormal bases bipartite pure state reduced eigenvalues',
+  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
+  {t:'title', text:'The Schmidt decomposition: two bases in which the state is diagonal'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A general bipartite pure state needs a double sum over two bases. The Schmidt decomposition says that the bases can always be chosen so that only the diagonal terms survive:</p>'},
+    {t:'eq', key:true, tex:'|\\psi\\rangle_{AB} = \\sum_{k=1}^{r} \\sqrt{\\lambda_{k}}\\;|u_{k}\\rangle_{A}\\,|v_{k}\\rangle_{B}, \\qquad \\lambda_{k}>0, \\quad \\sum_{k}\\lambda_{k}=1'},
+    {t:'body', html:'<p>The two sets $\\{|u_{k}\\rangle\\}$ and $\\{|v_{k}\\rangle\\}$ are orthonormal and are chosen for the state; the number of terms $r$ is the <b>Schmidt rank</b>.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>Two consequences do all the work. The reduced states are diagonal in those bases, with the $\\lambda_{k}$ as their eigenvalues; and the test for entanglement becomes a count:</p>'},
+      {t:'eq', key:true, tex:'\\rho_{A} = \\sum_{k}\\lambda_{k}|u_{k}\\rangle\\langle u_{k}|, \\qquad \\text{entangled} \\iff r > 1'},
+      {t:'small', html:'One term means the state is a product and the reduced state is pure. Two or more means it is entangled, and the reduced state is mixed. This is the earlier definition, now with a number attached.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figSchmidt(),
+      caption:'The two Schmidt coefficients of $\\cos\\theta\\,|00\\rangle+\\sin\\theta\\,|11\\rangle$. At the ends one of them is zero, the rank is one, and the state is a product. Where they are equal the state is maximally entangled, and every state in between is entangled by some amount.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\psi\\rangle=\\tfrac12\\left(\\sqrt3\\,|00\\rangle+|11\\rangle\\right)$.'],
+        ['Work', 'It is already in Schmidt form, with $\\sqrt{\\lambda_{1}}=\\sqrt3/2$ and $\\sqrt{\\lambda_{2}}=1/2$.'],
+        ['Answer', '$\\lambda=\\tfrac34,\\tfrac14$, rank two, so the state is entangled but not maximally so.'],
+        ['Check', 'The coefficients add to one, and $\\rho_{A}=\\operatorname{diag}(0.75,0.25)$ has purity $0.625$ — mixed, as the rank being two requires.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'def', head:'Why both sides always agree', html:'$\\rho_{A}$ and $\\rho_{B}$ have the same non-zero eigenvalues, whatever the two dimensions are. So one qubit entangled with a thousand others still has at most two Schmidt terms, because the smaller side caps the rank. Entanglement of a pure state is a property of the pair and cannot be more on one side than on the other.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.6.3 -- */
+{ id:'m3-svd', module:'M3', nav:'Computing it', title:'How the decomposition is actually computed',
+  objective:'Reshape a state vector into a coefficient matrix and get the Schmidt data from its singular values.',
+  keywords:'singular value decomposition svd reshape coefficient matrix numerical rank tolerance schmidt computation',
+  src:'L6 · computing Schmidt decompositions with an SVD', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
+  {t:'title', text:'How the decomposition is actually computed'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Write the amplitudes as a matrix instead of a column, with the rows indexed by the first system and the columns by the second:</p>'},
+    {t:'eq', key:true, tex:'|\\psi\\rangle = \\sum_{i,j} C_{ij}\\,|i\\rangle_{A}|j\\rangle_{B}, \\qquad C = U\\Sigma V^{\\dagger}'},
+    {t:'body', html:'<p>The singular value decomposition of $C$ is the Schmidt decomposition. The singular values are $\\sqrt{\\lambda_{k}}$, their squares are the eigenvalues of both reduced states, and the two sets of singular vectors are the two Schmidt bases.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'Nothing has to be derived a second time: $\\rho_{A}=CC^{\\dagger}$ and $\\rho_{B}=\\left(C^{\\dagger}C\\right)^{\\mathsf{T}}$, and the singular values of $C$ are the square roots of the eigenvalues of $CC^{\\dagger}$ by definition. The decomposition of chapter 1 has been waiting for this.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figSVD(),
+      caption:'The recipe. Reshape the four amplitudes into a two-by-two matrix, take its singular values, and read the Schmidt coefficients. For $n$ qubits split into two groups the matrix is rectangular and the recipe is unchanged.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\psi\\rangle=\\tfrac12\\left(\\sqrt3\\,|00\\rangle+|11\\rangle\\right)$, so $c=\\left(\\sqrt3/2,0,0,1/2\\right)$.'],
+        ['Work', '$C=\\begin{bmatrix}\\sqrt3/2&0\\\\0&1/2\\end{bmatrix}$, already diagonal, so the singular values are $\\sqrt3/2$ and $1/2$.'],
+        ['Answer', '$\\lambda=\\tfrac34$ and $\\tfrac14$, agreeing with the last scene.'],
+        ['Check', '$CC^{\\dagger}=\\operatorname{diag}(0.75,0.25)$, which is $\\rho_{A}$ computed by the block rule. Two routes, one answer.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'Two things to state before reshaping', html:'The qubit ordering, and which qubits go into the rows. Reshaping a column the wrong way round transposes $C$, which leaves the singular values alone and swaps the two Schmidt bases — so the entanglement number looks right while the states attached to it are the other system\u2019s. And the rank is the count of singular values above a stated tolerance: a value of $10^{-16}$ is a zero, and calling it a third Schmidt term is reporting rounding.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.7.1 -- */
+{ id:'m3-entropy', module:'M3', nav:'Entropy', title:'Entropy: how much entanglement, in bits',
+  objective:'Compute the von Neumann entropy of a reduced state and interpret it as an amount of entanglement.',
+  keywords:'von neumann entropy entanglement entropy ebit bits log base two reduced state pure zero maximal',
+  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Entropy'},
+  {t:'title', text:'Entropy: how much entanglement, in bits'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The Schmidt rank counts; the entropy weighs. It is the Shannon entropy of the eigenvalues of $\\rho$, and with logarithms base two it is measured in bits:</p>'},
+    {t:'eq', key:true, tex:'S(\\rho) = -\\operatorname{Tr}\\left(\\rho\\log_{2}\\rho\\right) = -\\sum_{k}\\lambda_{k}\\log_{2}\\lambda_{k}'},
+    {t:'body', html:'<p>For a pure state one eigenvalue is one and $S=0$: there is nothing to be uncertain about. For $I/d$ every eigenvalue is $1/d$ and $S=\\log_{2}d$, the largest it can be.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>For a <b>pure</b> bipartite state the entropy of either reduced state is the amount of entanglement the pair carries, and the two agree because the eigenvalues do:</p>'},
+      {t:'eq', key:true, tex:'S(\\rho_{A}) = S(\\rho_{B}) = -\\sum_{k}\\lambda_{k}\\log_{2}\\lambda_{k}'},
+      {t:'small', html:'A maximally entangled pair of qubits has $\\lambda=\\tfrac12,\\tfrac12$ and carries one bit, called one <b>ebit</b>. It is the unit every protocol in chapter 5 is priced in.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figEntropy(),
+      caption:'The entanglement entropy of a two-term Schmidt spectrum, against the larger coefficient. Zero at both ends, where the state is a product, and one bit in the middle, where the pair is maximally entangled.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', 'The state with $\\lambda=\\tfrac34,\\tfrac14$.'],
+        ['Work', '$-0.75\\log_{2}0.75 - 0.25\\log_{2}0.25 = 0.75(0.415) + 0.25(2)$.'],
+        ['Answer', '$S\\approx 0.811$ bits: entangled, and worth about four fifths of an ebit.'],
+        ['Check', 'A Bell pair gives $-2\\times\\tfrac12\\log_{2}\\tfrac12 = 1$ bit, and a product state gives $0$. The answer sits between them, where the rank-two-but-lopsided spectrum says it should.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'This measure is only for pure pairs', html:'$S(\\rho_{A})$ measures entanglement only when $\\rho_{AB}$ is pure. For a mixed joint state it measures the total uncertainty about $A$, which mixes entanglement together with ordinary classical noise, and a separable mixed state can have a large $S(\\rho_{A})$ while carrying no entanglement at all. Quoting the reduced entropy of a noisy pair as its entanglement is a common and serious overstatement.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.8.1 -- */
+{ id:'m3-bell', module:'M3', nav:'The Bell states', title:'The four Bell states, and the correlations that separate them',
+  objective:'List the Bell states and compute the three Pauli correlations of one of them.',
+  keywords:'bell states phi psi plus minus basis maximally entangled correlations XX YY ZZ classical mixture',
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Bell correlations'},
+  {t:'title', text:'The four Bell states, and the correlations that separate them'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Four maximally entangled two-qubit states are used constantly, and together they are an orthonormal basis of the four-dimensional space:</p>'},
+    {t:'eq', key:true, tex:'|\\Phi^{\\pm}\\rangle = \\frac{|00\\rangle \\pm |11\\rangle}{\\sqrt2}, \\qquad |\\Psi^{\\pm}\\rangle = \\frac{|01\\rangle \\pm |10\\rangle}{\\sqrt2}'},
+    {t:'body', html:'<p>Every one of them has $\\rho_{A}=\\rho_{B}=I/2$, so no measurement on one qubit tells them apart. What separates them is entirely in the joint correlations.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>For $|\\Phi^{+}\\rangle$ the three Pauli correlations are computed by applying the operators and reading the sign:</p>'},
+      {t:'eq', key:true, tex:'\\langle X\\otimes X\\rangle = 1, \\qquad \\langle Y\\otimes Y\\rangle = -1, \\qquad \\langle Z\\otimes Z\\rangle = 1'},
+      {t:'small', html:'Each is $\\pm1$, so each is a <b>certain</b> statement about the pair: measure both qubits in the $X$ basis and the two answers always agree, even though each answer on its own is a fair coin.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figBell(),
+      caption:'The three correlations of $|\\Phi^{+}\\rangle$, beside those of the classical mixture $\\tfrac12|00\\rangle\\langle 00|+\\tfrac12|11\\rangle\\langle 11|$. The two agree perfectly in $Z$ and nowhere else, and both have the same two reduced states.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$|\\Phi^{+}\\rangle$ and the operator $Y\\otimes Y$.'],
+        ['Work', '$Y|0\\rangle=i|1\\rangle$ and $Y|1\\rangle=-i|0\\rangle$, so $Y\\otimes Y|00\\rangle=-|11\\rangle$ and $Y\\otimes Y|11\\rangle=-|00\\rangle$.'],
+        ['Answer', '$Y\\otimes Y|\\Phi^{+}\\rangle=-|\\Phi^{+}\\rangle$, so $\\langle Y\\otimes Y\\rangle=-1$.'],
+        ['Check', 'The state is an eigenvector, so the reading is certain and the mean is the eigenvalue. The minus sign comes from the two factors of $i$ meeting, and it is the reason $|\\Phi^{+}\\rangle$ anticorrelates in $Y$ while correlating in $X$ and $Z$.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'ok', head:'What the contrast in the figure buys', html:'The classical mixture reproduces the $Z$ correlation exactly. Any model that says "the pair was made as $00$ or as $11$, we just do not know which" therefore predicts the first bar correctly and the other two wrongly. That is not yet a proof that no such model works, because a cleverer one might be built. Making the argument airtight is the next scene.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.8.2 -- */
+{ id:'m3-chsh', module:'M3', nav:'The classical bound', title:'CHSH: the number every classical model is trapped below',
+  objective:'Assemble the CHSH combination and derive the bound a model with pre-existing values obeys.',
+  keywords:'chsh bell inequality local hidden variable classical bound two pre-existing values correlations',
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Bell correlations'},
+  {t:'title', text:'CHSH: the number every classical model is trapped below'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Each party has two possible measurements, each returning $\\pm1$, and each pair of choices gives one correlation. Combine four of them into one number, with the fourth subtracted:</p>'},
+    {t:'eq', key:true, tex:'S = \\langle A_{0}B_{0}\\rangle + \\langle A_{0}B_{1}\\rangle + \\langle A_{1}B_{0}\\rangle - \\langle A_{1}B_{1}\\rangle'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>Now suppose every run carries definite values $a_{0},a_{1},b_{0},b_{1}\\in\\{\\pm1\\}$, fixed before the two settings are chosen. Group the four terms:</p>'},
+      {t:'eq', tex:'a_{0}\\left(b_{0}+b_{1}\\right) + a_{1}\\left(b_{0}-b_{1}\\right)'},
+      {t:'small', html:'Two numbers each $\\pm1$ either agree or differ, so one bracket is $\\pm2$ and the other is exactly zero. The whole expression is $\\pm2$ on every single run, and an average of numbers in $[-2,2]$ stays there.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figChshBox(),
+      caption:'The assumption being tested, drawn. Whatever fixes a run also fixes all four answers, including the two nobody asked for. That is the only thing used, and it is enough to trap the combination between $-2$ and $+2$.'},
+    {t:'reveal', at:2, items:[
+      {t:'eq', key:true, tex:'\\left|S\\right| \\le 2 \\qquad \\text{for every local model with pre-existing values}'},
+      {t:'small', html:'No quantum mechanics went into that. It uses only that the four numbers exist together, which is what "the values were there before anyone looked" means, and that each party’s answer does not depend on the other party’s setting.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'def', head:'Why this shape and not another', html:'The minus sign is what makes the bound bite. With four plus signs the classical bound would be four and so would the quantum one, and the two theories would agree. Bell inequalities are built to find a combination on which they do not, and the next scene evaluates this one.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.8.3 -- */
+{ id:'m3-violate', module:'M3', nav:'The violation', title:'What quantum mechanics reaches, and what that refutes',
+  objective:'Evaluate the CHSH combination on a Bell state and say precisely which assumption fails.',
+  keywords:'chsh violation tsirelson 2 root 2 bell state measurement angles refutation realism error bar shots',
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Bell correlations'},
+  {t:'title', text:'What quantum mechanics reaches, and what that refutes'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Take $|\\Phi^{+}\\rangle$ and four directions in one plane. For that state a joint Pauli correlation is one dot product with a sign:</p>'},
+    {t:'eq', key:true, tex:'\\langle \\left(\\mathbf{n}\\cdot\\boldsymbol\\sigma\\right)\\otimes\\left(\\mathbf{m}\\cdot\\boldsymbol\\sigma\\right)\\rangle = n_{x}m_{x} - n_{y}m_{y} + n_{z}m_{z}'},
+    {t:'reveal', at:1, items:[
+      {t:'wex', rows:[
+        ['Given', '$A_{0}=Z$, $A_{1}=X$, $B_{0}=(Z+X)/\\sqrt2$ and $B_{1}=(Z-X)/\\sqrt2$.'],
+        ['Work', 'Each of the first three correlations is $1/\\sqrt2$, and the fourth is $-1/\\sqrt2$.'],
+        ['Answer', '$S = 4/\\sqrt2 = 2\\sqrt2 \\approx 2.828$, above the bound of two.'],
+        ['Check', 'Every term has modulus at most one, so $S$ could in principle be four. Quantum mechanics stops at $2\\sqrt2$, and that ceiling is a theorem rather than an accident of these angles.']
+      ]}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figCHSH(),
+      caption:'The same combination with the second party’s two settings placed symmetrically at $\\pm\\varphi$ in the plane. The dashed line is the classical bound, and the curve is above it over a wide range of angles rather than at one exact setting.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'err', head:'What is refuted, exactly', html:'Not "the qubits communicate". The assumption that fails is that the four outcomes exist together before the settings are chosen. Reading a violation as a signal is the misreading the next scene exists to close, and it is the one students reach for first.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'A violation is a measurement and carries an error bar', html:'$S$ is estimated from four finite runs, so each of the four terms carries the sampling error of chapter 2. Reporting $S=2.6$ without a shot count and an interval is not reporting a violation. Noise pushes $S$ back towards two: mixing a Bell state with enough of the maximally mixed state stops the violation entirely, while leaving the state entangled for a while longer.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.L2 --- */
+{ id:'m3-lab-f', module:'M3', nav:'Laboratory F', title:'Laboratory F · CHSH: four angles and one number',
+  objective:'Let the reader set the four measurement directions and read the CHSH value against the classical bound.',
+  keywords:'laboratory chsh bell inequality four angles classical bound tsirelson correlations violation sweep',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 3 · Bell correlations'},
+  {t:'title', text:'Laboratory F · CHSH: four angles and one number'},
+  {t:'small', html:'Both parties measure $|\\Phi^{+}\\rangle$ along a direction in the $z$–$x$ plane, and each of the four directions is a slider. The left panel is the four correlations; the right one sweeps the first of the other party\u2019s two settings with the rest held where they are, against the classical bound and the largest value quantum mechanics permits. Find a setting that violates the bound, then find one that does not, and notice how much of the circle each occupies.'},
+  {t:'lab', id:'F'}
+]},
+
+/* ---------------------------------------------------------------- 3.8.4 -- */
+{ id:'m3-nosig', module:'M3', nav:'No signalling', title:'Why entanglement sends nothing',
+  objective:'Show that one party\u2019s outcome distribution does not depend on the other party\u2019s choice.',
+  keywords:'no signalling faster than light communication reduced state unchanged partial trace correlation classical channel',
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 3 · Bell correlations'},
+  {t:'title', text:'Why entanglement sends nothing'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The last scene showed a correlation no classical model reproduces. It is tempting to read that as a channel. It is not one, and the proof is the partial trace.</p>'},
+    {t:'body', html:'<p>Whatever measurement the second party makes, the state of the first party afterwards — averaged over the outcomes the first party has not been told — is the same operator it was before:</p>'},
+    {t:'eq', key:true, tex:'\\sum_{m} p(m)\\,\\rho_{A\\mid m} = \\rho_{A} \\qquad \\text{for every set } \\{E_{m}\\}'},
+    {t:'reveal', at:1, items:[
+      {t:'body', html:'<p>The reason is the completeness of the effects, $\\sum_{m}E_{m}=I$, together with the characterisation of the partial trace:</p>'},
+      {t:'eq', tex:'\\operatorname{Tr}\\left[\\rho_{AB}\\left(A\\otimes \\textstyle\\sum_{m}E_{m}\\right)\\right] = \\operatorname{Tr}\\left[\\rho_{AB}\\left(A\\otimes I\\right)\\right] = \\operatorname{Tr}\\left(\\rho_{A}A\\right)'},
+      {t:'small', html:'The second party\u2019s choice of measurement disappears from the expression before any number is computed. Nothing about the first party\u2019s statistics can depend on it.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figNoSig(),
+      caption:'What one party sees, for three different things the other party does. Every bar is one half. There is no setting of anyone\u2019s apparatus that moves them, so there is nothing here to encode a message in.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'ok', head:'Where the correlation actually appears', html:'Only when the two records are brought together and compared, which needs an ordinary classical channel and travels no faster than one. Entanglement is a resource that makes the two records agree in ways no classical preparation could; it is not a wire. Every protocol in chapter 5 that uses a Bell pair also sends classical bits, and that is why.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'The language does most of the damage', html:'"Measuring one qubit instantly collapses the other" describes a bookkeeping step: the first party updates their description of the pair conditioned on a result only they have. Two parties who have not spoken hold different descriptions of the same pair, and both are correct, because a description is a statement about what its holder can predict.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.9.1 -- */
+{ id:'m3-synth', module:'M3', nav:'Summary', title:'What this chapter leaves you with',
+  objective:'Collect the objects this chapter added and the four errors it exists to prevent.',
+  keywords:'summary module 3 review density operator purity channel partial trace schmidt entropy bell chsh',
+  steps:2, blocks:[
+  {t:'eyebrow', text:'Module 3 · Summary'},
+  {t:'title', text:'What this chapter leaves you with'},
+  {t:'fig', frame:true, svg:()=>figLadder(),
+    caption:'The chapter as one ladder. Each step drops an assumption the step before it was resting on, and each time the object that survives is a matrix rather than a vector. Nothing was added to the postulates to make any of this work.'},
+  {t:'grid', cols:4, gap:'20px', items:[
+    [{t:'card', head:'The object', items:[
+      {t:'small', html:'$\\rho=\\rho^{\\dagger}\\succeq 0$ with $\\operatorname{Tr}\\rho=1$. Predictions are $\\operatorname{Tr}(\\rho A)$. Purity $\\operatorname{Tr}\\rho^{2}$ runs from $1/d$ to $1$. For a qubit, $\\rho=\\tfrac12(I+\\mathbf{r}\\cdot\\boldsymbol\\sigma)$ with $|\\mathbf{r}|\\le 1$.'}]}],
+    [{t:'card', head:'Open evolution', items:[
+      {t:'small', html:'$\\mathcal{E}(\\rho)=\\sum_{k}K_{k}\\rho K_{k}^{\\dagger}$ with $\\sum_{k}K_{k}^{\\dagger}K_{k}=I$: a unitary on a larger system with the rest ignored. Damping moves populations, dephasing moves only coherences, and $T_{2}\\le 2T_{1}$.'}]}],
+    [{t:'card', head:'Parts of a whole', items:[
+      {t:'small', html:'$\\rho_{A}=\\operatorname{Tr}_{B}\\rho_{AB}$, defined by reproducing every measurement on $A$. A pure pair with mixed parts is entangled; the Schmidt rank counts and $S(\\rho_{A})$ weighs, in bits.'}]}],
+    [{t:'card', head:'Correlations', items:[
+      {t:'small', html:'The Bell states share one reduced state and differ in every joint correlation. $|S|\\le 2$ for any model with pre-existing values; quantum mechanics reaches $2\\sqrt2$. No choice of setting moves the other party\u2019s distribution.'}]}]
+  ]},
+  {t:'reveal', at:1, items:[
+    {t:'grid', cols:2, gap:'24px', items:[
+      [{t:'note', kind:'ok', head:'Six lines to be able to write without looking', html:'$\\rho=\\sum_{i}p_{i}|\\psi_{i}\\rangle\\langle\\psi_{i}|$ &nbsp;·&nbsp; $\\langle A\\rangle=\\operatorname{Tr}(\\rho A)$ &nbsp;·&nbsp; $\\operatorname{Tr}\\rho^{2}=\\tfrac12(1+|\\mathbf{r}|^{2})$ &nbsp;·&nbsp; $\\mathcal{E}(\\rho)=\\sum_{k}K_{k}\\rho K_{k}^{\\dagger}$ &nbsp;·&nbsp; $S=-\\sum_{k}\\lambda_{k}\\log_{2}\\lambda_{k}$ &nbsp;·&nbsp; $|S_{\\text{CHSH}}|\\le 2$.'}],
+      [{t:'note', kind:'warn', head:'Four errors that cost a whole question', html:'Treating a mixture as a superposition. Checking Hermiticity and trace and calling the result a state. Swapping the two partial traces, so $\\rho_{A}$ is computed where $\\rho_{B}$ was asked for. And reading a Bell violation as communication.'}]
+    ]}
+  ]},
+  {t:'reveal', at:2, items:[
+    {t:'note', kind:'def', head:'What comes next', html:'Chapter 4 draws the ball this chapter has been computing in, gives the two angles of a pure state their names, and turns every single-qubit gate into a rotation of it. It also builds the two-qubit gate that makes a Bell state out of a product one, so the pairs used here stop being assumed and start being constructed.'}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 3.9.2 -- */
+{ id:'m3-shapes', module:'M3', nav:'The shapes of question', title:'The shapes of question this chapter sets',
+  objective:'Name the recurring question types of chapter 3 and the method each is answered by.',
+  keywords:'question types taxonomy shapes method examination practice density purity channel partial trace schmidt chsh',
+  steps:1, blocks:[
+  {t:'eyebrow', text:'Module 3 · Summary and practice'},
+  {t:'title', text:'The shapes of question this chapter sets'},
+  {t:'small', html:'Six shapes keep coming back, and a seventh — a <b>full-length question</b> — puts three to five of them in one statement, usually as one pair of qubits followed from its preparation to a reported correlation. Name the shape before starting; the method for each is fixed.'},
+  {t:'grid', cols:3, gap:'22px', items:[
+    [{t:'drilltypes', module:'M3', from:0, to:2}],
+    [{t:'drilltypes', module:'M3', from:2, to:4}],
+    [{t:'drilltypes', module:'M3', from:4, to:6}]
+  ]},
+  {t:'reveal', at:1, items:[
+    {t:'note', kind:'ok', head:'The check that catches most of it', html:'A trace is one, every eigenvalue is between zero and one, a purity lies between $1/d$ and one, an entropy is never negative, and a correlation of two $\\pm1$ observables lies in $[-1,1]$. Five one-line tests, and between them they catch nearly every arithmetic slip this chapter can produce.'}
+  ]}
+]}
+
+];
+
+window.SCENES_M3 = SC;
+})();
+
+</script>
+<script>
 /* ==== 89_sections.js ==== */
 /* ==========================================================================
    NUMBERING — the contents address of every scene, and its textbook anchor.
@@ -6361,7 +7784,8 @@ window.SCENES_M2 = SC;
 CONTENT.CHAPTERS = [
   { n:'0', module:'M0', title:'The frame of the course', flat:true },
   { n:'1', module:'M1', title:'The mathematics of quantum states' },
-  { n:'2', module:'M2', title:'States, measurement and dynamics' }
+  { n:'2', module:'M2', title:'States, measurement and dynamics' },
+  { n:'3', module:'M3', title:'Mixed states and entanglement' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -6420,6 +7844,31 @@ CONTENT.SECTIONS = {
         'm2-schrod','m2-stationary','m2-gate','m2-lab-d'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
+  ],
+
+  /* Chapter 3 drops the two assumptions chapters 1 and 2 rested on, one at a
+     time, and the section order is that sequence: the state need not be known,
+     the system need not be closed, and the system need not be the whole of
+     what it belongs to. The section titles name the object rather than the
+     theorem for the same reason as chapter 1's do. Nothing here needs the
+     Bloch sphere, so the chapter can be read after chapter 4 as well as
+     before it, which is what the course map promises. */
+  M3: [
+    { n:'3.0', title:'Opening',                           ids:['m3-open'] },
+    { n:'3.1', title:'The density operator',              ids:[
+        'm3-rho','m3-physical','m3-expect','m3-ensemble'] },
+    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball'] },
+    { n:'3.3', title:'Quantum channels',                  ids:[
+        'm3-kraus','m3-damp','m3-dephase','m3-lab-e'] },
+    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2'] },
+    { n:'3.5', title:'Two systems, and one of them alone', ids:[
+        'm3-order','m3-ptrace','m3-local'] },
+    { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
+        'm3-sep','m3-schmidt','m3-svd'] },
+    { n:'3.7', title:'Entropy',                           ids:['m3-entropy'] },
+    { n:'3.8', title:'Bell correlations',                 ids:[
+        'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig'] },
+    { n:'3.9', title:'Summary and practice',              ids:['m3-synth','m3-shapes'] }
   ]
 
 };
@@ -6500,7 +7949,42 @@ CONTENT.BOOK = {
   'm2-ndotsigma':'2.2.5',
   'm2-schrod':'2.2.2',
   'm2-stationary':'2.2.2',
-  'm2-gate':'2.2.2'
+  'm2-gate':'2.2.2',
+
+  /* Chapter 3 rests on the book's sections 2.4 to 2.6, which is where the
+     density operator, the Schmidt decomposition and the Bell inequality are
+     developed. The channels leave chapter 2 of the book entirely: the
+     operator-sum form is 8.2.3 and the two elementary qubit channels are
+     8.3.5 and 8.3.6, with the continuous-time model in 8.4.1. Entropy is
+     11.3, and the Bell states are first written down in the book's opening
+     chapter, at 1.3.6.
+
+     Every one of those was read in the book's contents before it was written
+     here. Five scenes carry no anchor: the opening and the summary, the
+     question taxonomy, and the two laboratories. `m3-order` carries 2.2.8,
+     which is where the book states the composition postulate, but the
+     ordering convention itself is this course's and not the book's. */
+  'm3-rho':'2.4.1',
+  'm3-physical':'2.4.2',
+  'm3-expect':'2.4.2',
+  'm3-ensemble':'2.4.1',
+  'm3-purity':'2.4.2',
+  'm3-ball':'2.4.2',
+  'm3-kraus':'8.2.3',
+  'm3-damp':'8.3.5',
+  'm3-dephase':'8.3.6',
+  'm3-t1t2':'8.4.1',
+  'm3-order':'2.2.8',
+  'm3-ptrace':'2.4.3',
+  'm3-local':'2.4.3',
+  'm3-sep':'2.5',
+  'm3-schmidt':'2.5',
+  'm3-svd':'2.1.10',
+  'm3-entropy':'11.3',
+  'm3-bell':'1.3.6',
+  'm3-chsh':'2.6',
+  'm3-violate':'2.6',
+  'm3-nosig':'2.6'
 };
 
 /* ---- derivation --------------------------------------------------------
@@ -7346,6 +8830,396 @@ window.DRILL_M2 = [
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: probabilities add to one, a variance is never negative, the mean of a $\\pm1$ observable lies in $[-1,1]$, the Bloch vector of a pure state has length one, and adding a multiple of the identity to a Hamiltonian changes nothing.'},
   {t:'rule', short:true},
   {t:'drill', module:'M2'}
+]}
+
+];
+})();
+
+</script>
+<script>
+/* ==== 94_drill_m3.js ==== */
+/* ==========================================================================
+   Practice questions — Module 3.
+
+   Six shapes and twenty questions in them. The numbers are chosen so that the
+   Check step is cheap: a trace that is one, eigenvalues between zero and one,
+   a purity between one half and one, an entropy that is never negative, and a
+   correlation of two plus-or-minus-one observables inside its own range. Every
+   one of those catches an arithmetic slip in a line, and every solution ends
+   by using one.
+   ========================================================================== */
+(function(){
+
+CONTENT.DRILLTYPES.M3 = [
+  { k:'dm', name:'Building a density operator, and testing one',
+    asks:'A preparation or a matrix is given. Write the density operator, or decide whether the matrix is a state.',
+    method:['For a preparation, write $\\rho=\\sum_i p_i|\\psi_i\\rangle\\langle\\psi_i|$ term by term. Each term is an outer product and is a matrix, not a number.',
+            'To test a matrix, take the three conditions in order: Hermitian, trace one, and positive. The third is the one that fails, and for a qubit it is $|\\rho_{01}|^{2}\\le\\rho_{00}\\rho_{11}$.',
+            'Purity is $\\operatorname{Tr}\\rho^{2}$, the sum of the squared moduli of all the entries. For a qubit it also equals $\\tfrac12(1+|\\mathbf{r}|^{2})$, and computing it both ways is the check.',
+            'A state is pure exactly when the purity is one, equivalently $\\rho^{2}=\\rho$, equivalently the determinant is zero.'],
+    go:'m3-rho' },
+
+  { k:'predict', name:'Predictions from a density operator',
+    asks:'A density operator is given. Find an outcome probability, an expectation value, or the Bloch vector.',
+    method:['Every prediction is one trace: $\\langle A\\rangle=\\operatorname{Tr}(\\rho A)$ and $p(m)=\\operatorname{Tr}(\\rho E_m)$. No case distinction between pure and mixed is needed.',
+            'For a qubit, read the three Pauli means off the entries: $r_z=\\rho_{00}-\\rho_{11}$, and $\\rho_{01}=\\tfrac12(r_x-ir_y)$.',
+            'For a measurement along a direction, $p(\\pm)=\\tfrac12(1\\pm\\mathbf{n}\\cdot\\mathbf{r})$, exactly as in chapter 2 — the formula never needed the state to be pure.',
+            'Check that the probabilities add to one and that $|\\mathbf{r}|\\le1$.'],
+    go:'m3-expect' },
+
+  { k:'channel', name:'Channels, damping and dephasing',
+    asks:'A channel or a pair of decay times is given. Find the state afterwards, or a time, or a rate.',
+    method:['Apply the channel entry by entry rather than multiplying matrices: damping sends $\\rho_{11}\\to(1-\\gamma)\\rho_{11}$ and $\\rho_{01}\\to\\sqrt{1-\\gamma}\\,\\rho_{01}$; the phase flip leaves the diagonal and sends $\\rho_{01}\\to(1-2p)\\rho_{01}$.',
+            'Then rebuild the diagonal from the trace: it is one, so one population fixes the other.',
+            'In time, populations decay with $T_1$ and coherences with $T_2$, and the two are tied by $1/T_2=1/(2T_1)+1/T_\\phi$.',
+            'Check that the result is still a state — trace one, and $|\\rho_{01}|^{2}\\le\\rho_{00}\\rho_{11}$ — and that $T_2\\le 2T_1$.'],
+    go:'m3-kraus' },
+
+  { k:'ptrace', name:'Reduced states and the partial trace',
+    asks:'A two-qubit state is given. Find the state of one qubit, or compare two joint states that share one.',
+    method:['Fix the ordering first: $|q_1q_0\\rangle$, with entry $x$ of the column carrying the amplitude of $|x\\rangle$.',
+            'Cut the four-by-four into two-by-two blocks. The traces of the blocks are $\\rho_A$; the sum of the two diagonal blocks is $\\rho_B$. Getting these the wrong way round is the usual slip.',
+            'For a pure joint state the quicker route is the coefficient matrix: $\\rho_A=CC^{\\dagger}$ and $\\rho_B=(C^{\\dagger}C)^{\\mathsf{T}}$.',
+            'Check that each reduced state has trace one, and that both have the same non-zero eigenvalues.'],
+    go:'m3-ptrace' },
+
+  { k:'entangle', name:'Separability, Schmidt rank and entropy',
+    asks:'A bipartite pure state is given. Decide whether it factors, and if not, say by how much it is entangled.',
+    method:['For two qubits the test is one determinant: the state is a product exactly when $c_0c_3-c_1c_2=0$.',
+            'For the amount, reshape the amplitudes into $C$ and take its singular values. Their squares are the Schmidt coefficients, and the count of non-zero ones is the rank.',
+            'The entropy is $S=-\\sum_k\\lambda_k\\log_2\\lambda_k$, in bits, and it is what "how much entanglement" means for a pure pair.',
+            'Check that the $\\lambda_k$ add to one, that $S=0$ exactly when the state factors, and that $S$ never exceeds one bit for two qubits.'],
+    go:'m3-schmidt' },
+
+  { k:'bell', name:'Bell correlations and the CHSH number',
+    asks:'A Bell state and some measurement directions are given. Find the correlations, or the CHSH value, or what one party alone sees.',
+    method:['Apply the joint operator to the state and look for an eigenvector: for a Bell state each of $X\\otimes X$, $Y\\otimes Y$ and $Z\\otimes Z$ gives $\\pm1$ with certainty.',
+            'For directions in one plane on $|\\Phi^{+}\\rangle$, the correlation of the two readings is $\\cos$ of the angle between them.',
+            'Assemble $S$ with the fourth term subtracted, compare with $2$, and remember the ceiling $2\\sqrt2$.',
+            'For anything about one party alone, take the partial trace and stop: it does not depend on what the other party chose to do.'],
+    go:'m3-bell' },
+
+  { k:'full', name:'A full-length question: one pair, end to end',
+    asks:'A preparation, a channel or an idle period, a set of measurements and a reported number, in three to five parts.',
+    method:['Read every part before starting. The number at the end usually depends on every step before it.',
+            'Work in the order the experiment runs: state, then channel, then measurement, then statistics. Do not jump to the last part.',
+            'Carry exact values between parts and check each against the one before: trace one, purity in range, a correlation inside $[-1,1]$, and an error bar quoted with every estimated number.'] }
+];
+
+CONTENT.DRILL = CONTENT.DRILL.concat([
+
+/* ---- building and testing a density operator ------------------------- */
+
+{ id:'D3-01', module:'M3', type:'dm', src:'L6 · density operators: pure states, mixtures, and reduced states',
+  stem:'A source emits $|0\\rangle$ with probability $\\tfrac14$ and $|{+}\\rangle$ with probability $\\tfrac34$, and nothing records which.',
+  parts:['Write the density operator as a matrix in the computational basis.',
+         'Is the state pure? Say how you can tell without diagonalising.',
+         'Give the purity, and check it a second way.'],
+  sol:'<b>Given.</b> A classical coin choosing between two pure states, so the operator is a weighted sum of two outer products.<br>'
+     +'<b>Method.</b> Write each outer product as a matrix, then add with the weights.<br>'
+     +'<b>Solution — (a).</b> $|0\\rangle\\langle 0|=\\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}$ and $|{+}\\rangle\\langle{+}|=\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, so $\\rho=\\tfrac14\\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}+\\tfrac38\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}=\\begin{bmatrix}0.625&0.375\\\\0.375&0.375\\end{bmatrix}$.<br>'
+     +'<b>Solution — (b).</b> Not pure. Its determinant is $0.625(0.375)-0.375^{2}=0.09375$, and a pure state has rank one and therefore determinant zero.<br>'
+     +'<b>Solution — (c).</b> $\\operatorname{Tr}\\rho^{2}=0.625^{2}+0.375^{2}+2(0.375)^{2}=0.8125$.<br>'
+     +'<b>Check.</b> The Bloch vector is $r_{z}=0.625-0.375=0.25$ and $r_{x}=2(0.375)=0.75$, so $|\\mathbf{r}|^{2}=0.625$ and $\\tfrac12(1+0.625)=0.8125$. Two routes, one number, and $|\\mathbf{r}|<1$ as a mixed state requires.',
+  err:'Writing the superposition $\\tfrac12|0\\rangle+\\tfrac{\\sqrt3}{2}|{+}\\rangle$ instead. That is a pure state with purity one, and it is a different physical object: the source flips a coin, it does not add amplitudes.',
+  teach:'Ask for the purity of the superposition the error names. Getting one there and $0.8125$ here, from the same two numbers, is the fastest way to see that a mixture is not a superposition.' },
+
+{ id:'D3-02', module:'M3', type:'dm', src:'L6 · which matrices are physical states?',
+  stem:'Three candidate matrices: $M_{1}=\\begin{bmatrix}0.6&0.4\\\\0.4&0.4\\end{bmatrix}$, $M_{2}=\\begin{bmatrix}0.5&0.6i\\\\-0.6i&0.5\\end{bmatrix}$, $M_{3}=\\begin{bmatrix}0.5&0.3\\\\0.3&0.6\\end{bmatrix}$.',
+  parts:['Say which of the three are density operators, and which condition each failure breaks.',
+         'For the one that is a state, give its eigenvalues.',
+         'Give its purity, and check it against the eigenvalues.'],
+  sol:'<b>Given.</b> Three Hermitian-looking two-by-two matrices.<br>'
+     +'<b>Method.</b> Hermitian, then trace, then positive, in that order. For a qubit the last is $|\\rho_{01}|^{2}\\le\\rho_{00}\\rho_{11}$.<br>'
+     +'<b>Solution — (a).</b> $M_{1}$ is a state: Hermitian, trace one, and $0.4^{2}=0.16\\le 0.6(0.4)=0.24$. $M_{2}$ is Hermitian with trace one but $0.6^{2}=0.36>0.5(0.5)=0.25$, so positivity fails. $M_{3}$ has trace $1.1$, so it fails before positivity is reached.<br>'
+     +'<b>Solution — (b).</b> For $M_{1}$, $\\det = 0.24-0.16=0.08$, so $\\lambda_{\\pm}=\\tfrac12\\left(1\\pm\\sqrt{1-4(0.08)}\\right)=\\tfrac12\\left(1\\pm\\sqrt{0.68}\\right)$, that is $0.9123$ and $0.0877$.<br>'
+     +'<b>Solution — (c).</b> $\\operatorname{Tr}M_{1}^{2}=0.36+0.16+2(0.16)=0.84$.<br>'
+     +'<b>Check.</b> $0.9123^{2}+0.0877^{2}=0.84$. Both eigenvalues are in $[0,1]$ and they add to one, which is what positivity and unit trace together say.',
+  err:'Passing $M_{2}$ because it is Hermitian and has trace one. Those two are easy to arrange and mean nothing on their own; positivity is the condition that actually restricts, and it is the one skipped.',
+  teach:'$M_{2}$ is worth putting on the board as a warning: it looks more like a state than $M_{1}$ does, because its diagonal is symmetric. The eye is no help here and the inequality is.' },
+
+{ id:'D3-03', module:'M3', type:'dm', src:'L6 · density operators: pure states, mixtures, and reduced states',
+  stem:'Device A emits $|{+}\\rangle$ or $|{-}\\rangle$, each with probability $\\tfrac12$. Device B emits $|0\\rangle$ or $|1\\rangle$, each with probability $\\tfrac12$.',
+  parts:['Write both density operators.',
+         'Is there any measurement, or any number of copies, that tells the two devices apart?',
+         'Device A is now retuned to emit $|{+}\\rangle$ with probability $\\tfrac34$. Give the new matrix, and name a measurement that now separates it from device B.'],
+  sol:'<b>Given.</b> Two preparations that differ in every respect except their statistics.<br>'
+     +'<b>Method.</b> Build each matrix, compare, and then use the Bloch vector to find a measurement.<br>'
+     +'<b>Solution — (a).</b> $\\tfrac12\\left(|{+}\\rangle\\langle{+}|+|{-}\\rangle\\langle{-}|\\right)=\\tfrac12 I$ and $\\tfrac12\\left(|0\\rangle\\langle 0|+|1\\rangle\\langle 1|\\right)=\\tfrac12 I$. The two matrices are equal.<br>'
+     +'<b>Solution — (b).</b> No. Every prediction is $\\operatorname{Tr}(\\rho E)$ and the two $\\rho$ are the same operator, so every probability of every outcome of every measurement agrees, on any number of copies.<br>'
+     +'<b>Solution — (c).</b> $\\tfrac34|{+}\\rangle\\langle{+}|+\\tfrac14|{-}\\rangle\\langle{-}|=\\begin{bmatrix}0.5&0.25\\\\0.25&0.5\\end{bmatrix}$, with $\\mathbf{r}=(0.5,0,0)$. An $X$ measurement gives $p(+)=\\tfrac12(1+0.5)=0.75$, against $\\tfrac12$ for device B.<br>'
+     +'<b>Check.</b> A $Z$ measurement still gives $\\tfrac12$ and $\\tfrac12$ for both, so a reader who only ever measures $Z$ would still call them identical. The purity is $\\tfrac12(1+0.25)=0.625$, above the $0.5$ of $I/2$ and below one.',
+  err:'Answering part (b) with "yes, measure in the $X$ basis". Device A emits $X$ eigenstates, but which one is a fair coin, so the $X$ reading is a coin as well — exactly as it is for device B.',
+  teach:'Part (b) is the one to insist on. A student who answers it correctly has understood that $\\rho$ is the complete answer to every question that can be asked, and the rest of the chapter is easier afterwards.' },
+
+/* ---- predictions from a density operator ----------------------------- */
+
+{ id:'D3-04', module:'M3', type:'predict', src:'L6 · expectation values and measurement probabilities',
+  stem:'A qubit is in the state $\\rho=\\begin{bmatrix}0.7&0.2i\\\\-0.2i&0.3\\end{bmatrix}$.',
+  parts:['Give the three Pauli expectation values.',
+         'Give the outcome probabilities of a $Z$ measurement.',
+         'Give the purity, and say whether the state is pure.'],
+  sol:'<b>Given.</b> A density matrix with an imaginary coherence.<br>'
+     +'<b>Method.</b> Read the Bloch vector off the entries using $\\rho=\\tfrac12(I+\\mathbf{r}\\cdot\\boldsymbol\\sigma)$, which gives $r_{z}=\\rho_{00}-\\rho_{11}$ and $\\rho_{01}=\\tfrac12(r_{x}-ir_{y})$.<br>'
+     +'<b>Solution — (a).</b> $r_{z}=0.7-0.3=0.4$. From $\\tfrac12(r_{x}-ir_{y})=0.2i$ we get $r_{x}=0$ and $r_{y}=-0.4$. So $\\langle Z\\rangle=0.4$, $\\langle X\\rangle=0$, $\\langle Y\\rangle=-0.4$.<br>'
+     +'<b>Solution — (b).</b> $p(0)=\\rho_{00}=0.7$ and $p(1)=0.3$.<br>'
+     +'<b>Solution — (c).</b> $\\operatorname{Tr}\\rho^{2}=0.49+0.09+2(0.04)=0.66$, so the state is mixed.<br>'
+     +'<b>Check.</b> $|\\mathbf{r}|^{2}=0+0.16+0.16=0.32$ and $\\tfrac12(1+0.32)=0.66$, the same purity by the other route. The probabilities add to one and $|\\mathbf{r}|=0.566<1$, as a mixed state requires.',
+  err:'Reading $r_{y}=+0.4$ because the entry above the diagonal is $+0.2i$. The relation is $\\rho_{01}=\\tfrac12(r_{x}-ir_{y})$, with a minus sign, and the sign of $\\langle Y\\rangle$ is exactly what it decides.',
+  teach:'This is the question that catches a student who has memorised the matrix form without ever writing $\\tfrac12(I+\\mathbf{r}\\cdot\\boldsymbol\\sigma)$ out. Ask them to reconstruct $\\rho$ from their own $\\mathbf{r}$ as a check.' },
+
+{ id:'D3-05', module:'M3', type:'predict', src:'L6 · expectation values and measurement probabilities',
+  stem:'A qubit is in the mixture $\\rho=\\tfrac34|0\\rangle\\langle 0| + \\tfrac14|1\\rangle\\langle 1|$, and is measured along the direction $\\mathbf{n}=(\\sin\\alpha,\\,0,\\,\\cos\\alpha)$.',
+  parts:['Give the Bloch vector of the state.',
+         'Give $p(+1)$ as a function of $\\alpha$, and evaluate it at $\\alpha=60^{\\circ}$.',
+         'At which $\\alpha$ is the measurement a fair coin, and why does the answer not depend on how mixed the state is?'],
+  sol:'<b>Given.</b> A diagonal mixed state and a tilted instrument.<br>'
+     +'<b>Method.</b> $p(\\pm)=\\tfrac12(1\\pm\\mathbf{n}\\cdot\\mathbf{r})$, which was derived in chapter 2 and never needed the state to be pure.<br>'
+     +'<b>Solution — (a).</b> $r_{z}=0.75-0.25=0.5$ and the off-diagonal entries are zero, so $\\mathbf{r}=(0,0,0.5)$.<br>'
+     +'<b>Solution — (b).</b> $\\mathbf{n}\\cdot\\mathbf{r}=0.5\\cos\\alpha$, so $p(+1)=\\tfrac12\\left(1+0.5\\cos\\alpha\\right)$. At $\\alpha=60^{\\circ}$ this is $\\tfrac12(1+0.25)=0.625$.<br>'
+     +'<b>Solution — (c).</b> At $\\alpha=90^{\\circ}$, where $\\cos\\alpha=0$. The instrument is then aimed at right angles to $\\mathbf{r}$, and any vector along $z$ — of any length — has no component there.<br>'
+     +'<b>Check.</b> At $\\alpha=0$ the answer is $0.75$, which is $p(0)$ for a $Z$ measurement, as it must be. The probabilities add to one at every $\\alpha$.',
+  err:'Using $p(+1)=\\cos^{2}(\\alpha/2)$, which is the pure-state answer of chapter 2. That formula assumed $|\\mathbf{r}|=1$; here $|\\mathbf{r}|=0.5$ and the range of $p$ is only $0.25$ to $0.75$.',
+  teach:'Plot $p(+1)$ against $\\alpha$ for $|\\mathbf{r}|=1$ and for $|\\mathbf{r}|=0.5$ side by side. The mixed curve is the pure one squeezed towards one half, and that squeezing is the whole visible effect of mixedness.' },
+
+{ id:'D3-06', module:'M3', type:'predict', src:'L6 · expectation values and measurement probabilities',
+  stem:'The observable $A=X+Z$ is measured on the state $\\rho=\\begin{bmatrix}0.625&0.375\\\\0.375&0.375\\end{bmatrix}$.',
+  parts:['Give $\\langle A\\rangle$.',
+         'Give the variance of $A$ in this state.',
+         'The mean comes out as $1$. Is $1$ a reading the instrument can return?'],
+  sol:'<b>Given.</b> A sum of two Pauli operators, and the mixed state of the first question.<br>'
+     +'<b>Method.</b> The trace is linear, so $\\operatorname{Tr}(\\rho A)=\\langle X\\rangle+\\langle Z\\rangle$ and no matrix has to be multiplied.<br>'
+     +'<b>Solution — (a).</b> $\\langle X\\rangle=2(0.375)=0.75$ and $\\langle Z\\rangle=0.625-0.375=0.25$, so $\\langle A\\rangle=1$.<br>'
+     +'<b>Solution — (b).</b> $A^{2}=(X+Z)^{2}=X^{2}+Z^{2}+XZ+ZX=2I$, because $X$ and $Z$ anticommute. So $\\langle A^{2}\\rangle=2$ and $\\operatorname{Var}(A)=2-1^{2}=1$.<br>'
+     +'<b>Solution — (c).</b> No. $A^{2}=2I$ means the eigenvalues of $A$ are $\\pm\\sqrt2$, so every single reading is $+1.414$ or $-1.414$. The mean is where those two balance.<br>'
+     +'<b>Check.</b> The mean lies inside $[-\\sqrt2,\\sqrt2]$, as it must. And $\\operatorname{Var}(A)=1$ is positive, which a variance always is.',
+  err:'Computing $\\langle A^{2}\\rangle$ as $\\langle A\\rangle^{2}=1$ and reporting a variance of zero. The operator is squared before the sandwich, and here that squaring uses the anticommutation of $X$ and $Z$ rather than any property of the state.',
+  teach:'The anticommutation doing the work in part (b) is the Pauli algebra of chapter 2, used for something new. It is worth naming out loud: the cross terms cancel, and they cancel for every state.' },
+
+/* ---- channels, damping and dephasing --------------------------------- */
+
+{ id:'D3-07', module:'M3', type:'channel', src:'L6 · quantum channels and Kraus operators',
+  stem:'A qubit prepared in $|{+}\\rangle$ passes through an amplitude-damping channel of strength $\\gamma$.',
+  parts:['Give the density matrix after the channel for $\\gamma=0.36$.',
+         'Give its purity.',
+         'As $\\gamma$ runs from $0$ to $1$, what is the smallest purity the output ever has, and at which $\\gamma$?'],
+  sol:'<b>Given.</b> $\\rho=\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, and the rules $\\rho_{11}\\to(1-\\gamma)\\rho_{11}$, $\\rho_{01}\\to\\sqrt{1-\\gamma}\\,\\rho_{01}$.<br>'
+     +'<b>Method.</b> Apply the two rules, then rebuild the other population from the trace.<br>'
+     +'<b>Solution — (a).</b> $\\rho_{11}\\to 0.64(0.5)=0.32$, so $\\rho_{00}=0.68$, and $\\rho_{01}\\to\\sqrt{0.64}(0.5)=0.4$. The state is $\\begin{bmatrix}0.68&0.4\\\\0.4&0.32\\end{bmatrix}$.<br>'
+     +'<b>Solution — (b).</b> $0.68^{2}+0.32^{2}+2(0.4)^{2}=0.4624+0.1024+0.32=0.8848$.<br>'
+     +'<b>Solution — (c).</b> In general $r_{z}=\\gamma$ and $r_{x}=\\sqrt{1-\\gamma}$, so the purity is $\\tfrac12\\left(1+\\gamma^{2}+1-\\gamma\\right)=1-\\tfrac{\\gamma}{2}+\\tfrac{\\gamma^{2}}{2}$. That is smallest at $\\gamma=\\tfrac12$, where it is $0.875$.<br>'
+     +'<b>Check.</b> At $\\gamma=0.36$ the formula gives $1-0.18+0.0648=0.8848$, matching (b). At $\\gamma=1$ it gives one, correctly: the output is $|0\\rangle$, a pure state again.',
+  err:'Multiplying the coherence by $1-\\gamma$ instead of $\\sqrt{1-\\gamma}$. It is the amplitude that is damped once and the population twice, so the coherence always survives better than the population does.',
+  teach:'Part (c) is the surprise worth setting: a channel that destroys the qubit completely at full strength does its worst damage half way, and ends on a pure state. Ask why before showing the algebra.' },
+
+{ id:'D3-08', module:'M3', type:'channel', src:'L6 · quantum channels and Kraus operators',
+  stem:'A qubit prepared in $|{+}\\rangle$ passes through the phase-flip channel $\\mathcal{E}_{Z}(\\rho)=(1-p)\\rho+pZ\\rho Z$.',
+  parts:['Give the density matrix and the purity for $p=0.25$.',
+         'At which $p$ is the output the maximally mixed state?',
+         'Give the output at $p=1$, and explain why a channel at full strength has destroyed nothing.'],
+  sol:'<b>Given.</b> $\\rho=\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, and the rule $\\rho_{01}\\to(1-2p)\\rho_{01}$ with the diagonal untouched.<br>'
+     +'<b>Method.</b> One multiplication on one entry.<br>'
+     +'<b>Solution — (a).</b> $\\rho_{01}\\to 0.5(0.5)=0.25$, so the state is $\\begin{bmatrix}0.5&0.25\\\\0.25&0.5\\end{bmatrix}$, of purity $0.25+0.25+2(0.0625)=0.625$.<br>'
+     +'<b>Solution — (b).</b> At $p=\\tfrac12$, where $1-2p=0$ and the coherence vanishes. The diagonal is already $\\tfrac12,\\tfrac12$, so the output is $I/2$.<br>'
+     +'<b>Solution — (c).</b> At $p=1$ the channel is $\\rho\\mapsto Z\\rho Z$, which is the gate $Z$: the output is $|{-}\\rangle$, a pure state. Nothing was lost, because at $p=1$ the environment learns nothing — the same thing happens every run.<br>'
+     +'<b>Check.</b> The purity is $\\tfrac12\\left(1+(1-2p)^{2}\\right)$, which is one at $p=0$ and $p=1$ and $\\tfrac12$ in the middle. At $p=0.25$ that gives $\\tfrac12(1+0.25)=0.625$, matching (a).',
+  err:'Reading the strength as "how much damage", so that $p=1$ is the worst case. Damage is largest where the channel is least predictable, which is $p=\\tfrac12$; at either end the qubit undergoes the same unitary every time.',
+  teach:'Set this beside D3-07. Both channels are worst in the middle, and for the same reason, and neither is worst at full strength. That pattern is worth naming once so it is recognised later.' },
+
+{ id:'D3-09', module:'M3', type:'channel', src:'L6 · Markovian relaxation and dephasing',
+  stem:'A device has a relaxation time $T_{1}=80\\;\\mu\\text{s}$ and a pure-dephasing time $T_{\\phi}=40\\;\\mu\\text{s}$.',
+  parts:['Give $T_{2}$.',
+         'A qubit is prepared with an excited population and a coherence, and idles for $20\\;\\mu\\text{s}$. Give the surviving fraction of each.',
+         'What is the largest $T_{2}$ this $T_{1}$ allows, and what would have to be true of the device to reach it?'],
+  sol:'<b>Given.</b> Two rates, and the relation $1/T_{2}=1/(2T_{1})+1/T_{\\phi}$.<br>'
+     +'<b>Method.</b> Add the rates, invert, then evaluate the two exponentials.<br>'
+     +'<b>Solution — (a).</b> $1/T_{2}=1/160+1/40=5/160$, so $T_{2}=32\\;\\mu\\text{s}$.<br>'
+     +'<b>Solution — (b).</b> The population keeps $e^{-20/80}=e^{-0.25}=0.779$ of its initial value; the coherence keeps $e^{-20/32}=e^{-0.625}=0.535$.<br>'
+     +'<b>Solution — (c).</b> $T_{2}\\le 2T_{1}=160\\;\\mu\\text{s}$, reached only when $T_{\\phi}$ is infinite — that is, when there is no dephasing other than what relaxation itself causes.<br>'
+     +'<b>Check.</b> $32\\le160$, so the inequality holds. And the coherence has decayed further than the population, which it must whenever there is any pure dephasing at all.',
+  err:'Writing $1/T_{2}=1/T_{1}+1/T_{\\phi}$ and getting $T_{2}=26.7\\;\\mu\\text{s}$. The factor of two is not decoration: relaxation costs the coherence only half the rate it costs the population, which is the same $\\sqrt{1-\\gamma}$ as in D3-07.',
+  teach:'Connect the factor of two back to the damping channel explicitly. A student who has seen $\\sqrt{1-\\gamma}$ once will not misremember $1/(2T_{1})$ afterwards.' },
+
+/* ---- reduced states and the partial trace ---------------------------- */
+
+{ id:'D3-10', module:'M3', type:'ptrace', src:'L6 · partial trace: the state of a subsystem',
+  stem:'Two qubits are in the pure state $|\\psi\\rangle=\\tfrac12\\left(\\sqrt3\\,|00\\rangle+|11\\rangle\\right)$.',
+  parts:['Give the reduced state of each qubit.',
+         'Give the purity of each.',
+         'Is the pair entangled? Give the reason in one sentence.'],
+  sol:'<b>Given.</b> A pure two-qubit state with two non-zero amplitudes.<br>'
+     +'<b>Method.</b> Reshape the amplitudes into $C$ with rows indexed by $q_{1}$ and columns by $q_{0}$, then $\\rho_{A}=CC^{\\dagger}$.<br>'
+     +'<b>Solution — (a).</b> $C=\\begin{bmatrix}\\sqrt3/2&0\\\\0&1/2\\end{bmatrix}$, so $\\rho_{A}=CC^{\\dagger}=\\operatorname{diag}(0.75,\\,0.25)$, and $\\rho_{B}$ is the same.<br>'
+     +'<b>Solution — (b).</b> $0.75^{2}+0.25^{2}=0.625$ for each.<br>'
+     +'<b>Solution — (c).</b> Yes. The pair is pure with purity one and each half is mixed with purity $0.625$, and only entanglement produces that combination.<br>'
+     +'<b>Check.</b> Each reduced state has trace one, and the two have the same eigenvalues, which they must for a pure joint state. The separability determinant is $c_{0}c_{3}-c_{1}c_{2}=\\tfrac{\\sqrt3}{2}\\cdot\\tfrac12-0=\\tfrac{\\sqrt3}{4}\\ne0$, agreeing with (c).',
+  err:'Reporting $\\rho_{A}=\\operatorname{diag}(0.75,0.25)$ but $\\rho_{B}=\\operatorname{diag}(0.25,0.75)$, from reading the second index the wrong way along the column. Both reduced states of a pure pair have the same eigenvalues, and here they are the same matrix.',
+  teach:'Have the class do it twice, once by the block rule on the four-by-four and once by $CC^{\\dagger}$. The agreement is the point, and the second route is the one they will use afterwards.' },
+
+{ id:'D3-11', module:'M3', type:'ptrace', src:'L6 · partial trace: the state of a subsystem',
+  stem:'Two qubits are in the state $|\\psi\\rangle=\\tfrac12\\left(|00\\rangle+|01\\rangle+|10\\rangle-|11\\rangle\\right)$.',
+  parts:['Give the reduced state of the first qubit.',
+         'Decide whether the state is entangled, using the amplitude test.',
+         'Give the Schmidt coefficients and the entanglement entropy in bits.'],
+  sol:'<b>Given.</b> Four equal amplitudes with one sign changed.<br>'
+     +'<b>Method.</b> Reshape, then $\\rho_{A}=CC^{\\dagger}$; the determinant of $C$ answers (b) at the same time.<br>'
+     +'<b>Solution — (a).</b> $C=\\tfrac12\\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$, so $CC^{\\dagger}=\\tfrac14\\begin{bmatrix}2&0\\\\0&2\\end{bmatrix}=\\tfrac12 I$.<br>'
+     +'<b>Solution — (b).</b> $c_{0}c_{3}-c_{1}c_{2}=\\tfrac12\\left(-\\tfrac12\\right)-\\tfrac12\\left(\\tfrac12\\right)=-\\tfrac12\\ne0$, so the state is entangled.<br>'
+     +'<b>Solution — (c).</b> $\\rho_{A}=I/2$ has eigenvalues $\\tfrac12,\\tfrac12$, so the Schmidt coefficients are $\\lambda=\\tfrac12,\\tfrac12$ and $S=-2\\left(\\tfrac12\\log_{2}\\tfrac12\\right)=1$ bit.<br>'
+     +'<b>Check.</b> One bit is the maximum for two qubits, and it goes with a maximally mixed reduced state — which is what (a) gave. The three answers are the same fact three times.',
+  err:'Deciding the state is a product because the four amplitudes have equal size. Sign matters: with all four positive the state is $|{+}\\rangle\\otimes|{+}\\rangle$ and the determinant is zero, and one sign change makes it maximally entangled.',
+  teach:'Set the all-plus version first, get the product, then flip the last sign. The two states look almost identical on the page and are as far apart as two-qubit states get.' },
+
+{ id:'D3-12', module:'M3', type:'ptrace', src:'L6 · Bell states, correlations, and no signaling',
+  stem:'Compare $|\\Phi^{+}\\rangle=\\tfrac{1}{\\sqrt2}\\left(|00\\rangle+|11\\rangle\\right)$ with the mixed state $\\rho_{\\text{mix}}=\\tfrac12|00\\rangle\\langle 00|+\\tfrac12|11\\rangle\\langle 11|$.',
+  parts:['Give the reduced state of the first qubit in each case.',
+         'Give the purity of each joint state.',
+         'Name one measurement whose statistics differ, and give both answers.'],
+  sol:'<b>Given.</b> A pure entangled state and the classical mixture with the same populations.<br>'
+     +'<b>Method.</b> Partial trace for (a), $\\operatorname{Tr}\\rho^{2}$ for (b), and a joint correlation for (c).<br>'
+     +'<b>Solution — (a).</b> Both give $\\rho_{A}=I/2$. No measurement on one qubit alone separates them.<br>'
+     +'<b>Solution — (b).</b> $|\\Phi^{+}\\rangle$ is pure, so its purity is one. The mixture has eigenvalues $\\tfrac12,\\tfrac12$ inside a four-dimensional space, so its purity is $\\tfrac12$.<br>'
+     +'<b>Solution — (c).</b> Measure both qubits in the $X$ basis. For $|\\Phi^{+}\\rangle$, $\\langle X\\otimes X\\rangle=1$: the two readings always agree. For the mixture each qubit is separately a fair coin in $X$ and the readings are independent, so $\\langle X\\otimes X\\rangle=0$.<br>'
+     +'<b>Check.</b> Both give $\\langle Z\\otimes Z\\rangle=1$, so a reader who only measures in the computational basis sees no difference at all. That is why the $X$ correlation is the one worth reporting.',
+  err:'Concluding from part (a) that the two states are the same. Equal reduced states say only that no <em>local</em> measurement separates them; everything that differs is in the correlations, which the partial trace threw away.',
+  teach:'This question is the bridge to CHSH. A student who can say why $\\langle X\\otimes X\\rangle$ separates these two is ready for why one correlation is not enough to rule out every classical model.' },
+
+/* ---- separability, Schmidt rank and entropy -------------------------- */
+
+{ id:'D3-13', module:'M3', type:'entangle', src:'L6 · separability and the Schmidt decomposition',
+  stem:'Three two-qubit pure states: (i) $\\tfrac12\\left(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle\\right)$, (ii) $\\tfrac{1}{\\sqrt2}\\left(|00\\rangle+|11\\rangle\\right)$, (iii) $\\tfrac{1}{\\sqrt2}\\left(|00\\rangle+|01\\rangle\\right)$.',
+  parts:['Apply the amplitude test to each.',
+         'Factor the ones that factor.',
+         'For each, say what the reduced state of the first qubit is without computing a partial trace.'],
+  sol:'<b>Given.</b> Three states, written in the ordering $|q_{1}q_{0}\\rangle$.<br>'
+     +'<b>Method.</b> The test is $c_{0}c_{3}-c_{1}c_{2}=0$ for a product.<br>'
+     +'<b>Solution — (a).</b> (i) $\\tfrac14-\\tfrac14=0$: a product. (ii) $\\tfrac12-0=\\tfrac12\\ne0$: entangled. (iii) $c=(\\tfrac{1}{\\sqrt2},\\tfrac{1}{\\sqrt2},0,0)$, so $0-0=0$: a product.<br>'
+     +'<b>Solution — (b).</b> (i) is $|{+}\\rangle\\otimes|{+}\\rangle$. (iii) is $|0\\rangle\\otimes|{+}\\rangle$.<br>'
+     +'<b>Solution — (c).</b> A product state has a pure reduced state, and it is the corresponding factor: $|{+}\\rangle\\langle{+}|$ for (i) and $|0\\rangle\\langle 0|$ for (iii). For (ii) the state is maximally entangled, so $\\rho_{A}=I/2$.<br>'
+     +'<b>Check.</b> Each factorisation multiplies back out to the stated four amplitudes. And (iii) has all its weight on $q_{1}=0$, so the first qubit had to come out as $|0\\rangle$.',
+  err:'Calling (iii) entangled because two of its amplitudes are zero. Zeros are not evidence either way; the determinant is, and here it vanishes because the two non-zero amplitudes sit in the same row of $C$.',
+  teach:'Ask which qubit is the interesting one in (iii). The second is in $|{+}\\rangle$ and the first is definite, and reading that off the bit strings is a skill the later chapters use constantly.' },
+
+{ id:'D3-14', module:'M3', type:'entangle', src:'L6 · computing Schmidt decompositions with an SVD',
+  stem:'Two qubits are in the pure state $|\\psi\\rangle=\\tfrac{1}{\\sqrt6}\\left(|00\\rangle+|01\\rangle+2|10\\rangle\\right)$.',
+  parts:['Write the coefficient matrix and give $\\rho_{A}$.',
+         'Give the two Schmidt coefficients.',
+         'Give the entanglement entropy in bits.'],
+  sol:'<b>Given.</b> Three non-zero amplitudes, already normalised since $1+1+4=6$.<br>'
+     +'<b>Method.</b> Reshape into $C$, form $\\rho_{A}=CC^{\\dagger}$, and take its eigenvalues; those are the Schmidt coefficients.<br>'
+     +'<b>Solution — (a).</b> $C=\\tfrac{1}{\\sqrt6}\\begin{bmatrix}1&1\\\\2&0\\end{bmatrix}$, so $\\rho_{A}=CC^{\\dagger}=\\tfrac16\\begin{bmatrix}2&2\\\\2&4\\end{bmatrix}$.<br>'
+     +'<b>Solution — (b).</b> The trace is one and the determinant is $\\left(8-4\\right)/36=\\tfrac19$, so $\\lambda_{\\pm}=\\tfrac12\\left(1\\pm\\sqrt{1-\\tfrac49}\\right)=\\tfrac12\\left(1\\pm\\tfrac{\\sqrt5}{3}\\right)$, that is $0.8727$ and $0.1273$.<br>'
+     +'<b>Solution — (c).</b> $S=-0.8727\\log_{2}0.8727-0.1273\\log_{2}0.1273=0.1714+0.3786=0.550$ bits.<br>'
+     +'<b>Check.</b> The two coefficients add to one. The purity of $\\rho_{A}$ is $1-2\\det=\\tfrac79=0.778$, and $0.8727^{2}+0.1273^{2}=0.778$ as well. The entropy is between zero and one bit, as two qubits require.',
+  err:'Reshaping the column the wrong way round, so that $C$ is transposed. The singular values are unchanged, so the entropy still comes out right, and the two Schmidt bases have been swapped without any warning — which is why the ordering has to be stated before the reshape and not after.',
+  teach:'Worth doing once numerically as well. Ask for the singular values of $C$ directly and check that their squares are the eigenvalues found here; that is the whole content of the SVD route.' },
+
+{ id:'D3-15', module:'M3', type:'entangle', src:'L6 · separability and the Schmidt decomposition',
+  stem:'A family of two-qubit states, $|\\psi(\\theta)\\rangle=\\cos\\theta\\,|00\\rangle+\\sin\\theta\\,|11\\rangle$, with $\\theta$ between $0$ and $90^{\\circ}$.',
+  parts:['Give the Schmidt coefficients as functions of $\\theta$.',
+         'At which $\\theta$ is the pair maximally entangled, and at which is it a product?',
+         'Give the entropy at $\\theta=30^{\\circ}$.'],
+  sol:'<b>Given.</b> A one-parameter family, already written in Schmidt form.<br>'
+     +'<b>Method.</b> Read the coefficients off, since the two product terms are already orthogonal on both sides.<br>'
+     +'<b>Solution — (a).</b> $\\lambda_{1}=\\cos^{2}\\theta$ and $\\lambda_{2}=\\sin^{2}\\theta$.<br>'
+     +'<b>Solution — (b).</b> Maximally entangled at $\\theta=45^{\\circ}$, where both are $\\tfrac12$; a product at $\\theta=0$ and $\\theta=90^{\\circ}$, where one of them vanishes and the rank drops to one.<br>'
+     +'<b>Solution — (c).</b> At $\\theta=30^{\\circ}$, $\\lambda=\\tfrac34,\\tfrac14$, so $S=-0.75\\log_{2}0.75-0.25\\log_{2}0.25=0.3113+0.5=0.811$ bits.<br>'
+     +'<b>Check.</b> The coefficients add to one at every $\\theta$. The entropy is zero at both ends and one bit in the middle, and $0.811$ sits between them, closer to the maximum than $\\theta=30^{\\circ}$ might suggest.',
+  err:'Reporting the Schmidt coefficients as $\\cos\\theta$ and $\\sin\\theta$. Those are the coefficients of the state; the $\\lambda_{k}$ are their squares, and they are the ones that add to one and go into the entropy.',
+  teach:'Ask for the entropy at $\\theta=10^{\\circ}$ as well. It is about $0.20$ bits, which is far more than the $\\sin^{2}10^{\\circ}=0.03$ a student expects, and it shows how slowly entanglement disappears near a product state.' },
+
+/* ---- Bell correlations and CHSH -------------------------------------- */
+
+{ id:'D3-16', module:'M3', type:'bell', src:'L6 · Bell states, correlations, and no signaling',
+  stem:'Two qubits are in the singlet $|\\Psi^{-}\\rangle=\\tfrac{1}{\\sqrt2}\\left(|01\\rangle-|10\\rangle\\right)$.',
+  parts:['Give $\\langle X\\otimes X\\rangle$, $\\langle Y\\otimes Y\\rangle$ and $\\langle Z\\otimes Z\\rangle$.',
+         'Give the reduced state of each qubit.',
+         'What do the three answers in (a) say about measuring both qubits along the <em>same</em> arbitrary direction?'],
+  sol:'<b>Given.</b> The one Bell state that is antisymmetric under exchanging the two qubits.<br>'
+     +'<b>Method.</b> Apply each joint operator and look for an eigenvector.<br>'
+     +'<b>Solution — (a).</b> $X\\otimes X$ swaps $|01\\rangle$ and $|10\\rangle$, giving $-|\\Psi^{-}\\rangle$, so $\\langle X\\otimes X\\rangle=-1$. $Y\\otimes Y$ maps $|01\\rangle\\to|10\\rangle$ and $|10\\rangle\\to|01\\rangle$, giving $-|\\Psi^{-}\\rangle$ again. $Z\\otimes Z$ multiplies both terms by $-1$. All three are $-1$.<br>'
+     +'<b>Solution — (b).</b> $\\rho_{A}=\\rho_{B}=I/2$, as for every Bell state.<br>'
+     +'<b>Solution — (c).</b> The two readings always disagree, along <em>any</em> direction. Since the correlation is $-1$ along all three axes and the general direction is a combination of them, the singlet anticorrelates perfectly in every basis — which no other two-qubit state does.<br>'
+     +'<b>Check.</b> Each correlation has modulus one, so each is a certain statement, and each qubit alone is still a fair coin. Certainty about the pair with complete uncertainty about each part is the signature of maximal entanglement.',
+  err:'Getting $\\langle Y\\otimes Y\\rangle=+1$ by forgetting one of the two factors of $i$. Track both: $Y|0\\rangle=i|1\\rangle$ and $Y|1\\rangle=-i|0\\rangle$, so each term picks up $i(-i)=+1$ and the minus sign comes from the state, not from the operator.',
+  teach:'The singlet is the state to remember, because its perfect anticorrelation in every direction is what makes the classical explanation feel most obviously available — and it is the one CHSH removes.' },
+
+{ id:'D3-17', module:'M3', type:'bell', src:'L6 · Bell states, correlations, and no signaling',
+  stem:'Both parties measure $|\\Phi^{+}\\rangle$ along directions in the $z$–$x$ plane, at angles from $z$ of $A_{0}=0^{\\circ}$, $A_{1}=90^{\\circ}$, $B_{0}=30^{\\circ}$ and $B_{1}=-30^{\\circ}$. For this state the correlation of two such readings is the cosine of the angle between the directions.',
+  parts:['Give the four correlations.',
+         'Give $S=\\langle A_{0}B_{0}\\rangle+\\langle A_{0}B_{1}\\rangle+\\langle A_{1}B_{0}\\rangle-\\langle A_{1}B_{1}\\rangle$, and say whether it violates the classical bound.',
+         'Keeping $A_{0}$ and $A_{1}$ fixed and the two $B$ angles symmetric at $\\pm\\varphi$, find the $\\varphi$ that makes $S$ largest, and the value there.'],
+  sol:'<b>Given.</b> Four directions and one rule, $\\langle A B\\rangle=\\cos(a-b)$.<br>'
+     +'<b>Method.</b> Four cosines, then one sum with the last term subtracted.<br>'
+     +'<b>Solution — (a).</b> $\\cos(-30^{\\circ})=0.866$, $\\cos(30^{\\circ})=0.866$, $\\cos(60^{\\circ})=0.5$ and $\\cos(120^{\\circ})=-0.5$.<br>'
+     +'<b>Solution — (b).</b> $S=0.866+0.866+0.5-(-0.5)=2.732$, which is above $2$, so it violates.<br>'
+     +'<b>Solution — (c).</b> In general $S=2\\left(\\cos\\varphi+\\sin\\varphi\\right)=2\\sqrt2\\cos\\left(\\varphi-45^{\\circ}\\right)$, largest at $\\varphi=45^{\\circ}$ with $S=2\\sqrt2\\approx2.828$.<br>'
+     +'<b>Check.</b> At $\\varphi=30^{\\circ}$ the general formula gives $2(0.866+0.5)=2.732$, matching (b). Every individual correlation stays inside $[-1,1]$, and $S$ never passes $2\\sqrt2$.',
+  err:'Adding all four terms. The minus sign on the last one is the whole construction: with four plus signs the classical bound is four as well and nothing is being tested.',
+  teach:'Part (c) is worth doing on the board: the violation covers a wide band of angles rather than one exact setting, and that is why the experiment can be performed with imperfect apparatus at all.' },
+
+{ id:'D3-18', module:'M3', type:'bell', src:'L6 · Bell states, correlations, and no signaling',
+  stem:'Two parties each hold one qubit of $|\\Phi^{+}\\rangle$. The second party measures their qubit in the $X$ basis.',
+  parts:['Rewrite $|\\Phi^{+}\\rangle$ with both qubits in the $X$ basis.',
+         'Given that the second party obtained $+1$ and told the first party so, what is the first party\u2019s state?',
+         'If the second party says nothing, what is the first party\u2019s state — and does the answer depend on whether the second party measured $X$, measured $Z$, or did nothing at all?'],
+  sol:'<b>Given.</b> A Bell pair and one local measurement.<br>'
+     +'<b>Method.</b> Change basis on both sides, then read off; for (c) take the partial trace and stop.<br>'
+     +'<b>Solution — (a).</b> Substituting $|0\\rangle=(|{+}\\rangle+|{-}\\rangle)/\\sqrt2$ and $|1\\rangle=(|{+}\\rangle-|{-}\\rangle)/\\sqrt2$ into both factors and collecting terms gives $|\\Phi^{+}\\rangle=\\tfrac{1}{\\sqrt2}\\left(|{+}{+}\\rangle+|{-}{-}\\rangle\\right)$: the same form in the new basis.<br>'
+     +'<b>Solution — (b).</b> $|{+}\\rangle$, with certainty. The correlation $\\langle X\\otimes X\\rangle=1$ says the two readings always agree.<br>'
+     +'<b>Solution — (c).</b> $I/2$ in all three cases. The reduced state is $\\operatorname{Tr}_{B}|\\Phi^{+}\\rangle\\langle\\Phi^{+}|=I/2$ and the second party\u2019s choice never enters it.<br>'
+     +'<b>Check.</b> Averaging the two conditional states of (b) with their probabilities gives $\\tfrac12|{+}\\rangle\\langle{+}|+\\tfrac12|{-}\\rangle\\langle{-}|=I/2$, which is (c). The conditioning changes the description and not the statistics.',
+  err:'Answering (c) with $|{+}\\rangle$ or $|{-}\\rangle$, "we just do not know which". That is one particular ensemble for $I/2$, and $Z$ would have given a different one with the same matrix. Naming either as what is really there is the step that makes signalling look possible.',
+  teach:'Part (a) is the surprise: the Bell state has the same form in the $X$ basis. It is worth doing the substitution in full, because it explains the perfect $X$ correlation without any further calculation.' },
+
+/* ---- full-length questions ------------------------------------------- */
+
+{ id:'D3-19', module:'M3', type:'full', src:'L6 · Bell states, correlations, and no signaling',
+  stem:'A Bell pair $|\\Phi^{+}\\rangle$ is made. One of the two qubits then passes through a phase-flip channel of strength $p$ before both are measured along directions in the $z$–$x$ plane. The channel multiplies $\\langle X\\otimes X\\rangle$ and $\\langle Y\\otimes Y\\rangle$ by $\\eta=1-2p$ and leaves $\\langle Z\\otimes Z\\rangle$ alone.',
+  parts:['With $A_{0}=0^{\\circ}$, $A_{1}=90^{\\circ}$, $B_{0}=45^{\\circ}$ and $B_{1}=-45^{\\circ}$, write $S$ as a function of $\\eta$.',
+         'Evaluate $S$ at $p=0.1$.',
+         'Find the largest $p$ for which the pair still violates the classical bound.',
+         'The state is a mixture of two Bell states and stays entangled for every $p<\\tfrac12$. What does the gap between that and your answer to (c) say?'],
+  sol:'<b>Given.</b> A Bell pair, a channel acting on one side, and four measurement directions.<br>'
+     +'<b>Method.</b> Write each correlation as $n_{x}m_{x}\\eta+n_{z}m_{z}$, since the $y$ components are zero for directions in this plane, then assemble $S$.<br>'
+     +'<b>Solution — (a).</b> $A_{0}$ has $n=(0,0,1)$, so its two correlations carry no $\\eta$: both are $\\cos45^{\\circ}=1/\\sqrt2$. $A_{1}$ has $n=(1,0,0)$, so its two are $\\eta/\\sqrt2$ and $-\\eta/\\sqrt2$. Hence $S=\\sqrt2\\left(1+\\eta\\right)$.<br>'
+     +'<b>Solution — (b).</b> At $p=0.1$, $\\eta=0.8$ and $S=\\sqrt2(1.8)=2.546$.<br>'
+     +'<b>Solution — (c).</b> $S>2$ needs $1+\\eta>\\sqrt2$, that is $\\eta>0.4142$ and $p<0.2929$.<br>'
+     +'<b>Solution — (d).</b> Between $p=0.293$ and $p=0.5$ the pair is entangled and violates nothing. So a CHSH violation is a sufficient test for entanglement and not a necessary one: passing the test proves entanglement, failing it proves nothing.<br>'
+     +'<b>Check.</b> At $p=0$, $\\eta=1$ and $S=2\\sqrt2$, the undamaged value. At $p=\\tfrac12$, $\\eta=0$ and $S=\\sqrt2=1.414$, well inside the bound — and there the state is the classical mixture of D3-12, which is not entangled.',
+  err:'Multiplying all four correlations by $\\eta$. Two of the four involve a direction along $z$ on the damaged side, and the channel does nothing to $Z$; noticing which terms it touches is most of this question.',
+  teach:'Part (d) is the one worth the time. Students leave with "entangled means it violates CHSH", and this is the cheapest counterexample: one channel, one parameter, and a whole band where the two notions come apart.' },
+
+{ id:'D3-20', module:'M3', type:'full', src:'L6 · Markovian relaxation and dephasing',
+  stem:'A qubit is prepared in $|{+}\\rangle$ on a device with $T_{1}=50\\;\\mu\\text{s}$ and $T_{2}=30\\;\\mu\\text{s}$. It is left idle for a time $t$ and then measured in the $X$ basis.',
+  parts:['Give $p(+)$ as a function of $t$.',
+         'Evaluate it at $t=20\\;\\mu\\text{s}$.',
+         'How many shots are needed to estimate that probability to $\\pm0.01$ at two standard errors?',
+         'Check that the two quoted times are consistent with each other, and say what would have to be measured to know $T_{\\phi}$.'],
+  sol:'<b>Given.</b> A coherence that decays with $T_{2}$, and a measurement that reads the coherence.<br>'
+     +'<b>Method.</b> $|{+}\\rangle$ has $\\mathbf{r}=(1,0,0)$; the coherence decays as $e^{-t/T_{2}}$, so $r_{x}(t)=e^{-t/T_{2}}$, and $p(+)=\\tfrac12\\left(1+r_{x}\\right)$.<br>'
+     +'<b>Solution — (a).</b> $p(+)=\\tfrac12\\left(1+e^{-t/T_{2}}\\right)$.<br>'
+     +'<b>Solution — (b).</b> $e^{-20/30}=e^{-0.6667}=0.5134$, so $p(+)=0.7567$.<br>'
+     +'<b>Solution — (c).</b> Two standard errors is $0.01$, so $\\mathrm{SE}=0.005$ and $N=p(1-p)/\\mathrm{SE}^{2}=0.1841/(2.5\\times10^{-5})\\approx 7400$ shots.<br>'
+     +'<b>Solution — (d).</b> $T_{2}=30\\le 2T_{1}=100$, so the pair is consistent. From $1/T_{2}=1/(2T_{1})+1/T_{\\phi}$, $1/T_{\\phi}=1/30-1/100$, giving $T_{\\phi}=42.9\\;\\mu\\text{s}$ — so $T_{\\phi}$ is not measured directly, it is what is left after the relaxation contribution is removed from $T_{2}$.<br>'
+     +'<b>Check.</b> At $t=0$ the formula gives $p(+)=1$, which is a fresh $|{+}\\rangle$ measured in its own basis. As $t$ grows, $p(+)\\to\\tfrac12$: the state has become $I/2$ in every respect the $X$ reading can see. And $7400$ shots is the ordinary cost of two decimal places, exactly as chapter 2 said.',
+  err:'Using $T_{1}$ for the decay of $p(+)$. The $X$ reading is sensitive to the coherence, not to the population, so it is $T_{2}$ that appears — and a student who uses $T_{1}$ reports a device that looks better than it is.',
+  teach:'This question is the whole of chapters 2 and 3 in one experiment: a state, a channel, a measurement basis chosen so the effect is visible, and a shot count with an error bar. It is a good one to set as the last item of the sheet.' }
+
+]);
+
+window.DRILL_M3 = [
+
+{ id:'m3-drill', module:'M3', nav:'Module 3 · practice questions',
+  title:'Module 3 — practice questions',
+  objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
+  keywords:'practice questions module 3 density operator purity channel partial trace schmidt entropy bell chsh',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 3 · Practice D3-01 … D3-20'},
+  {t:'title', text:'Practice questions'},
+  {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: a trace of one, eigenvalues in $[0,1]$, a purity between $1/d$ and one computed both from the entries and from $|\\mathbf{r}|$, Schmidt coefficients that add to one, an entropy that is never negative, and a correlation of two $\\pm1$ observables inside $[-1,1]$.'},
+  {t:'rule', short:true},
+  {t:'drill', module:'M3'}
 ]}
 
 ];

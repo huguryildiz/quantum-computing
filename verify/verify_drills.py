@@ -28,8 +28,10 @@ from scipy.linalg import expm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
-from qops import (H, I2, KET0, KET1, KETM, KETP, X, Z,        # noqa: E402
-                  dev, inner, outer, unitarity)
+from qops import (BELL_PHI_P, BELL_PSI_M, H, I2, KET0, KET1,  # noqa: E402
+                  KETM, KETP, X, Y, Z, amp_damp, bloch, channel, dev,
+                  direction, inner, kron, ndotsigma, outer, partial_trace,
+                  phase_flip, proj, purity, unitarity, von_neumann)
 
 R2 = 1 / math.sqrt(2)
 
@@ -433,6 +435,126 @@ def _d220_meanZ(t):
     return _m2_mean(np.array([[1, 0], [0, -1]], dtype=complex), psi)
 
 
+
+# ── chapter 3 · mixed states and entanglement ───────────────────────────────
+#
+# The solutions apply a channel by its two entry rules, read a reduced state
+# off a block structure, and assemble a CHSH value from cosines. None of those
+# is the route below: channels are Kraus matrices multiplied out, reduced
+# states come from the sum over (I (x) <j|) of the definition, and correlations
+# are traces of four-by-four operators against the state.
+
+_D3_MIX01 = 0.25 * proj(KET0) + 0.75 * proj(KETP)          # D3-01
+_D3_M1 = np.array([[0.6, 0.4], [0.4, 0.4]], dtype=complex)  # D3-02
+_D3_M2 = np.array([[0.5, 0.6j], [-0.6j, 0.5]], dtype=complex)
+_D3_RETUNE = 0.75 * proj(KETP) + 0.25 * proj(KETM)          # D3-03
+_D3_RHO04 = np.array([[0.7, 0.2j], [-0.2j, 0.3]], dtype=complex)
+_D3_DIAG = 0.75 * proj(KET0) + 0.25 * proj(KET1)            # D3-05
+
+
+def _d3_mean(rho, A):
+    return float(np.trace(np.asarray(rho) @ np.asarray(A)).real)
+
+
+def _d3_eig(M):
+    return np.linalg.eigvalsh(np.asarray(M, dtype=complex))
+
+
+def _d3_p_along(rho, deg):
+    """p(+1) for a measurement along `deg` from z, from the projector itself
+    rather than from the (1 + n.r)/2 shortcut the solution uses."""
+    P = 0.5 * (I2 + ndotsigma(direction(deg)))
+    return _d3_mean(rho, P)
+
+
+def _d3_damped(gamma):
+    return channel(amp_damp(gamma), proj(KETP))
+
+
+def _d3_damp_purity_min():
+    """The smallest purity |+> reaches under damping, found by sampling rather
+    than by differentiating the closed form the solution writes down."""
+    return min(purity(_d3_damped(float(g))) for g in np.linspace(0.0, 1.0, 100001))
+
+
+def _d3_damp_argmin():
+    gs = np.linspace(0.0, 1.0, 100001)
+    return float(gs[int(np.argmin([purity(_d3_damped(float(g))) for g in gs]))])
+
+
+def _d3_dephased(p):
+    return channel(phase_flip(p), proj(KETP))
+
+
+def _d3_t2(t1, tphi):
+    return 1.0 / (1.0 / (2.0 * t1) + 1.0 / tphi)
+
+
+def _d3_tphi(t1, t2):
+    return 1.0 / (1.0 / t2 - 1.0 / (2.0 * t1))
+
+
+_D3_LOPSIDED = np.array([math.sqrt(3) / 2, 0, 0, 0.5], dtype=complex)   # D3-10
+_D3_SIGNFLIP = np.array([1, 1, 1, -1], dtype=complex) / 2               # D3-11
+_D3_SVDSTATE = np.array([1, 1, 2, 0], dtype=complex) / math.sqrt(6)     # D3-14
+
+
+def _d3_reduced(psi, keep=0):
+    return partial_trace(proj(np.asarray(psi, dtype=complex)), keep)
+
+
+def _d3_det(psi):
+    c = np.asarray(psi, dtype=complex)
+    return abs(c[0] * c[3] - c[1] * c[2])
+
+
+def _d3_family(theta_deg):
+    t = math.radians(theta_deg)
+    return np.array([math.cos(t), 0, 0, math.sin(t)], dtype=complex)
+
+
+def _d3_corr(rho, a_deg, b_deg):
+    M = kron(ndotsigma(direction(a_deg)), ndotsigma(direction(b_deg)))
+    return float(np.trace(np.asarray(rho) @ M).real)
+
+
+def _d3_chsh(rho, a0, a1, b0, b1):
+    return (_d3_corr(rho, a0, b0) + _d3_corr(rho, a0, b1)
+            + _d3_corr(rho, a1, b0) - _d3_corr(rho, a1, b1))
+
+
+def _d3_dephased_pair(p):
+    """The Bell pair with the phase-flip channel applied to the second qubit
+    only, built as a Kraus map on the four-dimensional space."""
+    ks = [np.kron(I2, K) for K in phase_flip(p)]
+    return channel(ks, proj(BELL_PHI_P))
+
+
+def _d3_chsh_threshold():
+    """The largest dephasing that still violates, found by bisection on the
+    simulated state rather than from the algebra the solution does."""
+    lo, hi = 0.0, 0.5
+    for _ in range(200):
+        mid = 0.5 * (lo + hi)
+        if _d3_chsh(_d3_dephased_pair(mid), 0.0, 90.0, 45.0, -45.0) > 2.0:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def _d3_idle_pplus(t, t2):
+    """p(+) for |+> after idling, from a dephasing channel of the matching
+    strength rather than from the exponential written in the solution."""
+    p = 0.5 * (1 - math.exp(-t / t2))
+    rho = channel(phase_flip(p), proj(KETP))
+    return _d3_mean(rho, proj(KETP))
+
+
+def _d3_shots_for(target_two_se, p):
+    return p * (1 - p) / (target_two_se / 2.0) ** 2
+
+
 CHECKS = [
     {"name": "D1-01 squared overlap", "stated": 0.5,
      "derive": _d101_squared_overlap, "rtol": 1e-12},
@@ -714,8 +836,260 @@ CHECKS = [
      "derive": lambda: _d220_meanZ(0.0), "rtol": 1e-12},
     {"name": "D2-20 shots for a standard error of 0.05", "stated": 400.0,
      "derive": lambda: _shots_for(0.05, 0.0), "rtol": 1e-9},
+
+    # ---- D3-01 to D3-03 · building and testing a density operator -------
+    {"name": "D3-01 the 00 entry of the mixture", "stated": 0.625,
+     "derive": lambda: float(_D3_MIX01[0, 0].real), "rtol": 1e-12},
+    {"name": "D3-01 its coherence", "stated": 0.375,
+     "derive": lambda: float(_D3_MIX01[0, 1].real), "rtol": 1e-12},
+    {"name": "D3-01 its determinant", "stated": 0.09375,
+     "derive": lambda: float(np.linalg.det(_D3_MIX01).real), "rtol": 1e-10},
+    {"name": "D3-01 its purity", "stated": 0.8125,
+     "derive": lambda: purity(_D3_MIX01), "rtol": 1e-12},
+    {"name": "D3-01 the squared length of its Bloch vector", "stated": 0.625,
+     "derive": lambda: float(np.linalg.norm(bloch(_D3_MIX01))) ** 2, "rtol": 1e-12},
+    {"name": "D3-02 M1 is a state", "stated": 0.0,
+     "derive": lambda: min(0.0, float(_d3_eig(_D3_M1)[0])), "atol": 1e-15},
+    {"name": "D3-02 M2 has a negative eigenvalue", "stated": -0.1,
+     "derive": lambda: float(_d3_eig(_D3_M2)[0]), "rtol": 1e-12},
+    {"name": "D3-02 M3 does not have trace one", "stated": 1.1,
+     "derive": lambda: float(np.trace(
+         np.array([[0.5, 0.3], [0.3, 0.6]], dtype=complex)).real), "rtol": 1e-12},
+    {"name": "D3-02 the larger eigenvalue of M1", "stated": 0.9123,
+     "derive": lambda: float(_d3_eig(_D3_M1)[1]), "rtol": 1e-4},
+    {"name": "D3-02 the smaller eigenvalue of M1", "stated": 0.0877,
+     "derive": lambda: float(_d3_eig(_D3_M1)[0]), "rtol": 1e-3},
+    {"name": "D3-02 the purity of M1", "stated": 0.84,
+     "derive": lambda: purity(_D3_M1), "rtol": 1e-12},
+    {"name": "D3-03 both devices give I/2", "stated": 0.0,
+     "derive": lambda: dev(0.5 * proj(KETP) + 0.5 * proj(KETM),
+                           0.5 * proj(KET0) + 0.5 * proj(KET1)), "atol": 1e-15},
+    {"name": "D3-03 the retuned device has coherence 0.25", "stated": 0.25,
+     "derive": lambda: float(_D3_RETUNE[0, 1].real), "rtol": 1e-12},
+    {"name": "D3-03 its p(+) in the X basis", "stated": 0.75,
+     "derive": lambda: _d3_mean(_D3_RETUNE, proj(KETP)), "rtol": 1e-12},
+    {"name": "D3-03 its purity", "stated": 0.625,
+     "derive": lambda: purity(_D3_RETUNE), "rtol": 1e-12},
+
+    # ---- D3-04 to D3-06 · predictions -----------------------------------
+    {"name": "D3-04 <Z>", "stated": 0.4,
+     "derive": lambda: _d3_mean(_D3_RHO04, Z), "rtol": 1e-12},
+    {"name": "D3-04 <X>", "stated": 0.0,
+     "derive": lambda: _d3_mean(_D3_RHO04, X), "atol": 1e-15},
+    {"name": "D3-04 <Y>", "stated": -0.4,
+     "derive": lambda: _d3_mean(_D3_RHO04, Y), "rtol": 1e-12},
+    {"name": "D3-04 p(0)", "stated": 0.7,
+     "derive": lambda: _d3_mean(_D3_RHO04, proj(KET0)), "rtol": 1e-12},
+    {"name": "D3-04 its purity", "stated": 0.66,
+     "derive": lambda: purity(_D3_RHO04), "rtol": 1e-12},
+    {"name": "D3-05 the z component of the diagonal mixture", "stated": 0.5,
+     "derive": lambda: float(bloch(_D3_DIAG)[2]), "rtol": 1e-12},
+    {"name": "D3-05 p(+1) at 60 degrees", "stated": 0.625,
+     "derive": lambda: _d3_p_along(_D3_DIAG, 60.0), "rtol": 1e-12},
+    {"name": "D3-05 the fair coin is at 90 degrees", "stated": 0.5,
+     "derive": lambda: _d3_p_along(_D3_DIAG, 90.0), "rtol": 1e-12},
+    {"name": "D3-05 the pure-state formula would have given something else",
+     "stated": 0.75, "derive": lambda: math.cos(math.radians(30.0)) ** 2,
+     "rtol": 1e-12},
+    {"name": "D3-06 <X + Z>", "stated": 1.0,
+     "derive": lambda: _d3_mean(_D3_MIX01, X + Z), "rtol": 1e-12},
+    {"name": "D3-06 <(X + Z)^2>", "stated": 2.0,
+     "derive": lambda: _d3_mean(_D3_MIX01, (X + Z) @ (X + Z)), "rtol": 1e-12},
+    {"name": "D3-06 its variance", "stated": 1.0,
+     "derive": lambda: _d3_mean(_D3_MIX01, (X + Z) @ (X + Z))
+                       - _d3_mean(_D3_MIX01, X + Z) ** 2, "rtol": 1e-12},
+    {"name": "D3-06 the readings are plus or minus root two",
+     "stated": math.sqrt(2),
+     "derive": lambda: float(_d3_eig(X + Z)[1]), "rtol": 1e-12},
+
+    # ---- D3-07 to D3-09 · channels --------------------------------------
+    {"name": "D3-07 the 11 entry after damping at 0.36", "stated": 0.32,
+     "derive": lambda: float(_d3_damped(0.36)[1, 1].real), "rtol": 1e-12},
+    {"name": "D3-07 the coherence there", "stated": 0.4,
+     "derive": lambda: abs(_d3_damped(0.36)[0, 1]), "rtol": 1e-12},
+    {"name": "D3-07 the purity there", "stated": 0.8848,
+     "derive": lambda: purity(_d3_damped(0.36)), "rtol": 1e-4},
+    {"name": "D3-07 the smallest purity reached", "stated": 0.875,
+     "derive": _d3_damp_purity_min, "rtol": 1e-6},
+    {"name": "D3-07 and the damping at which it happens", "stated": 0.5,
+     "derive": _d3_damp_argmin, "rtol": 1e-4},
+    {"name": "D3-07 full damping leaves a pure state", "stated": 1.0,
+     "derive": lambda: purity(_d3_damped(1.0)), "rtol": 1e-12},
+    {"name": "D3-08 the coherence after a phase flip at p = 0.25",
+     "stated": 0.25, "derive": lambda: abs(_d3_dephased(0.25)[0, 1]),
+     "rtol": 1e-12},
+    {"name": "D3-08 the purity there", "stated": 0.625,
+     "derive": lambda: purity(_d3_dephased(0.25)), "rtol": 1e-12},
+    {"name": "D3-08 at p = 1/2 the output is I/2", "stated": 0.0,
+     "derive": lambda: dev(_d3_dephased(0.5), I2 / 2), "atol": 1e-15},
+    {"name": "D3-08 at p = 1 the output is |->", "stated": 0.0,
+     "derive": lambda: dev(_d3_dephased(1.0), proj(KETM)), "atol": 1e-15},
+    {"name": "D3-09 T2 from T1 = 80 and Tphi = 40", "stated": 32.0,
+     "derive": lambda: _d3_t2(80.0, 40.0), "rtol": 1e-12},
+    {"name": "D3-09 the surviving population after 20", "stated": 0.779,
+     "derive": lambda: math.exp(-20.0 / 80.0), "rtol": 1e-3},
+    {"name": "D3-09 the surviving coherence after 20", "stated": 0.535,
+     "derive": lambda: math.exp(-20.0 / 32.0), "rtol": 1e-3},
+    {"name": "D3-09 the largest T2 this T1 allows", "stated": 160.0,
+     "derive": lambda: _d3_t2(80.0, 1e14), "rtol": 1e-11},
+
+    # ---- D3-10 to D3-12 · reduced states --------------------------------
+    {"name": "D3-10 the larger eigenvalue of the reduced state", "stated": 0.75,
+     "derive": lambda: float(_d3_eig(_d3_reduced(_D3_LOPSIDED))[1]), "rtol": 1e-12},
+    {"name": "D3-10 the two reduced states agree", "stated": 0.0,
+     "derive": lambda: dev(_d3_reduced(_D3_LOPSIDED, 0),
+                           _d3_reduced(_D3_LOPSIDED, 1)), "atol": 1e-15},
+    {"name": "D3-10 the purity of each", "stated": 0.625,
+     "derive": lambda: purity(_d3_reduced(_D3_LOPSIDED)), "rtol": 1e-12},
+    {"name": "D3-10 its separability determinant", "stated": math.sqrt(3) / 4,
+     "derive": lambda: _d3_det(_D3_LOPSIDED), "rtol": 1e-12},
+    {"name": "D3-11 the reduced state of the sign-flipped state is I/2",
+     "stated": 0.0, "derive": lambda: dev(_d3_reduced(_D3_SIGNFLIP), I2 / 2),
+     "atol": 1e-15},
+    {"name": "D3-11 its separability determinant", "stated": 0.5,
+     "derive": lambda: _d3_det(_D3_SIGNFLIP), "rtol": 1e-12},
+    {"name": "D3-11 its entropy is one bit", "stated": 1.0,
+     "derive": lambda: von_neumann(_d3_reduced(_D3_SIGNFLIP)), "rtol": 1e-12},
+    {"name": "D3-11 the all-plus version is a product instead", "stated": 0.0,
+     "derive": lambda: _d3_det(np.full(4, 0.5, dtype=complex)), "atol": 1e-16},
+    {"name": "D3-12 the mixture and the Bell pair share a reduced state",
+     "stated": 0.0,
+     "derive": lambda: dev(partial_trace(
+         0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+         + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex)), 0),
+         _d3_reduced(BELL_PHI_P)), "atol": 1e-15},
+    {"name": "D3-12 the purity of the mixture", "stated": 0.5,
+     "derive": lambda: purity(
+         0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+         + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex))), "rtol": 1e-12},
+    {"name": "D3-12 the two disagree about <X (x) X>", "stated": 1.0,
+     "derive": lambda: float(np.vdot(BELL_PHI_P, kron(X, X) @ BELL_PHI_P).real)
+                       - float(np.trace((
+         0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+         + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex))) @ kron(X, X)).real),
+     "rtol": 1e-12},
+    {"name": "D3-12 and agree about <Z (x) Z>", "stated": 0.0,
+     "derive": lambda: float(np.vdot(BELL_PHI_P, kron(Z, Z) @ BELL_PHI_P).real)
+                       - float(np.trace((
+         0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+         + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex))) @ kron(Z, Z)).real),
+     "atol": 1e-15},
+
+    # ---- D3-13 to D3-15 · separability, Schmidt and entropy -------------
+    {"name": "D3-13 (i) is a product", "stated": 0.0,
+     "derive": lambda: _d3_det(np.full(4, 0.5, dtype=complex)), "atol": 1e-16},
+    {"name": "D3-13 (i) factors as |+> (x) |+>", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         np.full(4, 0.5, dtype=complex) - np.kron(KETP, KETP))), "atol": 1e-15},
+    {"name": "D3-13 (ii) is entangled", "stated": 0.5,
+     "derive": lambda: _d3_det(BELL_PHI_P), "rtol": 1e-12},
+    {"name": "D3-13 (iii) factors as |0> (x) |+>", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         np.array([1, 1, 0, 0], dtype=complex) / math.sqrt(2)
+         - np.kron(KET0, KETP))), "atol": 1e-15},
+    {"name": "D3-14 the 00 entry of the reduced state", "stated": 1 / 3,
+     "derive": lambda: float(_d3_reduced(_D3_SVDSTATE)[0, 0].real), "rtol": 1e-12},
+    {"name": "D3-14 the larger Schmidt coefficient", "stated": 0.8727,
+     "derive": lambda: float(_d3_eig(_d3_reduced(_D3_SVDSTATE))[1]), "rtol": 1e-4},
+    {"name": "D3-14 the smaller one", "stated": 0.1273,
+     "derive": lambda: float(_d3_eig(_d3_reduced(_D3_SVDSTATE))[0]), "rtol": 1e-3},
+    {"name": "D3-14 the purity of the reduced state", "stated": 7 / 9,
+     "derive": lambda: purity(_d3_reduced(_D3_SVDSTATE)), "rtol": 1e-12},
+    {"name": "D3-14 its entropy in bits", "stated": 0.550,
+     "derive": lambda: von_neumann(_d3_reduced(_D3_SVDSTATE)), "rtol": 1e-3},
+    {"name": "D3-15 the larger coefficient at 30 degrees", "stated": 0.75,
+     "derive": lambda: float(_d3_eig(_d3_reduced(_d3_family(30.0)))[1]),
+     "rtol": 1e-12},
+    {"name": "D3-15 the entropy at 30 degrees", "stated": 0.811,
+     "derive": lambda: von_neumann(_d3_reduced(_d3_family(30.0))), "rtol": 1e-3},
+    {"name": "D3-15 one ebit at 45 degrees", "stated": 1.0,
+     "derive": lambda: von_neumann(_d3_reduced(_d3_family(45.0))), "rtol": 1e-12},
+    {"name": "D3-15 nothing at zero degrees", "stated": 0.0,
+     "derive": lambda: von_neumann(_d3_reduced(_d3_family(0.0))), "atol": 1e-9},
+    {"name": "D3-15 the teaching note's value at 10 degrees", "stated": 0.20,
+     "derive": lambda: von_neumann(_d3_reduced(_d3_family(10.0))), "rtol": 3e-2},
+
+    # ---- D3-16 to D3-18 · Bell correlations -----------------------------
+    {"name": "D3-16 <X (x) X> on the singlet", "stated": -1.0,
+     "derive": lambda: float(np.vdot(BELL_PSI_M, kron(X, X) @ BELL_PSI_M).real),
+     "rtol": 1e-12},
+    {"name": "D3-16 <Y (x) Y> on the singlet", "stated": -1.0,
+     "derive": lambda: float(np.vdot(BELL_PSI_M, kron(Y, Y) @ BELL_PSI_M).real),
+     "rtol": 1e-12},
+    {"name": "D3-16 <Z (x) Z> on the singlet", "stated": -1.0,
+     "derive": lambda: float(np.vdot(BELL_PSI_M, kron(Z, Z) @ BELL_PSI_M).real),
+     "rtol": 1e-12},
+    {"name": "D3-16 its reduced state is I/2", "stated": 0.0,
+     "derive": lambda: dev(_d3_reduced(BELL_PSI_M), I2 / 2), "atol": 1e-15},
+    {"name": "D3-16 it anticorrelates along every direction too", "stated": -1.0,
+     "derive": lambda: max(_d3_corr(proj(BELL_PSI_M), float(d), float(d))
+                           for d in np.linspace(0.0, 180.0, 181)), "rtol": 1e-12},
+    {"name": "D3-17 the first correlation", "stated": 0.8660,
+     "derive": lambda: _d3_corr(proj(BELL_PHI_P), 0.0, 30.0), "rtol": 1e-4},
+    {"name": "D3-17 the third correlation", "stated": 0.5,
+     "derive": lambda: _d3_corr(proj(BELL_PHI_P), 90.0, 30.0), "rtol": 1e-12},
+    {"name": "D3-17 the fourth correlation", "stated": -0.5,
+     "derive": lambda: _d3_corr(proj(BELL_PHI_P), 90.0, -30.0), "rtol": 1e-12},
+    {"name": "D3-17 the CHSH value", "stated": 2.732,
+     "derive": lambda: _d3_chsh(proj(BELL_PHI_P), 0.0, 90.0, 30.0, -30.0),
+     "rtol": 1e-3},
+    {"name": "D3-17 the best symmetric setting", "stated": 2 * math.sqrt(2),
+     "derive": lambda: max(_d3_chsh(proj(BELL_PHI_P), 0.0, 90.0, f, -f)
+                           for f in np.linspace(0.0, 90.0, 9001)), "rtol": 1e-6},
+    {"name": "D3-18 the Bell state has the same form in the X basis",
+     "stated": 0.0,
+     "derive": lambda: min(
+         float(np.linalg.norm(BELL_PHI_P
+               - (np.kron(KETP, KETP) + np.kron(KETM, KETM)) / math.sqrt(2))),
+         float(np.linalg.norm(BELL_PHI_P
+               + (np.kron(KETP, KETP) + np.kron(KETM, KETM)) / math.sqrt(2)))),
+     "atol": 1e-15},
+    {"name": "D3-18 the conditional state after a plus reading is |+>",
+     "stated": 1.0,
+     "derive": lambda: _d3_mean(
+         partial_trace(kron(I2, proj(KETP)) @ proj(BELL_PHI_P)
+                       @ kron(I2, proj(KETP)), 0) / 0.5, proj(KETP)),
+     "rtol": 1e-12},
+    {"name": "D3-18 the unconditional state is I/2 whatever B does",
+     "stated": 0.0,
+     "derive": lambda: max(
+         dev(partial_trace(
+             sum(kron(I2, 0.5 * (I2 + sg * ndotsigma(direction(float(d)))))
+                 @ proj(BELL_PHI_P)
+                 @ kron(I2, 0.5 * (I2 + sg * ndotsigma(direction(float(d)))))
+                 for sg in (+1, -1)), 0), I2 / 2)
+         for d in np.linspace(0.0, 180.0, 91)), "atol": 1e-14},
+
+    # ---- D3-19 and D3-20 · the full-length questions ---------------------
+    {"name": "D3-19 S at p = 0 is the undamaged value",
+     "stated": 2 * math.sqrt(2),
+     "derive": lambda: _d3_chsh(_d3_dephased_pair(0.0), 0.0, 90.0, 45.0, -45.0),
+     "rtol": 1e-12},
+    {"name": "D3-19 S at p = 0.1", "stated": 2.546,
+     "derive": lambda: _d3_chsh(_d3_dephased_pair(0.1), 0.0, 90.0, 45.0, -45.0),
+     "rtol": 1e-3},
+    {"name": "D3-19 the largest p that still violates", "stated": 0.2929,
+     "derive": _d3_chsh_threshold, "rtol": 1e-3},
+    {"name": "D3-19 S at p = 1/2", "stated": math.sqrt(2),
+     "derive": lambda: _d3_chsh(_d3_dephased_pair(0.5), 0.0, 90.0, 45.0, -45.0),
+     "rtol": 1e-12},
+    {"name": "D3-19 at p = 1/2 the pair is the classical mixture", "stated": 0.0,
+     "derive": lambda: dev(_d3_dephased_pair(0.5),
+         0.5 * proj(np.array([1, 0, 0, 0], dtype=complex))
+         + 0.5 * proj(np.array([0, 0, 0, 1], dtype=complex))), "atol": 1e-15},
+    {"name": "D3-20 p(+) after 20 microseconds", "stated": 0.7567,
+     "derive": lambda: _d3_idle_pplus(20.0, 30.0), "rtol": 1e-4},
+    {"name": "D3-20 p(+) at t = 0", "stated": 1.0,
+     "derive": lambda: _d3_idle_pplus(0.0, 30.0), "rtol": 1e-12},
+    {"name": "D3-20 the shots needed for two decimal places", "stated": 7400.0,
+     "derive": lambda: _d3_shots_for(0.01, _d3_idle_pplus(20.0, 30.0)),
+     "rtol": 1e-2},
+    {"name": "D3-20 the pure-dephasing time behind T1 = 50 and T2 = 30",
+     "stated": 42.857, "derive": lambda: _d3_tphi(50.0, 30.0), "rtol": 1e-4},
+    {"name": "D3-20 the two times are consistent", "stated": 30.0,
+     "derive": lambda: _d3_t2(50.0, _d3_tphi(50.0, 30.0)), "rtol": 1e-12},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_drills — chapters 1 and 2, worked solutions")
+    main(CHECKS, "verify_drills — chapters 1 to 3, worked solutions")

@@ -36,7 +36,8 @@
 CONTENT.CHAPTERS = [
   { n:'0', module:'M0', title:'The frame of the course', flat:true },
   { n:'1', module:'M1', title:'The mathematics of quantum states' },
-  { n:'2', module:'M2', title:'States, measurement and dynamics' }
+  { n:'2', module:'M2', title:'States, measurement and dynamics' },
+  { n:'3', module:'M3', title:'Mixed states and entanglement' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -95,6 +96,31 @@ CONTENT.SECTIONS = {
         'm2-schrod','m2-stationary','m2-gate','m2-lab-d'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
+  ],
+
+  /* Chapter 3 drops the two assumptions chapters 1 and 2 rested on, one at a
+     time, and the section order is that sequence: the state need not be known,
+     the system need not be closed, and the system need not be the whole of
+     what it belongs to. The section titles name the object rather than the
+     theorem for the same reason as chapter 1's do. Nothing here needs the
+     Bloch sphere, so the chapter can be read after chapter 4 as well as
+     before it, which is what the course map promises. */
+  M3: [
+    { n:'3.0', title:'Opening',                           ids:['m3-open'] },
+    { n:'3.1', title:'The density operator',              ids:[
+        'm3-rho','m3-physical','m3-expect','m3-ensemble'] },
+    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball'] },
+    { n:'3.3', title:'Quantum channels',                  ids:[
+        'm3-kraus','m3-damp','m3-dephase','m3-lab-e'] },
+    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2'] },
+    { n:'3.5', title:'Two systems, and one of them alone', ids:[
+        'm3-order','m3-ptrace','m3-local'] },
+    { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
+        'm3-sep','m3-schmidt','m3-svd'] },
+    { n:'3.7', title:'Entropy',                           ids:['m3-entropy'] },
+    { n:'3.8', title:'Bell correlations',                 ids:[
+        'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig'] },
+    { n:'3.9', title:'Summary and practice',              ids:['m3-synth','m3-shapes'] }
   ]
 
 };
@@ -175,7 +201,42 @@ CONTENT.BOOK = {
   'm2-ndotsigma':'2.2.5',
   'm2-schrod':'2.2.2',
   'm2-stationary':'2.2.2',
-  'm2-gate':'2.2.2'
+  'm2-gate':'2.2.2',
+
+  /* Chapter 3 rests on the book's sections 2.4 to 2.6, which is where the
+     density operator, the Schmidt decomposition and the Bell inequality are
+     developed. The channels leave chapter 2 of the book entirely: the
+     operator-sum form is 8.2.3 and the two elementary qubit channels are
+     8.3.5 and 8.3.6, with the continuous-time model in 8.4.1. Entropy is
+     11.3, and the Bell states are first written down in the book's opening
+     chapter, at 1.3.6.
+
+     Every one of those was read in the book's contents before it was written
+     here. Five scenes carry no anchor: the opening and the summary, the
+     question taxonomy, and the two laboratories. `m3-order` carries 2.2.8,
+     which is where the book states the composition postulate, but the
+     ordering convention itself is this course's and not the book's. */
+  'm3-rho':'2.4.1',
+  'm3-physical':'2.4.2',
+  'm3-expect':'2.4.2',
+  'm3-ensemble':'2.4.1',
+  'm3-purity':'2.4.2',
+  'm3-ball':'2.4.2',
+  'm3-kraus':'8.2.3',
+  'm3-damp':'8.3.5',
+  'm3-dephase':'8.3.6',
+  'm3-t1t2':'8.4.1',
+  'm3-order':'2.2.8',
+  'm3-ptrace':'2.4.3',
+  'm3-local':'2.4.3',
+  'm3-sep':'2.5',
+  'm3-schmidt':'2.5',
+  'm3-svd':'2.1.10',
+  'm3-entropy':'11.3',
+  'm3-bell':'1.3.6',
+  'm3-chsh':'2.6',
+  'm3-violate':'2.6',
+  'm3-nosig':'2.6'
 };
 
 /* ---- derivation --------------------------------------------------------

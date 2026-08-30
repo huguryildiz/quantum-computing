@@ -14,7 +14,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.3',
+    version:'0.4',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
@@ -117,14 +117,14 @@ const CONTENT = {
     shots:{ s:'N_{\\text{shots}}', d:'The number of repetitions a circuit is run for. A probability read from $N$ shots carries a standard error of about $\\sqrt{p(1-p)/N}$, which is sampling noise and not physical noise.' },
 
     /* Chapter 3 — mixed states and entanglement */
-    rho:{ s:'\\rho', d:'Density operator: positive semidefinite, Hermitian, unit trace. It describes a state that is either genuinely mixed or a piece of a larger entangled state.' },
-    purity:{ s:'\\operatorname{Tr}\\rho^2', d:'Purity. Equal to one for a pure state and as low as $1/d$ for the maximally mixed state of dimension $d$.' },
-    kraus:{ s:'\\mathcal{E}(\\rho)=\\sum_k K_k\\rho K_k^{\\dagger}', d:'A quantum channel in Kraus form, with $\\sum_k K_k^{\\dagger}K_k=I$. This is what a gate becomes once the system is no longer closed.' },
-    ptrace:{ s:'\\operatorname{Tr}_B', d:'Partial trace: the operation that answers "what is the state of $A$ alone". Its result is mixed exactly when $A$ and $B$ are entangled.' },
-    schmidt:{ s:'\\lambda_i', d:'Schmidt coefficients of a bipartite pure state. One non-zero coefficient means the state is a product; more than one means it is entangled.' },
-    vn:{ s:'S(\\rho)', d:'Von Neumann entropy, $-\\operatorname{Tr}\\rho\\log_2\\rho$, in bits. For a pure state it is zero, and for the reduced state of an entangled pair it is how much entanglement the pair carries.' },
-    bell:{ s:'|\\Phi^{\\pm}\\rangle,\\;|\\Psi^{\\pm}\\rangle', d:'The four Bell states: an orthonormal basis of two qubits in which every state is maximally entangled.' },
-    tone:{ s:'T_1,\\;T_2', d:'Relaxation and dephasing times. $T_1$ is how long a population survives, $T_2$ how long a relative phase does, and $T_2\\le 2T_1$ always.' },
+    rho:{ s:'\\rho', d:'Density operator: positive semidefinite, Hermitian, unit trace. It describes a state that is either genuinely mixed or a piece of a larger entangled state.', go:'m3-rho' },
+    purity:{ s:'\\operatorname{Tr}\\rho^2', d:'Purity. Equal to one for a pure state and as low as $1/d$ for the maximally mixed state of dimension $d$.', go:'m3-purity' },
+    kraus:{ s:'\\mathcal{E}(\\rho)=\\sum_k K_k\\rho K_k^{\\dagger}', d:'A quantum channel in Kraus form, with $\\sum_k K_k^{\\dagger}K_k=I$. This is what a gate becomes once the system is no longer closed.', go:'m3-kraus' },
+    ptrace:{ s:'\\operatorname{Tr}_B', d:'Partial trace: the operation that answers "what is the state of $A$ alone". Its result is mixed exactly when $A$ and $B$ are entangled.', go:'m3-ptrace' },
+    schmidt:{ s:'\\lambda_i', d:'Schmidt coefficients of a bipartite pure state. One non-zero coefficient means the state is a product; more than one means it is entangled.', go:'m3-schmidt' },
+    vn:{ s:'S(\\rho)', d:'Von Neumann entropy, $-\\operatorname{Tr}\\rho\\log_2\\rho$, in bits. For a pure state it is zero, and for the reduced state of an entangled pair it is how much entanglement the pair carries.', go:'m3-entropy' },
+    bell:{ s:'|\\Phi^{\\pm}\\rangle,\\;|\\Psi^{\\pm}\\rangle', d:'The four Bell states: an orthonormal basis of two qubits in which every state is maximally entangled.', go:'m3-bell' },
+    tone:{ s:'T_1,\\;T_2', d:'Relaxation and dephasing times. $T_1$ is how long a population survives, $T_2$ how long a relative phase does, and $T_2\\le 2T_1$ always.', go:'m3-t1t2' },
 
     /* Chapter 4 — the Bloch sphere and quantum gates */
     bloch:{ s:'\\mathbf{r}', d:'Bloch vector, $r_a=\\operatorname{Tr}(\\rho\\,\\sigma_a)$ for $a=x,y,z$. Its length is one for a pure state and less for a mixed one, so the sphere is really a ball.' },
