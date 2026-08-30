@@ -1146,6 +1146,29 @@ const SC = [
     {t:'note', kind:'def', head:'What comes next', html:'Chapter 2 adds the physics this chapter deliberately left out: which operator a laboratory instrument corresponds to, how an amplitude becomes a probability, what the state is after a measurement, and why the evolution of a closed system is the exponential of a Hermitian operator. Every one of those is a sentence about objects defined here.'}
   ]}
 ]}
+,
+
+/* ---------------------------------------------------------------- 1.9.2 ----
+   The promise made in the course map — that each chapter names the shapes of
+   question it sets before it sets them — is kept here. The list is the same
+   object the questions themselves are labelled from, so a shape cannot be
+   described here and set differently there. */
+{ id:'m1-shapes', module:'M1', nav:'The shapes of question', title:'The shapes of question this chapter sets',
+  objective:'Name the recurring question types and the method each one is answered by.',
+  keywords:'question types taxonomy shapes method examination practice inner basis phase operator spectral tensor',
+  steps:1, blocks:[
+  {t:'eyebrow', text:'Module 1 · Summary and practice'},
+  {t:'title', text:'The shapes of question this chapter sets'},
+  {t:'small', html:'Six shapes keep coming back, and a seventh — a <b>full-length question</b> — puts three to five of them in one statement, with each part resting on the one before. Name the shape before starting: the method for each is fixed, and most of the marks lost in this chapter are lost by applying the method for one shape to a question of another.'},
+  {t:'grid', cols:3, gap:'22px', items:[
+    [{t:'drilltypes', module:'M1', from:0, to:2}],
+    [{t:'drilltypes', module:'M1', from:2, to:4}],
+    [{t:'drilltypes', module:'M1', from:4, to:6}]
+  ]},
+  {t:'reveal', at:1, items:[
+    {t:'note', kind:'ok', head:'How to read a full-length question', html:'Read every part before starting. An error in the first part travels the whole way, and the marks for the later parts usually survive a wrong number carried forward correctly — but only if the working shows where it came from.'}
+  ]}
+]}
 
 ];
 

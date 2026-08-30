@@ -72,7 +72,7 @@ CONTENT.SECTIONS = {
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
         'm1-eig','m1-spectral','m1-fofa'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
-    { n:'1.9', title:'Summary',                           ids:['m1-synth'] }
+    { n:'1.9', title:'Summary and practice',              ids:['m1-synth','m1-shapes'] }
   ]
 
 };
