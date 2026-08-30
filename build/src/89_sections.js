@@ -37,7 +37,8 @@ CONTENT.CHAPTERS = [
   { n:'0', module:'M0', title:'The frame of the course', flat:true },
   { n:'1', module:'M1', title:'The mathematics of quantum states' },
   { n:'2', module:'M2', title:'States, measurement and dynamics' },
-  { n:'3', module:'M3', title:'Mixed states and entanglement' }
+  { n:'3', module:'M3', title:'Mixed states and entanglement' },
+  { n:'4', module:'M4', title:'The Bloch sphere and quantum gates' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -121,6 +122,29 @@ CONTENT.SECTIONS = {
     { n:'3.8', title:'Bell correlations',                 ids:[
         'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig'] },
     { n:'3.9', title:'Summary and practice',              ids:['m3-synth','m3-shapes'] }
+  ],
+
+  /* Chapter 4 is one qubit drawn, and then everything that can be done to it
+     read off that drawing. The section order is the order the picture is
+     built: the sphere first, then a gate as a motion of it, then a sequence of
+     gates, then the second qubit, which is where the picture stops helping and
+     the algebra takes over. The ordering convention has a section of its own,
+     restated from chapter 3, because this is where it starts producing wrong
+     states rather than merely wrong labels. */
+  M4: [
+    { n:'4.0', title:'Opening',                           ids:['m4-open'] },
+    { n:'4.1', title:'The Bloch sphere',                  ids:[
+        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover'] },
+    { n:'4.2', title:'Single-qubit gates as rotations',   ids:[
+        'm4-rot','m4-pauli','m4-had','m4-phase'] },
+    { n:'4.3', title:'Composing gates',                   ids:[
+        'm4-time','m4-euler','m4-ugate','m4-lab-g'] },
+    { n:'4.4', title:'Reversible embeddings',             ids:['m4-rev','m4-toffoli'] },
+    { n:'4.5', title:'Two-qubit gates',                   ids:[
+        'm4-order','m4-cnot','m4-cz','m4-swap'] },
+    { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h'] },
+    { n:'4.7', title:'Universality',                      ids:['m4-univ'] },
+    { n:'4.8', title:'Summary and practice',              ids:['m4-synth','m4-shapes'] }
   ]
 
 };
@@ -236,7 +260,47 @@ CONTENT.BOOK = {
   'm3-bell':'1.3.6',
   'm3-chsh':'2.6',
   'm3-violate':'2.6',
-  'm3-nosig':'2.6'
+  'm3-nosig':'2.6',
+
+  /* Chapter 4 is spread across three chapters of the book, which is the
+     sharpest illustration of why the mark exists. The sphere and the two
+     angles are in 1.2, where the book introduces the qubit; the Hadamard and
+     the multiple-qubit gates are in 1.3.1 and 1.3.2; the circuit conventions
+     and the swap circuit are in 1.3.4; the Bell states are in 1.3.6. Rotation
+     operators, the Euler decomposition and everything about a one-qubit gate
+     as a motion are 4.2, the controlled operations are 4.3, and universality
+     is 4.5. Reversible classical computation is not in the quantum chapters at
+     all: it is 3.2.5, "Energy and computation", which is where the book
+     develops Landauer's argument and the Toffoli gate.
+
+     The composite-system postulate 2.2.8 carries the ordering scene, exactly
+     as it does in chapter 3, and the phase section 2.2.7 carries the global
+     against relative phase scene, exactly as it does in chapter 1.
+
+     Every one of those was read in the book's contents before it was written
+     here. Seven scenes carry no anchor: the opening, the summary, the question
+     taxonomy, the two laboratories, the question scene, and `m4-ugate`, whose
+     three-parameter gate matrix is a software convention rather than anything
+     the book states. */
+  'm4-sphere':'1.2',
+  'm4-cardinal':'1.2',
+  'm4-overlap':'1.2',
+  'm4-glob':'2.2.7',
+  'm4-cover':'4.2',
+  'm4-rot':'4.2',
+  'm4-pauli':'4.2',
+  'm4-had':'1.3.1',
+  'm4-phase':'4.2',
+  'm4-time':'1.3.4',
+  'm4-euler':'4.2',
+  'm4-rev':'3.2.5',
+  'm4-toffoli':'3.2.5',
+  'm4-order':'2.2.8',
+  'm4-cnot':'1.3.2',
+  'm4-cz':'4.3',
+  'm4-swap':'1.3.4',
+  'm4-entangle':'1.3.6',
+  'm4-univ':'4.5'
 };
 
 /* ---- derivation --------------------------------------------------------

@@ -40,10 +40,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
 from qops import (BELL_PHI_P, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
-                  X, Y, Z, amp_damp, bloch, channel, dev, direction,
-                  hermiticity, inner, kron, ndotsigma, outer,
-                  partial_trace, phase_flip, proj, purity, unitarity,
-                  von_neumann)
+                  S_GATE, T_GATE, X, Y, Z, amp_damp, bloch, bloch_of,
+                  channel, cnot, cz_gate, dev, direction, hermiticity,
+                  inner, ket, kron, ndotsigma, on_qubit, outer,
+                  partial_trace, phase_gate, phase_flip, proj, purity,
+                  kron_state, rot, rx, ry, rz, same_state, swap_gate, toffoli,
+                  u_gate, unitarity, von_neumann)
 
 # ── 1.1 Vectors, dual vectors and the inner product ─────────────────────────
 
@@ -539,6 +541,148 @@ def _m3_binary_entropy_max():
     return best
 
 
+# ── Chapter 4: the Bloch sphere and quantum gates ───────────────────────────
+#
+# The independent routes here are three. A rotation operator the chapter writes
+# as cos(a/2) I - i sin(a/2) n.sigma is checked against `rot`, which is the
+# matrix exponential itself. A two-qubit gate the chapter prints as a matrix is
+# checked against a matrix built by looping over bit strings and asking where
+# each one goes. And a claim that two states are the same is checked with
+# `same_state`, which compares them up to a global phase, because that is what
+# the claim actually says.
+#
+# The ordering claims of section 4.5 have checks of their own. That convention
+# fails silently -- the wrong choice gives a normalised state whose numbers all
+# look reasonable -- so it is the one place in the chapter where a gate is the
+# only thing standing between a reader and a wrong answer.
+
+
+DEG = math.radians
+
+
+def _m4_state(theta_deg, phi_deg):
+    """The chapter's parameterisation, written out."""
+    t, p = DEG(theta_deg), DEG(phi_deg)
+    return math.cos(t / 2) * KET0 + np.exp(1j * p) * math.sin(t / 2) * KET1
+
+
+def _m4_bloch(theta_deg, phi_deg):
+    return bloch_of(_m4_state(theta_deg, phi_deg))
+
+
+def _m4_overlap_by_vectors(a, b):
+    """|<chi|psi>|^2 from the two Bloch vectors rather than from the states."""
+    return 0.5 * (1.0 + float(np.dot(a, b)))
+
+
+def _m4_closed_form(n, alpha):
+    """The closed form the chapter derives, to be checked against expm."""
+    return (math.cos(alpha / 2) * I2
+            - 1j * math.sin(alpha / 2) * ndotsigma(n))
+
+
+def _m4_bloch_rotation_gap(alpha):
+    """How far R_z(alpha) is from turning the Bloch vector by alpha.
+
+    The scene states the three component equations. They are re-derived here by
+    applying the operator to a generic state and comparing with a plain
+    rotation matrix acting on its Bloch vector.
+    """
+    psi = _m4_state(37.0, 61.0)
+    r = bloch_of(psi)
+    got = bloch_of(rot((0, 0, 1), alpha) @ psi)
+    c, s = math.cos(alpha), math.sin(alpha)
+    want = np.array([r[0] * c - r[1] * s, r[0] * s + r[1] * c, r[2]])
+    return float(np.linalg.norm(got - want))
+
+
+def _m4_hadamard_bloch_gap():
+    """H sends (rx, ry, rz) to (rz, -ry, rx), as the scene claims."""
+    psi = _m4_state(53.0, 24.0)
+    r = bloch_of(psi)
+    got = bloch_of(H @ psi)
+    return float(np.linalg.norm(got - np.array([r[2], -r[1], r[0]])))
+
+
+def _m4_controlled(U):
+    """The controlled version of a one-qubit gate, control q0 and target q1."""
+    M = np.zeros((4, 4), dtype=complex)
+    for x in range(4):
+        q1, q0 = (x >> 1) & 1, x & 1
+        if q0 == 0:
+            M[x, x] = 1.0
+        else:
+            for q1p in range(2):
+                M[2 * q1p + 1, x] = U[q1p, q1]
+    return M
+
+
+def _m4_controlled_2pi_gap():
+    """A 2 pi rotation on the target flips the sign of the control's |1> branch.
+
+    The control starts in |+> and must end in |->; the target is left alone.
+    """
+    psi = kron_state(KETP, KETP)                 # |q1 q0> = |+> (x) |+>
+    out = _m4_controlled(rot((0, 0, 1), 4 * math.pi / 2)) @ psi
+    return same_state(out, kron_state(KETP, KETM))
+
+
+def _m4_entangle_circuit(theta_deg):
+    """R_y(theta) on q0 of |00>, then CNOT with q0 as control and q1 as target."""
+    psi = ket(0, 0)
+    psi = on_qubit(ry(DEG(theta_deg)), 0) @ psi
+    return cnot(0, 1) @ psi
+
+
+def _m4_entropy_of(psi):
+    return von_neumann(partial_trace(proj(psi), keep=0))
+
+
+def _m4_local_gate_gap(theta_deg):
+    """A local gate on each qubit must leave the entanglement exactly alone."""
+    psi = _m4_entangle_circuit(theta_deg)
+    local = kron(u_gate(0.7, 1.1, 2.3), u_gate(2.0, 0.3, 1.7))
+    return abs(_m4_entropy_of(local @ psi) - _m4_entropy_of(psi))
+
+
+def _m4_kickback_gap():
+    """CNOT with the target in |-> puts a Z on the control and nothing else."""
+    ctrl = 0.6 * KET0 + 0.8 * KET1
+    psi = kron_state(KETM, ctrl)                 # target on q1, control on q0
+    return dev(cnot(0, 1) @ psi, kron_state(KETM, Z @ ctrl))
+
+
+def _m4_dirty_ancilla_probability():
+    """The register of a Bell pair, measured in the X basis: a fair coin.
+
+    The scene says a clean ancilla would give 0 with certainty and a dirty one
+    gives a coin. This computes the second; the first is the same circuit with
+    the ancilla left in |0>.
+    """
+    rho = partial_trace(proj(BELL_PHI_P), keep=0)
+    return float(np.real(np.trace(rho @ proj(KETP))))
+
+
+# The two CNOT matrices exactly as the scene prints them. They are transcribed
+# here and re-derived from the Boolean rule beside them, which is the only way
+# a printed matrix can be checked at all.
+SCENE_CNOT_0TO1 = np.array([[1, 0, 0, 0],
+                            [0, 0, 0, 1],
+                            [0, 0, 1, 0],
+                            [0, 1, 0, 0]], dtype=complex)
+SCENE_CNOT_1TO0 = np.array([[1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 0, 1],
+                            [0, 0, 1, 0]], dtype=complex)
+SCENE_SWAP = np.array([[1, 0, 0, 0],
+                       [0, 0, 1, 0],
+                       [0, 1, 0, 0],
+                       [0, 0, 0, 1]], dtype=complex)
+
+
+R2 = 1 / math.sqrt(2)
+
+
 CHECKS = [
     # ---- 1.1 -----------------------------------------------------------
     {"name": "1.1.1 squared length of (2+i, 1-3i)", "stated": 15.0,
@@ -892,8 +1036,259 @@ CHECKS = [
      "derive": lambda: max(_m3_nosignal(float(d))
                            for d in np.linspace(0.0, 180.0, 181)),
      "atol": 1e-14},
+
+    # ── 4.1 The Bloch sphere ────────────────────────────────────────────────
+    {"name": "4.1.1 r_x of the state at (60, 135) degrees", "stated": -0.6124,
+     "derive": lambda: _m4_bloch(60.0, 135.0)[0], "rtol": 1e-3},
+    {"name": "4.1.1 r_y of the same state", "stated": 0.6124,
+     "derive": lambda: _m4_bloch(60.0, 135.0)[1], "rtol": 1e-3},
+    {"name": "4.1.1 r_z of the same state", "stated": 0.5,
+     "derive": lambda: _m4_bloch(60.0, 135.0)[2], "rtol": 1e-12},
+    {"name": "4.1.1 the point is on the surface", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(_m4_bloch(60.0, 135.0))),
+     "rtol": 1e-12},
+    {"name": "4.1.1 p(0) for that state", "stated": 0.75,
+     "derive": lambda: abs(inner(KET0, _m4_state(60.0, 135.0))) ** 2,
+     "rtol": 1e-12},
+    {"name": "4.1.2 the vector (0,-1,0) names the state |-i>", "stated": 0.0,
+     "derive": lambda: same_state(_m4_state(90.0, 270.0),
+                                  (KET0 - 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "4.1.2 <Y> for that state", "stated": -1.0,
+     "derive": lambda: _m4_bloch(90.0, 270.0)[1], "rtol": 1e-12},
+    {"name": "4.1.3 the overlap of |0> and |+> from the two vectors",
+     "stated": 0.5,
+     "derive": lambda: _m4_overlap_by_vectors(np.array([0.0, 0.0, 1.0]),
+                                              np.array([1.0, 0.0, 0.0])),
+     "rtol": 1e-12},
+    {"name": "4.1.3 the caption: opposite points do not overlap", "stated": 0.0,
+     "derive": lambda: _m4_overlap_by_vectors(np.array([0.0, 0.0, 1.0]),
+                                              np.array([0.0, 0.0, -1.0])),
+     "atol": 1e-15},
+    {"name": "4.1.4 a global phase does not move the Bloch vector",
+     "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(bloch_of(1j * KETP)
+                                            - bloch_of(KETP))),
+     "atol": 1e-15},
+    {"name": "4.1.4 |+> and |-> are perfectly distinguishable", "stated": 0.0,
+     "derive": lambda: abs(inner(KETP, KETM)) ** 2, "atol": 1e-30},
+    {"name": "4.1.5 a full turn gives minus the identity", "stated": 0.0,
+     "derive": lambda: dev(rot((0.3, -0.5, 0.8) / np.linalg.norm([0.3, -0.5, 0.8]),
+                               2 * math.pi), -I2),
+     "atol": 1e-12},
+    {"name": "4.1.5 two full turns give the identity", "stated": 0.0,
+     "derive": lambda: dev(rot((0.3, -0.5, 0.8) / np.linalg.norm([0.3, -0.5, 0.8]),
+                               4 * math.pi), I2),
+     "atol": 1e-12},
+    {"name": "4.1.5 a controlled 2 pi rotation turns the control into |->",
+     "stated": 0.0, "derive": _m4_controlled_2pi_gap, "atol": 1e-12},
+
+    # ── 4.2 Single-qubit gates as rotations ─────────────────────────────────
+    {"name": "4.2.1 the closed form agrees with the matrix exponential",
+     "stated": 0.0,
+     "derive": lambda: max(dev(_m4_closed_form((0.6, 0.0, 0.8), a),
+                               rot((0.6, 0.0, 0.8), a))
+                           for a in np.linspace(0.0, 4 * math.pi, 41)),
+     "atol": 1e-12},
+    {"name": "4.2.1 R_z turns the Bloch vector by its own angle", "stated": 0.0,
+     "derive": lambda: max(_m4_bloch_rotation_gap(a)
+                           for a in np.linspace(0.0, 2 * math.pi, 37)),
+     "atol": 1e-12},
+    {"name": "4.2.1 R_z(90 degrees) sends |+> to |+i>", "stated": 0.0,
+     "derive": lambda: same_state(rz(DEG(90.0)) @ KETP,
+                                  (KET0 + 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "4.2.1 the caption: a rotation preserves the length", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(
+         bloch_of(rot((0.6, 0.0, 0.8), 2.1) @ _m4_state(41.0, 77.0)))),
+     "rtol": 1e-12},
+    {"name": "4.2.2 R_x(pi) is minus i times X", "stated": 0.0,
+     "derive": lambda: dev(rx(math.pi), -1j * X), "atol": 1e-12},
+    {"name": "4.2.2 R_y(pi) is minus i times Y", "stated": 0.0,
+     "derive": lambda: dev(ry(math.pi), -1j * Y), "atol": 1e-12},
+    {"name": "4.2.2 R_z(pi) is minus i times Z", "stated": 0.0,
+     "derive": lambda: dev(rz(math.pi), -1j * Z), "atol": 1e-12},
+    {"name": "4.2.2 X leaves |-> where it is", "stated": 0.0,
+     "derive": lambda: same_state(X @ KETM, KETM), "atol": 1e-15},
+    {"name": "4.2.2 the caption: Z exchanges |+> and |->", "stated": 0.0,
+     "derive": lambda: dev(Z @ KETP, KETM), "atol": 1e-15},
+    {"name": "4.2.3 H is the average of X and Z", "stated": 0.0,
+     "derive": lambda: dev(H, (X + Z) / math.sqrt(2)), "atol": 1e-15},
+    {"name": "4.2.3 the caption: the axis of H is at 45 degrees", "stated": 0.0,
+     "derive": lambda: dev(H, ndotsigma((R2, 0.0, R2))), "atol": 1e-15},
+    {"name": "4.2.3 H X H is Z", "stated": 0.0,
+     "derive": lambda: dev(H @ X @ H, Z), "atol": 1e-15},
+    {"name": "4.2.3 H Z H is X", "stated": 0.0,
+     "derive": lambda: dev(H @ Z @ H, X), "atol": 1e-15},
+    {"name": "4.2.3 H Y H is minus Y", "stated": 0.0,
+     "derive": lambda: dev(H @ Y @ H, -Y), "atol": 1e-15},
+    {"name": "4.2.3 H maps the Bloch vector as the scene states", "stated": 0.0,
+     "derive": _m4_hadamard_bloch_gap, "atol": 1e-14},
+    {"name": "4.2.3 H sends |+i> to |-i>", "stated": 0.0,
+     "derive": lambda: same_state(H @ (KET0 + 1j * KET1) / math.sqrt(2),
+                                  (KET0 - 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "4.2.3 H does not create a superposition from |+>", "stated": 0.0,
+     "derive": lambda: dev(H @ KETP, KET0), "atol": 1e-15},
+    {"name": "4.2.4 P(phi) is a phase times R_z(phi)", "stated": 0.0,
+     "derive": lambda: max(dev(phase_gate(f), np.exp(1j * f / 2) * rz(f))
+                           for f in np.linspace(0.0, 2 * math.pi, 25)),
+     "atol": 1e-12},
+    {"name": "4.2.4 S squared is Z", "stated": 0.0,
+     "derive": lambda: dev(S_GATE @ S_GATE, Z), "atol": 1e-15},
+    {"name": "4.2.4 T squared is S", "stated": 0.0,
+     "derive": lambda: dev(T_GATE @ T_GATE, S_GATE), "atol": 1e-15},
+    {"name": "4.2.4 the Bloch vector of T|+>", "stated": 0.7071,
+     "derive": lambda: bloch_of(T_GATE @ KETP)[1], "rtol": 1e-3},
+    {"name": "4.2.4 a phase gate never moves r_z", "stated": 0.0,
+     "derive": lambda: abs(bloch_of(T_GATE @ KETP)[2]), "atol": 1e-15},
+    {"name": "4.2.4 the caption: Z|+> is a half turn of the equator",
+     "stated": 180.0,
+     "derive": lambda: math.degrees(math.atan2(bloch_of(Z @ KETP)[1],
+                                               bloch_of(Z @ KETP)[0])),
+     "rtol": 1e-12},
+
+    # ── 4.3 Composing gates ─────────────────────────────────────────────────
+    {"name": "4.3.1 H then S sends |0> to |+i>", "stated": 0.0,
+     "derive": lambda: same_state(S_GATE @ H @ KET0,
+                                  (KET0 + 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "4.3.1 S then H sends |0> to |+>", "stated": 0.0,
+     "derive": lambda: same_state(H @ S_GATE @ KET0, KETP), "atol": 1e-12},
+    {"name": "4.3.1 the two orders give states at right angles", "stated": 0.5,
+     "derive": lambda: abs(inner(S_GATE @ H @ KET0, H @ S_GATE @ KET0)) ** 2,
+     "rtol": 1e-12},
+    {"name": "4.3.1 gates on different qubits commute", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(H, 0) @ on_qubit(T_GATE, 1),
+                           on_qubit(T_GATE, 1) @ on_qubit(H, 0)),
+     "atol": 1e-15},
+    {"name": "4.3.2 the Euler form of the Hadamard", "stated": 0.0,
+     "derive": lambda: dev(np.exp(1j * math.pi / 2) * ry(math.pi / 2)
+                           @ rz(math.pi), H),
+     "atol": 1e-12},
+    {"name": "4.3.3 U(pi/2, 0, pi) is the Hadamard", "stated": 0.0,
+     "derive": lambda: dev(u_gate(math.pi / 2, 0.0, math.pi), H), "atol": 1e-15},
+    {"name": "4.3.3 U(pi, 0, pi) is X", "stated": 0.0,
+     "derive": lambda: dev(u_gate(math.pi, 0.0, math.pi), X), "atol": 1e-15},
+    {"name": "4.3.3 U(0, phi, 0) is the phase gate", "stated": 0.0,
+     "derive": lambda: max(dev(u_gate(0.0, f, 0.0), phase_gate(f))
+                           for f in np.linspace(0.0, 2 * math.pi, 25)),
+     "atol": 1e-15},
+    {"name": "4.3.3 the three-parameter gate is unitary everywhere",
+     "stated": 0.0,
+     "derive": lambda: max(unitarity(u_gate(t, p, l))
+                           for t in np.linspace(0.0, math.pi, 7)
+                           for p in np.linspace(0.0, 2 * math.pi, 7)
+                           for l in np.linspace(0.0, 2 * math.pi, 7)),
+     "atol": 1e-14},
+
+    # ── 4.4 Reversible embeddings ───────────────────────────────────────────
+    {"name": "4.4.1 the CNOT undoes itself", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1) @ cnot(0, 1), np.eye(4)), "atol": 1e-15},
+    {"name": "4.4.1 the Toffoli undoes itself", "stated": 0.0,
+     "derive": lambda: dev(toffoli() @ toffoli(), np.eye(8)), "atol": 1e-15},
+    {"name": "4.4.1 the Toffoli computes AND into a cleared third wire",
+     "stated": 0.0,
+     "derive": lambda: max(dev(toffoli() @ ket(a, b, 0), ket(a, b, a & b))
+                           for a in (0, 1) for b in (0, 1)),
+     "atol": 1e-15},
+    {"name": "4.4.2 a dirty ancilla leaves the register a fair coin",
+     "stated": 0.5, "derive": _m4_dirty_ancilla_probability, "rtol": 1e-12},
+
+    # ── 4.5 Two-qubit gates, and the ordering ───────────────────────────────
+    #
+    # These four are the ordering gate the design record asks for. A wrong
+    # ordering produces a normalised state whose numbers all look reasonable,
+    # so nothing else in the suite would catch it.
+    {"name": "4.5.1 X on q0 of |10> gives |11>", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(X, 0) @ ket(1, 0), ket(1, 1)),
+     "atol": 1e-15},
+    {"name": "4.5.1 X on q1 of |10> gives |00>", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(X, 1) @ ket(1, 0), ket(0, 0)),
+     "atol": 1e-15},
+    {"name": "4.5.1 the two placements are different gates",
+     "stated": 2.8284,
+     "derive": lambda: dev(on_qubit(X, 0), on_qubit(X, 1)), "rtol": 1e-4},
+    {"name": "4.5.1 the untouched qubit is where the ordering shows",
+     "stated": -1.0,
+     "derive": lambda: bloch(partial_trace(
+         proj(on_qubit(X, 0) @ ket(1, 0)), keep=0))[2],
+     "rtol": 1e-12},
+    {"name": "4.5.2 the printed CNOT_{0->1} matches the Boolean rule",
+     "stated": 0.0, "derive": lambda: dev(SCENE_CNOT_0TO1, cnot(0, 1)),
+     "atol": 1e-15},
+    {"name": "4.5.2 the printed CNOT_{1->0} matches the Boolean rule",
+     "stated": 0.0, "derive": lambda: dev(SCENE_CNOT_1TO0, cnot(1, 0)),
+     "atol": 1e-15},
+    {"name": "4.5.2 the two CNOT directions are different gates",
+     "stated": 2.4495, "derive": lambda: dev(cnot(0, 1), cnot(1, 0)),
+     "rtol": 1e-4},
+    {"name": "4.5.2 a target in |-> writes Z onto the control", "stated": 0.0,
+     "derive": _m4_kickback_gap, "atol": 1e-15},
+    {"name": "4.5.2 Hadamards on both qubits exchange control and target",
+     "stated": 0.0,
+     "derive": lambda: dev(kron(H, H) @ cnot(1, 0) @ kron(H, H), cnot(0, 1)),
+     "atol": 1e-14},
+    {"name": "4.5.3 CZ is the CNOT conjugated on its target", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(H, 1) @ cnot(0, 1) @ on_qubit(H, 1),
+                           cz_gate()),
+     "atol": 1e-14},
+    {"name": "4.5.3 CZ is symmetric under exchanging its qubits", "stated": 0.0,
+     "derive": lambda: dev(swap_gate() @ cz_gate() @ swap_gate(), cz_gate()),
+     "atol": 1e-15},
+    {"name": "4.5.3 CZ on |++> is entangled: the amplitude test",
+     "stated": -0.5,
+     "derive": lambda: float(np.real(
+         (cz_gate() @ kron_state(KETP, KETP))[0]
+         * (cz_gate() @ kron_state(KETP, KETP))[3]
+         - (cz_gate() @ kron_state(KETP, KETP))[1]
+         * (cz_gate() @ kron_state(KETP, KETP))[2])),
+     "rtol": 1e-12},
+    {"name": "4.5.4 the printed SWAP matches the exchange rule", "stated": 0.0,
+     "derive": lambda: dev(SCENE_SWAP, swap_gate()), "atol": 1e-15},
+    {"name": "4.5.4 three CNOTs make a SWAP", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1) @ cnot(1, 0) @ cnot(0, 1), swap_gate()),
+     "atol": 1e-15},
+    {"name": "4.5.4 SWAP creates no entanglement", "stated": 0.0,
+     "derive": lambda: _m4_entropy_of(swap_gate() @ kron_state(KETP, KET0)),
+     "atol": 1e-12},
+
+    # ── 4.6 Entanglement from a gate ────────────────────────────────────────
+    {"name": "4.6.1 the circuit output at 90 degrees is a Bell state",
+     "stated": 0.0,
+     "derive": lambda: same_state(_m4_entangle_circuit(90.0), BELL_PHI_P),
+     "atol": 1e-12},
+    {"name": "4.6.1 the caption: one full ebit at 90 degrees", "stated": 1.0,
+     "derive": lambda: _m4_entropy_of(_m4_entangle_circuit(90.0)), "rtol": 1e-12},
+    {"name": "4.6.1 the caption: nothing at either end", "stated": 0.0,
+     "derive": lambda: max(_m4_entropy_of(_m4_entangle_circuit(t))
+                           for t in (0.0, 180.0)),
+     "atol": 1e-12},
+    {"name": "4.6.1 the worked example at 60 degrees", "stated": 0.8113,
+     "derive": lambda: _m4_entropy_of(_m4_entangle_circuit(60.0)), "rtol": 1e-3},
+    {"name": "4.6.1 a local gate does not change the entanglement",
+     "stated": 0.0,
+     "derive": lambda: max(_m4_local_gate_gap(t)
+                           for t in (30.0, 60.0, 90.0, 140.0)),
+     "atol": 1e-12},
+
+    # ── 4.7 Universality ────────────────────────────────────────────────────
+    {"name": "4.7.1 four T gates make a Z", "stated": 0.0,
+     "derive": lambda: dev(np.linalg.matrix_power(T_GATE, 4), Z), "atol": 1e-14},
+    {"name": "4.7.1 eight T gates make the identity", "stated": 0.0,
+     "derive": lambda: dev(np.linalg.matrix_power(T_GATE, 8), I2), "atol": 1e-14},
+    {"name": "4.7.1 H, S and CNOT are Clifford: they map X to a Pauli",
+     "stated": 0.0,
+     "derive": lambda: min(dev(S_GATE @ X @ S_GATE.conj().T, s * P)
+                           for s in (1, -1, 1j, -1j) for P in (X, Y, Z)),
+     "atol": 1e-14},
+    {"name": "4.7.1 T is not Clifford: it maps X off every Pauli",
+     "stated": 1.0824,
+     "derive": lambda: min(dev(T_GATE @ X @ T_GATE.conj().T, s * P)
+                           for s in (1, -1, 1j, -1j) for P in (X, Y, Z)),
+     "rtol": 1e-3},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_scenes — chapters 1 to 3, teaching scenes")
+    main(CHECKS, "verify_scenes — chapters 1 to 4, teaching scenes")

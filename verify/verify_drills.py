@@ -28,10 +28,13 @@ from scipy.linalg import expm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
-from qops import (BELL_PHI_P, BELL_PSI_M, H, I2, KET0, KET1,  # noqa: E402
-                  KETM, KETP, X, Y, Z, amp_damp, bloch, channel, dev,
-                  direction, inner, kron, ndotsigma, outer, partial_trace,
-                  phase_flip, proj, purity, unitarity, von_neumann)
+from qops import (BELL_PHI_M, BELL_PHI_P, BELL_PSI_M, H, I2,  # noqa: E402
+                  KET0, KET1, KETM, KETP, S_GATE, T_GATE, X, Y, Z,
+                  amp_damp, bloch, bloch_of, channel, cnot, cz_gate, dev,
+                  direction, inner, ket, kron, kron_state, ndotsigma,
+                  on_qubit, outer, partial_trace, phase_flip, phase_gate,
+                  proj, purity, rot, rx, ry, rz, same_state, swap_gate,
+                  u_gate, unitarity, von_neumann)
 
 R2 = 1 / math.sqrt(2)
 
@@ -553,6 +556,79 @@ def _d3_idle_pplus(t, t2):
 
 def _d3_shots_for(target_two_se, p):
     return p * (1 - p) / (target_two_se / 2.0) ** 2
+
+
+# ── Chapter 4 worked solutions ──────────────────────────────────────────────
+#
+# The independent routes are the same three as in verify_scenes: the matrix
+# exponential for a rotation, a bit-string loop for a two-qubit gate, and
+# comparison up to a global phase for a claim that two states are the same.
+# Two of the questions -- D4-13 and D4-14 -- exist entirely to test the qubit
+# ordering, so their checks are written against `on_qubit` and `cnot`, which
+# take the wire number rather than a tensor slot.
+
+DEG = math.radians
+
+
+def _d4_state(theta_deg, phi_deg):
+    t, p = DEG(theta_deg), DEG(phi_deg)
+    return math.cos(t / 2) * KET0 + np.exp(1j * p) * math.sin(t / 2) * KET1
+
+
+def _d4_bloch(theta_deg, phi_deg):
+    return bloch_of(_d4_state(theta_deg, phi_deg))
+
+
+def _d4_overlap(a, b):
+    return 0.5 * (1.0 + float(np.dot(a, b)))
+
+
+def _d4_shots_for(tol, p):
+    """The shots that put two standard errors at +/- tol."""
+    se = tol / 2.0
+    return p * (1.0 - p) / se ** 2
+
+
+def _d4_controlled(U):
+    """Control on q0, target on q1, built from the branch rule."""
+    M = np.zeros((4, 4), dtype=complex)
+    for x in range(4):
+        q1, q0 = (x >> 1) & 1, x & 1
+        if q0 == 0:
+            M[x, x] = 1.0
+        else:
+            for q1p in range(2):
+                M[2 * q1p + 1, x] = U[q1p, q1]
+    return M
+
+
+def _d4_13_state():
+    return np.array([1, 1, 1, 0], dtype=complex) / math.sqrt(3)
+
+
+def _d4_14_state():
+    return np.array([1, 0, 1, 0], dtype=complex) / math.sqrt(2)
+
+
+def _d4_entropy_of(psi):
+    return von_neumann(partial_trace(proj(psi), keep=0))
+
+
+def _d4_17_output(theta_deg):
+    return cnot(0, 1) @ (on_qubit(ry(DEG(theta_deg)), 0) @ ket(0, 0))
+
+
+def _d4_20_output():
+    """H on q0, then CNOT from q0 to q1, then Z on q1."""
+    psi = ket(0, 0)
+    psi = on_qubit(H, 0) @ psi
+    psi = cnot(0, 1) @ psi
+    return on_qubit(Z, 1) @ psi
+
+
+def _d4_corr(psi, A, B):
+    """<A (x) B> on a two-qubit state, with A on q1 and B on q0."""
+    return float(np.real(np.vdot(psi, kron(A, B) @ psi)))
 
 
 CHECKS = [
@@ -1088,8 +1164,270 @@ CHECKS = [
      "stated": 42.857, "derive": lambda: _d3_tphi(50.0, 30.0), "rtol": 1e-4},
     {"name": "D3-20 the two times are consistent", "stated": 30.0,
      "derive": lambda: _d3_t2(50.0, _d3_tphi(50.0, 30.0)), "rtol": 1e-12},
+
+    # ── D4-01 to D4-03: between a state, a matrix and a point ──────────────
+    {"name": "D4-01 r_x of the prepared state", "stated": -0.4330,
+     "derive": lambda: _d4_bloch(60.0, 120.0)[0], "rtol": 1e-3},
+    {"name": "D4-01 r_y of the prepared state", "stated": 0.7500,
+     "derive": lambda: _d4_bloch(60.0, 120.0)[1], "rtol": 1e-4},
+    {"name": "D4-01 r_z of the prepared state", "stated": 0.5000,
+     "derive": lambda: _d4_bloch(60.0, 120.0)[2], "rtol": 1e-12},
+    {"name": "D4-01 the check: the point is on the surface", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(_d4_bloch(60.0, 120.0))),
+     "rtol": 1e-12},
+    {"name": "D4-01 p(0), two ways agreeing", "stated": 0.75,
+     "derive": lambda: abs(inner(KET0, _d4_state(60.0, 120.0))) ** 2,
+     "rtol": 1e-12},
+    {"name": "D4-02 the polar angle behind r_z = 0.8", "stated": 36.87,
+     "derive": lambda: math.degrees(math.acos(0.8)), "rtol": 1e-4},
+    {"name": "D4-02 the amplitude of |0>", "stated": 0.9487,
+     "derive": lambda: math.cos(math.acos(0.8) / 2), "rtol": 1e-4},
+    {"name": "D4-02 the amplitude of |1>", "stated": 0.3162,
+     "derive": lambda: math.sin(math.acos(0.8) / 2), "rtol": 1e-4},
+    {"name": "D4-02 p(0) along z", "stated": 0.9,
+     "derive": lambda: _d4_overlap(np.array([0.6, 0.0, 0.8]),
+                                   np.array([0.0, 0.0, 1.0])),
+     "rtol": 1e-12},
+    {"name": "D4-02 p(+1) along x", "stated": 0.8,
+     "derive": lambda: _d4_overlap(np.array([0.6, 0.0, 0.8]),
+                                   np.array([1.0, 0.0, 0.0])),
+     "rtol": 1e-12},
+    {"name": "D4-03 the orthogonal pair really is antipodal", "stated": 0.0,
+     "derive": lambda: _d4_overlap(_d4_bloch(60.0, 0.0),
+                                   _d4_bloch(120.0, 180.0)),
+     "atol": 1e-15},
+    {"name": "D4-03 the overlap of the other pair", "stated": 0.9330,
+     "derive": lambda: _d4_overlap(_d4_bloch(90.0, 0.0), _d4_bloch(60.0, 0.0)),
+     "rtol": 1e-4},
+    {"name": "D4-03 the check: the same number from the half angle",
+     "stated": 0.9330, "derive": lambda: math.cos(DEG(15.0)) ** 2, "rtol": 1e-4},
+
+    # ── D4-04 to D4-06: a gate as a rotation ────────────────────────────────
+    {"name": "D4-04 the state after R_y(70 degrees) on |0>", "stated": 0.0,
+     "derive": lambda: dev(ry(DEG(70.0)) @ KET0,
+                           math.cos(DEG(35.0)) * KET0
+                           + math.sin(DEG(35.0)) * KET1),
+     "atol": 1e-12},
+    {"name": "D4-04 its Bloch vector turned by the full angle", "stated": 0.9397,
+     "derive": lambda: bloch_of(ry(DEG(70.0)) @ KET0)[0], "rtol": 1e-4},
+    {"name": "D4-04 p(0) afterwards", "stated": 0.6710,
+     "derive": lambda: abs(inner(KET0, ry(DEG(70.0)) @ KET0)) ** 2,
+     "rtol": 1e-4},
+    {"name": "D4-04 the check: the length is still one", "stated": 1.0,
+     "derive": lambda: float(np.linalg.norm(bloch_of(ry(DEG(70.0)) @ KET0))),
+     "rtol": 1e-12},
+    {"name": "D4-05 the gate is a half turn about the stated axis",
+     "stated": 0.0,
+     "derive": lambda: dev((X + Y) / math.sqrt(2), ndotsigma((R2, R2, 0.0))),
+     "atol": 1e-15},
+    {"name": "D4-05 it sends |0> to |1>", "stated": 0.0,
+     "derive": lambda: same_state((X + Y) / math.sqrt(2) @ KET0, KET1),
+     "atol": 1e-12},
+    {"name": "D4-05 it sends |+i> to |+>", "stated": 0.0,
+     "derive": lambda: same_state(
+         (X + Y) / math.sqrt(2) @ ((KET0 + 1j * KET1) / math.sqrt(2)), KETP),
+     "atol": 1e-12},
+    {"name": "D4-06 the Bloch vector of T|+>, y component", "stated": 0.7071,
+     "derive": lambda: bloch_of(T_GATE @ KETP)[1], "rtol": 1e-4},
+    {"name": "D4-06 p(0) after T alone", "stated": 0.5,
+     "derive": lambda: abs(inner(KET0, T_GATE @ KETP)) ** 2, "rtol": 1e-12},
+    {"name": "D4-06 p(0) after the Hadamard as well", "stated": 0.8536,
+     "derive": lambda: abs(inner(KET0, H @ T_GATE @ KETP)) ** 2, "rtol": 1e-4},
+
+    # ── D4-07 to D4-09: composing a sequence ────────────────────────────────
+    {"name": "D4-07 the circuit sends |0> to |-i>", "stated": 0.0,
+     "derive": lambda: same_state(H @ S_GATE @ H @ KET0,
+                                  (KET0 - 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "D4-07 the check: the net gate is a quarter turn about x",
+     "stated": 0.0,
+     "derive": lambda: dev(H @ S_GATE @ H,
+                           np.exp(1j * math.pi / 4) * rx(math.pi / 2)),
+     "atol": 1e-12},
+    {"name": "D4-08 H first gives |+i>", "stated": 0.0,
+     "derive": lambda: same_state(S_GATE @ H @ KET0,
+                                  (KET0 + 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-12},
+    {"name": "D4-08 S first gives |+>", "stated": 0.0,
+     "derive": lambda: same_state(H @ S_GATE @ KET0, KETP), "atol": 1e-12},
+    {"name": "D4-08 the overlap of the two answers", "stated": 0.5,
+     "derive": lambda: abs(inner(S_GATE @ H @ KET0, H @ S_GATE @ KET0)) ** 2,
+     "rtol": 1e-12},
+    {"name": "D4-08 the check: both give the same Z statistics", "stated": 0.5,
+     "derive": lambda: abs(inner(KET0, S_GATE @ H @ KET0)) ** 2, "rtol": 1e-12},
+    {"name": "D4-09 the four gates compose to minus the identity", "stated": 0.0,
+     "derive": lambda: dev(Z @ X @ Z @ X, -I2), "atol": 1e-15},
+    {"name": "D4-09 they move no Bloch vector at all", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         bloch_of(Z @ X @ Z @ X @ _d4_state(43.0, 71.0))
+         - _d4_bloch(43.0, 71.0))),
+     "atol": 1e-14},
+    {"name": "D4-09 under a control they turn |+> into |->", "stated": 0.0,
+     "derive": lambda: same_state(_d4_controlled(Z @ X @ Z @ X)
+                                  @ kron_state(KETP, KETP),
+                                  kron_state(KETP, KETM)),
+     "atol": 1e-12},
+
+    # ── D4-10 to D4-12: decomposing and synthesising ────────────────────────
+    {"name": "D4-10 S is a phase times a quarter turn about z", "stated": 0.0,
+     "derive": lambda: dev(S_GATE, np.exp(1j * math.pi / 4) * rz(math.pi / 2)),
+     "atol": 1e-12},
+    {"name": "D4-10 the controlled versions differ by a phase on the control",
+     "stated": 0.0,
+     "derive": lambda: dev(
+         _d4_controlled(S_GATE),
+         _d4_controlled(rz(math.pi / 2))
+         @ on_qubit(phase_gate(math.pi / 4), 0)),
+     "atol": 1e-12},
+    {"name": "D4-11 the gate prepares the wanted state from |0>", "stated": 0.0,
+     "derive": lambda: dev(u_gate(DEG(60.0), DEG(45.0), 0.0) @ KET0,
+                           _d4_state(60.0, 45.0)),
+     "atol": 1e-12},
+    {"name": "D4-11 the entry U_00", "stated": 0.8660,
+     "derive": lambda: float(np.real(u_gate(DEG(60.0), DEG(45.0), 0.0)[0, 0])),
+     "rtol": 1e-4},
+    {"name": "D4-11 the real part of U_10", "stated": 0.3536,
+     "derive": lambda: float(np.real(u_gate(DEG(60.0), DEG(45.0), 0.0)[1, 0])),
+     "rtol": 1e-3},
+    {"name": "D4-11 the real part of U_11", "stated": 0.6124,
+     "derive": lambda: float(np.real(u_gate(DEG(60.0), DEG(45.0), 0.0)[1, 1])),
+     "rtol": 1e-3},
+    {"name": "D4-11 the check: the matrix is unitary", "stated": 0.0,
+     "derive": lambda: unitarity(u_gate(DEG(60.0), DEG(45.0), 0.0)),
+     "atol": 1e-14},
+    {"name": "D4-12 four T gates make a Z", "stated": 0.0,
+     "derive": lambda: dev(np.linalg.matrix_power(T_GATE, 4), Z), "atol": 1e-14},
+    {"name": "D4-12 the check: eight of them make the identity", "stated": 0.0,
+     "derive": lambda: dev(np.linalg.matrix_power(T_GATE, 8), I2), "atol": 1e-14},
+    {"name": "D4-12 the length grows by this factor", "stated": 4.0,
+     "derive": lambda: (math.log(1e4) / math.log(1e2)) ** 2, "rtol": 1e-12},
+
+    # ── D4-13 to D4-16: two-qubit gates, and which qubit is which ───────────
+    {"name": "D4-13 X on q0 of the three-term state", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(X, 0) @ _d4_13_state(),
+                           np.array([1, 1, 0, 1], dtype=complex) / math.sqrt(3)),
+     "atol": 1e-15},
+    {"name": "D4-13 X on q1 of the same state", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(X, 1) @ _d4_13_state(),
+                           np.array([1, 0, 1, 1], dtype=complex) / math.sqrt(3)),
+     "atol": 1e-15},
+    {"name": "D4-13 p(01) after the gate on q0", "stated": 0.3333,
+     "derive": lambda: abs((on_qubit(X, 0) @ _d4_13_state())[1]) ** 2,
+     "rtol": 1e-3},
+    {"name": "D4-13 p(01) after the gate on q1", "stated": 0.0,
+     "derive": lambda: abs((on_qubit(X, 1) @ _d4_13_state())[1]) ** 2,
+     "atol": 1e-30},
+    {"name": "D4-14 with q0 as control the state is untouched", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1) @ _d4_14_state(), _d4_14_state()),
+     "atol": 1e-15},
+    {"name": "D4-14 with q1 as control it becomes a Bell state", "stated": 0.0,
+     "derive": lambda: dev(cnot(1, 0) @ _d4_14_state(), BELL_PHI_P),
+     "atol": 1e-15},
+    {"name": "D4-14 the entanglement in the first case", "stated": 0.0,
+     "derive": lambda: _d4_entropy_of(cnot(0, 1) @ _d4_14_state()),
+     "atol": 1e-12},
+    {"name": "D4-14 the entanglement in the second", "stated": 1.0,
+     "derive": lambda: _d4_entropy_of(cnot(1, 0) @ _d4_14_state()),
+     "rtol": 1e-12},
+    {"name": "D4-15 the amplitude test on CZ|++>", "stated": -0.5,
+     "derive": lambda: float(np.real(
+         (cz_gate() @ kron_state(KETP, KETP))[0]
+         * (cz_gate() @ kron_state(KETP, KETP))[3]
+         - (cz_gate() @ kron_state(KETP, KETP))[1]
+         * (cz_gate() @ kron_state(KETP, KETP))[2])),
+     "rtol": 1e-12},
+    {"name": "D4-15 the reduced state is maximally mixed", "stated": 0.0,
+     "derive": lambda: dev(partial_trace(
+         proj(cz_gate() @ kron_state(KETP, KETP)), keep=0), 0.5 * I2),
+     "atol": 1e-14},
+    {"name": "D4-15 its purity", "stated": 0.5,
+     "derive": lambda: purity(partial_trace(
+         proj(cz_gate() @ kron_state(KETP, KETP)), keep=0)),
+     "rtol": 1e-12},
+    {"name": "D4-15 the entanglement, in bits", "stated": 1.0,
+     "derive": lambda: _d4_entropy_of(cz_gate() @ kron_state(KETP, KETP)),
+     "rtol": 1e-12},
+    {"name": "D4-15 the check: the outcome probabilities do not move",
+     "stated": 0.25,
+     "derive": lambda: max(abs(z) ** 2
+                           for z in cz_gate() @ kron_state(KETP, KETP)),
+     "rtol": 1e-12},
+    {"name": "D4-16 the SWAP exchanges the two qubits", "stated": 0.0,
+     "derive": lambda: dev(swap_gate() @ ket(1, 0), ket(0, 1)), "atol": 1e-15},
+    {"name": "D4-16 three CNOTs build it", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1) @ cnot(1, 0) @ cnot(0, 1), swap_gate()),
+     "atol": 1e-15},
+    {"name": "D4-16 the check: a SWAP creates no entanglement", "stated": 0.0,
+     "derive": lambda: _d4_entropy_of(swap_gate() @ kron_state(KETP, KET0)),
+     "atol": 1e-12},
+
+    # ── D4-17 and D4-18: entangling power and universality ──────────────────
+    {"name": "D4-17 the output at 120 degrees", "stated": 0.0,
+     "derive": lambda: dev(_d4_17_output(120.0),
+                           math.cos(DEG(60.0)) * ket(0, 0)
+                           + math.sin(DEG(60.0)) * ket(1, 1)),
+     "atol": 1e-14},
+    {"name": "D4-17 its entanglement, in bits", "stated": 0.8113,
+     "derive": lambda: _d4_entropy_of(_d4_17_output(120.0)), "rtol": 1e-3},
+    {"name": "D4-17 a product at both ends", "stated": 0.0,
+     "derive": lambda: max(_d4_entropy_of(_d4_17_output(t))
+                           for t in (0.0, 180.0)),
+     "atol": 1e-12},
+    {"name": "D4-17 a local gate leaves the entropy alone", "stated": 0.0,
+     "derive": lambda: abs(
+         _d4_entropy_of(kron(u_gate(1.3, 0.4, 2.2), u_gate(0.9, 2.7, 1.1))
+                        @ _d4_17_output(120.0))
+         - _d4_entropy_of(_d4_17_output(120.0))),
+     "atol": 1e-12},
+    {"name": "D4-18 one-qubit gates alone never entangle", "stated": 0.0,
+     "derive": lambda: max(_d4_entropy_of(
+         kron(u_gate(a, 0.4, 2.2), u_gate(0.9, a, 1.1)) @ kron_state(KET0, KET0))
+         for a in np.linspace(0.0, math.pi, 13)),
+     "atol": 1e-12},
+    {"name": "D4-18 the length grows by this factor", "stated": 4.0,
+     "derive": lambda: (math.log(1e4) / math.log(1e2)) ** 2, "rtol": 1e-12},
+
+    # ── D4-19 and D4-20: full-length ────────────────────────────────────────
+    {"name": "D4-19 r_z after the second Hadamard", "stated": 0.7071,
+     "derive": lambda: bloch_of(H @ T_GATE @ H @ KET0)[2], "rtol": 1e-4},
+    {"name": "D4-19 p(0) at the end", "stated": 0.8536,
+     "derive": lambda: abs(inner(KET0, H @ T_GATE @ H @ KET0)) ** 2,
+     "rtol": 1e-4},
+    {"name": "D4-19 the check: the same number as cos^2(pi/8)", "stated": 0.8536,
+     "derive": lambda: math.cos(math.pi / 8) ** 2, "rtol": 1e-4},
+    {"name": "D4-19 the shots for two decimal places", "stated": 5000.0,
+     "derive": lambda: _d4_shots_for(
+         0.01, abs(inner(KET0, H @ T_GATE @ H @ KET0)) ** 2),
+     "rtol": 1e-3},
+    {"name": "D4-19 the conjugate gate gives the same probability",
+     "stated": 0.8536,
+     "derive": lambda: abs(inner(KET0,
+                                 H @ T_GATE.conj().T @ H @ KET0)) ** 2,
+     "rtol": 1e-4},
+    {"name": "D4-20 the circuit produces the Bell state with a minus sign",
+     "stated": 0.0, "derive": lambda: dev(_d4_20_output(), BELL_PHI_M),
+     "atol": 1e-14},
+    {"name": "D4-20 both reduced states are maximally mixed", "stated": 0.0,
+     "derive": lambda: max(dev(partial_trace(proj(_d4_20_output()), keep=k),
+                               0.5 * I2) for k in (0, 1)),
+     "atol": 1e-14},
+    {"name": "D4-20 the entanglement, in bits", "stated": 1.0,
+     "derive": lambda: _d4_entropy_of(_d4_20_output()), "rtol": 1e-12},
+    {"name": "D4-20 p(00) at the end", "stated": 0.5,
+     "derive": lambda: abs(_d4_20_output()[0]) ** 2, "rtol": 1e-12},
+    {"name": "D4-20 p(01) at the end", "stated": 0.0,
+     "derive": lambda: abs(_d4_20_output()[1]) ** 2, "atol": 1e-30},
+    {"name": "D4-20 the Z correlation cannot separate the two candidates",
+     "stated": 0.0,
+     "derive": lambda: abs(_d4_corr(_d4_20_output(), Z, Z)
+                           - _d4_corr(BELL_PHI_P, Z, Z)),
+     "atol": 1e-14},
+    {"name": "D4-20 the X correlation of the state produced", "stated": -1.0,
+     "derive": lambda: _d4_corr(_d4_20_output(), X, X), "rtol": 1e-12},
+    {"name": "D4-20 the X correlation of the state claimed", "stated": 1.0,
+     "derive": lambda: _d4_corr(BELL_PHI_P, X, X), "rtol": 1e-12},
 ]
 
 
 if __name__ == "__main__":
-    main(CHECKS, "verify_drills — chapters 1 to 3, worked solutions")
+    main(CHECKS, "verify_drills — chapters 1 to 4, worked solutions")

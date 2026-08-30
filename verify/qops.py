@@ -164,3 +164,167 @@ BELL_PHI_P = np.array([1, 0, 0, 1], dtype=complex) / np.sqrt(2)
 BELL_PHI_M = np.array([1, 0, 0, -1], dtype=complex) / np.sqrt(2)
 BELL_PSI_P = np.array([0, 1, 1, 0], dtype=complex) / np.sqrt(2)
 BELL_PSI_M = np.array([0, 1, -1, 0], dtype=complex) / np.sqrt(2)
+
+
+# ---------------------------------------------------------------------------
+# Chapter 4 needs the standard gates and the two-qubit conventions. Everything
+# below is written from a definition rather than copied from the artifact:
+#
+#   * `rot` is the matrix exponential itself, computed by scipy's
+#     scaling-and-squaring Pade approximant, so it is an independent route to
+#     the cos/sin closed form the chapter teaches.
+#   * `cnot`, `cz` and `swap` are built by looping over the bit strings and
+#     writing down where each basis state goes. No matrix is transcribed, so a
+#     matrix printed in a scene can be checked against the Boolean rule it
+#     claims to implement.
+#   * `on_qubit` places a one-qubit operator on a named wire of an n-qubit
+#     register under this course's ordering, |q_{n-1} ... q_0>, so the qubit
+#     ordering itself is checkable rather than assumed.
+# ---------------------------------------------------------------------------
+
+from scipy.linalg import expm as _expm                        # noqa: E402
+
+S_GATE = np.array([[1, 0], [0, 1j]], dtype=complex)
+T_GATE = np.array([[1, 0], [0, np.exp(1j * math.pi / 4)]], dtype=complex)
+
+
+def phase_gate(phi: float) -> np.ndarray:
+    """P(phi) = diag(1, e^{i phi})."""
+    return np.array([[1, 0], [0, np.exp(1j * phi)]], dtype=complex)
+
+
+def rot(n, alpha: float) -> np.ndarray:
+    """R_n(alpha) = exp(-i alpha n.sigma / 2), by matrix exponential.
+
+    The chapter reaches the same operator through (n.sigma)^2 = I and a pair of
+    trigonometric series. `expm` knows nothing about either, so agreeing with it
+    is a real check on the closed form rather than on arithmetic.
+    """
+    return _expm(-0.5j * alpha * ndotsigma(n))
+
+
+def rx(a: float) -> np.ndarray:
+    return rot((1, 0, 0), a)
+
+
+def ry(a: float) -> np.ndarray:
+    return rot((0, 1, 0), a)
+
+
+def rz(a: float) -> np.ndarray:
+    return rot((0, 0, 1), a)
+
+
+def u_gate(theta: float, phi: float, lam: float) -> np.ndarray:
+    """The three-parameter gate, written out from the scene's own statement."""
+    c, s = math.cos(theta / 2), math.sin(theta / 2)
+    return np.array([[c, -np.exp(1j * lam) * s],
+                     [np.exp(1j * phi) * s, np.exp(1j * (phi + lam)) * c]],
+                    dtype=complex)
+
+
+def bloch_of(psi: np.ndarray) -> np.ndarray:
+    """The Bloch vector of a pure one-qubit state, from <psi|sigma_a|psi>."""
+    psi = np.asarray(psi, dtype=complex)
+    return np.array([np.vdot(psi, M @ psi).real for M in (X, Y, Z)], dtype=float)
+
+
+def same_state(u: np.ndarray, v: np.ndarray) -> float:
+    """0 when two normalised states agree up to a global phase, and nothing else.
+
+    This is the quantity a claim like "R_z(pi/2)|+> is |+i>" is really making,
+    and comparing the columns entry by entry would wrongly fail it.
+    """
+    return float(abs(abs(inner(u, v)) - 1.0))
+
+
+# ---- the two-qubit conventions, built from the bit strings -----------------
+#
+# Basis order |q_1 q_0> with x = 2 q_1 + q_0, exactly as the course fixes it.
+# Every gate below is assembled by asking, for each of the four inputs, which
+# output bit string it becomes. Nothing is transcribed from a printed matrix.
+
+
+def bits(x: int, n: int = 2):
+    """The bit string of x, most significant first: x = 2 q_1 + q_0 for n = 2."""
+    return tuple((x >> (n - 1 - k)) & 1 for k in range(n))
+
+
+def index(b) -> int:
+    """The inverse of `bits`."""
+    out = 0
+    for q in b:
+        out = 2 * out + int(q)
+    return out
+
+
+def permutation(rule, n: int = 2) -> np.ndarray:
+    """The unitary that sends each basis string to `rule(string)`."""
+    d = 2 ** n
+    M = np.zeros((d, d), dtype=complex)
+    for x in range(d):
+        M[index(rule(bits(x, n))), x] = 1.0
+    return M
+
+
+def cnot(control: int, target: int, n: int = 2) -> np.ndarray:
+    """CNOT with the named wires, from |c>|t> -> |c>|c xor t>.
+
+    `control` and `target` are qubit numbers in the course's own numbering, so
+    qubit 0 is the least significant bit of the printed string.
+    """
+    def rule(b):
+        out = list(b)
+        pos = lambda q: n - 1 - q                       # noqa: E731
+        out[pos(target)] ^= b[pos(control)]
+        return tuple(out)
+    return permutation(rule, n)
+
+
+def swap_gate(n: int = 2) -> np.ndarray:
+    """SWAP on two qubits, from |q1 q0> -> |q0 q1>."""
+    return permutation(lambda b: (b[1], b[0]), n)
+
+
+def cz_gate() -> np.ndarray:
+    """CZ, from its action rather than from a written matrix: a sign on |11>."""
+    M = np.eye(4, dtype=complex)
+    M[index((1, 1)), index((1, 1))] = -1.0
+    return M
+
+
+def toffoli() -> np.ndarray:
+    """|a b c> -> |a b, c xor ab>, on three qubits."""
+    return permutation(lambda b: (b[0], b[1], b[2] ^ (b[0] & b[1])), 3)
+
+
+def on_qubit(A: np.ndarray, q: int, n: int = 2) -> np.ndarray:
+    """A acting on qubit `q` of an n-qubit register, identity elsewhere.
+
+    Under |q_{n-1} ... q_0> the leftmost tensor factor is qubit n-1, so qubit q
+    sits in slot n-1-q. Getting this wrong is the silent error of the chapter,
+    which is exactly why it is written here once and used everywhere.
+    """
+    ops = [I2] * n
+    ops[n - 1 - q] = np.asarray(A, dtype=complex)
+    return kron(*ops)
+
+
+def kron_state(*vs) -> np.ndarray:
+    """The tensor product of state columns, left factor most significant.
+
+    `kron` above starts from a one-by-one matrix and so returns a row when it
+    is handed vectors. States are columns everywhere in this suite, so they get
+    their own two lines rather than a reshape at every call site.
+    """
+    out = np.array([1], dtype=complex)
+    for v in vs:
+        out = np.kron(out, np.asarray(v, dtype=complex))
+    return out
+
+
+def ket(*qs) -> np.ndarray:
+    """The computational basis state |q_{n-1} ... q_0>, as a column."""
+    v = np.zeros(2 ** len(qs), dtype=complex)
+    v[index(qs)] = 1.0
+    return v

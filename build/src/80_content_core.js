@@ -14,7 +14,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.4',
+    version:'0.5',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
@@ -127,12 +127,12 @@ const CONTENT = {
     tone:{ s:'T_1,\\;T_2', d:'Relaxation and dephasing times. $T_1$ is how long a population survives, $T_2$ how long a relative phase does, and $T_2\\le 2T_1$ always.', go:'m3-t1t2' },
 
     /* Chapter 4 — the Bloch sphere and quantum gates */
-    bloch:{ s:'\\mathbf{r}', d:'Bloch vector, $r_a=\\operatorname{Tr}(\\rho\\,\\sigma_a)$ for $a=x,y,z$. Its length is one for a pure state and less for a mixed one, so the sphere is really a ball.' },
-    angles:{ s:'\\theta,\\;\\varphi', d:'Polar and azimuthal angles of a pure qubit state, $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$. The half angle is not a typographic accident: it is the double cover.' },
-    rot:{ s:'R_a(\\theta)', d:'Rotation of the Bloch vector by $\\theta$ about axis $a$, $e^{-i\\theta\\sigma_a/2}$. Every single-qubit gate is one of these up to a global phase.' },
-    hgate:{ s:'H', d:'The Hadamard gate, which exchanges the $Z$ and $X$ bases. Written the same way as a Hamiltonian, and told apart by where it stands: a gate acts in a circuit, a Hamiltonian sits in an exponential.' },
-    sgate:{ s:'S,\\;T', d:'The quarter- and eighth-turn phase gates about $Z$, $S=\\operatorname{diag}(1,i)$ and $T=\\operatorname{diag}(1,e^{i\\pi/4})$.' },
-    cnot:{ s:'\\mathrm{CNOT}', d:'The controlled-NOT gate. Together with the single-qubit gates it is universal, and on its own it is what turns a product state into an entangled one.' },
+    bloch:{ s:'\\mathbf{r}', d:'Bloch vector, $r_a=\\operatorname{Tr}(\\rho\\,\\sigma_a)$ for $a=x,y,z$. Its length is one for a pure state and less for a mixed one, so the sphere is really a ball.', go:'m4-sphere' },
+    angles:{ s:'\\theta,\\;\\varphi', d:'Polar and azimuthal angles of a pure qubit state, $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$. The half angle is not a typographic accident: it is the double cover.', go:'m4-sphere' },
+    rot:{ s:'R_a(\\theta)', d:'Rotation of the Bloch vector by $\\theta$ about axis $a$, $e^{-i\\theta\\sigma_a/2}$. Every single-qubit gate is one of these up to a global phase.', go:'m4-rot' },
+    hgate:{ s:'H', d:'The Hadamard gate, which exchanges the $Z$ and $X$ bases. Written the same way as a Hamiltonian, and told apart by where it stands: a gate acts in a circuit, a Hamiltonian sits in an exponential.', go:'m4-had' },
+    sgate:{ s:'S,\\;T', d:'The quarter- and eighth-turn phase gates about $Z$, $S=\\operatorname{diag}(1,i)$ and $T=\\operatorname{diag}(1,e^{i\\pi/4})$.', go:'m4-phase' },
+    cnot:{ s:'\\mathrm{CNOT}', d:'The controlled-NOT gate. Together with the single-qubit gates it is universal, and on its own it is what turns a product state into an entangled one.', go:'m4-cnot' },
 
     /* Chapter 5 — circuits and protocols */
     depth:{ s:'d', d:'Circuit depth: the number of layers of gates that must run one after another. It is the quantity a coherence time is spent against, and it is not the gate count.' },

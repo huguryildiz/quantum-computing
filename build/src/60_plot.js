@@ -431,6 +431,11 @@ const PLOT = (() => {
       } else if(it.t==='sum'){
         g.push(`<circle cx="${it.x}" cy="${it.y}" r="14" fill="none" stroke="${COL.ink}" stroke-width="1.6"/>`);
         g.push(`<text x="${it.x}" y="${it.y+6}" ${halo()} font-size="${18*LBLS}" fill="${COL.ink}" text-anchor="middle">+</text>`);
+      } else if(it.t==='dot'){
+        /* A filled disc. A circuit control is drawn as a solid dot and a
+           target as an open one, and the difference is the whole notation, so
+           it cannot be left to a stroked path with `fill:none`. */
+        g.push(`<circle cx="${it.x}" cy="${it.y}" r="${it.r||7}" fill="${it.color||COL.ink}"/>`);
       } else if(it.t==='line'){
         g.push(`<path d="${it.d}" fill="none" stroke="${it.color||COL.ink}" stroke-width="${1.5*STRW}"/>`);
       }

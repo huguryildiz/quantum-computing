@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/KaTeX%20vendored-12314E?style=for-the-badge&logo=latex&logoColor=white" alt="KaTeX">
   <img src="https://img.shields.io/badge/Playwright-12314E?style=for-the-badge&logo=playwright&logoColor=45BA4B" alt="Playwright">
   <img src="https://img.shields.io/badge/NumPy%20%C2%B7%20SciPy%20%C2%B7%20SymPy-12314E?style=for-the-badge&logo=python&logoColor=FFD343" alt="NumPy, SciPy and SymPy">
-  <img src="https://img.shields.io/badge/v0.1%20%C2%B7%20Chapter%200-12314E?style=for-the-badge" alt="Version v0.1">
+  <img src="https://img.shields.io/badge/v0.5%20%C2%B7%20Chapters%200%E2%80%934-12314E?style=for-the-badge" alt="Version v0.5">
 </p>
 
 ---
@@ -39,8 +39,11 @@ It is written for **undergraduate engineering students who have had linear algeb
 but no quantum mechanics**, and that constraint decides every writing question: plain first and
 formal second, a worked example before a general theorem, and nothing the course does not need.
 
-**Status: version 0.1.** The engine, the verification gates and chapter 0 are in place. Chapters 1
-to 6 are planned and not yet written; the build plan is in `.claude/plans/`.
+**Status: version 0.5.** Chapters 0 to 4 are written: the frame of the course, the mathematics of
+quantum states, states and measurement and dynamics, mixed states and entanglement, and the Bloch
+sphere and quantum gates. That is 111 scenes, eight interactive laboratories and eighty worked
+practice questions, with every number in them re-derived by a separate numerical suite. Chapters 5
+and 6 are planned and not yet written; the build plan is in `.claude/plans/`.
 
 ---
 

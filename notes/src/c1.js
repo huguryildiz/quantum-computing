@@ -160,7 +160,7 @@ window.C1 = [
 /* ---------------- front matter ---------------- */
 {t:'title', kicker:'Quantum Computing', text:'Quantum Computing',
  sub:'Lecture notes for the software half of the course: what a quantum state is, what can be done to it, what a measurement returns, and what an algorithm has to arrange before that measurement is worth making.',
- meta:[['Covers','Chapters 1 and 2'],['Level','Undergraduate'],
+ meta:[['Covers','Chapters 1 to 4'],['Level','Undergraduate'],
        ['Assumed background','Linear algebra over the real numbers, and some Python']]},
 
 {t:'h3', text:'How to read these notes'},
@@ -174,7 +174,13 @@ window.C1 = [
   'NC CH2.1 · NC CH2.2.7'],
  ['2','States, measurement and dynamics',
   'The Born rule, and why choosing a measurement basis is choosing an experiment. Projective measurement, the state it leaves behind, and the general measurement an imperfect readout is. Observables, means and spreads. Compatibility, the commutator, and the uncertainty relation. The Pauli algebra and a measurement along any direction. Evolution, stationary states and why a gate is an exponential. What a finite run of shots is worth.',
-  'NC CH2.2, NC CH2.1.3, NC CH2.1.9']
+  'NC CH2.2, NC CH2.1.3, NC CH2.1.9'],
+ ['3','Mixed states and entanglement',
+  'The density operator, and the two situations no state vector describes. Which matrices are states, and the purity that says how mixed one is. Quantum channels in Kraus form, amplitude damping and dephasing, and the two decay times they become in continuous time. The partial trace, and a pure pair whose halves are mixed. Separability, the Schmidt decomposition and the entropy that weighs it. The Bell states, CHSH, and why entanglement sends nothing.',
+  'NC CH2.4 · NC CH2.5 · NC CH2.6 · NC CH8.2 · NC CH11.3'],
+ ['4','The Bloch sphere and quantum gates',
+  'One qubit drawn: the two angles, the half angle, and why opposite points are the orthogonal ones. Global against relative phase, and the double cover. Every one-qubit gate as a rotation — the Pauli gates, the Hadamard and the phase family. The order a circuit multiplies in, the Euler decomposition, and the three-parameter gate a machine offers. Reversible embeddings, ancillas and uncomputing. Two-qubit gates and the ordering that fails silently. Entangling power and universality.',
+  'NC CH1.2 · NC CH1.3 · NC CH3.2.5 · NC CH4.2 · NC CH4.5']
 ]},
 
 {t:'page'},
