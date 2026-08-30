@@ -949,11 +949,11 @@ const SC = [
   ], right:[
     {t:'reveal', at:1, items:[
       {t:'body', html:'<p>For a Pauli operator the exponential closes in two terms. Use $\\sigma^{2}=I$, which makes every even power the identity and every odd power $\\sigma$ again, and split the series accordingly:</p>'},
-      {t:'eq', tex:'e^{-i\\theta\\sigma/2} = \\sum_{m\\ \\mathrm{even}} \\frac{(-i\\theta/2)^{m}}{m!}\\,I \;+\; \\sum_{m\\ \\mathrm{odd}} \\frac{(-i\\theta/2)^{m}}{m!}\\,\\sigma'}
+      {t:'eq', tex:'e^{-i\\theta\\sigma/2} = \\sum_{m\\ \\mathrm{even}} \\frac{(-i\\theta/2)^{m}}{m!}\\,I \\;+\\; \\sum_{m\\ \\mathrm{odd}} \\frac{(-i\\theta/2)^{m}}{m!}\\,\\sigma'}
     ]},
     {t:'reveal', at:2, items:[
       {t:'body', html:'<p>The two sums are the series for a cosine and for a sine, with the argument halved by the $\\tfrac12$ in the exponent:</p>'},
-      {t:'eq', key:true, tex:'e^{-i\\theta\\sigma/2} = \\cos\\!\\left(\\tfrac{\\theta}{2}\\right) I \;-\; i\\sin\\!\\left(\\tfrac{\\theta}{2}\\right)\\sigma'}
+      {t:'eq', key:true, tex:'e^{-i\\theta\\sigma/2} = \\cos\\!\\left(\\tfrac{\\theta}{2}\\right) I \\;-\\; i\\sin\\!\\left(\\tfrac{\\theta}{2}\\right)\\sigma'}
     ]},
     {t:'reveal', at:3, items:[
       {t:'note', kind:'ok', head:'Where this is going', html:'Chapter 2 will say that a closed system evolves as $U(t)=e^{-iHt}$ with $H$ the Hamiltonian. None of that is new mathematics: it is this scene, with $\\theta G$ replaced by $Ht$. What Chapter 2 adds is the claim that nature does it.'}

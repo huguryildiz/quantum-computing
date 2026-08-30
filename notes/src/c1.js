@@ -180,7 +180,10 @@ window.C1 = [
   'NC CH2.4 · NC CH2.5 · NC CH2.6 · NC CH8.2 · NC CH11.3'],
  ['4','The Bloch sphere and quantum gates',
   'One qubit drawn: the two angles, the half angle, and why opposite points are the orthogonal ones. Global against relative phase, and the double cover. Every one-qubit gate as a rotation — the Pauli gates, the Hadamard and the phase family. The order a circuit multiplies in, the Euler decomposition, and the three-parameter gate a machine offers. Reversible embeddings, ancillas and uncomputing. Two-qubit gates and the ordering that fails silently. Entangling power and universality.',
-  'NC CH1.2 · NC CH1.3 · NC CH3.2.5 · NC CH4.2 · NC CH4.5']
+  'NC CH1.2 · NC CH1.3 · NC CH3.2.5 · NC CH4.2 · NC CH4.5'],
+ ['5','Circuits and protocols',
+  'A circuit as a program, and the model of computation it belongs to. Depth against gate count, and which one a coherence time is spent against. Exact simulation and where it stops; shots, error bars, and the difference between sampling noise and a broken machine. Measurement inside a circuit, classical feedforward, and what a compiler does before the hardware sees anything. Then the five things a resource claim must name, and two protocols worked end to end against them: teleportation, which finishes nothing until two classical bits arrive, and Grover, whose square root is a count of queries and not a time.',
+  'NC CH1.3.4 · NC CH1.3.5 · NC CH1.3.7 · NC CH4.4 · NC CH4.6 · NC CH6.1 · NC CH6.6']
 ]},
 
 {t:'page'},

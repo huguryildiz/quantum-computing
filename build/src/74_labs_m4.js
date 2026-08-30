@@ -55,11 +55,22 @@ Object.assign(LABS, (function(){
   const Z0 = [0,0], ONE = [1,0];
 
   /* ---- the Bloch vector of a normalised two-component state --------------
-     Straight from the definition r_a = <psi|sigma_a|psi>, written out. */
+     Straight from the definition r_a = <psi|sigma_a|psi>, written out.
+
+     The y component is the one to write carefully, and it is worth doing on
+     paper once rather than reading off a table. With Y = [[0,-i],[i,0]] and
+     psi = (a, b),
+
+         Y psi = (-i b,  i a),   <psi|Y|psi> = -i a* b + i a b* = 2 Im(a* b),
+
+     so the sign is positive. The test that catches it is |+i> = (|0> + i|1>)
+     over root two, which must come out at r_y = +1: with a real and b = i/root
+     two, a* b = i/2 and twice its imaginary part is one. A minus sign here
+     mirrors the whole sphere in the x-z plane and no gate reads a rendering. */
   function bloch(v){
     const a = v[0], b = v[1];
     const ab = cx(cj(a), b);                  /* a* b */
-    return [ 2*ab[0], -2*ab[1],
+    return [ 2*ab[0], 2*ab[1],
              a[0]*a[0]+a[1]*a[1] - (b[0]*b[0]+b[1]*b[1]) ];
   }
   const norm = v => Math.sqrt(v[0][0]**2+v[0][1]**2+v[1][0]**2+v[1][1]**2);

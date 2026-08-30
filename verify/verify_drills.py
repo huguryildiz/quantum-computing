@@ -17,6 +17,7 @@ Adding a check is adding a dict to CHECKS. The runner does not change.
 
 from __future__ import annotations
 
+import cmath
 import math
 import os
 import sys
@@ -29,6 +30,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
 from qops import (BELL_PHI_M, BELL_PHI_P, BELL_PSI_M, H, I2,  # noqa: E402
+                  grover_best, grover_oracle, grover_success, index,
+                  teleport_bob, teleport_branch,
                   KET0, KET1, KETM, KETP, S_GATE, T_GATE, X, Y, Z,
                   amp_damp, bloch, bloch_of, channel, cnot, cz_gate, dev,
                   direction, inner, ket, kron, kron_state, ndotsigma,
@@ -1429,5 +1432,330 @@ CHECKS = [
 ]
 
 
+# ── D5-01 to D5-20: circuits, runs, protocols and claims ────────────────────
+#
+# The two protocol questions are checked by simulating rather than by
+# evaluating the closed forms the solutions quote. Every teleportation branch
+# is reached by applying the gates and projecting, and every Grover number is
+# reached by performing the two reflections, so the correction table and
+# sin^2((2r+1)theta) are results of this file rather than assumptions in it.
+
+_D5_PSI = np.array([0.6, 0.8], dtype=complex)
+
+
+def _d5_ghz_chain(n):
+    v = ket(*([0] * n))
+    v = on_qubit(H, 0, n) @ v
+    for k in range(n - 1):
+        v = cnot(k, k + 1, n) @ v
+    return v
+
+
+def _d5_ghz_tree(n):
+    v = ket(*([0] * n))
+    v = on_qubit(H, 0, n) @ v
+    width = 1
+    while width < n:
+        for k in range(width):
+            if k + width < n:
+                v = cnot(k, k + width, n) @ v
+        width *= 2
+    return v
+
+
+def _d5_ghz_target(n):
+    v = np.zeros(2 ** n, dtype=complex)
+    v[0] = v[-1] = 1 / math.sqrt(2)
+    return v
+
+
+def _d5_03_output():
+    """H on q0, CNOT 0->1, then Z on q1, from |00>."""
+    v = ket(0, 0)
+    v = on_qubit(H, 0, 2) @ v
+    v = cnot(0, 1, 2) @ v
+    v = on_qubit(Z, 1, 2) @ v
+    return v
+
+
+def _d5_06_joint(mode):
+    """The joint distribution of (c1, c0) for the three variants of D5-06.
+
+    Each branch of the first measurement is followed separately; the qubit is
+    left in the state that was read, and the later gates act on that state.
+    """
+    v = H @ KET0
+    out = {}
+    for m in (0, 1):
+        p = abs(v[m]) ** 2
+        u = KET0 if m == 0 else KET1
+        if mode in ("corrected", "corrected_h") and m == 1:
+            u = X @ u
+        if mode == "corrected_h":
+            u = H @ u
+        for c1 in (0, 1):
+            out[(c1, m)] = out.get((c1, m), 0.0) + p * abs(u[c1]) ** 2
+    return out
+
+
+def _d5_12_channel(rho):
+    """The channel Bob is left with when only m1 is sent: full dephasing."""
+    return 0.5 * (rho + Z @ rho @ Z)
+
+
+def _d5_12_average_fidelity(samples=4000):
+    """The average of <psi| rho_out |psi> over pure states spread on the ball.
+
+    The states are laid on a Fibonacci lattice of the sphere, so the average is
+    an average over directions rather than over a parameter, which is what the
+    solution claims and what the two-thirds bound is stated for.
+    """
+    total = 0.0
+    golden = math.pi * (3.0 - math.sqrt(5.0))
+    for k in range(samples):
+        z = 1.0 - 2.0 * (k + 0.5) / samples
+        r = math.sqrt(max(0.0, 1.0 - z * z))
+        phi = golden * k
+        theta = math.acos(max(-1.0, min(1.0, z)))
+        psi = np.array([math.cos(theta / 2),
+                        cmath.exp(1j * phi) * math.sin(theta / 2)],
+                       dtype=complex)
+        rho = np.outer(psi, np.conjugate(psi))
+        total += float(np.real(np.conjugate(psi) @ _d5_12_channel(rho) @ psi))
+        del r
+    return total / samples
+
+
+def _d5_17_after_query():
+    """The two-qubit register after one phase-oracle call marking |10>."""
+    v = np.ones(4, dtype=complex) / 2.0
+    return grover_oracle(2, [2]) @ v
+
+
+CHECKS += [
+    # ---- reading and counting a circuit --------------------------------
+    {"name": "D5-01 the chain and the tree build the same eight-qubit state",
+     "stated": 0.0,
+     "derive": lambda: dev(_d5_ghz_chain(8), _d5_ghz_tree(8)), "atol": 1e-13},
+    {"name": "D5-01 and that state is the GHZ state", "stated": 0.0,
+     "derive": lambda: same_state(_d5_ghz_tree(8), _d5_ghz_target(8)),
+     "atol": 1e-13},
+    {"name": "D5-01 the chain takes 2840 nanoseconds", "stated": 2840.0,
+     "derive": lambda: 40 + 7 * 400, "atol": 1e-9},
+    {"name": "D5-01 the tree takes 1240 nanoseconds", "stated": 1240.0,
+     "derive": lambda: 40 + 3 * 400, "atol": 1e-9},
+    {"name": "D5-02 the string 011 is entry 3 of the state vector",
+     "stated": 3.0, "derive": lambda: float(index((0, 1, 1))), "atol": 1e-12},
+    {"name": "D5-02 the printed matrix is the CNOT it claims to be",
+     "stated": 0.0,
+     "derive": lambda: dev(np.array([[1, 0, 0, 0], [0, 0, 0, 1],
+                                     [0, 0, 1, 0], [0, 1, 0, 0]],
+                                    dtype=complex),
+                           cnot(0, 1, 2)),
+     "atol": 1e-14},
+    {"name": "D5-02 that matrix is its own inverse", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1, 2) @ cnot(0, 1, 2), np.eye(4)),
+     "atol": 1e-14},
+    {"name": "D5-03 the circuit produces the Bell state with a minus sign",
+     "stated": 0.0,
+     "derive": lambda: same_state(_d5_03_output(), BELL_PHI_M), "atol": 1e-14},
+    {"name": "D5-03 p(00) at the end", "stated": 0.5,
+     "derive": lambda: abs(_d5_03_output()[0]) ** 2, "rtol": 1e-12},
+    {"name": "D5-03 p(01) at the end", "stated": 0.0,
+     "derive": lambda: abs(_d5_03_output()[1]) ** 2, "atol": 1e-30},
+
+    # ---- shots, error bars and simulation cost -------------------------
+    {"name": "D5-04 the standard error after a thousand shots at p = 0.2",
+     "stated": 0.01265, "derive": lambda: math.sqrt(0.2 * 0.8 / 1000),
+     "rtol": 1e-3},
+    {"name": "D5-04 the shots a standard error of 0.002 needs",
+     "stated": 40000.0, "derive": lambda: 0.16 / 0.002 ** 2, "rtol": 1e-12},
+    {"name": "D5-04 how far 0.31 sits from 0.2 in standard errors",
+     "stated": 55.0, "derive": lambda: (0.31 - 0.2) / 0.002, "rtol": 1e-2},
+    {"name": "D5-05 a thirty-four-qubit state vector, in bytes",
+     "stated": 2.749e11, "derive": lambda: 16 * 2.0 ** 34, "rtol": 1e-3},
+    {"name": "D5-05 the qubits whose state vector fits in one terabyte",
+     "stated": 35.86, "derive": lambda: math.log2(1e12 / 16), "rtol": 1e-3},
+    {"name": "D5-05 a fifteen-qubit circuit matrix, in bytes",
+     "stated": 1.718e10, "derive": lambda: 16 * 4.0 ** 15, "rtol": 1e-3},
+    {"name": "D5-06 with the correction, the second reading is always zero",
+     "stated": 1.0,
+     "derive": lambda: sum(v for (c1, _), v in _d5_06_joint("corrected").items()
+                           if c1 == 0),
+     "rtol": 1e-14},
+    {"name": "D5-06 without the correction, the two readings always agree",
+     "stated": 1.0,
+     "derive": lambda: sum(v for (c1, c0), v in _d5_06_joint("plain").items()
+                           if c1 == c0),
+     "rtol": 1e-14},
+    {"name": "D5-06 with a further Hadamard, all four patterns are equal",
+     "stated": 0.0,
+     "derive": lambda: max(abs(v - 0.25)
+                           for v in _d5_06_joint("corrected_h").values()),
+     "atol": 1e-14},
+
+    # ---- rewriting and routing -----------------------------------------
+    {"name": "D5-07 the instruction count after translation", "stated": 144.0,
+     "derive": lambda: 12 + 24 * 3 + 20 * 3, "atol": 1e-9},
+    {"name": "D5-07 the probability that no gate fails", "stated": 0.8728,
+     "derive": lambda: 0.992 ** 12 * 0.9997 ** 132, "rtol": 1e-3},
+    {"name": "D5-07 the two-qubit gates alone account for most of the loss",
+     "stated": 0.9081, "derive": lambda: 0.992 ** 12, "rtol": 1e-3},
+    {"name": "D5-08 routing across a line of five, leaving them permuted",
+     "stated": 10.0, "derive": lambda: 3 * 3 + 1, "atol": 1e-9},
+    {"name": "D5-08 routing there and back", "stated": 19.0,
+     "derive": lambda: 2 * (3 * 3) + 1, "atol": 1e-9},
+    {"name": "D5-09 version A takes twelve microseconds", "stated": 12.0,
+     "derive": lambda: 30 * 0.4, "rtol": 1e-12},
+    {"name": "D5-09 version B takes 7.2 microseconds", "stated": 7.2,
+     "derive": lambda: 18 * 0.4, "rtol": 1e-12},
+    {"name": "D5-09 version A survives its gates with probability 0.6690",
+     "stated": 0.6690, "derive": lambda: 0.99 ** 40, "rtol": 1e-3},
+    {"name": "D5-09 version B survives its gates with probability 0.5930",
+     "stated": 0.5930, "derive": lambda: 0.99 ** 52, "rtol": 1e-3},
+    {"name": "D5-09 version A, both effects together", "stated": 0.5477,
+     "derive": lambda: 0.99 ** 40 * math.exp(-12 / 60), "rtol": 1e-3},
+    {"name": "D5-09 version B, both effects together", "stated": 0.5259,
+     "derive": lambda: 0.99 ** 52 * math.exp(-7.2 / 60), "rtol": 1e-3},
+    {"name": "D5-09 at a shorter coherence time version B wins",
+     "stated": 0.3670, "derive": lambda: 0.99 ** 52 * math.exp(-7.2 / 15),
+     "rtol": 1e-3},
+    {"name": "D5-09 and version A then loses", "stated": 0.3006,
+     "derive": lambda: 0.99 ** 40 * math.exp(-12 / 15), "rtol": 1e-3},
+
+    # ---- teleportation --------------------------------------------------
+    {"name": "D5-10 branch 10 leaves Bob with X|psi>", "stated": 0.0,
+     "derive": lambda: same_state(teleport_branch(_D5_PSI, 0, 1)[0],
+                                  X @ _D5_PSI),
+     "atol": 1e-14},
+    {"name": "D5-10 that state has amplitude 0.8 on |0>", "stated": 0.8,
+     "derive": lambda: abs(teleport_branch(_D5_PSI, 0, 1)[0][0]), "rtol": 1e-9},
+    {"name": "D5-10 the correction returns the state that was sent",
+     "stated": 0.0,
+     "derive": lambda: same_state(X @ teleport_branch(_D5_PSI, 0, 1)[0],
+                                  _D5_PSI),
+     "atol": 1e-14},
+    {"name": "D5-10 the fidelity if Bob applies nothing", "stated": 0.9216,
+     "derive": lambda: abs(inner(_D5_PSI,
+                                 teleport_branch(_D5_PSI, 0, 1)[0])) ** 2,
+     "rtol": 1e-9},
+    {"name": "D5-11 every branch has probability one quarter", "stated": 0.0,
+     "derive": lambda: max(abs(teleport_branch(_D5_PSI, a, b)[1] - 0.25)
+                           for a in (0, 1) for b in (0, 1)),
+     "atol": 1e-14},
+    {"name": "D5-11 the four Bloch vectors average to zero", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(sum(
+         bloch(P @ np.outer(_D5_PSI, np.conjugate(_D5_PSI)) @ P.conj().T)
+         for P in (I2, Z, X, X @ Z)) / 4)),
+     "atol": 1e-14},
+    {"name": "D5-11 so Bob holds I/2 before the bits arrive", "stated": 0.0,
+     "derive": lambda: dev(teleport_bob(_D5_PSI), 0.5 * I2), "atol": 1e-14},
+    {"name": "D5-12 sending only m1 gives full dephasing on a |+> input",
+     "stated": 0.5,
+     "derive": lambda: float(np.real(
+         np.conjugate(KETP) @ _d5_12_channel(outer(KETP, KETP)) @ KETP)),
+     "rtol": 1e-12},
+    {"name": "D5-12 and leaves a |0> input untouched", "stated": 1.0,
+     "derive": lambda: float(np.real(
+         np.conjugate(KET0) @ _d5_12_channel(outer(KET0, KET0)) @ KET0)),
+     "rtol": 1e-12},
+    {"name": "D5-12 the average fidelity is exactly the classical benchmark",
+     "stated": 0.66667, "derive": _d5_12_average_fidelity, "rtol": 2e-3},
+    {"name": "D5-13 the pair quality behind an average fidelity of 0.78",
+     "stated": 0.67, "derive": lambda: (3 * 0.78 - 1) / 2, "rtol": 1e-9},
+    {"name": "D5-13 the pair quality an average fidelity of 0.9 would need",
+     "stated": 0.85, "derive": lambda: (3 * 0.9 - 1) / 2, "rtol": 1e-9},
+    {"name": "D5-13 a separable pair reaches exactly two thirds",
+     "stated": 0.66667, "derive": lambda: (2 * 0.5 + 1) / 3, "rtol": 1e-4},
+
+    # ---- Grover ----------------------------------------------------------
+    {"name": "D5-14 the angle for sixteen candidates, in degrees",
+     "stated": 14.4775,
+     "derive": lambda: math.degrees(math.asin(math.sqrt(1 / 16))),
+     "rtol": 1e-4},
+    {"name": "D5-14 the exact optimum for sixteen candidates", "stated": 2.6083,
+     "derive": lambda: math.pi / (4 * math.asin(math.sqrt(1 / 16))) - 0.5,
+     "rtol": 1e-4},
+    {"name": "D5-14 the simulated optimum is the whole number three",
+     "stated": 3.0, "derive": lambda: float(grover_best(4, [9], 6)),
+     "atol": 1e-12},
+    {"name": "D5-14 the success probability at three iterations",
+     "stated": 0.9613, "derive": lambda: grover_success(4, [9], 3),
+     "rtol": 1e-3},
+    {"name": "D5-14 and at two", "stated": 0.9084,
+     "derive": lambda: grover_success(4, [9], 2), "rtol": 1e-3},
+    {"name": "D5-15 sixty-four candidates with four marked, at three",
+     "stated": 0.9613, "derive": lambda: grover_success(6, [1, 2, 3, 4], 3),
+     "rtol": 1e-3},
+    {"name": "D5-15 the same problem has the same angle as sixteen with one",
+     "stated": 0.0,
+     "derive": lambda: abs(math.asin(math.sqrt(4 / 64))
+                           - math.asin(math.sqrt(1 / 16))),
+     "atol": 1e-14},
+    {"name": "D5-15 sixty-four candidates with one marked: the optimum",
+     "stated": 6.0, "derive": lambda: float(grover_best(6, [9], 12)),
+     "atol": 1e-12},
+    {"name": "D5-15 and the success probability there", "stated": 0.9966,
+     "derive": lambda: grover_success(6, [9], 6), "rtol": 1e-3},
+    {"name": "D5-15 the iteration counts are in the ratio of the square roots",
+     "stated": 2.0, "derive": lambda: grover_best(6, [9], 12)
+                                      / grover_best(6, [1, 2, 3, 4], 6),
+     "rtol": 1e-12},
+    {"name": "D5-16 the simulated optimum for a thousand candidates",
+     "stated": 25.0, "derive": lambda: float(grover_best(10, [7], 60)),
+     "atol": 1e-12},
+    {"name": "D5-16 the success probability there", "stated": 0.99946,
+     "derive": lambda: grover_success(10, [7], 25), "rtol": 1e-4},
+    {"name": "D5-16 the overshoot at fifty iterations", "stated": 0.00023,
+     "derive": lambda: grover_success(10, [7], 50), "rtol": 5e-2},
+    {"name": "D5-16 the curve comes back up at seventy-five", "stated": 0.99995,
+     "derive": lambda: grover_success(10, [7], 75), "rtol": 1e-4},
+    {"name": "D5-17 the marked amplitude is negative after one query",
+     "stated": -0.5, "derive": lambda: float(np.real(_d5_17_after_query()[2])),
+     "rtol": 1e-12},
+    {"name": "D5-17 and its probability has not changed", "stated": 0.25,
+     "derive": lambda: abs(_d5_17_after_query()[2]) ** 2, "rtol": 1e-12},
+    {"name": "D5-17 the four candidates still add to one", "stated": 1.0,
+     "derive": lambda: float(sum(abs(z) ** 2 for z in _d5_17_after_query())),
+     "rtol": 1e-14},
+    {"name": "D5-17 one iteration then makes the answer certain", "stated": 1.0,
+     "derive": lambda: grover_success(2, [2], 1), "rtol": 1e-12},
+
+    # ---- assessing a resource claim --------------------------------------
+    {"name": "D5-19 the quantum time at a million candidates, in seconds",
+     "stated": 0.0157,
+     "derive": lambda: math.pi / 4 * math.sqrt(1e6) * 20e-6, "rtol": 1e-3},
+    {"name": "D5-19 the classical time there", "stated": 0.0025,
+     "derive": lambda: 0.5e6 * 5e-9, "rtol": 1e-12},
+    {"name": "D5-19 the crossover problem size", "stated": 3.9e7,
+     "derive": lambda: (math.pi / 4 * 20e-6 / (0.5 * 5e-9)) ** 2, "rtol": 2e-2},
+    {"name": "D5-19 both sides take about a tenth of a second there",
+     "stated": 0.1,
+     "derive": lambda: math.pi / 4 * math.sqrt(3.9478e7) * 20e-6, "rtol": 2e-2},
+
+    # ---- the full-length question -----------------------------------------
+    {"name": "D5-20 the angle for 4096 candidates, in degrees",
+     "stated": 0.89528,
+     "derive": lambda: math.degrees(math.asin(math.sqrt(1 / 4096))),
+     "rtol": 1e-4},
+    {"name": "D5-20 the exact optimum", "stated": 49.7634,
+     "derive": lambda: math.pi / (4 * math.asin(math.sqrt(1 / 4096))) - 0.5,
+     "rtol": 1e-4},
+    {"name": "D5-20 the simulated optimum is fifty", "stated": 50.0,
+     "derive": lambda: float(grover_best(12, [7], 60)), "atol": 1e-12},
+    {"name": "D5-20 the success probability there", "stated": 0.99995,
+     "derive": lambda: grover_success(12, [7], 50), "rtol": 1e-4},
+    {"name": "D5-20 the two-qubit gates the run needs", "stated": 6350.0,
+     "derive": lambda: 50 * (65 + 62), "atol": 1e-9},
+    {"name": "D5-20 the probability that none of them fails",
+     "stated": 1.9e-28, "derive": lambda: 0.99 ** 6350, "rtol": 2e-2},
+    {"name": "D5-20 a random guess among 4096 candidates", "stated": 0.000244,
+     "derive": lambda: 1 / 4096, "rtol": 1e-3},
+    {"name": "D5-20 the classical baseline, in queries", "stated": 2048.0,
+     "derive": lambda: 4096 / 2, "rtol": 1e-12},
+]
+
+
+
 if __name__ == "__main__":
-    main(CHECKS, "verify_drills — chapters 1 to 4, worked solutions")
+    main(CHECKS, "verify_drills — chapters 1 to 5, worked solutions")

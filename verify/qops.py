@@ -328,3 +328,112 @@ def ket(*qs) -> np.ndarray:
     v = np.zeros(2 ** len(qs), dtype=complex)
     v[index(qs)] = 1.0
     return v
+
+
+# ---- the protocols of chapter 5, built from their own definitions -----------
+#
+# Both are written as circuits and as operators, never as the closed forms the
+# artifact reasons with. The teleportation branch is reached by applying the
+# gates and projecting; the Grover state is reached by reflecting twice per
+# iteration. A gate that quoted sin^2((2r+1)theta) would be checking the
+# artifact's algebra against a second copy of the same algebra.
+
+
+def teleport_after_alice(psi: np.ndarray) -> np.ndarray:
+    """The three-qubit state after Alice's gates, from the circuit itself.
+
+    Qubit 0 carries the unknown state, qubits 1 and 2 are the shared pair, and
+    the register is |q2 q1 q0> with x = 4 q2 + 2 q1 + q0. The gates applied are
+    exactly the ones the scene draws: H on q1 and CNOT from q1 to q2 to make
+    the pair, then CNOT from q0 to q1 and H on q0 to rotate into the Bell
+    basis. Nothing about the four branches is assumed here.
+    """
+    v = kron_state(KET0, KET0, np.asarray(psi, dtype=complex))
+    v = on_qubit(H, 1, 3) @ v
+    v = cnot(1, 2, 3) @ v
+    v = cnot(0, 1, 3) @ v
+    v = on_qubit(H, 0, 3) @ v
+    return v
+
+
+def teleport_branch(psi: np.ndarray, m0: int, m1: int):
+    """Bob's normalised state in one branch, and that branch's probability.
+
+    The projection is written out: keep the amplitudes whose q0 and q1 bits are
+    the measured ones, read the two values of q2 off them, and renormalise.
+    """
+    v = teleport_after_alice(psi)
+    k = 2 * m1 + m0
+    amps = np.array([v[k], v[4 + k]], dtype=complex)
+    p = float(np.vdot(amps, amps).real)
+    if p < 1e-15:
+        return np.zeros(2, dtype=complex), 0.0
+    return amps / math.sqrt(p), p
+
+
+def teleport_bob(psi: np.ndarray) -> np.ndarray:
+    """Bob's density operator before the classical bits arrive.
+
+    Taken as a partial trace of the whole three-qubit state over the two qubits
+    Alice holds, so it never mentions the four branches at all.
+    """
+    v = teleport_after_alice(psi)
+    rho = np.outer(v, np.conjugate(v))
+    # Under |q2 q1 q0> the leftmost tensor factor is q2, so Bob's qubit is the
+    # dimension-2 factor and Alice's pair is the dimension-4 one beside it.
+    return partial_trace(rho, keep=0, dims=(2, 4))
+
+
+def grover_oracle(n: int, marked) -> np.ndarray:
+    """The phase oracle: a sign on every marked basis state, and nothing else."""
+    d = 2 ** n
+    M = np.eye(d, dtype=complex)
+    for x in marked:
+        M[x, x] = -1.0
+    return M
+
+
+def grover_diffusion(n: int) -> np.ndarray:
+    """2|s><s| - I with |s> the uniform superposition, written out."""
+    d = 2 ** n
+    s = np.ones(d, dtype=complex) / math.sqrt(d)
+    return 2 * np.outer(s, np.conjugate(s)) - np.eye(d, dtype=complex)
+
+
+def grover_state(n: int, marked, iterations: int) -> np.ndarray:
+    """The register after a stated number of full Grover iterations.
+
+    Built by applying the two reflections as matrices. No angle is computed and
+    no closed form is used, so the agreement with sin^2((2r+1)theta) is a
+    result of this function rather than an assumption inside it.
+    """
+    d = 2 ** n
+    v = np.ones(d, dtype=complex) / math.sqrt(d)
+    G = grover_diffusion(n) @ grover_oracle(n, marked)
+    for _ in range(int(iterations)):
+        v = G @ v
+    return v
+
+
+def grover_success(n: int, marked, iterations: int) -> float:
+    """The probability of reading a marked string, from the simulated state."""
+    v = grover_state(n, marked, iterations)
+    return float(sum(abs(v[x]) ** 2 for x in marked))
+
+
+def grover_best(n: int, marked, upper: int) -> int:
+    """The iteration count that maximises the simulated success probability.
+
+    Searched by simulation up to `upper`, so the optimum this returns owes
+    nothing to the formula pi/(4 theta) - 1/2 that the artifact quotes.
+    """
+    d = 2 ** n
+    v = np.ones(d, dtype=complex) / math.sqrt(d)
+    G = grover_diffusion(n) @ grover_oracle(n, marked)
+    best, best_p = 0, float(sum(abs(v[x]) ** 2 for x in marked))
+    for r in range(1, int(upper) + 1):
+        v = G @ v
+        p = float(sum(abs(v[x]) ** 2 for x in marked))
+        if p > best_p:
+            best, best_p = r, p
+    return best

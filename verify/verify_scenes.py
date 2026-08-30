@@ -28,6 +28,7 @@ Adding a check is adding a dict to CHECKS. The runner does not change.
 
 from __future__ import annotations
 
+import cmath
 import math
 import os
 import sys
@@ -40,6 +41,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
 from qops import (BELL_PHI_P, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
+                  grover_best, grover_state, grover_success, index,
+                  teleport_bob, teleport_branch,
                   S_GATE, T_GATE, X, Y, Z, amp_damp, bloch, bloch_of,
                   channel, cnot, cz_gate, dev, direction, hermiticity,
                   inner, ket, kron, ndotsigma, on_qubit, outer,
@@ -1290,5 +1293,327 @@ CHECKS = [
 ]
 
 
+# ── chapter 5 · circuits and protocols ──────────────────────────────────────
+#
+# Two things in this chapter are checked by simulating the circuit rather than
+# by evaluating the formula the scene quotes. The four teleportation branches
+# come from applying the gates to eight amplitudes and projecting, and the
+# Grover numbers come from performing the two reflections as reflections. Both
+# closed forms — the correction table and sin^2((2r+1)theta) — are therefore
+# results of the check rather than assumptions inside it.
+
+_M5_PSI = np.array([0.6, 0.8], dtype=complex)
+_M5_PSI2 = np.array([math.cos(math.radians(35.0)),
+                     cmath.exp(1j * math.radians(110.0))
+                     * math.sin(math.radians(35.0))], dtype=complex)
+
+
+def _m5_ghz_chain(n):
+    """GHZ on n qubits by the chain of CNOTs the scene draws."""
+    v = ket(*([0] * n))
+    v = on_qubit(H, 0, n) @ v
+    for k in range(n - 1):
+        v = cnot(k, k + 1, n) @ v
+    return v
+
+
+def _m5_ghz_tree(n):
+    """GHZ on n qubits by the doubling tree, which has the same gate count."""
+    v = ket(*([0] * n))
+    v = on_qubit(H, 0, n) @ v
+    width = 1
+    while width < n:
+        for k in range(width):
+            if k + width < n:
+                v = cnot(k, k + width, n) @ v
+        width *= 2
+    return v
+
+
+def _m5_ghz_target(n):
+    """(|0...0> + |1...1>)/sqrt(2), written down rather than built."""
+    v = np.zeros(2 ** n, dtype=complex)
+    v[0] = v[-1] = 1 / math.sqrt(2)
+    return v
+
+
+def _m5_circuit_scene():
+    """H on q0, CNOT 0->1, CNOT 1->2 on three qubits, from |000>."""
+    v = ket(0, 0, 0)
+    v = on_qubit(H, 0, 3) @ v
+    v = cnot(0, 1, 3) @ v
+    v = cnot(1, 2, 3) @ v
+    return v
+
+
+def _m5_defer_gap():
+    """How far the two circuits of the deferred-measurement scene disagree.
+
+    Circuit A applies the CNOT and measures both qubits. Circuit B measures the
+    control first and applies X to the target when the bit is one. The gate
+    compares the two joint distributions outcome by outcome.
+    """
+    psi = _M5_PSI2
+    a = cnot(0, 1, 2) @ kron_state(KET0, psi)          # |q1 q0>, target on q1
+    pa = [abs(a[x]) ** 2 for x in range(4)]
+    pb = [0.0] * 4
+    for m in (0, 1):
+        p = abs(psi[m]) ** 2
+        pb[index((m, m))] += p                          # q1 becomes m as well
+    return max(abs(x - y) for x, y in zip(pa, pb))
+
+
+def _m5_feed_final():
+    """The probability that the dynamic circuit's second reading is zero.
+
+    Each branch of the first measurement is followed separately: the qubit is
+    left in the state that was read, the X is applied when the bit was one,
+    and the branches are weighted by their own probabilities.
+    """
+    v = H @ KET0
+    total = 0.0
+    for m in (0, 1):
+        after = KET0 if m == 0 else X @ KET1
+        total += abs(v[m]) ** 2 * abs(after[0]) ** 2
+    return total
+
+
+def _m5_hadamard_from_rotations():
+    """H against exp(i pi/2) Rz(pi/2) Rx(pi/2) Rz(pi/2)."""
+    U = rz(math.pi / 2) @ rx(math.pi / 2) @ rz(math.pi / 2)
+    return dev(cmath.exp(1j * math.pi / 2) * U, H)
+
+
+def _m5_cnot_from_cz():
+    """CNOT_{0->1} against (H on q1) CZ (H on q1)."""
+    h1 = on_qubit(H, 1, 2)
+    return dev(h1 @ cz_gate() @ h1, cnot(0, 1, 2))
+
+
+def _m5_ramsey(phi_deg):
+    """p(0) after H, P(phi), H, from the matrices rather than from a cosine."""
+    v = H @ phase_gate(math.radians(phi_deg)) @ H @ KET0
+    return abs(v[0]) ** 2
+
+
+def _m5_clone_overlap():
+    """|<++|CNOT(|+>|0>)|^2, the overlap of the failed copy with a real one."""
+    out = cnot(0, 1, 2) @ kron_state(KET0, KETP)
+    return abs(inner(kron_state(KETP, KETP), out)) ** 2
+
+
+def _m5_clone_reduced():
+    """How far each half of the failed copy is from I/2."""
+    out = cnot(0, 1, 2) @ kron_state(KET0, KETP)
+    rho = np.outer(out, np.conjugate(out))
+    return max(dev(partial_trace(rho, keep=k), 0.5 * I2) for k in (0, 1))
+
+
+def _m5_branch_gap(m0, m1, psi=None):
+    """How far Bob's simulated branch state is from X^{m1} Z^{m0} |psi>."""
+    psi = _M5_PSI if psi is None else psi
+    u, _ = teleport_branch(psi, m0, m1)
+    want = np.linalg.matrix_power(X, m1) @ np.linalg.matrix_power(Z, m0) @ psi
+    return same_state(u, want)
+
+
+def _m5_branch_prob(m0, m1, psi=None):
+    psi = _M5_PSI if psi is None else psi
+    return teleport_branch(psi, m0, m1)[1]
+
+
+def _m5_bob_gap():
+    """The largest distance from I/2 over several inputs, before the bits."""
+    return max(dev(teleport_bob(p), 0.5 * I2)
+               for p in (_M5_PSI, _M5_PSI2, KET0, KETP))
+
+
+def _m5_kick_gap():
+    """U_f |x>|-> against (-1)^{f(x)} |x>|->, for f(x) = x on one bit.
+
+    The oracle for f(x) = x is a CNOT with the register as control and the
+    target as target, and the target is prepared in |->. The claim under test
+    is that the pair comes back unchanged apart from the stated sign.
+    """
+    uf = cnot(0, 1, 2)                       # target on q1, so f(q0) = q0
+    worst = 0.0
+    for x in (0, 1):
+        v = kron_state(KETM, KET0 if x == 0 else KET1)
+        worst = max(worst, dev(uf @ v, ((-1) ** x) * v))
+    return worst
+
+
+def _m5_kick_example():
+    """|+>|-> after one query with f(x)=x: the register must become |->."""
+    out = cnot(0, 1, 2) @ kron_state(KETM, KETP)
+    return same_state(out, kron_state(KETM, KETM))
+
+
+def _m5_grover_angle(n, marked):
+    """The angle of the simulated start state from the unmarked axis."""
+    v = grover_state(n, marked, 0)
+    good = math.sqrt(sum(abs(v[x]) ** 2 for x in marked))
+    bad = math.sqrt(max(0.0, 1.0 - good * good))
+    return math.degrees(math.atan2(good, bad))
+
+
+def _m5_grover_turn(n, marked):
+    """The angle the first iteration adds, in units of the starting angle."""
+    t0 = _m5_grover_angle(n, marked)
+    v = grover_state(n, marked, 1)
+    good = math.sqrt(sum(abs(v[x]) ** 2 for x in marked))
+    bad = math.sqrt(max(0.0, 1.0 - good * good))
+    return math.degrees(math.atan2(good, bad)) / t0
+
+
+CHECKS += [
+    # ── 5.1 The circuit model ───────────────────────────────────────────────
+    {"name": "5.1.1 the three-gate circuit reaches the GHZ state",
+     "stated": 0.0,
+     "derive": lambda: same_state(_m5_circuit_scene(), _m5_ghz_target(3)),
+     "atol": 1e-14},
+    {"name": "5.1.1 p(000) of that state", "stated": 0.5,
+     "derive": lambda: abs(_m5_circuit_scene()[0]) ** 2, "rtol": 1e-12},
+    {"name": "5.1.3 the string 101 is entry 5 of the vector", "stated": 5.0,
+     "derive": lambda: float(index((1, 0, 1))), "atol": 1e-12},
+    {"name": "5.1.3 that entry is the amplitude of |101>", "stated": 1.0,
+     "derive": lambda: abs(ket(1, 0, 1)[5]), "rtol": 1e-12},
+    {"name": "5.1.4 the chain circuit builds GHZ on eight qubits",
+     "stated": 0.0,
+     "derive": lambda: same_state(_m5_ghz_chain(8), _m5_ghz_target(8)),
+     "atol": 1e-13},
+    {"name": "5.1.4 the tree circuit builds the same state", "stated": 0.0,
+     "derive": lambda: same_state(_m5_ghz_tree(8), _m5_ghz_target(8)),
+     "atol": 1e-13},
+    {"name": "5.1.4 the chain of sixteen qubits takes 3.2 microseconds",
+     "stated": 3.2, "derive": lambda: 16 * 0.2, "rtol": 1e-12},
+    {"name": "5.1.4 the tree of sixteen qubits takes 1.0 microsecond",
+     "stated": 1.0, "derive": lambda: (1 + math.log2(16)) * 0.2, "rtol": 1e-12},
+
+    # ── 5.2 Running a circuit ───────────────────────────────────────────────
+    {"name": "5.2.1 a thirty-qubit state vector, in bytes", "stated": 17.18e9,
+     "derive": lambda: 16 * 2.0 ** 30, "rtol": 1e-3},
+    {"name": "5.2.1 a fifty-qubit state vector, in bytes", "stated": 18.0e15,
+     "derive": lambda: 16 * 2.0 ** 50, "rtol": 1e-2},
+    {"name": "5.2.1 the qubits that fit in 64 GB", "stated": 31.9,
+     "derive": lambda: math.log2(64e9 / 16), "rtol": 1e-3},
+    {"name": "5.2.2 the shots a standard error of 0.005 needs at p = 0.5",
+     "stated": 10000.0, "derive": lambda: 0.25 / 0.005 ** 2, "rtol": 1e-12},
+    {"name": "5.2.2 the standard error at a thousand shots", "stated": 0.0158,
+     "derive": lambda: math.sqrt(0.25 / 1000), "rtol": 2e-3},
+    {"name": "5.2.3 the two deferred-measurement circuits agree exactly",
+     "stated": 0.0, "derive": _m5_defer_gap, "atol": 1e-14},
+    {"name": "5.2.4 the dynamic circuit's second reading is always zero",
+     "stated": 1.0, "derive": _m5_feed_final, "rtol": 1e-14},
+
+    # ── 5.3 Compiling for a machine ─────────────────────────────────────────
+    {"name": "5.3.1 the Hadamard from three rotations, up to the stated phase",
+     "stated": 0.0, "derive": _m5_hadamard_from_rotations, "atol": 1e-14},
+    {"name": "5.3.1 the CNOT from a CZ between two Hadamards", "stated": 0.0,
+     "derive": _m5_cnot_from_cz, "atol": 1e-14},
+    {"name": "5.3.1 forty CNOTs become a hundred and twenty instructions",
+     "stated": 120.0, "derive": lambda: 40 + 2 * 40, "atol": 1e-12},
+    {"name": "5.3.2 routing across four qubits on a line costs seven CNOTs",
+     "stated": 7.0, "derive": lambda: 2 * 3 + 1, "atol": 1e-12},
+
+    # ── 5.4 Interference in a circuit ───────────────────────────────────────
+    {"name": "5.4.1 the Ramsey circuit at ninety degrees", "stated": 0.5,
+     "derive": lambda: _m5_ramsey(90.0), "rtol": 1e-12},
+    {"name": "5.4.1 the Ramsey circuit at a hundred and eighty degrees",
+     "stated": 0.0, "derive": lambda: _m5_ramsey(180.0), "atol": 1e-28},
+    {"name": "5.4.1 the Ramsey circuit is a cosine squared throughout",
+     "stated": 0.0,
+     "derive": lambda: max(abs(_m5_ramsey(d)
+                               - math.cos(math.radians(d) / 2) ** 2)
+                           for d in range(0, 361, 5)),
+     "atol": 1e-14},
+    {"name": "5.4.1 the standard error at four thousand shots",
+     "stated": 0.0079, "derive": lambda: math.sqrt(0.25 / 4000), "rtol": 2e-3},
+
+    # ── 5.5 Teleportation ───────────────────────────────────────────────────
+    {"name": "5.5.1 the failed copy overlaps a real copy by one half",
+     "stated": 0.5, "derive": _m5_clone_overlap, "rtol": 1e-12},
+    {"name": "5.5.1 both halves of the failed copy are maximally mixed",
+     "stated": 0.0, "derive": _m5_clone_reduced, "atol": 1e-14},
+    # The four branches, one check each, because each is a separate claim of
+    # the correction table and a table with one wrong row still looks right.
+    {"name": "5.5.3 branch m1m0 = 00 leaves Bob with |psi>", "stated": 0.0,
+     "derive": lambda: _m5_branch_gap(0, 0), "atol": 1e-14},
+    {"name": "5.5.3 branch m1m0 = 01 leaves Bob with Z|psi>", "stated": 0.0,
+     "derive": lambda: _m5_branch_gap(1, 0), "atol": 1e-14},
+    {"name": "5.5.3 branch m1m0 = 10 leaves Bob with X|psi>", "stated": 0.0,
+     "derive": lambda: _m5_branch_gap(0, 1), "atol": 1e-14},
+    {"name": "5.5.3 branch m1m0 = 11 leaves Bob with XZ|psi>", "stated": 0.0,
+     "derive": lambda: _m5_branch_gap(1, 1), "atol": 1e-14},
+    {"name": "5.5.4 branch m1m0 = 00 has probability one quarter",
+     "stated": 0.25, "derive": lambda: _m5_branch_prob(0, 0), "rtol": 1e-12},
+    {"name": "5.5.4 branch m1m0 = 01 has probability one quarter",
+     "stated": 0.25, "derive": lambda: _m5_branch_prob(1, 0), "rtol": 1e-12},
+    {"name": "5.5.4 branch m1m0 = 10 has probability one quarter",
+     "stated": 0.25, "derive": lambda: _m5_branch_prob(0, 1), "rtol": 1e-12},
+    {"name": "5.5.4 branch m1m0 = 11 has probability one quarter",
+     "stated": 0.25, "derive": lambda: _m5_branch_prob(1, 1), "rtol": 1e-12},
+    {"name": "5.5.4 the four branch probabilities add to one", "stated": 1.0,
+     "derive": lambda: sum(_m5_branch_prob(a, b)
+                           for a in (0, 1) for b in (0, 1)),
+     "rtol": 1e-12},
+    {"name": "5.5.4 a second input gives the same four probabilities",
+     "stated": 0.0,
+     "derive": lambda: max(abs(_m5_branch_prob(a, b, _M5_PSI2) - 0.25)
+                           for a in (0, 1) for b in (0, 1)),
+     "atol": 1e-14},
+    {"name": "5.5.5 Bob holds I/2 before the bits arrive, for every input",
+     "stated": 0.0, "derive": _m5_bob_gap, "atol": 1e-14},
+    {"name": "5.5.6 a separable pair reaches exactly the classical benchmark",
+     "stated": 0.6667, "derive": lambda: (2 * 0.5 + 1) / 3, "rtol": 1e-3},
+    {"name": "5.5.6 a perfect pair reaches fidelity one", "stated": 1.0,
+     "derive": lambda: (2 * 1.0 + 1) / 3, "rtol": 1e-12},
+    {"name": "5.5.6 the pair quality behind an average fidelity of 0.81",
+     "stated": 0.715, "derive": lambda: (3 * 0.81 - 1) / 2, "rtol": 1e-12},
+
+    # ── 5.6 Grover search ───────────────────────────────────────────────────
+    {"name": "5.6.2 the oracle writes a sign and changes no probability",
+     "stated": 0.0, "derive": _m5_kick_gap, "atol": 1e-14},
+    {"name": "5.6.2 one query carries |+> to |-> when f(x) = x", "stated": 0.0,
+     "derive": _m5_kick_example, "atol": 1e-14},
+    {"name": "5.6.3 the starting angle for a thousand candidates, in degrees",
+     "stated": 1.7908, "derive": lambda: _m5_grover_angle(10, [7]),
+     "rtol": 1e-3},
+    {"name": "5.6.3 the starting success probability is one in N",
+     "stated": 0.000977, "derive": lambda: grover_success(10, [7], 0),
+     "rtol": 1e-3},
+    {"name": "5.6.4 one iteration turns the state to three times the angle",
+     "stated": 3.0, "derive": lambda: _m5_grover_turn(10, [7]), "rtol": 1e-6},
+    {"name": "5.6.5 the eight-candidate example succeeds with certainty",
+     "stated": 1.0, "derive": lambda: grover_success(3, [5, 6], 1),
+     "rtol": 1e-12},
+    {"name": "5.6.5 two iterations return the eight-candidate example to 0.25",
+     "stated": 0.25, "derive": lambda: grover_success(3, [5, 6], 2),
+     "rtol": 1e-12},
+    {"name": "5.6.5 the simulated optimum for a thousand candidates",
+     "stated": 25.0, "derive": lambda: float(grover_best(10, [7], 60)),
+     "atol": 1e-12},
+    {"name": "5.6.5 the success probability at that optimum", "stated": 0.9995,
+     "derive": lambda: grover_success(10, [7], 25), "rtol": 1e-3},
+    {"name": "5.6.5 the overshoot: twice the optimum returns almost nothing",
+     "stated": 0.00023, "derive": lambda: grover_success(10, [7], 50),
+     "rtol": 5e-2},
+    {"name": "5.6.5 the formula and the simulation agree at every count",
+     "stated": 0.0,
+     "derive": lambda: max(
+         abs(grover_success(10, [7], r)
+             - math.sin((2 * r + 1) * math.asin(math.sqrt(1 / 1024))) ** 2)
+         for r in range(0, 61, 5)),
+     "atol": 1e-12},
+    {"name": "5.6.6 the queries Grover needs against the classical count",
+     "stated": 512.0, "derive": lambda: (1024 + 1) / 2, "rtol": 1e-2},
+    {"name": "5.6.6 the quantum run takes 250 microseconds", "stated": 250.0,
+     "derive": lambda: 25 * 10.0, "rtol": 1e-12},
+    {"name": "5.6.6 the classical run takes 5.1 microseconds", "stated": 5.1,
+     "derive": lambda: 512 * 0.01, "rtol": 1e-2},
+]
+
+
+
 if __name__ == "__main__":
-    main(CHECKS, "verify_scenes — chapters 1 to 4, teaching scenes")
+    main(CHECKS, "verify_scenes — chapters 1 to 5, teaching scenes")

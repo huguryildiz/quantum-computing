@@ -14,7 +14,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.5',
+    version:'0.6',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
@@ -135,10 +135,10 @@ const CONTENT = {
     cnot:{ s:'\\mathrm{CNOT}', d:'The controlled-NOT gate. Together with the single-qubit gates it is universal, and on its own it is what turns a product state into an entangled one.', go:'m4-cnot' },
 
     /* Chapter 5 — circuits and protocols */
-    depth:{ s:'d', d:'Circuit depth: the number of layers of gates that must run one after another. It is the quantity a coherence time is spent against, and it is not the gate count.' },
-    isa:{ s:'\\text{ISA}', d:'The instruction set a particular machine actually runs. A circuit written in ideal gates is transpiled into it, and the transpiled depth is the one that matters.' },
-    fid:{ s:'F', d:'Fidelity between a prepared state and its target, $F=\\langle\\psi|\\rho|\\psi\\rangle$ for a pure target. A protocol is claimed to work only against a fidelity that beats the best classical strategy.' },
-    grov:{ s:'k_{\\text{opt}}', d:'The number of Grover iterations that maximises the success probability, about $\\tfrac{\\pi}{4}\\sqrt{N/M}$. Running past it makes the answer less likely, not more.' },
+    depth:{ s:'d', d:'Circuit depth: the number of layers of gates that must run one after another. It is the quantity a coherence time is spent against, and it is not the gate count.', go:'m5-depth' },
+    isa:{ s:'\\text{ISA}', d:'The instruction set a particular machine actually runs. A circuit written in ideal gates is transpiled into it, and the transpiled depth is the one that matters.', go:'m5-iset' },
+    fid:{ s:'F', d:'Fidelity between a prepared state and its target, $F=\\langle\\psi|\\rho|\\psi\\rangle$ for a pure target. A protocol is claimed to work only against a fidelity that beats the best classical strategy.', go:'m5-teleres' },
+    grov:{ s:'k_{\\text{opt}}', d:'The number of Grover iterations that maximises the success probability, about $\\tfrac{\\pi}{4}\\sqrt{N/M}$. Running past it makes the answer less likely, not more.', go:'m5-iter' },
 
     /* Chapter 6 — quantum algorithms */
     oracle:{ s:'U_f', d:'A reversible embedding of a classical function, $U_f|x\\rangle|y\\rangle=|x\\rangle|y\\oplus f(x)\\rangle$. Counting queries to it is not the same as counting the gates it costs to build.' },

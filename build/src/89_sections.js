@@ -38,7 +38,8 @@ CONTENT.CHAPTERS = [
   { n:'1', module:'M1', title:'The mathematics of quantum states' },
   { n:'2', module:'M2', title:'States, measurement and dynamics' },
   { n:'3', module:'M3', title:'Mixed states and entanglement' },
-  { n:'4', module:'M4', title:'The Bloch sphere and quantum gates' }
+  { n:'4', module:'M4', title:'The Bloch sphere and quantum gates' },
+  { n:'5', module:'M5', title:'Circuits and protocols' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -145,6 +146,37 @@ CONTENT.SECTIONS = {
     { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h'] },
     { n:'4.7', title:'Universality',                      ids:['m4-univ'] },
     { n:'4.8', title:'Summary and practice',              ids:['m4-synth','m4-shapes'] }
+  ],
+
+  /* Chapter 5 has two halves and the section order is the join between them.
+     The first three sections are the machine — what a circuit is, what a run
+     gives back, and what a compiler does to it in between — in the order a
+     circuit meets them. Then one section on the three-gate circuit that turns
+     a phase into counts, placed there rather than in chapter 4 because it is
+     the first thing in this course that is a measurement rather than an
+     identity, and because both protocols after it are built on it.
+
+     The two protocols take a section each and both run to the same shape: the
+     mechanism, the derivation, the thing that is easy to get wrong, then the
+     laboratory. Teleportation closes on what it costs and Grover closes on
+     what its claim does and does not say, because those two scenes are the
+     ones this chapter exists for. */
+  M5: [
+    { n:'5.0', title:'Opening',                           ids:['m5-open'] },
+    { n:'5.1', title:'The circuit model',                 ids:[
+        'm5-circuit','m5-model','m5-read','m5-depth'] },
+    { n:'5.2', title:'Running a circuit',                 ids:[
+        'm5-state','m5-shots','m5-measure','m5-feed'] },
+    { n:'5.3', title:'Compiling for a machine',           ids:[
+        'm5-iset','m5-transpile','m5-cost'] },
+    { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey'] },
+    { n:'5.5', title:'Teleportation',                     ids:[
+        'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',
+        'm5-lab-i'] },
+    { n:'5.6', title:'Grover search',                     ids:[
+        'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
+        'm5-lab-j'] },
+    { n:'5.7', title:'Summary and practice',              ids:['m5-synth','m5-shapes'] }
   ]
 
 };
@@ -300,7 +332,60 @@ CONTENT.BOOK = {
   'm4-cz':'4.3',
   'm4-swap':'1.3.4',
   'm4-entangle':'1.3.6',
-  'm4-univ':'4.5'
+  'm4-univ':'4.5',
+
+  /* Chapter 5 rests on three places in the book and one of them is a surprise.
+     The circuit notation is 1.3.4 and the model as a whole is 4.6, which is
+     the book's own summary of what a quantum computation is allowed to be.
+     Measurement inside a circuit, and the two principles that let one be moved
+     or dropped, are 4.4. Compiling into a fixed gate set is 4.5.3, the
+     discrete universal set.
+
+     The surprise is 3.2.1, "How to quantify computational resources", which is
+     in the book's computer-science chapter and not in any quantum one. That is
+     the right place for the scene that says what a resource claim has to name,
+     and putting it anywhere else would make the claim look like a quantum
+     matter when it is not.
+
+     Teleportation is 1.3.7 throughout, and no-cloning is 1.3.5, which the book
+     calls the qubit copying circuit — the same failed circuit this course
+     draws. What one teleportation costs is 12.5, entanglement as a physical
+     resource.
+
+     Grover is 6.1: the oracle is 6.1.1, the procedure 6.1.2, the geometric
+     picture 6.1.3 and the iteration count 6.1.4. The scene that writes the
+     claim out against the five components takes 6.6, the optimality of the
+     search algorithm, because that is where the book states what the result
+     does and does not promise.
+
+     Every one of those was read in the book's contents before it was written
+     here. Six scenes carry no anchor: the opening, the summary, the question
+     taxonomy, the two laboratories, and three scenes the book has no
+     counterpart for — `m5-state` and `m5-shots`, which are classical
+     simulation and sampling statistics rather than quantum mechanics, and
+     `m5-transpile`, whose layout and routing passes are a property of a chip
+     rather than of the theory. */
+  'm5-circuit':'1.3.4',
+  'm5-model':'4.6',
+  'm5-read':'2.2.8',
+  'm5-depth':'4.6',
+  'm5-measure':'4.4',
+  'm5-feed':'4.4',
+  'm5-iset':'4.5.3',
+  'm5-cost':'3.2.1',
+  'm5-ramsey':'4.2',
+  'm5-nocopy':'1.3.5',
+  'm5-tele':'1.3.7',
+  'm5-teleid':'1.3.7',
+  'm5-telecorr':'1.3.7',
+  'm5-nosig':'1.3.7',
+  'm5-teleres':'12.5',
+  'm5-search':'6.1.1',
+  'm5-kick':'6.1.1',
+  'm5-geom':'6.1.3',
+  'm5-rotate':'6.1.2',
+  'm5-iter':'6.1.4',
+  'm5-claim':'6.6'
 };
 
 /* ---- derivation --------------------------------------------------------

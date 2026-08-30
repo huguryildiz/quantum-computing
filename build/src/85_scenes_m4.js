@@ -631,7 +631,7 @@ const SC = [
   {t:'title', text:'Six states worth knowing by their positions'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Six states carry most of a first course, and they are the two eigenstates of each Pauli operator. On the sphere they are the six points where the axes meet the surface:</p>'},
-    {t:'eq', key:true, tex:'\\begin{aligned}|0\\rangle,\;|1\\rangle \;&\\longleftrightarrow\; \\pm\\hat{z} \\\\ |{+}\\rangle,\;|{-}\\rangle \;&\\longleftrightarrow\; \\pm\\hat{x} \\\\ |{+}i\\rangle,\;|{-}i\\rangle \;&\\longleftrightarrow\; \\pm\\hat{y}\\end{aligned}'},
+    {t:'eq', key:true, tex:'\\begin{aligned}|0\\rangle,\\;|1\\rangle \\;&\\longleftrightarrow\\; \\pm\\hat{z} \\\\ |{+}\\rangle,\\;|{-}\\rangle \\;&\\longleftrightarrow\\; \\pm\\hat{x} \\\\ |{+}i\\rangle,\\;|{-}i\\rangle \\;&\\longleftrightarrow\\; \\pm\\hat{y}\\end{aligned}'},
     {t:'reveal', at:1, items:[
       {t:'small', html:'Each pair is one measurement basis, and each pair sits at the two ends of one axis. That is not a coincidence to be memorised: the two eigenstates of an observable are orthogonal, and the next scene shows that orthogonal states are exactly the opposite points.'}
     ]}
