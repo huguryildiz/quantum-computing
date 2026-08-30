@@ -86,20 +86,20 @@ const CONTENT = {
      convention is in force. */
   GLOSS: {
     /* Chapter 1 — the mathematics of quantum states */
-    ket:{ s:'|\\psi\\rangle', d:'A quantum state, written as a column of complex numbers once a basis has been chosen. Normalised: $\\langle\\psi|\\psi\\rangle=1$.' },
-    bra:{ s:'\\langle\\psi|', d:'The dual of $|\\psi\\rangle$: the same column transposed and conjugated, so it is a row that eats a ket and returns a number.' },
-    inner:{ s:'\\langle\\phi|\\psi\\rangle', d:'Inner product, conjugating the first argument. It measures overlap: zero when the two states are perfectly distinguishable, unit modulus when they are the same state.' },
-    norm:{ s:'\\|\\psi\\|', d:'Length of a state, $\\sqrt{\\langle\\psi|\\psi\\rangle}$. A physical state has length one, which is what makes the Born probabilities sum to one.' },
-    outer:{ s:'|\\phi\\rangle\\langle\\psi|', d:'Outer product: a ket beside a bra is an operator, not a number. It is the one construction that turns states into the things that act on states.' },
-    proj:{ s:'P_k', d:'A projector, $P_k=|k\\rangle\\langle k|$ for a basis state. Idempotent, $P_k^2=P_k$, and Hermitian.' },
-    resid:{ s:'\\sum_k |k\\rangle\\langle k| = I', d:'Resolution of the identity. Inserting it is how a basis expansion is derived rather than guessed.' },
-    kron:{ s:'\\otimes', d:'Tensor product. Two systems of dimension $d_1$ and $d_2$ make one system of dimension $d_1 d_2$, not $d_1+d_2$: this is where the exponential comes from.' },
-    dag:{ s:'A^{\\dagger}', d:'Adjoint: transpose and conjugate. In NumPy, `A.conj().T`.' },
-    herm:{ s:'A=A^{\\dagger}', d:'Hermitian. Its eigenvalues are real, which is why observables are Hermitian: a measurement returns a real number.' },
-    unit:{ s:'U^{\\dagger}U=I', d:'Unitary. It preserves inner products and therefore norms, which is why closed-system evolution and every gate is unitary.' },
-    eig:{ s:'A|v\\rangle=\\lambda|v\\rangle', d:'Eigenvalue equation. The eigenvectors are the states the operator leaves in place, up to a scale.' },
-    spec:{ s:'A=\\sum_k \\lambda_k P_k', d:'Spectral decomposition of a Hermitian operator: the eigenvalues, and the projectors onto the eigenspaces they belong to.' },
-    fofa:{ s:'f(A)=\\sum_k f(\\lambda_k)P_k', d:'A function of an operator is that function applied to the eigenvalues. This is what an operator exponential means, and it is why $e^{-iHt}$ can be computed at all.' },
+    ket:{ s:'|\\psi\\rangle', d:'A quantum state, written as a column of complex numbers once a basis has been chosen. Normalised: $\\langle\\psi|\\psi\\rangle=1$.', go:'m1-ket' },
+    bra:{ s:'\\langle\\psi|', d:'The dual of $|\\psi\\rangle$: the same column transposed and conjugated, so it is a row that eats a ket and returns a number.', go:'m1-bra' },
+    inner:{ s:'\\langle\\phi|\\psi\\rangle', d:'Inner product, conjugating the first argument. It measures overlap: zero when the two states are perfectly distinguishable, unit modulus when they are the same state.', go:'m1-bra' },
+    norm:{ s:'\\|\\psi\\|', d:'Length of a state, $\\sqrt{\\langle\\psi|\\psi\\rangle}$. A physical state has length one, which is what makes the Born probabilities sum to one.', go:'m1-overlap' },
+    outer:{ s:'|\\phi\\rangle\\langle\\psi|', d:'Outer product: a ket beside a bra is an operator, not a number. It is the one construction that turns states into the things that act on states.', go:'m1-outer' },
+    proj:{ s:'P_k', d:'A projector, $P_k=|k\\rangle\\langle k|$ for a basis state. Idempotent, $P_k^2=P_k$, and Hermitian.', go:'m1-proj' },
+    resid:{ s:'\\sum_k |k\\rangle\\langle k| = I', d:'Resolution of the identity. Inserting it is how a basis expansion is derived rather than guessed.', go:'m1-resid' },
+    kron:{ s:'\\otimes', d:'Tensor product. Two systems of dimension $d_1$ and $d_2$ make one system of dimension $d_1 d_2$, not $d_1+d_2$: this is where the exponential comes from.', go:'m1-tensor' },
+    dag:{ s:'A^{\\dagger}', d:'Adjoint: transpose and conjugate. In NumPy, `A.conj().T`.', go:'m1-herm' },
+    herm:{ s:'A=A^{\\dagger}', d:'Hermitian. Its eigenvalues are real, which is why observables are Hermitian: a measurement returns a real number.', go:'m1-herm' },
+    unit:{ s:'U^{\\dagger}U=I', d:'Unitary. It preserves inner products and therefore norms, which is why closed-system evolution and every gate is unitary.', go:'m1-unit' },
+    eig:{ s:'A|v\\rangle=\\lambda|v\\rangle', d:'Eigenvalue equation. The eigenvectors are the states the operator leaves in place, up to a scale.', go:'m1-eig' },
+    spec:{ s:'A=\\sum_k \\lambda_k P_k', d:'Spectral decomposition of a Hermitian operator: the eigenvalues, and the projectors onto the eigenspaces they belong to.', go:'m1-spectral' },
+    fofa:{ s:'f(A)=\\sum_k f(\\lambda_k)P_k', d:'A function of an operator is that function applied to the eigenvalues. This is what an operator exponential means, and it is why $e^{-iHt}$ can be computed at all.', go:'m1-fofa' },
 
     /* Chapter 2 — states, measurement and dynamics */
     zero:{ s:'|0\\rangle,\\;|1\\rangle', d:'The computational basis of one qubit, the eigenvectors of $Z$. Every measurement in this course is in this basis unless a scene says otherwise.' },
@@ -146,5 +146,17 @@ const CONTENT = {
     qft:{ s:'\\mathrm{QFT}_N', d:'The quantum Fourier transform on $N=2^n$ amplitudes. It costs $O(n^2)$ gates, and it does not hand back the spectrum: the amplitudes it produces still have to be measured.' },
     qpe:{ s:'\\varphi', d:'The phase estimated by quantum phase estimation, defined by $U|u\\rangle=e^{2\\pi i\\varphi}|u\\rangle$. The number of counting qubits fixes both the precision and the success probability.' },
     order:{ s:'r', d:'The order of $a$ modulo $N$: the smallest $r>0$ with $a^r\\equiv 1 \\pmod N$. Finding it is the only quantum step in factoring; everything around it is classical.' }
-  }
+  },
+
+  /* ---- the question bank ----
+     DRILL holds the questions themselves, one flat array that the module drill
+     files concatenate onto. DRILLTYPES holds, per module, the recurring shapes
+     a question comes in, so a reader meets the taxonomy before the questions
+     and can name what is being asked before answering it.
+
+     Both are declared empty here rather than in a module file, because the
+     renderer reads them on the first draw and a module that has not been
+     written yet must leave an empty section rather than an error. */
+  DRILL: [],
+  DRILLTYPES: {}
 };

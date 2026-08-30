@@ -253,6 +253,17 @@ const MAX_COMBOS = 60;      /* per laboratory; a breach is reported, never silen
            a full redraw of every mark each time, which on this laboratory ran
            the gate past ten minutes on its own. The transport's own buttons
            are exercised by the probes above; this part is arithmetic. */
+        /* The accumulation check below is written against a laboratory that
+           counts trials over a `phase` axis and prints a `Measured` readout.
+           A course whose transport drives something else — a construction step,
+           a circuit depth — has neither, and the check has nothing to say about
+           it. The reset and step probes above already covered the transport;
+           what follows is the arithmetic, and it is skipped where the two
+           things it reads do not exist. */
+        const hasPhase = await p.$('[data-v="phase"]');
+        const hasMeasured = await p.evaluate(() => [...document.querySelectorAll('.lab .readout dt')]
+          .some(e => e.textContent.trim() === 'Measured'));
+        if (hasPhase && hasMeasured) {
         const setPhase = v => p.$eval('[data-v="phase"]', (e, val) => {
           e.value = String(val === 'max' ? e.max : val);
           e.dispatchEvent(new Event('input', { bubbles: true }));
@@ -268,6 +279,7 @@ const MAX_COMBOS = 60;      /* per laboratory; a breach is reported, never silen
           problems.push(`${theme} ${lab}: accumulation differs from one run — ` +
                         `batch one measured ${w1} wrong, all ${pmax} measured ` +
                         `${wN}, exactly ${pmax}×${w1}`);
+        }
         await click('[data-run="reset"]');
       }
     }

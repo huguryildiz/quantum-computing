@@ -34,7 +34,8 @@
    two-part. Chapter 0 is the course opening, short enough that a section level
    would be an empty frame. */
 CONTENT.CHAPTERS = [
-  { n:'0', module:'M0', title:'The frame of the course', flat:true }
+  { n:'0', module:'M0', title:'The frame of the course', flat:true },
+  { n:'1', module:'M1', title:'The mathematics of quantum states' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -49,6 +50,29 @@ CONTENT.SECTIONS = {
 
   M0: [
     { n:'0', ids:['m0-open','m0-what','m0-scale','m0-phase','m0-fringe','m0-map','m0-how'] }
+  ],
+
+  /* Chapter 1 carries two source lectures, so it is long. The section titles
+     are what a reader scans, and they name the object being built rather than
+     the theorem being proved: "building an orthonormal basis" rather than
+     "Gram-Schmidt", because the reader who needs that section does not yet
+     know the name. */
+  M1: [
+    { n:'1.0', title:'Opening',                          ids:['m1-open'] },
+    { n:'1.1', title:'Vectors, dual vectors and the inner product', ids:[
+        'm1-ket','m1-bra','m1-overlap','m1-basis'] },
+    { n:'1.2', title:'Amplitude, phase and interference', ids:[
+        'm1-amp','m1-phase','m1-lab-a'] },
+    { n:'1.3', title:'Outer products and projectors',     ids:[
+        'm1-outer','m1-proj','m1-resid'] },
+    { n:'1.4', title:'Building an orthonormal basis',     ids:['m1-gs','m1-lab-b'] },
+    { n:'1.5', title:'The tensor product',                ids:['m1-tensor','m1-expo'] },
+    { n:'1.6', title:'Hermitian and unitary operators',   ids:[
+        'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle'] },
+    { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
+        'm1-eig','m1-spectral','m1-fofa'] },
+    { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
+    { n:'1.9', title:'Summary',                           ids:['m1-synth'] }
   ]
 
 };
@@ -71,7 +95,40 @@ CONTENT.BOOK = {
   'm0-what':'1.1',
   'm0-scale':'1.1',
   'm0-phase':'1.3.1',
-  'm0-fringe':'1.3.1'
+  'm0-fringe':'1.3.1',
+
+  /* Chapter 1 sits almost entirely inside the book's section 2.1, which is the
+     linear algebra its chapter 2 opens with. Four scenes reach outside it: the
+     two phase scenes go to 2.2.7, which is where the book argues that a global
+     phase has no observable consequence, and the generator scene goes to 2.2.2,
+     where the same exponential appears as the evolution postulate.
+
+     Three scenes carry no anchor and the omission is deliberate. `m1-proj` is
+     one: the projector is defined in the book, but this course could not verify
+     which subsection carries the definition, and a well-formed wrong anchor is
+     worse than none because no gate can catch it. `m1-open` and `m1-synth` are
+     an opening and a summary, and the book has no counterpart to either. The
+     two laboratories are exercises rather than exposition. */
+  'm1-ket':'2.1.1',
+  'm1-bra':'2.1.4',
+  'm1-overlap':'2.1.4',
+  'm1-basis':'2.1.1',
+  'm1-amp':'2.2.7',
+  'm1-phase':'2.2.7',
+  'm1-outer':'2.1.4',
+  'm1-resid':'2.1.4',
+  'm1-gs':'2.1.4',
+  'm1-tensor':'2.1.7',
+  'm1-expo':'2.1.7',
+  'm1-adjoint':'2.1.6',
+  'm1-herm':'2.1.6',
+  'm1-unit':'2.1.6',
+  'm1-gen':'2.2.2',
+  'm1-halfangle':'2.2.2',
+  'm1-eig':'2.1.5',
+  'm1-spectral':'2.1.6',
+  'm1-fofa':'2.1.8',
+  'm1-dirac':'2.1'
 };
 
 /* ---- derivation --------------------------------------------------------

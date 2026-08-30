@@ -1220,3 +1220,11 @@ body[data-layout=phone] #counter{ font-size:10px; white-space:nowrap; }
   .mtf-trace,.mtf-fade,.mtf-stem,.mtf-box,.mtf-stem-dot,
   .mtf-wire-in,.mtf-wire-out{ animation:none !important; opacity:1 !important; }
 }
+
+/* A laboratory that carries two figures shows them side by side rather than
+   stacked. `#scene-host svg` makes every figure a full-width block, so two of
+   them in one column are two full-height figures and the stage overflows; a
+   two-track grid halves the width each one is printed at and therefore halves
+   its height too. On the phone the track collapses, like every other grid. */
+.labgrid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
+@media (max-width:820px){ .labgrid{ grid-template-columns:minmax(0,1fr); } }
