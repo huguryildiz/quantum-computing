@@ -24,6 +24,11 @@ __pycache__/
 *.md
 textclash.json
 
+# The pin for the numerical suite in verify/, which does not ship. Left on the
+# host it makes the platform read the project as a Python application and the
+# deploy fails looking for an entrypoint; this is a directory of static files.
+requirements.txt
+
 # Instructor material is not published.
 dist/Instructor_Solutions.*
 

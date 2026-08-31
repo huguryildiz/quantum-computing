@@ -1,10 +1,28 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/", "destination": "/site/index.html" },
-    { "source": "/artifact", "destination": "/dist/Quantum_Computing.html" },
-    { "source": "/notes", "destination": "/dist/Lecture_Notes.pdf" },
-    { "source": "/workbook", "destination": "/dist/Student_Workbook.pdf" },
-    { "source": "/reference", "destination": "/dist/Formula_Reference.pdf" }
-  ]
+    {
+      "source": "/",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/artifact",
+      "destination": "/dist/Quantum_Computing.html"
+    },
+    {
+      "source": "/notes",
+      "destination": "/dist/Lecture_Notes.pdf"
+    },
+    {
+      "source": "/workbook",
+      "destination": "/dist/Student_Workbook.pdf"
+    },
+    {
+      "source": "/reference",
+      "destination": "/dist/Formula_Reference.pdf"
+    }
+  ],
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "."
 }

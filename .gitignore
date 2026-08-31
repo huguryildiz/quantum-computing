@@ -31,3 +31,4 @@ __pycache__/
 AGENTS.md
 CLAUDE.md
 .Codex/notes/
+.env*
