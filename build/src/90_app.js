@@ -20,11 +20,17 @@ const RENDER = (() => {
       catch(e2){ return '<code>'+s+'</code>'; }
     }
   }
-  /* inline $...$ inside prose */
+  /* Inline $...$ inside prose, and `code` after it. The backtick span is a
+     late addition and it is not decoration: the glossary and the conventions
+     manifest both write a NumPy call that way, and without this the backticks
+     reached the page as backticks — in the artifact, in the lecture notes and in
+     the printed formula reference at once. Mathematics is typeset first, so a
+     $ inside a code span is not reachable and does not need to be. */
   function md(t){
     if(t==null) return '';
     return String(t).replace(/\$\$([^$]+)\$\$/g, (m,a)=>tex(a,true))
-                    .replace(/\$([^$]+)\$/g, (m,a)=>tex(a,false));
+                    .replace(/\$([^$]+)\$/g, (m,a)=>tex(a,false))
+                    .replace(/`([^`\n]+)`/g, (m,a)=>'<code>'+a+'</code>');
   }
 
   /* ---------- glossary symbol linking ---------- */

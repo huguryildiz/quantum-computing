@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/KaTeX%20vendored-12314E?style=for-the-badge&logo=latex&logoColor=white" alt="KaTeX">
   <img src="https://img.shields.io/badge/Playwright-12314E?style=for-the-badge&logo=playwright&logoColor=45BA4B" alt="Playwright">
   <img src="https://img.shields.io/badge/NumPy%20%C2%B7%20SciPy%20%C2%B7%20SymPy-12314E?style=for-the-badge&logo=python&logoColor=FFD343" alt="NumPy, SciPy and SymPy">
-  <img src="https://img.shields.io/badge/v0.5%20%C2%B7%20Chapters%200%E2%80%934-12314E?style=for-the-badge" alt="Version v0.5">
+  <img src="https://img.shields.io/badge/v1.0%20%C2%B7%20Chapters%200%E2%80%936-12314E?style=for-the-badge" alt="Version v1.0">
 </p>
 
 ---
@@ -27,7 +27,7 @@
 ## Overview
 
 **Quantum Computing** turns a first course in quantum computing into a stepped, self-explaining
-document. It is being built to cover the software half of the subject — the mathematics of quantum
+document. It covers the software half of the subject — the mathematics of quantum
 states; measurement and dynamics; density operators, decoherence and entanglement; the Bloch sphere
 and the gate set; circuits, teleportation and Grover search; and the introductory algorithms
 through phase estimation and order finding — in scenes that advance one idea at a time.
@@ -39,11 +39,24 @@ It is written for **undergraduate engineering students who have had linear algeb
 but no quantum mechanics**, and that constraint decides every writing question: plain first and
 formal second, a worked example before a general theorem, and nothing the course does not need.
 
-**Status: version 0.5.** Chapters 0 to 4 are written: the frame of the course, the mathematics of
-quantum states, states and measurement and dynamics, mixed states and entanglement, and the Bloch
-sphere and quantum gates. That is 111 scenes, eight interactive laboratories and eighty worked
-practice questions, with every number in them re-derived by a separate numerical suite. Chapters 5
-and 6 are planned and not yet written; the build plan is in `.claude/plans/`.
+**Status: version 1.0.** All seven chapters are written: the frame of the course, the mathematics of
+quantum states, states and measurement and dynamics, mixed states and entanglement, the Bloch sphere
+and quantum gates, circuits and protocols, and quantum algorithms. That is 172 scenes, eleven
+interactive laboratories and 120 worked practice questions, with every number in them re-derived by
+a separate numerical suite.
+
+Four documents are generated from the same content, so a question number means the same question in
+every one of them and a formula is written in one place only:
+
+| Document | What it is |
+| --- | --- |
+| `dist/Quantum_Computing.html` | the interactive artifact — one offline file |
+| `dist/Lecture_Notes.pdf` | the reading edition, chapters 1 to 6 and Appendix A |
+| `dist/Student_Workbook.pdf` | every question, with no answer and no solution |
+| `dist/Formula_Reference.pdf` | the conventions, every formula, and every symbol |
+
+A fifth, the instructor solutions, prints every question fully worked and is not published.
+`site/index.html` is the public page that introduces them.
 
 ---
 

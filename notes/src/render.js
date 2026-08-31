@@ -7,9 +7,13 @@
       catch(e){ console.error('NOTES: mathematics is not valid TeX: '+s+' — '+e.message);
                 try{ return katex.renderToString(s,Object.assign({displayMode:!!d,throwOnError:false},OPT)); }
                 catch(e2){ return '<code>'+s+'</code>'; } } };
+  /* Mathematics first, then a `code` span. The glossary the editions print
+     writes a NumPy call in backticks, and without the second rule they reach the
+     printed page as backticks. */
   const md = t => String(t==null?'':t)
       .replace(/\$\$([^$]+)\$\$/g,(m,a)=>T(a,true))
-      .replace(/\$([^$]+)\$/g,(m,a)=>T(a,false));
+      .replace(/\$([^$]+)\$/g,(m,a)=>T(a,false))
+      .replace(/`([^`\n]+)`/g,(m,a)=>'<code>'+a+'</code>');
 
   const R = {
     page:   ()=>'</div><div class="page">',

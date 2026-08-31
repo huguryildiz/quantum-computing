@@ -25,3 +25,10 @@ author's own earlier lecture artifact and is unrelated to the work cited above.
 
 KaTeX (https://katex.org) is vendored into the built artifact under the MIT
 License, Copyright (c) 2013-2020 Khan Academy and other contributors.
+
+The interference figure animated behind the heading of the public page in
+site/ is adapted from the "Moire Interference" shader of Radiant Shaders
+(https://radiant-shaders.com, https://github.com/pbakaus/radiant), MIT
+License, Copyright (c) 2025 Paul Bakaus. The palette is retuned to this
+project mark and the canvas is bound to the page heading rather than to the
+window; the licence text is carried in the file itself.

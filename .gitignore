@@ -1,12 +1,13 @@
 # Third-party and oversized source material. Never redistributed, never in history.
 source/
 
-# Generated intermediates and derived editions. Only the artifact and the lecture
-# notes PDF are tracked; the other three editions are rebuilt from the sources.
+# Generated intermediates. The HTML editions are rebuilt from the sources and
+# duplicate the printed ones beside them, so only the printed editions are
+# tracked — and the instructor edition is not published at all.
 dist/Lecture_Notes.html
-dist/Student_Workbook.*
+dist/Student_Workbook.html
+dist/Formula_Reference.html
 dist/Instructor_Solutions.*
-dist/Formula_Reference.*
 
 # Local working area, not student-facing. The commands that drive production
 # live here too, and they are instructions to whoever is building this rather
