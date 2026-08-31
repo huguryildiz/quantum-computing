@@ -95,5 +95,7 @@ Aleksandr Krasnok, whose educational materials are licensed under
 that course as a stepped interactive artifact with generated figures, laboratories and worked
 questions, at the level of a second-year undergraduate reader.
 
-Full attribution, including what was changed and the terms carried forward, is in
-[NOTICE](NOTICE). KaTeX is vendored into the built artifact under the MIT License.
+This work is itself released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the
+full terms are in [LICENSE](LICENSE). Full attribution, including what was changed and the terms
+carried forward, is in [NOTICE](NOTICE). KaTeX is vendored into the built artifact under the MIT
+License, and the interference figure on the public page is adapted from an MIT-licensed shader.
