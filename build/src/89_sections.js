@@ -39,7 +39,8 @@ CONTENT.CHAPTERS = [
   { n:'2', module:'M2', title:'States, measurement and dynamics' },
   { n:'3', module:'M3', title:'Mixed states and entanglement' },
   { n:'4', module:'M4', title:'The Bloch sphere and quantum gates' },
-  { n:'5', module:'M5', title:'Circuits and protocols' }
+  { n:'5', module:'M5', title:'Circuits and protocols' },
+  { n:'6', module:'M6', title:'Quantum algorithms' }
 ];
 
 /* ---- sections ----------------------------------------------------------
@@ -177,6 +178,41 @@ CONTENT.SECTIONS = {
         'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
         'm5-lab-j'] },
     { n:'5.7', title:'Summary and practice',              ids:['m5-synth','m5-shapes'] }
+  ],
+
+  /* Chapter 6 is one mechanism and four uses of it, and the section order is
+     the order the mechanism is built and then spent. The first section says
+     what a query model counts, because every result after it is stated in one
+     and a reader who takes a query count for a runtime will misread all four
+     algorithms. The second section is the mechanism itself, in three scenes:
+     the Boolean form, the general form, and the rule that a superposition
+     which never interferes has bought nothing. The remaining sections spend
+     it \u2014 on a promise problem, on a transform, on an eigenphase, and on an
+     order \u2014 and each of them answers that same rule.
+
+     The laboratory sits inside phase estimation rather than after it, because
+     the distribution it draws is the thing the two scenes before it describe
+     and the two after it depend on.
+
+     The last section is called factoring and the reach of one mechanism, and
+     the words after "factoring" are the point of it: the family scene at the
+     end is what stops the chapter reading as a list of tricks. */
+  M6: [
+    { n:'6.0', title:'Opening',                           ids:['m6-open'] },
+    { n:'6.1', title:'What a query model counts',         ids:['m6-query','m6-classes'] },
+    { n:'6.2', title:'One mechanism: phase kickback',     ids:[
+        'm6-kick','m6-eigen','m6-cancel'] },
+    { n:'6.3', title:'Deutsch and Deutsch\u2013Jozsa',      ids:[
+        'm6-deutsch','m6-dj','m6-djcost'] },
+    { n:'6.4', title:'The quantum Fourier transform',     ids:[
+        'm6-qft','m6-qftcirc','m6-qftnot'] },
+    { n:'6.5', title:'Phase estimation',                  ids:[
+        'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-lab-k'] },
+    { n:'6.6', title:'Order finding',                     ids:[
+        'm6-order','m6-ordereig','m6-modexp','m6-cf','m6-repeat'] },
+    { n:'6.7', title:'Factoring, and the reach of one mechanism', ids:[
+        'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family'] },
+    { n:'6.8', title:'Summary and practice',              ids:['m6-synth','m6-shapes'] }
   ]
 
 };
@@ -385,7 +421,53 @@ CONTENT.BOOK = {
   'm5-geom':'6.1.3',
   'm5-rotate':'6.1.2',
   'm5-iter':'6.1.4',
-  'm5-claim':'6.6'
+  'm5-claim':'6.6',
+
+  /* Chapter 6 rests on three chapters of the book and on one section outside
+     them. Quantum parallelism, and the argument that it buys nothing on its
+     own, is 1.4.2; Deutsch is 1.4.3 and Deutsch-Jozsa is 1.4.4. The transform
+     and its circuit are 5.1, phase estimation is 5.2 with its precision and
+     confidence in 5.2.1, order finding is 5.3.1 and factoring is 5.3.2, and
+     the family the whole construction belongs to is 5.4.1, period finding.
+     Quantum counting is 6.3, which is where the book applies phase estimation
+     to the search iterate. The scene that says what a query count is and is
+     not takes 3.2.1, "How to quantify computational resources", exactly as
+     chapter 5's resource scene does, because that is the book's own statement
+     of what a cost model has to fix.
+
+     Every one of those was read in the book's contents before it was written
+     here. Six scenes carry no anchor. The opening, the summary, the question
+     taxonomy and the laboratory have no counterpart, as in every chapter.
+     `m6-classes` is the interesting omission: the complexity classes are
+     developed in the book's computer-science chapter, but which subsection
+     carries the definitions could not be verified, and a well-formed wrong
+     anchor is worse than none because no gate can catch it. `m6-rsa` is the
+     other: the book develops RSA in an appendix rather than in a numbered
+     section, and this table has no form for that. */
+  'm6-query':'3.2.1',
+  'm6-kick':'1.4.3',
+  'm6-eigen':'5.2',
+  'm6-cancel':'1.4.2',
+  'm6-deutsch':'1.4.3',
+  'm6-dj':'1.4.4',
+  'm6-djcost':'1.4.4',
+  'm6-qft':'5.1',
+  'm6-qftcirc':'5.1',
+  'm6-qftnot':'5.1',
+  'm6-qpe':'5.2',
+  'm6-qpeexact':'5.2',
+  'm6-qpeprec':'5.2.1',
+  'm6-qpecost':'5.2.1',
+  'm6-count':'6.3',
+  'm6-order':'5.3.1',
+  'm6-ordereig':'5.3.1',
+  'm6-modexp':'5.3.1',
+  'm6-cf':'5.3.1',
+  'm6-repeat':'5.3.2',
+  'm6-shor':'5.3.2',
+  'm6-shor15':'5.3.2',
+  'm6-shorclaim':'3.2.1',
+  'm6-family':'5.4.1'
 };
 
 /* ---- derivation --------------------------------------------------------

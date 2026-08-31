@@ -14,7 +14,7 @@ const CONTENT = {
   META: {
     course:'Quantum Computing',
     title:'Quantum Computing',
-    version:'0.6',
+    version:'0.7',
     language:'Academic English',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
@@ -141,11 +141,11 @@ const CONTENT = {
     grov:{ s:'k_{\\text{opt}}', d:'The number of Grover iterations that maximises the success probability, about $\\tfrac{\\pi}{4}\\sqrt{N/M}$. Running past it makes the answer less likely, not more.', go:'m5-iter' },
 
     /* Chapter 6 — quantum algorithms */
-    oracle:{ s:'U_f', d:'A reversible embedding of a classical function, $U_f|x\\rangle|y\\rangle=|x\\rangle|y\\oplus f(x)\\rangle$. Counting queries to it is not the same as counting the gates it costs to build.' },
-    kick:{ s:'\\text{phase kickback}', d:'The mechanism behind every algorithm in this chapter: an oracle written to change a target register instead writes a phase onto the control register, because the target was prepared in an eigenstate of the operation.' },
-    qft:{ s:'\\mathrm{QFT}_N', d:'The quantum Fourier transform on $N=2^n$ amplitudes. It costs $O(n^2)$ gates, and it does not hand back the spectrum: the amplitudes it produces still have to be measured.' },
-    qpe:{ s:'\\varphi', d:'The phase estimated by quantum phase estimation, defined by $U|u\\rangle=e^{2\\pi i\\varphi}|u\\rangle$. The number of counting qubits fixes both the precision and the success probability.' },
-    order:{ s:'r', d:'The order of $a$ modulo $N$: the smallest $r>0$ with $a^r\\equiv 1 \\pmod N$. Finding it is the only quantum step in factoring; everything around it is classical.' }
+    oracle:{ s:'U_f', d:'A reversible embedding of a classical function, $U_f|x\\rangle|y\\rangle=|x\\rangle|y\\oplus f(x)\\rangle$. Counting queries to it is not the same as counting the gates it costs to build.', go:'m6-query' },
+    kick:{ s:'\\text{phase kickback}', d:'The mechanism behind every algorithm in this chapter: an oracle written to change a target register instead writes a phase onto the control register, because the target was prepared in an eigenstate of the operation.', go:'m6-kick' },
+    qft:{ s:'\\mathrm{QFT}_N', d:'The quantum Fourier transform on $N=2^n$ amplitudes. It costs $O(n^2)$ gates, and it does not hand back the spectrum: the amplitudes it produces still have to be measured.', go:'m6-qft' },
+    qpe:{ s:'\\varphi', d:'The phase estimated by quantum phase estimation, defined by $U|u\\rangle=e^{2\\pi i\\varphi}|u\\rangle$. The number of counting qubits fixes both the precision and the success probability.', go:'m6-qpe' },
+    order:{ s:'r', d:'The order of $a$ modulo $N$: the smallest $r>0$ with $a^r\\equiv 1 \\pmod N$. Finding it is the only quantum step in factoring; everything around it is classical.', go:'m6-order' }
   },
 
   /* ---- the question bank ----

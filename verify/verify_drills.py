@@ -30,7 +30,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
 from qops import (BELL_PHI_M, BELL_PHI_P, BELL_PSI_M, H, I2,  # noqa: E402
-                  grover_best, grover_oracle, grover_success, index,
+                  convergents, deutsch_jozsa, grover_best, grover_oracle,
+                  grover_success, index, mod_order,
+                  order_finding_distribution, order_finding_success,
+                  order_from_reading, qft_matrix, qpe_best_prob,
+                  qpe_distribution, qpe_two_nearest_prob,
                   teleport_bob, teleport_branch,
                   KET0, KET1, KETM, KETP, S_GATE, T_GATE, X, Y, Z,
                   amp_damp, bloch, bloch_of, channel, cnot, cz_gate, dev,
@@ -1757,5 +1761,309 @@ CHECKS += [
 
 
 
+# ── D6-01 to D6-20 · quantum algorithms ─────────────────────────────────────
+#
+# Same discipline as the chapter-6 scene checks: every Deutsch-Jozsa answer is
+# reached by running the circuit as matrices with the oracle built as a
+# permutation, every phase-estimation number by preparing the counting
+# register and applying a Fourier matrix assembled from its defining sum, and
+# every order-finding number by simulating the two-register circuit and then
+# running the continued fractions on the readings it produced. None of the
+# closed forms the worked solutions use appears in any derivation here.
+
+
+def _parity6(x: int) -> int:
+    p = 0
+    while x:
+        p ^= x & 1
+        x >>= 1
+    return p
+
+
+def _mask_oracle(mask: int):
+    return lambda x: _parity6(x & mask)
+
+
+def _dj_error(n: int, k: int) -> float:
+    """The exact probability that k distinct queries on a balanced function
+    all return the same value."""
+    N = 2 ** n
+    return 2 * math.comb(N // 2, k) / math.comb(N, k)
+
+
+def _control_after_s():
+    """The control qubit after a controlled S with the target in |1>, and the
+    probability of reading 0 after a Hadamard. Built by matrix arithmetic on
+    the two-qubit register rather than by quoting a one-qubit state."""
+    v = kron_state(KETP, KET1)                   # |+> on the control, |1> below
+    cs = np.eye(4, dtype=complex)
+    cs[index((1, 1)), index((1, 1))] = 1j        # a phase on |1>|1>
+    v = cs @ v
+    v = on_qubit(H, 1, 2) @ v                    # H on the control
+    # the control is the high bit, so the |0> branch is the first two entries
+    return float(abs(v[index((0, 0))]) ** 2 + abs(v[index((0, 1))]) ** 2)
+
+
+CHECKS += [
+    # D6-01 the constant oracle
+    {"name": "D6-01 the constant oracle reads 0 with certainty", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(lambda x: 1, 1)[0]), "rtol": 1e-12},
+    {"name": "D6-01 and the other constant oracle agrees with it",
+     "stated": 0.0,
+     "derive": lambda: float(abs(deutsch_jozsa(lambda x: 1, 1)[0]
+                                - deutsch_jozsa(lambda x: 0, 1)[0])),
+     "atol": 1e-12},
+
+    # D6-02 the bottom-bit oracle on three qubits
+    {"name": "D6-02 the amplitude of the all-zero string is zero",
+     "stated": 0.0,
+     "derive": lambda: float(deutsch_jozsa(_mask_oracle(0b001), 3)[0]),
+     "atol": 1e-12},
+    {"name": "D6-02 the circuit prints 001 with certainty", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(_mask_oracle(0b001), 3)[1]),
+     "rtol": 1e-12},
+    {"name": "D6-02 the exact classical worst case on three bits",
+     "stated": 5.0, "derive": lambda: 2.0 ** 2 + 1, "atol": 1e-9},
+
+    # D6-03 the controlled S gate
+    {"name": "D6-03 the eigenphase of S on the state one", "stated": 0.25,
+     "derive": lambda: cmath.phase(complex(S_GATE[1, 1])) / (2 * math.pi),
+     "rtol": 1e-12},
+    {"name": "D6-03 the probability of reading zero after the Hadamard",
+     "stated": 0.5, "derive": _control_after_s, "rtol": 1e-12},
+
+    # D6-04 the separation at eight bits
+    {"name": "D6-04 the exact classical worst case at eight bits",
+     "stated": 129.0, "derive": lambda: 2.0 ** 7 + 1, "atol": 1e-9},
+    {"name": "D6-04 eleven queries leave an error below a thousandth",
+     "stated": 7.8e-4, "derive": lambda: _dj_error(8, 11), "rtol": 2e-2},
+    {"name": "D6-04 ten queries would not", "stated": 1.0,
+     "derive": lambda: 1.0 if _dj_error(8, 10) > 1e-3 else 0.0, "atol": 1e-12},
+
+    # D6-05 the broken promise
+    {"name": "D6-05 the amplitude of the all-zero string", "stated": 0.25,
+     "derive": lambda: float((10 - 6) / 16), "rtol": 1e-12},
+    {"name": "D6-05 the probability of reading it", "stated": 0.0625,
+     "derive": lambda: ((10 - 6) / 16) ** 2, "rtol": 1e-12},
+    {"name": "D6-05 and the circuit really does produce that amplitude",
+     "stated": 0.0625,
+     "derive": lambda: float(deutsch_jozsa(
+         lambda x: 1 if x in (0, 1, 2, 3, 4, 5) else 0, 4)[0]),
+     "rtol": 1e-9},
+
+    # D6-06 the parity of two of three bits
+    {"name": "D6-06 the circuit prints 101 with certainty", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(_mask_oracle(0b101), 3)[5]),
+     "rtol": 1e-12},
+    {"name": "D6-06 the wire the function ignores reads zero", "stated": 0.0,
+     "derive": lambda: float(sum(deutsch_jozsa(_mask_oracle(0b101), 3)[x]
+                                for x in range(8) if (x >> 1) & 1)),
+     "atol": 1e-12},
+
+    # D6-07 the transform of one basis state
+    {"name": "D6-07 every amplitude has modulus one over root eight",
+     "stated": 0.35355,
+     "derive": lambda: float(np.min(np.abs(qft_matrix(3) @ ket(1, 1, 0)))),
+     "rtol": 1e-4},
+    {"name": "D6-07 the phase step, in degrees", "stated": 270.0,
+     "derive": lambda: math.degrees(
+         (cmath.phase((qft_matrix(3) @ ket(1, 1, 0))[1])
+          - cmath.phase((qft_matrix(3) @ ket(1, 1, 0))[0])) % (2 * math.pi)),
+     "rtol": 1e-6},
+    {"name": "D6-07 every probability is one eighth", "stated": 0.125,
+     "derive": lambda: float(np.max(np.abs(qft_matrix(3) @ ket(1, 1, 0)) ** 2)),
+     "rtol": 1e-9},
+
+    # D6-08 the circuit on six qubits
+    {"name": "D6-08 the controlled rotations on six qubits", "stated": 15.0,
+     "derive": lambda: 6 * 5 / 2, "atol": 1e-9},
+    {"name": "D6-08 the total gate count", "stated": 21.0,
+     "derive": lambda: 6 * 7 / 2, "atol": 1e-9},
+    {"name": "D6-08 the smallest angle, in degrees", "stated": 5.625,
+     "derive": lambda: 360 / 64, "rtol": 1e-12},
+    {"name": "D6-08 the classical transform on sixty-four stored numbers",
+     "stated": 384.0, "derive": lambda: 64 * math.log2(64), "rtol": 1e-12},
+
+    # D6-09 the two-term input
+    {"name": "D6-09 the even indices each carry a quarter", "stated": 0.25,
+     "derive": lambda: float(abs((qft_matrix(3)
+                                  @ ((ket(0, 0, 0) + ket(1, 0, 0))
+                                     / math.sqrt(2)))[4]) ** 2),
+     "rtol": 1e-9},
+    {"name": "D6-09 the odd indices carry nothing", "stated": 0.0,
+     "derive": lambda: float(np.max(np.abs(
+         (qft_matrix(3) @ ((ket(0, 0, 0) + ket(1, 0, 0)) / math.sqrt(2)))[1::2]
+     ))), "atol": 1e-12},
+    {"name": "D6-09 the four of them add to one", "stated": 1.0,
+     "derive": lambda: float(np.sum(np.abs(
+         qft_matrix(3) @ ((ket(0, 0, 0) + ket(1, 0, 0)) / math.sqrt(2))) ** 2)),
+     "rtol": 1e-12},
+
+    # D6-10 the exact reading
+    {"name": "D6-10 a four-bit phase is read with probability one",
+     "stated": 1.0, "derive": lambda: qpe_best_prob(5 / 16, 4), "rtol": 1e-12},
+    {"name": "D6-10 the reading is five", "stated": 5.0,
+     "derive": lambda: float(int(np.argmax(qpe_distribution(5 / 16, 4)))),
+     "atol": 1e-12},
+    {"name": "D6-10 the phase as a decimal", "stated": 0.3125,
+     "derive": lambda: 1 / 4 + 1 / 16, "rtol": 1e-12},
+    {"name": "D6-10 the applications of U at four counting qubits",
+     "stated": 15.0, "derive": lambda: 2.0 ** 4 - 1, "atol": 1e-9},
+
+    # D6-11 the inexact reading
+    {"name": "D6-11 the nearest reading for phi = 0.1 at three qubits",
+     "stated": 0.8769, "derive": lambda: float(qpe_distribution(0.1, 3)[1]),
+     "rtol": 1e-3},
+    {"name": "D6-11 the other bracketing reading", "stated": 0.0565,
+     "derive": lambda: float(qpe_distribution(0.1, 3)[0]), "rtol": 1e-3},
+    {"name": "D6-11 the two together", "stated": 0.9334,
+     "derive": lambda: qpe_two_nearest_prob(0.1, 3), "rtol": 1e-3},
+    {"name": "D6-11 the other six carry the rest", "stated": 0.0666,
+     "derive": lambda: float(sum(qpe_distribution(0.1, 3)[y]
+                                for y in range(2, 8))), "rtol": 1e-2},
+    {"name": "D6-11 the error of the best estimate", "stated": 0.025,
+     "derive": lambda: abs(1 / 8 - 0.1), "rtol": 1e-9},
+    {"name": "D6-11 the worst case at three qubits meets the floor",
+     "stated": 0.4053, "derive": lambda: qpe_best_prob(1 / 16, 3),
+     "rtol": 2e-2},
+
+    # D6-12 the register a stated accuracy needs
+    {"name": "D6-12 six bits at five per cent", "stated": 10.0,
+     "derive": lambda: 6 + math.ceil(math.log2(2 + 1 / (2 * 0.05))),
+     "atol": 1e-9},
+    {"name": "D6-12 the applications that needs", "stated": 1023.0,
+     "derive": lambda: 2.0 ** 10 - 1, "atol": 1e-9},
+    {"name": "D6-12 six bits at half a per cent", "stated": 13.0,
+     "derive": lambda: 6 + math.ceil(math.log2(2 + 1 / (2 * 0.005))),
+     "atol": 1e-9},
+    {"name": "D6-12 seven bits at five per cent", "stated": 11.0,
+     "derive": lambda: 7 + math.ceil(math.log2(2 + 1 / (2 * 0.05))),
+     "atol": 1e-9},
+    {"name": "D6-12 and the applications double", "stated": 2047.0,
+     "derive": lambda: 2.0 ** 11 - 1, "atol": 1e-9},
+
+    # D6-13 where the cost is
+    {"name": "D6-13 the applications at twelve counting qubits",
+     "stated": 4095.0, "derive": lambda: 2.0 ** 12 - 1, "atol": 1e-9},
+    {"name": "D6-13 the gates they come to", "stated": 3.28e6,
+     "derive": lambda: (2 ** 12 - 1) * 800.0, "rtol": 1e-2},
+    {"name": "D6-13 the inverse transform there", "stated": 78.0,
+     "derive": lambda: 12 * 13 / 2, "atol": 1e-9},
+    {"name": "D6-13 the transform as a fraction, in per cent", "stated": 0.0024,
+     "derive": lambda: 100 * (12 * 13 / 2) / ((2 ** 12 - 1) * 800.0),
+     "rtol": 5e-2},
+    {"name": "D6-13 one more counting qubit doubles the controlled part",
+     "stated": 6.6e6, "derive": lambda: (2 ** 13 - 1) * 800.0, "rtol": 1e-2},
+
+    # D6-14 thirty-three
+    {"name": "D6-14 the order of five modulo thirty-three", "stated": 10.0,
+     "derive": lambda: float(mod_order(5, 33)), "atol": 1e-12},
+    {"name": "D6-14 its half power", "stated": 23.0,
+     "derive": lambda: float(pow(5, 5, 33)), "atol": 1e-12},
+    {"name": "D6-14 the first factor", "stated": 11.0,
+     "derive": lambda: float(math.gcd(pow(5, 5, 33) - 1, 33)), "atol": 1e-12},
+    {"name": "D6-14 the second", "stated": 3.0,
+     "derive": lambda: float(math.gcd(pow(5, 5, 33) + 1, 33)), "atol": 1e-12},
+    {"name": "D6-14 and their product", "stated": 33.0,
+     "derive": lambda: float(math.gcd(pow(5, 5, 33) - 1, 33)
+                             * math.gcd(pow(5, 5, 33) + 1, 33)), "atol": 1e-12},
+    {"name": "D6-14 the base thirty-two fails the second condition",
+     "stated": 32.0, "derive": lambda: float(pow(32, mod_order(32, 33) // 2, 33)),
+     "atol": 1e-12},
+
+    # D6-15 which readings are usable, and how often
+    {"name": "D6-15 the order of two modulo twenty-one", "stated": 6.0,
+     "derive": lambda: float(mod_order(2, 21)), "atol": 1e-12},
+    {"name": "D6-15 two of the six values of s give the order",
+     "stated": 2.0,
+     "derive": lambda: float(sum(1 for sv in range(6)
+                                 if math.gcd(sv, 6) == 1)), "atol": 1e-12},
+    {"name": "D6-15 so one run in three succeeds", "stated": 0.3333,
+     "derive": lambda: order_finding_success(2, 21, 12), "rtol": 2e-2},
+    {"name": "D6-15 the candidate from s = 3 fails its check", "stated": 4.0,
+     "derive": lambda: float(pow(2, 2, 21)), "atol": 1e-12},
+    {"name": "D6-15 the candidate from s = 2 fails its check", "stated": 8.0,
+     "derive": lambda: float(pow(2, 3, 21)), "atol": 1e-12},
+
+    # D6-16 a reading on fifteen
+    {"name": "D6-16 the reading as a fraction", "stated": 0.75,
+     "derive": lambda: 192 / 256, "rtol": 1e-12},
+    {"name": "D6-16 the order it gives", "stated": 4.0,
+     "derive": lambda: float(order_from_reading(192, 256, 2, 15)),
+     "atol": 1e-12},
+    {"name": "D6-16 the reading 64 gives the same order", "stated": 4.0,
+     "derive": lambda: float(order_from_reading(64, 256, 2, 15)),
+     "atol": 1e-12},
+    {"name": "D6-16 the first factor of fifteen", "stated": 3.0,
+     "derive": lambda: float(math.gcd(pow(2, 2, 15) - 1, 15)), "atol": 1e-12},
+    {"name": "D6-16 the second", "stated": 5.0,
+     "derive": lambda: float(math.gcd(pow(2, 2, 15) + 1, 15)), "atol": 1e-12},
+    {"name": "D6-16 the circuit really does put its weight on those readings",
+     "stated": 1.0,
+     "derive": lambda: float(sum(order_finding_distribution(2, 15, 8)[y]
+                                for y in (0, 64, 128, 192))), "rtol": 1e-9},
+
+    # D6-17 a reading on twenty-one
+    {"name": "D6-17 the reading as a fraction", "stated": 0.833984,
+     "derive": lambda: 427 / 512, "rtol": 1e-5},
+    {"name": "D6-17 its third convergent is five sixths", "stated": 6.0,
+     "derive": lambda: float(convergents(427, 512)[2][1]), "atol": 1e-12},
+    {"name": "D6-17 the order it gives", "stated": 6.0,
+     "derive": lambda: float(order_from_reading(427, 512, 2, 21)),
+     "atol": 1e-12},
+    {"name": "D6-17 the smallest power of two above N squared", "stated": 512.0,
+     "derive": lambda: 2.0 ** math.ceil(math.log2(21 ** 2 + 1)), "atol": 1e-9},
+    {"name": "D6-17 the reading is within one over 2Q of five sixths",
+     "stated": 0.00065, "derive": lambda: abs(427 / 512 - 5 / 6), "rtol": 2e-2},
+    {"name": "D6-17 and that is below one over 2Q", "stated": 1.0,
+     "derive": lambda: 1.0 if abs(427 / 512 - 5 / 6) < 1 / 1024 else 0.0,
+     "atol": 1e-12},
+
+    # D6-18 the honest ratios at twenty bits
+    {"name": "D6-18 the exact classical count at twenty bits",
+     "stated": 524289.0, "derive": lambda: 2.0 ** 19 + 1, "atol": 1e-9},
+    {"name": "D6-18 the randomised count for one error in a million",
+     "stated": 21.0,
+     "derive": lambda: float(next(k for k in range(1, 60)
+                                 if _dj_error(20, k) <= 1e-6)), "atol": 1e-9},
+    {"name": "D6-18 and the ratio between the two ratios", "stated": 25000.0,
+     "derive": lambda: (2.0 ** 19 + 1) / 21, "rtol": 5e-2},
+
+    # D6-19 the resource sketch at a thousand bits
+    {"name": "D6-19 the gates in one modular multiplication", "stated": 1.05e6,
+     "derive": lambda: 1024.0 ** 2, "rtol": 1e-2},
+    {"name": "D6-19 the arithmetic in total", "stated": 2.1e9,
+     "derive": lambda: 2048 * 1024.0 ** 2, "rtol": 3e-2},
+    {"name": "D6-19 the inverse transform on that register", "stated": 2.1e6,
+     "derive": lambda: 2048 * 2049 / 2, "rtol": 1e-2},
+    {"name": "D6-19 the ratio between them", "stated": 1000.0,
+     "derive": lambda: (2048 * 1024.0 ** 2) / (2048 * 2049 / 2), "rtol": 5e-2},
+
+    # D6-20 the full-length run, end to end
+    {"name": "D6-20 the counting register for twenty-one", "stated": 512.0,
+     "derive": lambda: 2.0 ** math.ceil(math.log2(21 ** 2 + 1)), "atol": 1e-9},
+    {"name": "D6-20 the applications of the multiplier", "stated": 511.0,
+     "derive": lambda: 2.0 ** 9 - 1, "atol": 1e-9},
+    {"name": "D6-20 the order", "stated": 6.0,
+     "derive": lambda: float(mod_order(2, 21)), "atol": 1e-12},
+    {"name": "D6-20 the order recovered from the reading", "stated": 6.0,
+     "derive": lambda: float(order_from_reading(427, 512, 2, 21)),
+     "atol": 1e-12},
+    {"name": "D6-20 the first factor", "stated": 7.0,
+     "derive": lambda: float(math.gcd(pow(2, 3, 21) - 1, 21)), "atol": 1e-12},
+    {"name": "D6-20 the second", "stated": 3.0,
+     "derive": lambda: float(math.gcd(pow(2, 3, 21) + 1, 21)), "atol": 1e-12},
+    {"name": "D6-20 and their product", "stated": 21.0,
+     "derive": lambda: float(math.gcd(pow(2, 3, 21) - 1, 21)
+                             * math.gcd(pow(2, 3, 21) + 1, 21)), "atol": 1e-12},
+    {"name": "D6-20 the order divides the size of the group of units",
+     "stated": 0.0, "derive": lambda: float(12 % mod_order(2, 21)),
+     "atol": 1e-12},
+    {"name": "D6-20 the end-to-end success probability of one run",
+     "stated": 0.3333, "derive": lambda: order_finding_success(2, 21, 9),
+     "rtol": 5e-2},
+]
+
+
 if __name__ == "__main__":
-    main(CHECKS, "verify_drills — chapters 1 to 5, worked solutions")
+    main(CHECKS, "verify_drills — chapters 1 to 6, worked solutions")

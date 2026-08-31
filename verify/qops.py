@@ -437,3 +437,200 @@ def grover_best(n: int, marked, upper: int) -> int:
         if p > best_p:
             best, best_p = r, p
     return best
+
+
+# ---- the algorithms of chapter 6, built from their own definitions ----------
+#
+# Everything below is written as a circuit or as a definition, never as the
+# closed form the artifact reasons with. The Fourier matrix is assembled from
+# its defining sum; the phase-estimation distribution is reached by preparing
+# the counting register, writing the phases onto it and applying that matrix,
+# so the ratio of sines the artifact prints is a result here rather than an
+# assumption; and the order-finding distribution is a simulation of the whole
+# register, work qubits included, so the eigenphases s/r are something this
+# file discovers rather than something it is told.
+
+
+def qft_matrix(n: int, inverse: bool = False) -> np.ndarray:
+    """F|x> = Q^{-1/2} sum_k e^{2 pi i x k / Q} |k>, assembled entry by entry.
+
+    Built from the defining sum and not from a circuit of Hadamards and
+    controlled rotations, which is the route the artifact draws.
+    """
+    Q = 2 ** int(n)
+    sign = -1.0 if inverse else 1.0
+    k = np.arange(Q)
+    return np.exp(sign * 2j * math.pi * np.outer(k, k) / Q) / math.sqrt(Q)
+
+
+def qpe_distribution(phi: float, t: int) -> np.ndarray:
+    """The outcome distribution of phase estimation, from the circuit itself.
+
+    The counting register is prepared uniform, each basis state k collects the
+    phase e^{2 pi i k phi} that the controlled powers write onto it, and the
+    inverse transform is then applied as a matrix. No closed form is used.
+    """
+    Q = 2 ** int(t)
+    k = np.arange(Q)
+    state = np.exp(2j * math.pi * k * float(phi)) / math.sqrt(Q)
+    out = qft_matrix(t, inverse=True) @ state
+    return np.abs(out) ** 2
+
+
+def qpe_nearest(phi: float, t: int) -> int:
+    """The reading closest to 2^t phi, on the circle of 2^t readings."""
+    Q = 2 ** int(t)
+    return int(round(float(phi) * Q)) % Q
+
+
+def qpe_best_prob(phi: float, t: int) -> float:
+    """The probability of the single closest reading."""
+    return float(qpe_distribution(phi, t)[qpe_nearest(phi, t)])
+
+
+def qpe_two_nearest_prob(phi: float, t: int) -> float:
+    """The probability of the two readings that bracket 2^t phi."""
+    Q = 2 ** int(t)
+    p = qpe_distribution(phi, t)
+    lo = int(math.floor(float(phi) * Q)) % Q
+    hi = (lo + 1) % Q
+    return float(p[lo]) if lo == hi else float(p[lo] + p[hi])
+
+
+def qpe_within(phi: float, t: int, n_bits: int) -> float:
+    """Probability that the reading is within 2^{-n_bits} of the true phase.
+
+    The distance is taken on the circle, because the reading 0 sits next to
+    the reading 2^t - 1.
+    """
+    Q = 2 ** int(t)
+    p = qpe_distribution(phi, t)
+    tol = 2.0 ** (-int(n_bits))
+    total = 0.0
+    for y in range(Q):
+        d = abs(y / Q - float(phi))
+        d = min(d, 1.0 - d)
+        if d <= tol + 1e-12:
+            total += p[y]
+    return float(total)
+
+
+def deutsch_jozsa(f, n: int) -> np.ndarray:
+    """The output distribution of the Deutsch-Jozsa circuit, run as a circuit.
+
+    The oracle is built as the permutation |x>|y> -> |x>|y xor f(x)> on n+1
+    qubits, exactly as chapter 4 defines a reversible embedding, and the
+    circuit is then Hadamards, the oracle, and Hadamards on the query register.
+    Nothing here knows that the amplitude of the all-zero string is the mean of
+    the signs; that is what the check compares against.
+    """
+    d = 2 ** (n + 1)
+    U = np.zeros((d, d), dtype=complex)
+    for x in range(2 ** n):
+        for y in range(2):
+            src = (x << 1) | y                      # |x>|y>, y the low bit
+            dst = (x << 1) | (y ^ (int(f(x)) & 1))
+            U[dst, src] = 1.0
+    # the query register in |+>^n and the target in |->
+    v = np.zeros(d, dtype=complex)
+    for x in range(2 ** n):
+        v[(x << 1) | 0] = 1.0 / math.sqrt(2 ** (n + 1))
+        v[(x << 1) | 1] = -1.0 / math.sqrt(2 ** (n + 1))
+    v = U @ v
+    # Hadamards on the n query qubits, which are the high bits of the index
+    Hn = np.array([[1.0]], dtype=complex)
+    for _ in range(n):
+        Hn = np.kron(Hn, H)
+    W = np.kron(Hn, np.eye(2, dtype=complex))
+    v = W @ v
+    # marginal over the query register
+    out = np.zeros(2 ** n, dtype=float)
+    for x in range(2 ** n):
+        out[x] = abs(v[(x << 1) | 0]) ** 2 + abs(v[(x << 1) | 1]) ** 2
+    return out
+
+
+def mod_order(a: int, N: int) -> int:
+    """The smallest r > 0 with a^r = 1 mod N, by direct search."""
+    x = 1 % N
+    for r in range(1, N + 2):
+        x = (x * a) % N
+        if x == 1:
+            return r
+    return 0
+
+
+def convergents(y: int, Q: int):
+    """The continued-fraction convergents of y/Q, as (numerator, denominator).
+
+    The plain recursion: take the whole part, invert the remainder, and build
+    the numerators and denominators from the two previous ones.
+    """
+    a, b = int(y), int(Q)
+    h_prev, h = 0, 1
+    k_prev, k = 1, 0
+    out = []
+    while b:
+        q = a // b
+        h, h_prev = q * h + h_prev, h
+        k, k_prev = q * k + k_prev, k
+        out.append((h, k))
+        a, b = b, a - q * b
+    return out
+
+
+def order_from_reading(y: int, Q: int, a: int, N: int) -> int:
+    """The classical post-processing: continued fractions, then one check.
+
+    Returns the candidate order the procedure accepts, or 0 if it accepts
+    none. The candidate is the last convergent denominator below N, and it is
+    accepted only when a^cand = 1 mod N.
+    """
+    best = 0
+    for _, den in convergents(y, Q):
+        if 0 < den < N:
+            best = den
+    if best and pow(int(a), int(best), int(N)) == 1:
+        return best
+    return 0
+
+
+def order_finding_distribution(a: int, N: int, t: int) -> np.ndarray:
+    """The reading distribution of the order-finding circuit, simulated whole.
+
+    The joint register is |k>|w> with k the counting register and w the work
+    register. The controlled powers send |k>|1> to |k>|a^k mod N>, so the state
+    before the inverse transform is Q^{-1/2} sum_k |k>|a^k mod N>. The inverse
+    transform is applied to the counting register as a matrix and the work
+    register is then traced out by summing the squared moduli over w.
+
+    Nothing about eigenstates, eigenphases or the number r enters this
+    function. Those are properties of the answer it produces.
+    """
+    Q = 2 ** int(t)
+    m = 1
+    while 2 ** m < int(N):
+        m += 1
+    M = 2 ** m
+    psi = np.zeros((Q, M), dtype=complex)
+    x = 1 % int(N)
+    for k in range(Q):
+        psi[k, x] = 1.0 / math.sqrt(Q)
+        x = (x * int(a)) % int(N)
+    psi = qft_matrix(t, inverse=True) @ psi
+    return np.sum(np.abs(psi) ** 2, axis=1)
+
+
+def order_finding_success(a: int, N: int, t: int) -> float:
+    """The probability that one whole run returns the true order.
+
+    The quantum part is simulated, the reading distribution is weighted by
+    whether the classical post-processing accepts the true order, and the two
+    are added. This is the end-to-end number: the continued fractions and the
+    modular-exponentiation check are inside it.
+    """
+    r = mod_order(int(a), int(N))
+    p = order_finding_distribution(a, N, t)
+    Q = 2 ** int(t)
+    return float(sum(p[y] for y in range(Q)
+                     if order_from_reading(y, Q, int(a), int(N)) == r))

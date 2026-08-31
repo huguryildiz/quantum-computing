@@ -41,7 +41,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
 from qops import (BELL_PHI_P, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
-                  grover_best, grover_state, grover_success, index,
+                  convergents, deutsch_jozsa, grover_best, grover_state,
+                  grover_success, index, mod_order, order_finding_success,
+                  order_from_reading, qft_matrix, qpe_best_prob,
+                  order_finding_distribution, qpe_distribution,
+                  qpe_two_nearest_prob, qpe_within,
                   teleport_bob, teleport_branch,
                   S_GATE, T_GATE, X, Y, Z, amp_damp, bloch, bloch_of,
                   channel, cnot, cz_gate, dev, direction, hermiticity,
@@ -1615,5 +1619,320 @@ CHECKS += [
 
 
 
+# ── Chapter 6 · quantum algorithms ──────────────────────────────────────────
+#
+# The independent routes here are the ones the chapter cannot supply for
+# itself. Every Deutsch-Jozsa claim is checked by building the oracle as a
+# permutation on n+1 qubits and running the circuit as matrices, so the rule
+# "the amplitude of the all-zero string is the mean of the signs" is a result
+# of the check rather than an input to it. Every phase-estimation claim is
+# checked by preparing the counting register, writing the phases onto it and
+# applying a Fourier matrix assembled from its defining sum, so the ratio of
+# sines the scene prints is never used. And every order-finding claim is
+# checked by simulating the whole two-register circuit -- work qubits included
+# -- and then running the continued fractions and the modular-exponentiation
+# test on the readings it produces, so the success probability the chapter
+# quotes is an end-to-end number and not a counting argument.
+
+
+def _parity(x: int) -> int:
+    p = 0
+    while x:
+        p ^= x & 1
+        x >>= 1
+    return p
+
+
+def _dj_pattern(n: int, mask: int):
+    """The oracle f(x) = parity of (x AND mask), which is balanced unless the
+    mask is zero. The circuit should print the mask."""
+    return lambda x: _parity(x & mask)
+
+
+def _dj_randomised_queries(n: int, eps: float) -> int:
+    """The smallest number of distinct classical queries whose exact error
+    probability on a balanced function is at most eps.
+
+    Written from the hypergeometric count 2 C(2^{n-1}, k) / C(2^n, k), not from
+    the bound 2^{-(k-1)} the scene quotes.
+    """
+    N = 2 ** n
+    for k in range(1, N // 2 + 2):
+        p = 2 * math.comb(N // 2, k) / math.comb(N, k)
+        if p <= eps:
+            return k
+    return N // 2 + 1
+
+
+def _qft_of(vec, n: int):
+    """The transform of an explicit amplitude list, by matrix multiplication."""
+    return qft_matrix(n) @ np.asarray(vec, dtype=complex)
+
+
+CHECKS += [
+    # 6.1.1 what a query count hides
+    {"name": "6.1.1 the quantum run at 4000 gates a query", "stated": 1.0e5,
+     "derive": lambda: 25 * 4000.0, "rtol": 1e-12},
+    {"name": "6.1.1 the classical run at 30 operations a query",
+     "stated": 1.54e4, "derive": lambda: 512 * 30.0, "rtol": 1e-2},
+
+    # 6.2.1 phase kickback, run as a circuit
+    {"name": "6.2.1 the balanced one-bit oracle prints 1 with certainty",
+     "stated": 1.0, "derive": lambda: float(deutsch_jozsa(lambda x: x, 1)[1]),
+     "rtol": 1e-12},
+    {"name": "6.2.1 the constant one-bit oracle prints 0 with certainty",
+     "stated": 1.0, "derive": lambda: float(deutsch_jozsa(lambda x: 0, 1)[0]),
+     "rtol": 1e-12},
+
+    # 6.2.2 the general form: T on |1> is a phase of one eighth
+    {"name": "6.2.2 the eigenphase of T on the state one", "stated": 0.125,
+     "derive": lambda: cmath.phase(complex(T_GATE[1, 1])) / (2 * math.pi),
+     "rtol": 1e-12},
+
+    # 6.2.3 the cancellation, on four bits
+    {"name": "6.2.3 the amplitude before the last layer is one quarter",
+     "stated": 0.25, "derive": lambda: 1 / math.sqrt(16), "rtol": 1e-12},
+    {"name": "6.2.3 the parity oracle on four bits prints all ones",
+     "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(_dj_pattern(4, 0b1111), 4)[15]),
+     "rtol": 1e-12},
+    {"name": "6.2.3 and prints the all-zero string never", "stated": 0.0,
+     "derive": lambda: float(deutsch_jozsa(_dj_pattern(4, 0b1111), 4)[0]),
+     "atol": 1e-12},
+
+    # 6.3.1 Deutsch: the four promised functions, run one at a time
+    {"name": "6.3.1 the second constant function also prints 0", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(lambda x: 1, 1)[0]), "rtol": 1e-12},
+    {"name": "6.3.1 the second balanced function also prints 1", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(lambda x: 1 - x, 1)[1]),
+     "rtol": 1e-12},
+
+    # 6.3.2 Deutsch-Jozsa on two bits, with the parity oracle
+    {"name": "6.3.2 the two-bit parity oracle prints 11 with certainty",
+     "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(_dj_pattern(2, 0b11), 2)[3]),
+     "rtol": 1e-12},
+    {"name": "6.3.2 the amplitude of the all-zero string is exactly zero",
+     "stated": 0.0,
+     "derive": lambda: float(deutsch_jozsa(_dj_pattern(2, 0b11), 2)[0]),
+     "atol": 1e-12},
+
+    # 6.3.3 what the separation is, and is not
+    {"name": "6.3.3 the exact classical worst case at ten bits",
+     "stated": 513.0, "derive": lambda: 2.0 ** 9 + 1, "atol": 1e-9},
+    {"name": "6.3.3 the randomised count for one error in a million",
+     "stated": 21.0, "derive": lambda: float(_dj_randomised_queries(10, 1e-6)),
+     "atol": 1e-9},
+    {"name": "6.3.3 the same count at thirty bits does not move",
+     "stated": 21.0, "derive": lambda: float(_dj_randomised_queries(20, 1e-6)),
+     "atol": 1e-9},
+    {"name": "6.3.3 the exact classical worst case at thirty bits",
+     "stated": 5.4e8, "derive": lambda: 2.0 ** 29 + 1, "rtol": 1e-2},
+
+    # 6.4.1 the transform on one basis state
+    {"name": "6.4.1 every output amplitude has modulus one over root eight",
+     "stated": 0.35355,
+     "derive": lambda: float(np.max(np.abs(_qft_of(ket(0, 1, 1), 3)))),
+     "rtol": 1e-4},
+    {"name": "6.4.1 and the smallest is the same as the largest",
+     "stated": 0.35355,
+     "derive": lambda: float(np.min(np.abs(_qft_of(ket(0, 1, 1), 3)))),
+     "rtol": 1e-4},
+    {"name": "6.4.1 the phase advances by 135 degrees a step",
+     "stated": 135.0,
+     "derive": lambda: math.degrees(
+         (cmath.phase(_qft_of(ket(0, 1, 1), 3)[1])
+          - cmath.phase(_qft_of(ket(0, 1, 1), 3)[0])) % (2 * math.pi)),
+     "rtol": 1e-6},
+    {"name": "6.4.1 the transform of the all-zero state is uniform",
+     "stated": 0.0,
+     "derive": lambda: float(np.max(np.abs(
+         _qft_of(ket(0, 0, 0), 3) - np.ones(8) / math.sqrt(8)))),
+     "atol": 1e-12},
+
+    # 6.4.2 the circuit, counted
+    {"name": "6.4.2 the gate count on ten qubits", "stated": 55.0,
+     "derive": lambda: 10 * 11 / 2, "atol": 1e-9},
+    {"name": "6.4.2 the smallest rotation on ten qubits, in degrees",
+     "stated": 0.35, "derive": lambda: 360 / 1024, "rtol": 2e-2},
+    {"name": "6.4.2 the classical transform on a stored vector of 1024",
+     "stated": 10240.0, "derive": lambda: 1024 * math.log2(1024),
+     "rtol": 1e-12},
+    {"name": "6.4.2 the transform matrix is unitary", "stated": 0.0,
+     "derive": lambda: unitarity(qft_matrix(4)), "atol": 1e-12},
+
+    # 6.4.3 what one run returns
+    {"name": "6.4.3 the two-term input transforms to four equal weights",
+     "stated": 0.25,
+     "derive": lambda: float(np.abs(
+         _qft_of((ket(0, 0, 1) + ket(1, 0, 1)) / math.sqrt(2), 3)[2]) ** 2),
+     "rtol": 1e-9},
+    {"name": "6.4.3 and the odd indices are exactly zero", "stated": 0.0,
+     "derive": lambda: float(np.max(np.abs(
+         _qft_of((ket(0, 0, 1) + ket(1, 0, 1)) / math.sqrt(2), 3)[1::2]))),
+     "atol": 1e-12},
+
+    # 6.5.2 the exact case
+    {"name": "6.5.2 a three-bit phase is read with probability one",
+     "stated": 1.0, "derive": lambda: qpe_best_prob(3 / 8, 3), "rtol": 1e-12},
+    {"name": "6.5.2 the seven wrong outcomes carry nothing at all",
+     "stated": 0.0,
+     "derive": lambda: float(sum(qpe_distribution(3 / 8, 3)[y]
+                                for y in range(8) if y != 3)),
+     "atol": 1e-12},
+    {"name": "6.5.2 the eighth-turn phase is read at y = 1", "stated": 1.0,
+     "derive": lambda: float(qpe_distribution(1 / 8, 3)[1]), "rtol": 1e-12},
+
+    # 6.5.3 the general case, and the two guarantees
+    {"name": "6.5.3 the nearest outcome for phi = 0.3 at three qubits",
+     "stated": 0.577, "derive": lambda: float(qpe_distribution(0.3, 3)[2]),
+     "rtol": 2e-3},
+    {"name": "6.5.3 the second nearest outcome there", "stated": 0.259,
+     "derive": lambda: float(qpe_distribution(0.3, 3)[3]), "rtol": 2e-3},
+    {"name": "6.5.3 the two together", "stated": 0.836,
+     "derive": lambda: qpe_two_nearest_prob(0.3, 3), "rtol": 2e-3},
+    {"name": "6.5.3 the remainder is spread over the other six",
+     "stated": 0.164,
+     "derive": lambda: 1 - qpe_two_nearest_prob(0.3, 3), "rtol": 2e-2},
+    # The two floors, checked as floors: the worst phase over a fine sweep,
+    # at four register sizes, never falls below either of them.
+    {"name": "6.5.3 the single nearest never falls below 4/pi^2",
+     "stated": 0.4053,
+     "derive": lambda: min(qpe_best_prob(j / 997, t)
+                           for t in (2, 3, 4, 6) for j in range(1, 997, 7)),
+     "rtol": 5e-3},
+    {"name": "6.5.3 the two nearest never fall below 8/pi^2",
+     "stated": 0.8106,
+     "derive": lambda: min(qpe_two_nearest_prob(j / 997, t)
+                           for t in (2, 3, 4, 6) for j in range(1, 997, 7)),
+     "rtol": 2e-3},
+    {"name": "6.5.3 the worst case is a phase halfway between two readings",
+     "stated": 0.4053, "derive": lambda: qpe_best_prob(1 / 16, 3),
+     "rtol": 2e-2},
+    # And the register-size rule: t = n + ceil(log2(2 + 1/2eps)) really does
+    # give n correct bits with failure probability at most eps.
+    {"name": "6.5.3 six bits at five per cent needs ten counting qubits",
+     "stated": 10.0,
+     "derive": lambda: 6 + math.ceil(math.log2(2 + 1 / (2 * 0.05))),
+     "atol": 1e-9},
+    {"name": "6.5.3 and that register really does deliver six bits",
+     "stated": 0.95,
+     "derive": lambda: min(qpe_within(j / 401, 10, 6) for j in range(1, 401, 3)),
+     "rtol": 5e-2},
+
+    # 6.5.4 where the cost is
+    {"name": "6.5.4 the applications of U at ten counting qubits",
+     "stated": 1023.0, "derive": lambda: 2.0 ** 10 - 1, "atol": 1e-9},
+    {"name": "6.5.4 the gates in the inverse transform there", "stated": 55.0,
+     "derive": lambda: 10 * 11 / 2, "atol": 1e-9},
+    {"name": "6.5.4 the controlled part at 500 gates a call", "stated": 5.1e5,
+     "derive": lambda: (2 ** 10 - 1) * 500.0, "rtol": 1e-2},
+
+    # 6.5.5 counting the marked
+    {"name": "6.5.5 an angle of 3.6 degrees means four marked candidates",
+     "stated": 4.04,
+     "derive": lambda: 1024 * math.sin(math.radians(3.6)) ** 2, "rtol": 1e-2},
+    {"name": "6.5.5 four marked candidates mean an angle of 3.583 degrees",
+     "stated": 3.583,
+     "derive": lambda: math.degrees(math.asin(math.sqrt(4 / 1024))),
+     "rtol": 1e-3},
+    {"name": "6.5.5 the iteration count that follows", "stated": 12.07,
+     "derive": lambda: math.pi / (4 * math.asin(math.sqrt(4 / 1024))) - 0.5,
+     "rtol": 2e-3},
+    {"name": "6.5.5 and the simulated optimum agrees", "stated": 12.0,
+     "derive": lambda: float(grover_best(10, [3, 11, 57, 900], 40)),
+     "atol": 1e-12},
+
+    # 6.6.1 the order
+    {"name": "6.6.1 the order of two modulo fifteen", "stated": 4.0,
+     "derive": lambda: float(mod_order(2, 15)), "atol": 1e-12},
+    {"name": "6.6.1 the order of two modulo twenty-one", "stated": 6.0,
+     "derive": lambda: float(mod_order(2, 21)), "atol": 1e-12},
+    {"name": "6.6.1 and two to that power returns one", "stated": 1.0,
+     "derive": lambda: float(pow(2, mod_order(2, 21), 21)), "atol": 1e-12},
+
+    # 6.6.2 where the order hides -- checked end to end, by simulating the
+    # whole circuit and running the classical post-processing on its readings
+    {"name": "6.6.2 half the runs succeed for fifteen with base two",
+     "stated": 0.5, "derive": lambda: order_finding_success(2, 15, 8),
+     "rtol": 1e-6},
+    {"name": "6.6.2 the simulated readings concentrate on the four quarters",
+     "stated": 1.0,
+     "derive": lambda: float(sum(order_finding_distribution(2, 15, 8)[y]
+                                for y in (0, 64, 128, 192))),
+     "rtol": 1e-9},
+
+    # 6.6.3 what it costs to build
+    {"name": "6.6.3 the modular multiplications for a 2048-bit modulus",
+     "stated": 4096.0, "derive": lambda: 2.0 * 2048, "atol": 1e-9},
+    {"name": "6.6.3 the gates in one of them", "stated": 4.2e6,
+     "derive": lambda: 2048.0 ** 2, "rtol": 1e-2},
+    {"name": "6.6.3 the arithmetic in total", "stated": 1.7e10,
+     "derive": lambda: 4096 * 2048.0 ** 2, "rtol": 2e-2},
+    {"name": "6.6.3 the inverse transform on that counting register",
+     "stated": 8.4e6, "derive": lambda: 4096 * 4097 / 2, "rtol": 1e-2},
+    {"name": "6.6.3 the ratio between them", "stated": 2050.0,
+     "derive": lambda: (4096 * 2048.0 ** 2) / (4096 * 4097 / 2), "rtol": 2e-2},
+
+    # 6.6.4 reading the order out
+    {"name": "6.6.4 the reading 85 over 512 gives the order six",
+     "stated": 6.0, "derive": lambda: float(order_from_reading(85, 512, 2, 21)),
+     "atol": 1e-12},
+    {"name": "6.6.4 its third convergent has denominator 253", "stated": 253.0,
+     "derive": lambda: float(convergents(85, 512)[2][1]), "atol": 1e-12},
+    {"name": "6.6.4 the reading itself", "stated": 0.166016,
+     "derive": lambda: 85 / 512, "rtol": 1e-5},
+    {"name": "6.6.4 the fraction it stands for", "stated": 0.166667,
+     "derive": lambda: 1 / 6, "rtol": 1e-5},
+    {"name": "6.6.4 the counting register must beat N squared",
+     "stated": 512.0, "derive": lambda: 2.0 ** math.ceil(math.log2(21 ** 2)),
+     "atol": 1e-9},
+
+    # 6.6.5 when a run fails -- the same end-to-end number, and the effect of
+    # a longer counting register on it
+    {"name": "6.6.5 one run in two succeeds for fifteen with base two",
+     "stated": 0.5, "derive": lambda: order_finding_success(2, 15, 8),
+     "rtol": 1e-6},
+    {"name": "6.6.5 the counting argument for twenty-one, base two",
+     "stated": 0.3333, "derive": lambda: order_finding_success(2, 21, 12),
+     "rtol": 2e-2},
+    {"name": "6.6.5 a longer register moves it towards the counting argument",
+     "stated": 1.0,
+     "derive": lambda: 1.0 if (abs(order_finding_success(2, 21, 12) - 1 / 3)
+                               < abs(order_finding_success(2, 21, 9) - 1 / 3))
+     else 0.0, "atol": 1e-12},
+
+    # 6.7.2 fifteen, worked
+    {"name": "6.7.2 the first greatest common divisor", "stated": 3.0,
+     "derive": lambda: float(math.gcd(2 ** (mod_order(2, 15) // 2) - 1, 15)),
+     "atol": 1e-12},
+    {"name": "6.7.2 the second", "stated": 5.0,
+     "derive": lambda: float(math.gcd(2 ** (mod_order(2, 15) // 2) + 1, 15)),
+     "atol": 1e-12},
+    {"name": "6.7.2 and their product", "stated": 15.0,
+     "derive": lambda: float(math.gcd(2 ** (mod_order(2, 15) // 2) - 1, 15)
+                             * math.gcd(2 ** (mod_order(2, 15) // 2) + 1, 15)),
+     "atol": 1e-12},
+    {"name": "6.7.2 the base fourteen has order two", "stated": 2.0,
+     "derive": lambda: float(mod_order(14, 15)), "atol": 1e-12},
+    {"name": "6.7.2 and its half power is minus one", "stated": 14.0,
+     "derive": lambda: float(pow(14, 1, 15)), "atol": 1e-12},
+    {"name": "6.7.2 two of the eight coprime bases are useless",
+     "stated": 2.0,
+     "derive": lambda: float(sum(
+         1 for a in range(1, 15) if math.gcd(a, 15) == 1
+         and (mod_order(a, 15) % 2 == 1
+              or pow(a, mod_order(a, 15) // 2, 15) == 14))),
+     "atol": 1e-12},
+
+    # 6.7.4 what Shor claims
+    {"name": "6.7.4 the run at one microsecond a logical gate, in seconds",
+     "stated": 1.7e4, "derive": lambda: 4096 * 2048.0 ** 2 * 1e-6,
+     "rtol": 2e-2},
+    {"name": "6.7.4 which is about five hours", "stated": 4.8,
+     "derive": lambda: 4096 * 2048.0 ** 2 * 1e-6 / 3600, "rtol": 5e-2},
+]
+
+
 if __name__ == "__main__":
-    main(CHECKS, "verify_scenes — chapters 1 to 5, teaching scenes")
+    main(CHECKS, "verify_scenes — chapters 1 to 6, teaching scenes")
