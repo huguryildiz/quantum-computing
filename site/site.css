@@ -280,3 +280,15 @@ h1,h2,h3{ font-family:var(--serif); font-weight:600; line-height:1.15;
   .brand__name{ font-size:11.5px; letter-spacing:.05em; }
   .bar__nav .btn{ white-space:nowrap; }
 }
+
+/* Below about 360 points the same pair still does not fit: the mark, the name
+   and the button come to 311 points inside a 288-point bar, so the page scrolls
+   sideways by the difference. The mark shrinks, the name loses its tracking and
+   the button loses its padding; nothing is dropped. */
+@media (max-width:380px){
+  .bar{ padding-inline:13px; gap:9px; }
+  .brand{ gap:8px; }
+  .brand img{ width:24px; height:24px; }
+  .brand__name{ font-size:10.5px; letter-spacing:.02em; }
+  .bar__nav .btn--sm{ padding:7px 11px; font-size:12.5px; }
+}
