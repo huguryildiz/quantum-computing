@@ -160,8 +160,15 @@ window.C1 = [
 /* ---------------- front matter ---------------- */
 {t:'title', kicker:'Quantum Computing', text:'Quantum Computing',
  sub:'Lecture notes for the software half of the course: what a quantum state is, what can be done to it, what a measurement returns, and what an algorithm has to arrange before that measurement is worth making.',
- meta:[['Covers','Chapters 1 to 4'],['Level','Undergraduate'],
+ meta:[['Covers','Chapters 1 to 6, and Appendix A'],['Level','Undergraduate'],
        ['Assumed background','Linear algebra over the real numbers, and some Python']]},
+
+/* The credit CC BY 4.0 asks for. It sits in the front matter rather than in a
+   colophon at the back, because a reader who never reaches the last page has
+   still been told. The artifact prints the same sentence from
+   `CONTENT.META.adapted`; this pipeline does not load that file, so the two
+   are kept in step by hand. */
+{t:'p', text:'These notes are an adaptation. Their syllabus and the sequence of topics they teach derive from <b>Quantum Computing Lectures</b> by Aleksandr Krasnok, <i class="url">github.com/AlexKrasnok/quantum-computing-lectures</i>, used under CC BY 4.0. Every page here — the prose, the figures, the worked examples and the questions — is written for this edition.'},
 
 {t:'h3', text:'How to read these notes'},
 {t:'p', text:'Each idea arrives in the same order: what it is for, a definition, an equation, a short derivation with every step shown, a worked example, and the mistake that is easiest to make. Worked examples use five headings — Given, Find, Method, Solution, Check. Do the Check step yourself before reading it; it is where a wrong answer is most likely to survive, because a calculation that goes wrong in the middle usually goes wrong in the check as well and agrees with itself.'},
@@ -183,7 +190,13 @@ window.C1 = [
   'NC CH1.2 · NC CH1.3 · NC CH3.2.5 · NC CH4.2 · NC CH4.5'],
  ['5','Circuits and protocols',
   'A circuit as a program, and the model of computation it belongs to. Depth against gate count, and which one a coherence time is spent against. Exact simulation and where it stops; shots, error bars, and the difference between sampling noise and a broken machine. Measurement inside a circuit, classical feedforward, and what a compiler does before the hardware sees anything. Then the five things a resource claim must name, and two protocols worked end to end against them: teleportation, which finishes nothing until two classical bits arrive, and Grover, whose square root is a count of queries and not a time.',
-  'NC CH1.3.4 · NC CH1.3.5 · NC CH1.3.7 · NC CH4.4 · NC CH4.6 · NC CH6.1 · NC CH6.6']
+  'NC CH1.3.4 · NC CH1.3.5 · NC CH1.3.7 · NC CH4.4 · NC CH4.6 · NC CH6.1 · NC CH6.6'],
+ ['6','Quantum algorithms',
+  'What a query model counts, and what a query count is not. One mechanism — phase kickback — first with a Boolean oracle and then with any unitary, and the rule that a superposition which never interferes has bought nothing. Deutsch and Deutsch–Jozsa. The quantum Fourier transform, its circuit and what it does not return. Phase estimation, the two floors it guarantees, and quantum counting. Order finding, the continued fractions that read it, and the factoring that follows — with the reach of the same mechanism named at the end.',
+  'NC CH1.4.2 · NC CH1.4.3 · NC CH1.4.4 · NC CH5.1 · NC CH5.2 · NC CH5.3 · NC CH6.3'],
+ ['A','Formula summary',
+  'Every formula the six chapters establish, in the order they establish it, each entry naming the section that develops it. Nothing is derived there.',
+  '']
 ]},
 
 {t:'page'},

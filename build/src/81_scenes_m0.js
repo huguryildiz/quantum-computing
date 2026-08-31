@@ -388,7 +388,8 @@ const SC = [
     {t:'grid', cols:2, gap:'24px', items:[
       [{t:'note', kind:'def', head:'Where the textbook is', html:'Most scenes carry a small chip beside their address, such as <b>NC CH2.2.5</b>, pointing into the course textbook; the marker says the address belongs to the book and not to this artifact. The two numbering systems agree nowhere, so the marker is never dropped. A scene with no chip is one the textbook does not cover in that form.'}],
       [{t:'note', kind:'ok', head:'And where the numbers come from', html:'Every number stated in a scene or a solution is recomputed by a separate program that reaches it a different way. Gate identities are checked against matrix arithmetic, probabilities against sampling, and every entangled state against its own partial trace.'}]
-    ]}
+    ]},
+    {t:'small', html:CONTENT.META.adapted}
   ]}
 ]}
 

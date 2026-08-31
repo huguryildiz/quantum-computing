@@ -86,6 +86,7 @@ const B = [
         ['Level','Undergraduate'],
         ['Answers','Not printed in this edition']]},
  {t:'toc', items: MODS.map(id=>[id.replace('M',''), MT[id], BY[id].length + ' questions'])},
+ {t:'p', text:CONTENT.META.adapted},
  {t:'h3', text:'How to use it'},
  {t:'p', text:'The questions are in the order the course meets them, and each is labelled with what it asks for. Only the statement and its lettered parts are printed; the reasoning stays for you to supply. The question numbers are shared with every other edition, so D5-04 is the same question in the artifact, in this workbook and in the instructor solutions.'},
  {t:'page'}
@@ -115,6 +116,7 @@ const B = [
         ['Edition', CONTENT.META.version],
         ['Distribution','Instructor only']]},
  {t:'box', kind:'warn', hd:'Instructor edition', html:'This document prints the worked solution and the source pages behind every question. The student workbook contains the same questions with none of it. Question ids are shared, so a number quoted in class resolves in either document.'},
+ {t:'p', text:CONTENT.META.adapted},
  {t:'toc', items: MODS.map(id=>[id.replace('M',''), MT[id], BY[id].length + ' questions'])},
  {t:'page'}
 ];
@@ -147,6 +149,7 @@ const B = [
         ['Companion','Lecture notes, Chapters 1 to 6']]},
  {t:'h3', text:'How to read it'},
  {t:'p', text:'Part 1 states the four conventions this course fixes and the two expressions everything else is built on. Part 2 is the summary of formulas, in the order the course establishes them. Part 3 defines every symbol. Nothing here is derived: where a result needs an argument, the argument is in the lecture notes chapter named beside it.'},
+ {t:'p', text:CONTENT.META.adapted},
  {t:'page'},
  {t:'h1', num:'PART 1', text:'Conventions'},
  {t:'p', lead:true, text:'These hold everywhere in the course, without local variation. The first two are the ones that fail silently. A wrong qubit order does not make a result approximately wrong \u2014 it names a different state, and every number after it is quietly wrong. A phase dropped in the wrong place removes the only mechanism any algorithm here has.'},

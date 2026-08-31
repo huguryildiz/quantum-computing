@@ -49,7 +49,7 @@
        it on the title line; the summary then spans the two columns beneath. */
     toc:    b=>`<div class="toc">${b.items.map(([n,t,s,a])=>
        `<div class="c"><div class="n">${md(n)}</div><div class="t">${md(t)}</div>${
-         `<div class="a">${a?md(a):''}</div>`}<div class="s">${md(s)}</div></div>`).join('')}</div>`,
+         `<div class="a">${a?md(a).replace(/NC\s+CH[\d.]+/g, m=>`<span class="ax">${m}</span>`):''}</div>`}<div class="s">${md(s)}</div></div>`).join('')}</div>`,
     hr:     ()=>'<hr>',
     q:      b=>`<div class="q"><span class="n">${b.n}</span> ${md(b.text)}${
        b.ans?`<div class="ans">Answer: ${md(b.ans)}</div>`:''}</div>`,

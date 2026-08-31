@@ -16,6 +16,17 @@ const CONTENT = {
     title:'Quantum Computing',
     version:'1.0',
     language:'Academic English',
+    /* The credit the licence asks for, written once and printed in every
+       document generated from this file. It is not the same thing as quoting a
+       source: the course this adapts is never cited as an authority on a page a
+       student reads, and `rule_check.py` still fires on any sentence that does
+       that. This is the notice CC BY 4.0 requires to travel with the work, and
+       it travels with every edition of it.
+
+       The lecture notes carry the same sentence in `notes/src/c1.js` and the
+       public page in `site/index.html`; neither pipeline loads this file. If
+       this line changes, those two change with it. */
+    adapted:'This course is an adaptation. Its syllabus and the sequence of topics it teaches derive from <b>Quantum Computing Lectures</b> by Aleksandr Krasnok, <a href="https://github.com/AlexKrasnok/quantum-computing-lectures" class="url">github.com/AlexKrasnok/quantum-computing-lectures</a>, used under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Every scene, figure, laboratory and question here is written for this artifact.',
     /* Four conventions, stated once on the page in the scene where each is
        first needed, and repeated here so the conventions panel can show them
        without the reader having to find that scene again.

@@ -5,6 +5,11 @@
    graphics. Original identity — no card-heavy dashboard chrome.
    ========================================================================== */
 
+/* A URL on a phone is wider than the column it sits in, so on screen it
+   breaks rather than pushing the page sideways. The printed editions take the
+   opposite rule, in notes.css, because there the line width is fixed. */
+.url{ overflow-wrap:anywhere; }
+
 :root{
   /* ---- surface ---- */
   --paper:        #FAF8F4;   /* primary canvas, cool ivory */
@@ -200,6 +205,11 @@ html,body{
   background:var(--paper-3);
 }
 body[data-sidebar=off] #viewport{ --sbw:0px; }
+/* A URL on a phone is wider than the column it sits in, so on screen it
+   breaks rather than pushing the page sideways. The printed editions take the
+   opposite rule, in notes.css, because there the line width is fixed. */
+.url{ overflow-wrap:anywhere; }
+
 :root{ --sbw:268px; }
 
 /* --- brand mark ------------------------------------------------------- */
