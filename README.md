@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://quantum-computing-plum.vercel.app/"><img src="https://img.shields.io/badge/Read%20it%20online-12314E?style=for-the-badge&logo=vercel&logoColor=FAF8F4" alt="The course, online"></a>
+  <a href="https://quantum-computing-course.vercel.app/"><img src="https://img.shields.io/badge/quantum--computing--course.vercel.app-12314E?style=for-the-badge&logo=vercel&logoColor=FAF8F4" alt="The course, online"></a>
   &nbsp;
   <a href="dist/Quantum_Computing.html"><img src="https://img.shields.io/badge/Quantum__Computing.html-12314E?style=for-the-badge&logo=html5&logoColor=FAF8F4" alt="The interactive artifact"></a>
   &nbsp;

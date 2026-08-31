@@ -24,22 +24,23 @@
    Laboratory J performs the two reflections as reflections rather than
    quoting the closed form for the angle. Nothing in either file is tabulated.
 
-   The Bloch ball of laboratory I is drawn with the chapter-4 convention,
+   The Bloch ball may be turned. It is drawn through an orthographic camera
+   in an isotropic frame, so the rim is a true circle at every viewpoint and
+   the length of a vector can be read against it however far the ball has been
+   turned. The camera opens at the view the fixed oblique drawing of chapter 4
+   gave, so the figure looks as it always did until the reader drags it; the
+   camera itself, and why the poles stay put, are written down in
+   `70_labs.js`.
 
-       (x, y, z)  ->  (x + 0.42 y,  z + 0.24 y),
-
-   in an isotropic frame, so the great circle in the plane of the page is a
-   genuine circle. The plane of laboratory J is isotropic for the same reason
-   and a sharper one: the whole argument of the scene beside it is that one
-   iteration turns the state by exactly two theta, and an anisotropic frame
-   would draw that angle as something else.
+   The plane of laboratory J is isotropic for a sharper reason: the whole
+   argument of the scene beside it is that one iteration turns the state by
+   exactly two theta, and an anisotropic frame would draw that angle as
+   something else.
    ========================================================================== */
 Object.assign(LABS, (function(){
-  const T = LABS.KIT.T, fmt = LABS.KIT.F;
+  const T = LABS.KIT.T, fmt = LABS.KIT.F, KIT = LABS.KIT;
   const P = PLOT;
   const D2R = Math.PI/180;
-  const KY = 0.42, KZ = 0.24;
-  const pj = (x,y,z) => [x + KY*y, z + KZ*y];
 
   /* ---- the smallest complex arithmetic that will do ----------------------
      A complex number is [re, im]. A three-qubit state is a flat array of eight
@@ -76,7 +77,11 @@ Object.assign(LABS, (function(){
      branches and their probabilities are computed rather than quoted.
      ======================================================================= */
   const I = (() => {
-    let st = { theta:60, phi:30, stage:'corr', branch:0, fix:'bits' };
+    /* `az` and `el` are the camera, and they sit in the same object as the
+       rest of the state because they are state: a drag changes what the
+       figure shows and nothing else about the laboratory. */
+    let st = { theta:60, phi:30, stage:'corr', branch:0, fix:'bits',
+               az:KIT.CAM0.az, el:KIT.CAM0.el };
     const STAGES = ['pair','sent','arrived','corr'];
     const SNAME = { pair:'the pair is shared',
                     sent:'Alice has measured; the bits are travelling',
@@ -204,19 +209,54 @@ Object.assign(LABS, (function(){
       pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
       grid:false, zeroAxes:false, arrows:false});
 
-    function frame(a){
-      const r=[]; for(let i=0;i<=220;i++){ const s=2*Math.PI*i/220;
-        r.push([Math.cos(s),Math.sin(s)]); }
-      a.poly(r,{color:P.COL.grid,width:1.5});
-      const e=[]; for(let i=0;i<=220;i++){ const t=2*Math.PI*i/220;
-        e.push(pj(Math.cos(t),Math.sin(t),0)); }
-      a.poly(e,{color:P.COL.rule,width:1.0,dash:'4 4'});
-      a.poly([[0,-1.22],[0,1.22]],{color:P.COL.rule,width:1.1});
-      a.poly([[-1.22,0],[1.22,0]],{color:P.COL.rule,width:1.1});
-      a.poly([[0,0],pj(0,1.22,0)],{color:P.COL.rule,width:1.1});
-      a.note(0,1.30,'|0\\rangle',{fs:12.5,color:P.COL.muted,anchor:'middle',tex:true});
+    /* The frame the ball is drawn in, as it looks from the camera `V`.
+
+       The rim is a true circle at every viewpoint, because that is what the
+       orthographic projection of a sphere is, so the length of a Bloch vector
+       can be read against it however far the ball has been turned.
+
+       The equator is the ellipse the horizontal great circle projects to, drawn
+       solid over the half nearer the reader and dashed over the half behind.
+       The depth of the equator at angle t is cos(el) cos(t - az), so the near
+       half is exactly t in (az - 90, az + 90) and the two arcs are written down
+       rather than sampled and sorted.
+
+       All three axes are drawn end to end. Before the ball could be turned the
+       y axis was drawn as a half only, which reads as depth in one fixed view
+       and as a missing line in every other. */
+    function frame(a, V){
+      const pj = V.p, L = 1.22;
+      const rim=[]; for(let i=0;i<=220;i++){ const s=2*Math.PI*i/220;
+        rim.push([Math.cos(s),Math.sin(s)]); }
+      a.poly(rim,{color:P.COL.grid,width:1.5});
+      const arc = (t0,t1) => { const e=[]; for(let i=0;i<=110;i++){
+        const t = t0 + (t1-t0)*i/110; e.push(pj(Math.cos(t),Math.sin(t),0)); } return e; };
+      const A = V.az*D2R, Q = Math.PI/2;
+      a.poly(arc(A+Q, A+3*Q),{color:P.COL.rule,width:1.0,dash:'4 4'});
+      a.poly(arc(A-Q, A+Q),  {color:P.COL.rule,width:1.4});
+      a.poly([pj(0,0,-L),pj(0,0,L)],{color:P.COL.rule,width:1.1});
+      a.poly([pj(-L,0,0),pj(L,0,0)],{color:P.COL.rule,width:1.1});
+      a.poly([pj(0,-L,0),pj(0,L,0)],{color:P.COL.rule,width:1.1});
+      /* The two poles keep the places they have always had, because z projects
+         to the vertical whatever the camera is doing.
+
+         The names of x and y follow their own axes, each pushed clear of its
+         line on the side the line is not on, and each dropped altogether once
+         its axis is pointing at the reader and has nothing left to name. At the
+         view the figure opens in that is the y axis, so the picture opens
+         labelled exactly as it always was. */
+      a.note(0, 1.30,'|0\\rangle',{fs:12.5,color:P.COL.muted,anchor:'middle',tex:true});
       a.note(0,-1.30,'|1\\rangle',{fs:12.5,color:P.COL.muted,anchor:'middle',dy:12,tex:true});
-      a.note(1.32,0,'x',{fs:12.5,color:P.COL.muted,dy:20,tex:true});
+      const tag = (q, s) => { if(Math.hypot(q[0],q[1]) < 0.80) return;
+        a.note(q[0], q[1], s, {fs:12.5, color:P.COL.muted, tex:true,
+          anchor: q[0] > 0.25 ? 'start' : q[0] < -0.25 ? 'end' : 'middle',
+          dx: q[0] > 0.25 ? 5 : q[0] < -0.25 ? -5 : 0,
+          dy: q[1] < 0 ? 15 : -5}); };
+      tag(pj(1.34,0,0),'x');
+      tag(pj(0,1.34,0),'y');
+      /* A control nobody can see is a control that teaches nothing. The corner
+         is the one part of this frame no rim, axis or state vector reaches. */
+      a.note(-1.45,-1.40,'drag to turn',{fs:11.5,color:P.COL.muted});
       return a;
     }
 
@@ -238,7 +278,8 @@ Object.assign(LABS, (function(){
       })();
 
       /* ---- the ball: the input state, and Bob's qubit ---- */
-      const a = frame(ball());
+      const V = KIT.cam(st.az, st.el), pj = V.p;
+      const a = frame(ball(), V);
       const qi = pj(rin[0],rin[1],rin[2]);
       a.poly([[0,0],qi],{color:P.COL.in,width:1.6,dash:'4 4'});
       a.point(qi[0],qi[1],{color:P.COL.in,r:5});
@@ -270,7 +311,7 @@ Object.assign(LABS, (function(){
       b.note(134,1.24,'\\text{always }Z',{fs:12,color:P.COL.h,tex:true});
 
       root.querySelector('.plots').innerHTML =
-        `<div class="labgrid">${a.svg()}${b.svg()}</div>`;
+        `<div class="labgrid">${KIT.orbitBox(a.svg())}${b.svg()}</div>`;
 
       const good = fid > 1 - 1e-9;
       root.querySelector('.ro').innerHTML = `
@@ -356,6 +397,7 @@ Object.assign(LABS, (function(){
         const b = e.target.closest('[data-seg="branch"]');
         if(b){ st.branch = parseInt(b.dataset.val,10); draw(root); }
       });
+      KIT.orbit(root, st, ()=>draw(root));
       draw(root);
     }};
   })();
