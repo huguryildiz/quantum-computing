@@ -260,11 +260,11 @@ h1,h2,h3{ font-family:var(--serif); font-weight:600; line-height:1.15;
 /* ----------------------------------------------------------------- footer -- */
 .foot{
   border-top:1px solid var(--rule); background:var(--bg-2);
-  padding:38px clamp(20px,5vw,44px) 52px;
-  font-size:13.5px; color:var(--faint);
+  padding:18px clamp(20px,5vw,44px) 20px;
+  font-size:12.5px; line-height:1.5; color:var(--faint);
 }
-.foot > *{ max-width:var(--wide); margin-inline:auto; }
-.foot__fine{ margin-top:8px; }
+.foot > *{ max-width:var(--wide); margin:0 auto; }
+.foot__fine{ margin-top:5px; }
 .foot a{ color:var(--muted); text-decoration:underline; text-underline-offset:2px; }
 .foot a:hover{ color:var(--ink); }
 
