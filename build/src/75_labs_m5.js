@@ -237,23 +237,27 @@ Object.assign(LABS, (function(){
       a.poly([pj(0,0,-L),pj(0,0,L)],{color:P.COL.rule,width:1.1});
       a.poly([pj(-L,0,0),pj(L,0,0)],{color:P.COL.rule,width:1.1});
       a.poly([pj(0,-L,0),pj(0,L,0)],{color:P.COL.rule,width:1.1});
-      /* The two poles keep the places they have always had, because z projects
-         to the vertical whatever the camera is doing.
+      /* All four names sit just beyond the rim on their own axes, each pushed
+         clear of its line on the side the line is not on.
 
-         The names of x and y follow their own axes, each pushed clear of its
-         line on the side the line is not on, and each dropped altogether once
-         its axis is pointing at the reader and has nothing left to name. At the
-         view the figure opens in that is the y axis, so the picture opens
-         labelled exactly as it always was. */
-      a.note(0, 1.30,'|0\\rangle',{fs:12.5,color:P.COL.muted,anchor:'middle',tex:true});
-      a.note(0,-1.30,'|1\\rangle',{fs:12.5,color:P.COL.muted,anchor:'middle',dy:12,tex:true});
+         A name is dropped as soon as its axis has turned towards the reader far
+         enough to be drawn shorter than four fifths of the rim. An axis pointing
+         at the reader projects to a stub near the centre of the picture, and a
+         name left at the edge of the frame then labels a piece of the rim
+         instead of the axis it belongs to. That rule is what takes |0> and |1>
+         off the picture when the ball is turned to look down the z axis, and it
+         is why y is unnamed at the view the figure opens in — which is the view
+         this course has always drawn, so the picture opens labelled exactly as
+         it was. */
       const tag = (q, s) => { if(Math.hypot(q[0],q[1]) < 0.80) return;
         a.note(q[0], q[1], s, {fs:12.5, color:P.COL.muted, tex:true,
           anchor: q[0] > 0.25 ? 'start' : q[0] < -0.25 ? 'end' : 'middle',
           dx: q[0] > 0.25 ? 5 : q[0] < -0.25 ? -5 : 0,
           dy: q[1] < 0 ? 15 : -5}); };
-      tag(pj(1.34,0,0),'x');
-      tag(pj(0,1.34,0),'y');
+      tag(pj(0,0, 1.32),'|0\\rangle');
+      tag(pj(0,0,-1.32),'|1\\rangle');
+      tag(pj(1.32,0,0),'x');
+      tag(pj(0,1.32,0),'y');
       /* A control nobody can see is a control that teaches nothing. The corner
          is the one part of this frame no rim, axis or state vector reaches. */
       a.note(-1.45,-1.40,'drag to turn',{fs:11.5,color:P.COL.muted});
