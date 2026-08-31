@@ -396,12 +396,18 @@ CONTENT.BOOK = {
      does and does not promise.
 
      Every one of those was read in the book's contents before it was written
-     here. Six scenes carry no anchor: the opening, the summary, the question
+     here. Seven scenes carry no anchor: the opening, the summary, the question
      taxonomy, the two laboratories, and three scenes the book has no
      counterpart for — `m5-state` and `m5-shots`, which are classical
      simulation and sampling statistics rather than quantum mechanics, and
      `m5-transpile`, whose layout and routing passes are a property of a chip
-     rather than of the theory. */
+     rather than of the theory.
+
+     `m5-fault` is the seventh, and it is not one of those three: the book
+     develops error correction at length and a counterpart certainly exists.
+     The anchor was simply not looked up before the scene shipped, and a
+     section number must never be guessed. Read the book's contents and write
+     it. */
   'm5-circuit':'1.3.4',
   'm5-model':'4.6',
   'm5-read':'2.2.8',
