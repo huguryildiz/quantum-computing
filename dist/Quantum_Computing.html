@@ -11059,6 +11059,28 @@ function figClaimBox(){
   return P.blocks({w:760,h:258,items});
 }
 
+/* One logical qubit as a protected encoding and the control loop that keeps it
+   useful. The threshold condition sits below the loop because it is a
+   condition on the whole construction, not another step inside it. */
+function figFault(){
+  return P.blocks({w:760,h:250,items:[
+    {t:'box',x:24,y:34,w:162,h:54,label:'physical qubits',fs:13,color:C.in},
+    {t:'arrow',x1:186,y1:61,x2:222,y2:61},
+    {t:'box',x:222,y:34,w:146,h:54,label:'syndrome checks',fs:13,color:C.h},
+    {t:'arrow',x1:368,y1:61,x2:404,y2:61},
+    {t:'box',x:404,y:34,w:132,h:54,label:'decoder',fs:13,color:C.mid},
+    {t:'arrow',x1:536,y1:61,x2:572,y2:61},
+    {t:'box',x:572,y:34,w:164,h:54,label:'correction',fs:13,color:C.out},
+    {t:'text',x:380,y:119,label:'together these protect one logical qubit',fs:13,color:C.out},
+    {t:'line',d:'M82,139 H678',color:C.rule},
+    {t:'text',x:190,y:174,label:'space overhead',fs:12.5,color:C.err},
+    {t:'text',x:190,y:199,label:'data qubits + check ancillas',fs:12},
+    {t:'text',x:570,y:174,label:'time overhead',fs:12.5,color:C.err},
+    {t:'text',x:570,y:199,label:'checks + decoding + logical gates',fs:12},
+    {t:'text',x:380,y:235,label:'p < p_{\\mathrm{th}}:\\; \\text{larger code distance can suppress logical error}',tex:true,fs:13,color:C.h}
+  ]});
+}
+
 /* The Ramsey sandwich: a phase written between two Hadamards comes out as a
    population, and the curve is what is actually measured. */
 function figRamsey(){
@@ -11682,6 +11704,31 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 5.3.4 -- */
+{ id:'m5-fault', module:'M5', nav:'Physical and logical qubits', title:'One logical qubit is a protected encoding, not one better physical qubit',
+  objective:'Distinguish physical and logical qubits, explain syndrome checks and the threshold, and identify space and time overhead.',
+  keywords:'quantum error correction physical qubit logical qubit code block syndrome checks decoder threshold code distance fault tolerance space overhead time overhead',
+  src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
+  {t:'title', text:'One logical qubit is a protected encoding, not one better physical qubit'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A <b>physical qubit</b> is a device on the chip. A <b>logical qubit</b> is quantum information encoded across a block of physical data qubits. Extra ancilla qubits measure checks on that block. The encoding is useful because a local physical error need not destroy the logical state.</p>'},
+    {t:'body', html:'<p>The check results form a <b>syndrome</b>. A syndrome reveals information about an error pattern without reading the unknown amplitudes $\\alpha$ and $\\beta$. A classical decoder uses the syndrome to choose a correction. The checks, decoding and corrections repeat while the computation runs.</p>'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'A code corrects only the error patterns it was designed to handle. Increasing its <b>distance</b> can protect against more faults, but it also requires more physical qubits and more check rounds. Error correction trades resources for a lower logical error rate. It does not make errors disappear for free.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figFault(),
+      caption:'The protection loop and its two costs. The logical qubit is the encoded information carried through the loop, not one of the physical devices in the first box.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'What the threshold means', html:'Let $p$ be the physical error rate and $p_{\\mathrm{th}}$ the threshold for a stated code, noise model and control system. If $p<p_{\\mathrm{th}}$, increasing the code distance can reduce the logical error rate. If $p$ is above that threshold, making the same code larger does not provide scalable reliability. There is no single threshold number for every machine.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'Logical resources are not hardware resources', html:'A claim of logical qubits and logical gates is only the first line of a hardware estimate. It must name the code and distance, physical error assumptions, ancillas and routing. It must also name the correction-cycle time and target failure probability. Error correction expands both space and time, sometimes by many orders of magnitude.'}
+    ]}
+  ]}
+]},
+
 /* ---------------------------------------------------------------- 5.4.1 -- */
 { id:'m5-ramsey', module:'M5', nav:'Turning phase into counts', title:'A phase is invisible until two Hadamards turn it into a population',
   objective:'Trace the Hadamard sandwich and give the probability it produces from a phase.',
@@ -11747,16 +11794,16 @@ const SC = [
 
 /* ---------------------------------------------------------------- 5.5.2 -- */
 { id:'m5-tele', module:'M5', nav:'The teleportation circuit', title:'Teleportation, as a circuit with three qubits and two classical wires',
-  objective:'Read the teleportation circuit stage by stage and name what each stage does.',
-  keywords:'teleportation circuit bell pair bell measurement basis rotation classical wires correction three qubits protocol stages',
-  src:'L9 · the three-qubit teleportation circuit', steps:3, blocks:[
+  objective:'Read the teleportation circuit stage by stage, name what each stage does, and state its role in a quantum network.',
+  keywords:'teleportation circuit quantum network primitive nodes link bell pair bell measurement basis rotation classical wires correction three qubits protocol stages',
+  src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Teleportation, as a circuit with three qubits and two classical wires'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Three qubits, and each belongs to somebody. Qubit $q_{0}$ carries the unknown state $|\\psi\\rangle$ and belongs to Alice. Qubits $q_{1}$ and $q_{2}$ are an entangled pair: Alice keeps $q_{1}$ and Bob has taken $q_{2}$ away with him.</p>'},
     {t:'body', html:'<p>The circuit has four stages, and the last one is not a quantum gate at all.</p>'},
     {t:'reveal', at:1, items:[
-      {t:'body', html:'<p><b>One.</b> A Hadamard and a CNOT make the shared pair $|\\Phi^{+}\\rangle$ on $q_{1}$ and $q_{2}$. In a real network this happens long before anything else and has to be verified.</p>'},
+      {t:'body', html:'<p><b>One.</b> A Hadamard and a CNOT make the shared pair $|\\Phi^{+}\\rangle$ on $q_{1}$ and $q_{2}$. A network distributes and verifies this pair first. Teleportation is the network primitive that later consumes the pair and two classical bits to move a state between its nodes. It does not create or extend the entangled link.</p>'},
       {t:'body', html:'<p><b>Two.</b> A CNOT from $q_{0}$ to $q_{1}$ and a Hadamard on $q_{0}$. These two gates rotate the Bell basis of Alice\u2019s pair onto the computational basis, so that the next step is an ordinary measurement.</p>'},
       {t:'body', html:'<p><b>Three.</b> Alice measures $q_{0}$ and $q_{1}$, obtaining two bits $m_{0}$ and $m_{1}$.</p>'},
       {t:'body', html:'<p><b>Four.</b> The two bits travel to Bob by any ordinary classical channel, and Bob applies the correction they name.</p>'}
@@ -12110,9 +12157,9 @@ const SC = [
     [{t:'card', head:'The machine', items:[
       {t:'small', html:'Prepare $|0\\rangle^{\\otimes n}$, apply gates from a fixed set, measure, repeat. Depth is layers and is what a coherence time is spent against; the gate count is not. $q_{0}$ is the top wire and the last digit of the ket.'}]}],
     [{t:'card', head:'Running it', items:[
-      {t:'small', html:'An exact state vector costs $16\\cdot2^{n}$ bytes and stops near thirty qubits. A probability from $N$ shots carries $\\sqrt{p(1-p)/N}$, which shrinks; device error does not. A SWAP costs three CNOTs.'}]}],
+      {t:'small', html:'A state vector costs $16\\cdot2^{n}$ bytes. Sampling error shrinks as $1/\\sqrt N$; device error does not. A logical qubit is an encoded block, and correction expands space and time.'}]}],
     [{t:'card', head:'Teleportation', items:[
-      {t:'small', html:'$|\\Psi\\rangle = \\tfrac12\\sum_{m_{1}m_{0}}|m_{1}m_{0}\\rangle X^{m_{1}}Z^{m_{0}}|\\psi\\rangle$. Four branches of probability $\\tfrac14$ for every input, so $\\rho_{B}=I/2$ until two classical bits arrive. One pair and two bits per qubit.'}]}],
+      {t:'small', html:'A network spends one distributed pair and two classical bits to move a state between nodes. Bob has $I/2$ before the bits arrive, so the protocol cannot signal faster than light.'}]}],
     [{t:'card', head:'Grover', items:[
       {t:'small', html:'$\\sin\\theta=\\sqrt{M/N}$, one iteration is a rotation by $2\\theta$, and $P(r)=\\sin^{2}((2r+1)\\theta)$ with $r_{*}=\\tfrac{\\pi}{4\\theta}-\\tfrac12$. Past the optimum the probability falls. Quadratic in <b>queries</b>, and silent about time.'}]}]
   ]},
@@ -13929,7 +13976,7 @@ CONTENT.SECTIONS = {
     { n:'5.2', title:'Running a circuit',                 ids:[
         'm5-state','m5-shots','m5-measure','m5-feed'] },
     { n:'5.3', title:'Compiling for a machine',           ids:[
-        'm5-iset','m5-transpile','m5-cost'] },
+        'm5-iset','m5-transpile','m5-cost','m5-fault'] },
     { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey'] },
     { n:'5.5', title:'Teleportation',                     ids:[
         'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',

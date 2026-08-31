@@ -245,6 +245,9 @@ window.CA = [
 {t:'eqbox', cap:'two exact rewrites a compiler uses', tex:['H = e^{i\\pi/2} R_{z}\\!\\left(\\tfrac{\\pi}{2}\\right) R_{x}\\!\\left(\\tfrac{\\pi}{2}\\right) R_{z}\\!\\left(\\tfrac{\\pi}{2}\\right)', '\\mathrm{CNOT}_{0\\to1} = \\left(H \\text{ on } q_{1}\\right)\\;\\mathrm{CZ}\\;\\left(H \\text{ on } q_{1}\\right)'],
  after:'What is lost is only length; the two-qubit count does not move. The phase in the first line becomes observable the moment the gate is controlled. Chapter 5, section 5.3.'},
 
+{t:'eqbox', cap:'the fault-tolerance threshold condition', tex:'p < p_{\\mathrm{th}}',
+ after:'For a stated code, noise model and control system, increasing the code distance can then reduce the logical error rate. The threshold is not one universal number. Chapter 5, section 5.3.'},
+
 {t:'eqbox', cap:'turning a phase into counts', tex:['|0\\rangle \\;\\xrightarrow{\\;H\\;}\\; \\tfrac{1}{\\sqrt2}\\left(|0\\rangle+|1\\rangle\\right) \\;\\xrightarrow{\\;P(\\varphi)\\;}\\; \\tfrac{1}{\\sqrt2}\\left(|0\\rangle+e^{i\\varphi}|1\\rangle\\right)', '\\xrightarrow{\\;H\\;}\\; \\tfrac12\\left(1+e^{i\\varphi}\\right)|0\\rangle + \\tfrac12\\left(1-e^{i\\varphi}\\right)|1\\rangle, \\qquad p(0) = \\cos^{2}\\frac{\\varphi}{2}'],
  after:'Measuring in the middle learns nothing; the second Hadamard is what makes the phase readable. Chapter 5, section 5.4.'},
 

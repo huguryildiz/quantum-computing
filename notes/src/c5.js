@@ -295,6 +295,14 @@ window.C5 = [
 
 {t:'box', kind:'err', hd:'A query count is not a runtime', html:'Almost every quantum speedup in a textbook is stated as a count of <b>queries</b> to a black box. That is a real and provable statement, and it is not a time. One quantum query is a whole circuit, deep and error-corrected, running for microseconds; one classical query is a memory read taking nanoseconds. A ratio of query counts and a ratio of runtimes can point in opposite directions, and section 5.7 works an example where they do.'},
 
+{t:'h3', text:'From physical qubits to logical qubits'},
+
+{t:'p', text:'A <b>physical qubit</b> is a device on a chip. A <b>logical qubit</b> is quantum information encoded across a block of physical data qubits. Extra ancilla qubits measure checks on the block. Their results form a <b>syndrome</b>, which reveals information about an error pattern without reading the unknown amplitudes. A classical decoder maps that syndrome to a correction, and the checks repeat while the computation runs.'},
+
+{t:'p', text:'A code corrects only the error patterns it was designed to handle. Increasing its <b>distance</b> can protect against more faults, but it also needs more physical qubits and more check rounds. Let $p$ be the physical error rate and $p_{\\mathrm{th}}$ the threshold for a stated code, noise model and control system. When $p<p_{\\mathrm{th}}$, increasing the distance can reduce the logical error rate. Above that threshold, making the same code larger does not provide scalable reliability. The threshold is not one universal hardware number.'},
+
+{t:'box', kind:'err', hd:'Logical resources are not hardware resources', html:'A count of logical qubits and logical gates is only the first line of a hardware estimate. The estimate must name the code and distance, physical error assumptions, ancillas and routing. It must also name the correction-cycle time and target failure probability. Error correction expands both space and time, sometimes by many orders of magnitude.'},
+
 /* ---- 5.4 ---- */
 {t:'h2', num:'5.4', text:'Turning a phase into counts'},
 
@@ -341,6 +349,8 @@ window.C5 = [
  after:'The right-hand side has no $\\rho$ in it. Whatever Alice was sending, whatever she did, and whether or not she ran the protocol at all, Bob\u2019s qubit is maximally mixed until two classical bits reach him. The sum is easiest to check in the Bloch picture: $X$ flips the signs of $r_{y}$ and $r_{z}$, $Z$ flips $r_{x}$ and $r_{y}$, and $XZ$ flips $r_{x}$ and $r_{z}$, so each component appears twice with each sign and the four vectors add to zero. Alice\u2019s measurement changes what <b>she</b> can say about Bob\u2019s qubit; it changes nothing he can observe, and that is why the theory and relativity do not collide.'},
 
 {t:'p', text:'The account is short and exact. Moving one unknown qubit consumes one shared entangled pair and two classical bits, and destroys the original; nothing is reusable, and a second qubit needs a second pair. Saying that a laboratory has <b>done</b> this needs a number, because a noisy apparatus produces something that resembles the input, and the number is the fidelity $F(\\psi)=\\langle\\psi|\\rho_{\\text{out}}|\\psi\\rangle$.'},
+
+{t:'box', kind:'def', hd:'Why this is a quantum-network primitive', html:'A quantum network first distributes an entangled pair across a link. Teleportation then consumes that pair and two classical bits to move a state between nodes without sending the data qubit through the link. Teleportation does not create the pair, remove loss or extend the link by itself. A repeater needs entanglement generation, verification and link joining around it.'},
 
 {t:'box', kind:'err', hd:'A best-case fidelity is not a result', html:'One fidelity on one input proves nothing: a machine that always outputs $|0\\rangle$ scores $F=1$ whenever the input happened to be $|0\\rangle$. The claim has to be an average over inputs covering the sphere, and it has to beat $2/3$ — what measuring the qubit and preparing a new one achieves with no entanglement at all. With pairs of singlet fraction $f$ the optimum is $F_{\\text{avg}}=(2f+1)/3$, which meets both ends correctly: $f=0.5$ gives exactly $2/3$ and $f=1$ gives $1$. A report must also state the unconditional success rate, what was discarded and by what rule, and a confidence interval.'},
 
@@ -407,7 +417,8 @@ window.C5 = [
  'An exact state vector costs $16\\cdot2^{n}$ bytes and stops near thirty qubits; a circuit matrix costs $16\\cdot4^{n}$ and stops much sooner.',
  'A probability from $N$ shots carries $\\sqrt{p(1-p)/N}$, which shrinks as $1/\\sqrt N$. Device error does not shrink at all, so a large disagreement is never a reason for more shots.',
  'A measured control may be deferred to the end of a circuit; a gate on the measured wire may not cross the measurement. A compiler rewrites gates exactly and routes them at three CNOTs per SWAP, and two runs of it need not agree.',
- 'Teleportation: $|\\Psi\\rangle = \\tfrac12\\sum_{m_{1}m_{0}}|m_{1}m_{0}\\rangle\\,X^{m_{1}}Z^{m_{0}}|\\psi\\rangle$, four branches of probability $\\tfrac14$ for every input, so $\\rho_{B}=I/2$ until two classical bits arrive. One pair and two bits per qubit, the original destroyed, and $F_{\\text{avg}}>\\tfrac23$ before the word is earned.',
+ 'A logical qubit is an encoded block of physical data qubits and check ancillas. Syndromes guide corrections. Below the threshold, more distance can suppress logical error, while the encoding and correction cycles expand both space and time.',
+ 'Teleportation: $|\\Psi\\rangle = \\tfrac12\\sum_{m_{1}m_{0}}|m_{1}m_{0}\\rangle\\,X^{m_{1}}Z^{m_{0}}|\\psi\\rangle$, four branches of probability $\\tfrac14$ for every input, so $\\rho_{B}=I/2$ until two classical bits arrive. A network consumes one distributed pair and those two bits to move one state between nodes.',
  'Grover: $\\sin\\theta=\\sqrt{M/N}$, one iteration is a rotation by $2\\theta$, and $P(r)=\\sin^{2}((2r+1)\\theta)$ with $r_{*}=\\tfrac{\\pi}{4\\theta}-\\tfrac12$. Past the optimum the probability falls. Quadratic in queries, optimal in that model, and silent about time.']},
 
 {t:'box', kind:'err', hd:'Four errors that cost a whole question', html:'Reporting a gate count where a depth was asked for. Reading a printed bit string in the wrong direction. Saying that teleportation finished before the classical bits arrived. And running more Grover iterations than the optimum, which lowers the success probability rather than raising it.'},

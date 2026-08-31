@@ -170,7 +170,7 @@ CONTENT.SECTIONS = {
     { n:'5.2', title:'Running a circuit',                 ids:[
         'm5-state','m5-shots','m5-measure','m5-feed'] },
     { n:'5.3', title:'Compiling for a machine',           ids:[
-        'm5-iset','m5-transpile','m5-cost'] },
+        'm5-iset','m5-transpile','m5-cost','m5-fault'] },
     { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey'] },
     { n:'5.5', title:'Teleportation',                     ids:[
         'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',
