@@ -111,6 +111,8 @@ const CONTENT = {
     eig:{ s:'A|v\\rangle=\\lambda|v\\rangle', d:'Eigenvalue equation. The eigenvectors are the states the operator leaves in place, up to a scale.', go:'m1-eig' },
     spec:{ s:'A=\\sum_k \\lambda_k P_k', d:'Spectral decomposition of a Hermitian operator: the eigenvalues, and the projectors onto the eigenspaces they belong to.', go:'m1-spectral' },
     fofa:{ s:'f(A)=\\sum_k f(\\lambda_k)P_k', d:'A function of an operator is that function applied to the eigenvalues. This is what an operator exponential means, and it is why $e^{-iHt}$ can be computed at all.', go:'m1-fofa' },
+    ltwo:{ s:'L^{2}[a,b]', d:'The vector space of square-integrable functions on an interval, with inner product $\\langle f|g\\rangle=\\int_a^b f^{*}(x)g(x)\\,\\mathrm dx$.', go:'m1-wavefunctions' },
+    parseval:{ s:'\\|f\\|^{2}=\\sum_n|c_n|^{2}', d:'Parseval identity for a complete orthonormal basis. The omitted coefficient tail is the exact squared error of a truncated expansion.', go:'m1-completeness' },
 
     /* Chapter 2 — states, measurement and dynamics */
     zero:{ s:'|0\\rangle,\\;|1\\rangle', d:'The computational basis of one qubit, the eigenvectors of $Z$. Every measurement in this course is in this basis unless a scene says otherwise.' },
@@ -124,7 +126,10 @@ const CONTENT = {
     pauli:{ s:'X,\\;Y,\\;Z', d:'The Pauli operators. Each is Hermitian and unitary at once, so each is both an observable and a gate.' },
     ham:{ s:'H', d:'Hamiltonian: the Hermitian operator that generates evolution. With $\\hbar=1$ it is measured in angular frequency.' },
     eve:{ s:'U(t)=e^{-iHt}', d:'The evolution operator of a closed system. Every gate in this course is one of these for some $H$ and some duration.' },
-    povm:{ s:'\\{E_k\\}', d:'A POVM: positive operators summing to the identity. It is the most general set of outcome probabilities a measurement can have, and it need not have as many outcomes as the space has dimensions.' },
+    povm:{ s:'\\{E_k\\}', d:'A POVM: positive operators summing to the identity. It fixes the outcome probabilities, but not the state left by the measurement.', go:'m2-povm' },
+    instrument:{ s:'\\{M_{m\\alpha}\\}', d:'A measurement instrument. It realises each POVM effect and fixes the conditional state after an outcome.', go:'m2-povm' },
+    posrep:{ s:'\\hat{x},\\;\\hat{p}', d:'Position and momentum in the coordinate representation: position multiplies a wavefunction and momentum differentiates it.', go:'m2-position' },
+    well:{ s:'\\phi_n,\\;E_n', d:'The stationary states and discrete energies of the infinite square well, selected by boundary conditions at the two walls.', go:'m2-well' },
     shots:{ s:'N_{\\text{shots}}', d:'The number of repetitions a circuit is run for. A probability read from $N$ shots carries a standard error of about $\\sqrt{p(1-p)/N}$, which is sampling noise and not physical noise.' },
 
     /* Chapter 3 — mixed states and entanglement */

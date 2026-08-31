@@ -140,12 +140,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'The resolution of the identity in the $X$ basis is $|+\\rangle\\langle+|+|-\\rangle\\langle-|=I$.',
   parts:['Insert it into $\\langle 0|1\\rangle$ and write the resulting sum.',
          'Evaluate every factor and give the total.',
-         'Say what the calculation demonstrates.'],
+         'Say what the calculation demonstrates.',
+         'For a complete function basis with coefficients $c_n$, state Parseval identity and the squared error after retaining only $n\\le N$.'],
   sol:'<b>Given.</b> Two computational basis states and a different orthonormal basis.<br>'
      +'<b>Method.</b> Insert the identity between the bra and the ket, then evaluate the four overlaps.<br>'
      +'<b>Solution — (a).</b> $\\langle0|1\\rangle=\\langle0|I|1\\rangle=\\langle0|+\\rangle\\langle+|1\\rangle+\\langle0|-\\rangle\\langle-|1\\rangle$.<br>'
      +'<b>Solution — (b).</b> $\\langle0|+\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle+|1\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle0|-\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle-|1\\rangle=-\\tfrac{1}{\\sqrt2}$. The sum is $\\tfrac12-\\tfrac12=0$.<br>'
      +'<b>Solution — (c).</b> The answer is $\\langle0|1\\rangle=0$, which was known from the start. What the calculation shows is that inserting the identity is exact: it changes the route and not the number.<br>'
+     +'<b>Solution — (d).</b> Parseval gives $\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_n|^{2}$. The truncated approximation $f_N=\\sum_{n=1}^{N}c_nu_n$ has squared error $\\|f-f_N\\|^{2}=\\sum_{n>N}|c_n|^{2}$. The finite resolution of the identity has become a complete infinite expansion.<br>'
      +'<b>Check.</b> Run the same insertion on $\\langle0|0\\rangle$: $\\tfrac12+\\tfrac12=1$, again the known answer. A basis that gave anything else would not be orthonormal.',
   err:'Dropping the minus sign in $\\langle-|1\\rangle$. The sum then comes to one, and $|0\\rangle$ and $|1\\rangle$ appear to be the same state.',
   teach:'This is the move, not the result. Set it again with a basis the student chooses, and the point lands: the answer cannot depend on which identity was inserted.' },

@@ -146,12 +146,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A readout reports the wrong bit with probability $\\epsilon=0.05$, in either direction, so its effects are $E_{0}=(1-\\epsilon)|0\\rangle\\langle0|+\\epsilon|1\\rangle\\langle1|$ and $E_{1}=I-E_{0}$.',
   parts:['Give the probability of reporting $0$ for a qubit truly in $|0\\rangle$.',
          'For a state with true $p(0)=q$, give the reported probability.',
-         'A long run reports $0$ a fraction $0.62$ of the time. Give the corrected estimate of $q$, and say what the correction does to the error bar.'],
+         'A long run reports $0$ a fraction $0.62$ of the time. Give the corrected estimate of $q$, and say what the correction does to the error bar.',
+         'Do the effects determine the state after outcome $m$? Name the extra object and give its update rule.'],
   sol:'<b>Given.</b> A symmetric assignment error of five per cent.<br>'
      +'<b>Method.</b> Sandwich the effect; the answer is linear in $q$, so invert the line.<br>'
      +'<b>Solution — (a).</b> $\\langle0|E_{0}|0\\rangle=1-\\epsilon=0.95$.<br>'
      +'<b>Solution — (b).</b> $p_{\\text{rep}}(0)=(1-\\epsilon)q+\\epsilon(1-q)=\\epsilon+(1-2\\epsilon)q=0.05+0.9\\,q$.<br>'
      +'<b>Solution — (c).</b> $q=(0.62-0.05)/0.9=0.6333$. Inverting divides by $0.9$, so every error is multiplied by $1/0.9=1.111$: the corrected estimate is unbiased and about eleven per cent noisier.<br>'
+     +'<b>Solution — (d).</b> No. The effects fix only the probabilities. A measurement instrument supplies operators $M_{m\\alpha}$ with $E_m=\\sum_\\alpha M_{m\\alpha}^{\\dagger}M_{m\\alpha}$ and $\\rho_m=\\sum_\\alpha M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}/p(m)$. Different instruments can share the same effects and leave different states.<br>'
      +'<b>Check.</b> $E_{0}+E_{1}=I$ and both are positive, so this is a legal measurement. At $\\epsilon=\\tfrac12$ the slope is zero, the correction divides by zero, and the instrument has indeed stopped reporting anything about the state — the formula fails exactly where the device does.',
   err:'Reporting the corrected number without widening the error bar. Mitigation removes a bias and buys it with variance, and a corrected value quoted at the raw precision claims an accuracy the run does not have.',
   teach:'Worth extending: with an asymmetric error the two rows differ and the correction is a matrix inversion, whose condition number is what the last sentence of the solution is really about.' },
@@ -266,12 +268,16 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A system has $H|E_{1}\\rangle=E_{1}|E_{1}\\rangle$ and $H|E_{2}\\rangle=E_{2}|E_{2}\\rangle$, with $E_{2}>E_{1}$.',
   parts:['Show that $|E_{1}\\rangle$ is stationary.',
          'Give $|\\psi(t)\\rangle$ for the initial state $\\tfrac{1}{\\sqrt2}\\left(|E_{1}\\rangle+|E_{2}\\rangle\\right)$, with the global phase removed.',
-         'Give the period of any observable quantity, and say what happens to it when both energies are raised by the same amount.'],
+         'Give the period of any observable quantity, and say what happens to it when both energies are raised by the same amount.',
+         'For an infinite square well of width $a$, give $\\phi_n(x)$ and $E_n$, and show that $E_2=4E_1$.',
+         'In the coordinate representation, give $\\hat p$ and the free-particle Hamiltonian. Why is one plane wave not a normalisable physical state on the whole line?'],
   sol:'<b>Given.</b> Two energy eigenstates and an equal superposition of them.<br>'
      +'<b>Method.</b> The exponential acts on the eigenvalues; then pull out one phase as global.<br>'
      +'<b>Solution — (a).</b> $|E_{1}(t)\\rangle=e^{-iE_{1}t}|E_{1}\\rangle$, which differs from $|E_{1}\\rangle$ by a global phase. Every probability of every measurement is therefore unchanged for all time.<br>'
      +'<b>Solution — (b).</b> $\\tfrac{1}{\\sqrt2}\\left(e^{-iE_{1}t}|E_{1}\\rangle+e^{-iE_{2}t}|E_{2}\\rangle\\right)\\equiv\\tfrac{1}{\\sqrt2}\\left(|E_{1}\\rangle+e^{-i(E_{2}-E_{1})t}|E_{2}\\rangle\\right)$.<br>'
      +'<b>Solution — (c).</b> The relative phase returns after $(E_{2}-E_{1})T=2\\pi$, so $T=2\\pi/(E_{2}-E_{1})$. Raising both energies by $c$ multiplies the state by $e^{-ict}$, a global phase, and leaves $T$ untouched.<br>'
+     +'<b>Solution — (d).</b> Restoring physical units, $\\phi_n(x)=\\sqrt{2/a}\\sin(n\\pi x/a)$ and $E_n=\\hbar^{2}\\pi^{2}n^{2}/(2ma^{2})$ for $n=1,2,\\ldots$. Therefore $E_2/E_1=2^{2}=4$; $n=0$ would give the zero function and is not a state.<br>'
+     +'<b>Solution — (e).</b> $(\\hat p\\psi)(x)=-i\\hbar\\,\\mathrm d\\psi/\\mathrm dx$ and $\\hat H_0=\\hat p^{2}/(2m)=-\\hbar^{2}\\mathrm d^{2}/(2m\\,\\mathrm dx^{2})$. A plane wave has constant $|\\psi|^{2}$, so its integral over the whole line is infinite. A physical state is a normalisable wave packet.<br>'
      +'<b>Check.</b> Part (a) is part (c) with the two energies equal: the difference is zero, the period is infinite, and nothing ever happens. The two answers are the same statement.',
   err:'Reporting a period of $2\\pi/E_{2}$, using one energy rather than the difference. Only differences are observable, and part (c) is the demonstration.',
   teach:'This is the whole of spectroscopy in one question: every line an experiment sees is a difference, and the zero of energy is a convention.' },

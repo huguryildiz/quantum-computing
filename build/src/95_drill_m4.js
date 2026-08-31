@@ -296,12 +296,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A chip couples $q_0$ to $q_1$ and $q_1$ to $q_2$, and nothing else. A CNOT is wanted with $q_0$ as control and $q_2$ as target.',
   parts:['Give the SWAP gate as a matrix, in the ordering $|q_1q_0\\rangle$.',
          'How many CNOTs does the whole job cost if the qubits may be left in their new positions?',
-         'And if they must be returned to where they started?'],
+         'And if they must be returned to where they started?',
+         'A reversible half adder must also write $s=a\\oplus b$ and $c=ab$. Give an embedding that preserves its inputs, and name the gates that write the two outputs.'],
   sol:'<b>Given.</b> A coupling map with a missing edge, and a gate that needs it.<br>'
      +'<b>Method.</b> SWAP exchanges the two labels; three CNOTs build one when CNOT is the native gate.<br>'
      +'<b>Solution — (a).</b> $\\mathrm{SWAP}|q_1q_0\\rangle=|q_0q_1\\rangle$ exchanges the middle two basis states, so $\\mathrm{SWAP}=\\begin{bmatrix}1&0&0&0\\\\0&0&1&0\\\\0&1&0&0\\\\0&0&0&1\\end{bmatrix}$.<br>'
      +'<b>Solution — (b).</b> Swap $q_0$ with $q_1$ so that the state of $q_0$ sits next to $q_2$ — three CNOTs — then apply the wanted CNOT: four in total.<br>'
      +'<b>Solution — (c).</b> Swap back afterwards: three more, so seven.<br>'
+     +'<b>Solution — (d).</b> Initialise two output wires to zero and use $(a,b,0,0)\\mapsto(a,b,a\\oplus b,ab)$. Two CNOTs write the sum on the third wire and one Toffoli writes the carry on the fourth. Keeping $a$ and $b$ makes the map invertible.<br>'
      +'<b>Check.</b> SWAP creates no entanglement, so none of the extra six gates does any of the work; all of it is done by the one CNOT in the middle. That is the honest way to read the cost of limited connectivity.',
   err:'Assuming a SWAP is free because it "only relabels". It only relabels when the algorithm is indifferent to the labels, in which case no gate is needed at all. Here the coupling map is fixed and the qubits really must move.',
   teach:'Ask whether the swap back in part (c) is ever avoidable. It usually is, by renaming the qubits for the rest of the circuit, and noticing that is what a routing pass in a compiler does.' },

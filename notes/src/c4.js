@@ -335,6 +335,13 @@ window.C4 = [
 {t:'eqbox', cap:'the reversible embeddings', tex:['(a,\\,b) \\longmapsto (a,\\;a\\oplus b) \\qquad \\text{is exactly CNOT}', '|x\\rangle|y\\rangle \\longmapsto |x\\rangle\\,|y\\oplus f(x)\\rangle \\qquad \\text{for any } f'],
  after:'The first map is its own inverse — apply it twice and $a\\oplus b\\oplus a=b$ comes back — so it is a permutation of the four inputs, which is what a unitary on the computational basis is allowed to be. The second is the general pattern: keep the input, and write the answer into a second register by addition rather than by overwriting. Chapter 6 calls that an oracle and builds every algorithm on it. AND itself needs a third wire, $(a,b,c)\\mapsto(a,b,c\\oplus ab)$, which is the Toffoli gate.'},
 
+{t:'ex', hd:'Example 4.4 · a reversible half adder', rows:[
+ ['Given','Two input bits $a,b$, with sum $s=a\\oplus b$ and carry $c=ab$.'],
+ ['Find','A reversible circuit that writes both outputs without erasing the inputs.'],
+ ['Method','Keep $a$ and $b$, and initialise separate sum and carry wires to zero.'],
+ ['Solution','$(a,b,0,0)\\mapsto(a,b,a\\oplus b,ab)$. Two CNOTs write $a\\oplus b$ on the sum wire and one Toffoli writes $ab$ on the carry wire.'],
+ ['Check','Run the three gates backwards. The Toffoli clears the carry and the CNOTs clear the sum, returning all four wires to $(a,b,0,0)$. The map is invertible because the inputs were preserved.']]},
+
 {t:'box', kind:'def', hd:'Erasing a bit costs energy, and that is not a metaphor', html:'Landauer\u2019s argument ties the erasure of one bit to a definite minimum heat, $k_{B}T\\ln 2$, released into the environment. Reversible computation is the way around it, and the reason it matters here is narrower and sharper: a quantum computer cannot erase inside a coherent block at all, because erasure is exactly the operation a unitary is not.'},
 
 {t:'p', text:'Any real computation needs somewhere to put intermediate results. Those extra qubits are <b>ancillas</b>, they start in a known state, and the problem is what they hold at the end. Run a computation on an input in superposition and the ancilla holds a different value in each branch, so the output register is entangled with the workings.'},
@@ -385,7 +392,7 @@ window.C4 = [
 
 {t:'box', kind:'def', hd:'Why $T$ is singled out, and what "universal" does not promise', html:'$H$, $S$ and CNOT generate the Clifford group, which maps Pauli operators to Pauli operators. That structure makes Clifford circuits classically simulable in polynomial time, so a Clifford-only machine offers no advantage at all. $T$ is the cheapest gate that leaves the group, and counting $T$ gates is how the cost of a fault-tolerant circuit is usually reported. Universality itself is a reachability claim and not a performance claim: counting shows there are far more $n$-qubit unitaries than short circuits, so a generic one needs a circuit exponential in $n$. It makes a machine programmable; it is never an argument that a particular task is fast.'},
 
-{t:'ex', hd:'Example 4.4 · one gate, two directions', rows:[
+{t:'ex', hd:'Example 4.5 · one gate, two directions', rows:[
  ['Given','$\\tfrac{1}{\\sqrt2}(|00\\rangle+|10\\rangle)$, that is $q_1$ in $|{+}\\rangle$ and $q_0$ in $|0\\rangle$, and a CNOT whose direction has not been named.'],
  ['Find','The output for each direction, and its entanglement.'],
  ['Solution','With $q_0$ as control the control is $0$ in both terms, so nothing happens and the state stays a product: $S=0$. With $q_1$ as control, $|10\\rangle\\to|11\\rangle$ and the output is $\\tfrac{1}{\\sqrt2}(|00\\rangle+|11\\rangle)=|\\Phi^{+}\\rangle$, with Schmidt weights $\\tfrac12,\\tfrac12$ and $S=1$ bit.'],

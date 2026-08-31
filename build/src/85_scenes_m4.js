@@ -982,8 +982,8 @@ const SC = [
 
 /* ---------------------------------------------------------------- 4.4.1 -- */
 { id:'m4-rev', module:'M4', nav:'Reversible embeddings', title:'A classical gate that throws information away cannot be unitary',
-  objective:'Embed an irreversible Boolean function in a reversible gate and say what it costs.',
-  keywords:'reversible computation irreversible AND XOR landauer erasure bijection cnot embedding classical logic',
+  objective:'Embed an irreversible Boolean function and a half adder in reversible gates, and state the extra wires they require.',
+  keywords:'reversible computation irreversible AND XOR half adder sum carry landauer erasure bijection cnot toffoli embedding classical logic',
   src:'L7 · classical logic, information loss and reversible embeddings', steps:3, blocks:[
   {t:'eyebrow', text:'Module 4 · Reversible embeddings'},
   {t:'title', text:'A classical gate that throws information away cannot be unitary'},
@@ -1000,10 +1000,10 @@ const SC = [
       caption:'The two kinds of classical gate. The left one erases two of its four inputs; the right one only relabels them. A quantum gate has to be of the second kind, and the first kind reaches a quantum computer only by being rewritten as the second.'},
     {t:'reveal', at:2, items:[
       {t:'wex', rows:[
-        ['Given', 'AND, to be made reversible.'],
-        ['Work', 'Keep both inputs and add a third wire for the answer: $(a,b,c)\\mapsto(a,\\,b,\\,c\\oplus ab)$.'],
-        ['Answer', 'That is the Toffoli gate. Set $c=0$ and the third wire leaves carrying $ab$, with $a$ and $b$ untouched.'],
-        ['Check', 'Eight inputs, eight outputs, and applying it twice restores everything, because $ab\\oplus ab = 0$. So it is a permutation of the eight basis states, and a permutation matrix is unitary.']
+        ['Given', 'A half adder with sum $s=a\\oplus b$ and carry $c=ab$, to be made reversible.'],
+        ['Work', 'Keep both inputs and initialise two output wires to zero: $(a,b,0,0)\\mapsto(a,b,a\\oplus b,ab)$. Two CNOTs write the sum, and one Toffoli writes the carry.'],
+        ['Answer', 'The four-wire map preserves $a$ and $b$, so every output identifies its input. The last two wires carry the ordinary half-adder result.'],
+        ['Check', 'Run the gates backwards: the Toffoli clears $ab$, and the two CNOTs clear $a\\oplus b$. All four wires return to $(a,b,0,0)$, so no information was erased.']
       ]}
     ]},
     {t:'reveal', at:3, items:[

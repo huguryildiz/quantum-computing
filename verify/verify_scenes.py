@@ -426,6 +426,17 @@ def _m2_standard_error(p, n):
     return math.sqrt(p * (1 - p) / n)
 
 
+def _m2_plane_wave_operator_dev(k):
+    """Check the coordinate operators by symbolic differentiation rather than
+    by substituting their quoted eigenvalues."""
+    x = sp.symbols("x", real=True)
+    wave = sp.exp(sp.I * sp.Float(k) * x)
+    p_residual = sp.simplify(-sp.I * sp.diff(wave, x) - k * wave)
+    h_residual = sp.simplify(-sp.diff(wave, x, 2) / 2 - (k ** 2 / 2) * wave)
+    return float(abs(complex(p_residual.subs(x, 0)))) \
+         + float(abs(complex(h_residual.subs(x, 0))))
+
+
 
 # ── chapter 3 · mixed states and entanglement ───────────────────────────────
 #
@@ -670,6 +681,22 @@ def _m4_dirty_ancilla_probability():
     return float(np.real(np.trace(rho @ proj(KETP))))
 
 
+def _m4_half_adder_dev():
+    """Build the four-wire circuit from gates and compare its basis action
+    with the classical half-adder truth table."""
+    carry = np.zeros((16, 16), dtype=complex)
+    for a in (0, 1):
+        for b in (0, 1):
+            for s in (0, 1):
+                for c in (0, 1):
+                    carry += outer(ket(a, b, s, c ^ (a & b)),
+                                   ket(a, b, s, c))
+    circuit = carry @ cnot(2, 1, n=4) @ cnot(3, 1, n=4)
+    return max(dev(circuit @ ket(a, b, 0, 0),
+                   ket(a, b, a ^ b, a & b))
+               for a in (0, 1) for b in (0, 1))
+
+
 # The two CNOT matrices exactly as the scene prints them. They are transcribed
 # here and re-derived from the Boolean rule beside them, which is the only way
 # a printed matrix can be checked at all.
@@ -796,6 +823,20 @@ CHECKS = [
      "stated": -1.7183, "derive": _entrywise_exponential_negative_eigenvalue,
      "rtol": 1e-4},
 
+    # ---- 1.9 -----------------------------------------------------------
+    {"name": "1.9.1 sin(x)/sqrt(pi) has unit norm on [-pi, pi]",
+     "stated": 1.0,
+     "derive": lambda: float(sp.integrate(
+         sp.sin(sp.symbols("x")) ** 2 / sp.pi,
+         (sp.symbols("x"), -sp.pi, sp.pi))),
+     "rtol": 1e-12},
+    {"name": "1.9.1 the normalised sine and cosine are orthogonal",
+     "stated": 0.0,
+     "derive": lambda: float(sp.integrate(
+         sp.sin(sp.symbols("x")) * sp.cos(sp.symbols("x")) / sp.pi,
+         (sp.symbols("x"), -sp.pi, sp.pi))),
+     "atol": 1e-15},
+
     # ---- 2.1 -----------------------------------------------------------
     {"name": "2.1.1 p(0) for (3, 4i)/5", "stated": 0.36,
      "derive": lambda: _m2_born(np.array([3, 4j], dtype=complex) / 5, KET0),
@@ -878,19 +919,29 @@ CHECKS = [
      "rtol": 1e-12},
 
     # ---- 2.6 -----------------------------------------------------------
-    {"name": "2.6.1 P(0) under H = (omega/2)Z is one half for all t",
+    {"name": "2.6.1 plane waves satisfy the stated momentum and free-energy equations",
+     "stated": 0.0, "derive": lambda: _m2_plane_wave_operator_dev(1.7),
+     "atol": 1e-14},
+    {"name": "2.6.2 P(0) under H = (omega/2)Z is one half for all t",
      "stated": 0.5,
      "derive": lambda: abs(inner(KET0, _m2_evolve(Z / 2, KETP, 1.7))) ** 2,
      "rtol": 1e-12},
-    {"name": "2.6.2 an energy eigenstate is stationary", "stated": 0.0,
+    {"name": "2.6.3 an energy eigenstate is stationary", "stated": 0.0,
      "derive": lambda: _m2_stationary_dev(1.0, 3.3), "atol": 1e-14},
-    {"name": "2.6.2 the beat returns at omega t = 2 pi", "stated": 1.0,
+    {"name": "2.6.3 the beat returns at omega t = 2 pi", "stated": 1.0,
      "derive": lambda: _m2_beat(1.0, 2 * math.pi), "rtol": 1e-10},
-    {"name": "2.6.2 and vanishes at omega t = pi", "stated": 0.0,
+    {"name": "2.6.3 and vanishes at omega t = pi", "stated": 0.0,
      "derive": lambda: _m2_beat(1.0, math.pi), "atol": 1e-25},
-    {"name": "2.6.3 a resonant pi pulse flips the qubit", "stated": 1.0,
+    {"name": "2.6.4 the second square-well energy is four times the first",
+     "stated": 4.0,
+     "derive": lambda: ((2 * math.pi) ** 2) / ((1 * math.pi) ** 2),
+     "rtol": 1e-12},
+    {"name": "2.6.4 the first-two-level beat period in units hbar/E1",
+     "stated": 2 * math.pi / 3,
+     "derive": lambda: 2 * math.pi / (4 - 1), "rtol": 1e-12},
+    {"name": "2.6.5 a resonant pi pulse flips the qubit", "stated": 1.0,
      "derive": lambda: _m2_driven_population(1.0, 0.0, math.pi), "rtol": 1e-10},
-    {"name": "2.6.3 the ceiling at equal drive and detuning", "stated": 0.5,
+    {"name": "2.6.5 the ceiling at equal drive and detuning", "stated": 0.5,
      "derive": lambda: _m2_driven_ceiling(1.0, 1.0), "rtol": 1e-4},
 
     # ---- 2.7 -----------------------------------------------------------
@@ -1199,6 +1250,8 @@ CHECKS = [
      "derive": lambda: max(dev(toffoli() @ ket(a, b, 0), ket(a, b, a & b))
                            for a in (0, 1) for b in (0, 1)),
      "atol": 1e-15},
+    {"name": "4.4.1 the reversible half adder writes sum and carry",
+     "stated": 0.0, "derive": _m4_half_adder_dev, "atol": 1e-15},
     {"name": "4.4.2 a dirty ancilla leaves the register a fair coin",
      "stated": 0.5, "derive": _m4_dirty_ancilla_probability, "rtol": 1e-12},
 

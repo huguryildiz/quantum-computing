@@ -125,6 +125,9 @@ window.C2 = [
 
 {t:'p', text:'Two things in this course are both called "changing the basis" and they are not the same. A <b>passive change of coordinates</b> rewrites the same state and the same operator in a different orthonormal basis, and every physical prediction is unchanged. <b>Choosing what to measure</b> is a different matter: an instrument whose outcomes are the $X$ eigenstates is a different instrument from one whose outcomes are the $Z$ eigenstates, and it returns a different distribution from the same state.'},
 
+{t:'eqbox', cap:'passive coordinates against an active transformation', tex:['|\\psi\\rangle^{\\prime}=V^{\\dagger}|\\psi\\rangle, \\qquad A^{\\prime}=V^{\\dagger}AV, \\qquad \\langle\\psi|A|\\psi\\rangle=\\langle\\psi^{\\prime}|A^{\\prime}|\\psi^{\\prime}\\rangle', '|\\psi\\rangle\\longmapsto U|\\psi\\rangle \\qquad \\text{with the coordinates and } A \\text{ fixed}'],
+ after:'The first line changes only the numbers used to describe the same state and observable, so every prediction is invariant. The second is active: a gate or physical evolution moves the state, and its probabilities generally change. Choosing a new measurement basis changes the projectors of the apparatus and is a third operation.'},
+
 {t:'fig', svg:threebases, cap:'One state, read by three different instruments. The three groups are the eigenbases of $Z$, $X$ and $Y$, and the bars are computed from the state itself. Nothing about the state changed between them; the apparatus did.'},
 
 {t:'box', kind:'warn', hd:'And what a change of basis costs', html:'Real hardware measures in one basis only, almost always the computational one. Measuring $X$ means applying a gate that rotates the $X$ eigenstates onto the computational ones and then measuring as usual. A change of measurement basis therefore costs a gate, that gate has an error, and a scheme that needs many bases pays for each of them.'},
@@ -152,6 +155,9 @@ window.C2 = [
  ['Check','Omit the middle measurement and the answer is one, because an immediate repeat is certain. The difference is entirely $[Z,X]\\ne0$, and no noise was added anywhere in the story.']]},
 
 {t:'p', text:'A projective measurement is not the most general one an apparatus can perform. The general form keeps only what is needed for the probabilities to be a distribution: a set of positive operators called <b>effects</b> that add to the identity, with $p(m)=\\langle\\psi|E_{m}|\\psi\\rangle$. Projectors are the special case. Effects need not be orthogonal and there need not be as many of them as the space has dimensions.'},
+
+{t:'eqbox', cap:'a POVM gives probabilities and an instrument gives the state', tex:['E_m=\\sum_{\\alpha}M_{m\\alpha}^{\\dagger}M_{m\\alpha}, \\qquad p(m)=\\operatorname{Tr}(\\rho E_m)', '\\rho_m=\\frac{\\sum_{\\alpha}M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}}{p(m)}'],
+ after:'The effects alone do not determine the conditional state. Two devices can have the same POVM and disturb the system differently because their instruments differ. A projective measurement is the special case $M_m=P_m$.'},
 
 {t:'ex', hd:'Example 2.2 · a readout that sometimes lies', rows:[
  ['Given','A symmetric assignment error $\\epsilon$: $E_{0}=(1-\\epsilon)|0\\rangle\\langle0|+\\epsilon|1\\rangle\\langle1|$ and $E_{1}=I-E_{0}$.'],
@@ -209,6 +215,16 @@ window.C2 = [
 
 /* ---- 2.6 ---- */
 {t:'h2', num:'2.6', text:'Dynamics'},
+
+{t:'p', text:'The function-space vectors of section 1.9 become physical wavefunctions when the coordinate is position. In one dimension, position multiplies a wavefunction and momentum differentiates it. A free particle has kinetic energy only.'},
+
+{t:'eqbox', cap:'coordinate representation and a free particle', tex:['(\\hat{x}\\psi)(x)=x\\psi(x), \\qquad (\\hat{p}\\psi)(x)=-i\\hbar\\frac{\\mathrm d\\psi}{\\mathrm dx}', '\\hat H_0=\\frac{\\hat p^{2}}{2m}=-\\frac{\\hbar^{2}}{2m}\\frac{\\mathrm d^{2}}{\\mathrm dx^{2}}'],
+ after:'The plane wave $e^{ikx}$ has momentum $p=\\hbar k$ and energy $E=\\hbar^{2}k^{2}/(2m)$. It extends across all space and is not square-integrable, so a physical free-particle state is a normalisable wave packet built as a continuous superposition of plane waves.'},
+
+{t:'p', text:'Confining the particle to $0<x<a$ with infinite walls keeps the free-particle equation inside the well and adds the boundary conditions $\\phi(0)=\\phi(a)=0$. Those conditions select a discrete set of standing waves.'},
+
+{t:'eqbox', cap:'the infinite square well', tex:['\\phi_n(x)=\\sqrt{\\frac{2}{a}}\\sin\\!\\left(\\frac{n\\pi x}{a}\\right), \\qquad n=1,2,\\ldots', 'E_n=\\frac{\\hbar^{2}\\pi^{2}n^{2}}{2ma^{2}}'],
+ after:'There is no $n=0$ state because it is the zero function. Each energy eigenstate has a time-independent probability density. A superposition of two levels has a moving cross term at angular frequency $(E_m-E_n)/\\hbar$. For the first two levels, $E_2=4E_1$ and the period is $2\\pi\\hbar/(3E_1)$.'},
 
 {t:'p', text:'A closed system evolves by a differential equation with one operator in it, the <b>Hamiltonian</b>. With $\\hbar=1$, and for a Hamiltonian that does not depend on time, the solution is the exponential of chapter 1 and no new mathematics is needed.'},
 

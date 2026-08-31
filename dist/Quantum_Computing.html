@@ -1941,6 +1941,8 @@ const CONTENT = {
     eig:{ s:'A|v\\rangle=\\lambda|v\\rangle', d:'Eigenvalue equation. The eigenvectors are the states the operator leaves in place, up to a scale.', go:'m1-eig' },
     spec:{ s:'A=\\sum_k \\lambda_k P_k', d:'Spectral decomposition of a Hermitian operator: the eigenvalues, and the projectors onto the eigenspaces they belong to.', go:'m1-spectral' },
     fofa:{ s:'f(A)=\\sum_k f(\\lambda_k)P_k', d:'A function of an operator is that function applied to the eigenvalues. This is what an operator exponential means, and it is why $e^{-iHt}$ can be computed at all.', go:'m1-fofa' },
+    ltwo:{ s:'L^{2}[a,b]', d:'The vector space of square-integrable functions on an interval, with inner product $\\langle f|g\\rangle=\\int_a^b f^{*}(x)g(x)\\,\\mathrm dx$.', go:'m1-wavefunctions' },
+    parseval:{ s:'\\|f\\|^{2}=\\sum_n|c_n|^{2}', d:'Parseval identity for a complete orthonormal basis. The omitted coefficient tail is the exact squared error of a truncated expansion.', go:'m1-completeness' },
 
     /* Chapter 2 — states, measurement and dynamics */
     zero:{ s:'|0\\rangle,\\;|1\\rangle', d:'The computational basis of one qubit, the eigenvectors of $Z$. Every measurement in this course is in this basis unless a scene says otherwise.' },
@@ -1954,7 +1956,10 @@ const CONTENT = {
     pauli:{ s:'X,\\;Y,\\;Z', d:'The Pauli operators. Each is Hermitian and unitary at once, so each is both an observable and a gate.' },
     ham:{ s:'H', d:'Hamiltonian: the Hermitian operator that generates evolution. With $\\hbar=1$ it is measured in angular frequency.' },
     eve:{ s:'U(t)=e^{-iHt}', d:'The evolution operator of a closed system. Every gate in this course is one of these for some $H$ and some duration.' },
-    povm:{ s:'\\{E_k\\}', d:'A POVM: positive operators summing to the identity. It is the most general set of outcome probabilities a measurement can have, and it need not have as many outcomes as the space has dimensions.' },
+    povm:{ s:'\\{E_k\\}', d:'A POVM: positive operators summing to the identity. It fixes the outcome probabilities, but not the state left by the measurement.', go:'m2-povm' },
+    instrument:{ s:'\\{M_{m\\alpha}\\}', d:'A measurement instrument. It realises each POVM effect and fixes the conditional state after an outcome.', go:'m2-povm' },
+    posrep:{ s:'\\hat{x},\\;\\hat{p}', d:'Position and momentum in the coordinate representation: position multiplies a wavefunction and momentum differentiates it.', go:'m2-position' },
+    well:{ s:'\\phi_n,\\;E_n', d:'The stationary states and discrete energies of the infinite square well, selected by boundary conditions at the two walls.', go:'m2-well' },
     shots:{ s:'N_{\\text{shots}}', d:'The number of repetitions a circuit is run for. A probability read from $N$ shots carries a standard error of about $\\sqrt{p(1-p)/N}$, which is sampling noise and not physical noise.' },
 
     /* Chapter 3 — mixed states and entanglement */
@@ -5702,6 +5707,26 @@ function figFringe(){
   return a.svg();
 }
 
+/* The field's development as a change in engineering regime. The dates are
+   landmarks, not a claim that one resource model superseded all the others. */
+function figRegimes(){
+  return P.blocks({w:760,h:178,items:[
+    {t:'box',x:24,y:18,w:154,h:52,label:'device scaling',fs:14},
+    {t:'arrow',x1:178,y1:44,x2:218,y2:44},
+    {t:'box',x:218,y:18,w:154,h:52,label:'quantum models',fs:14},
+    {t:'arrow',x1:372,y1:44,x2:412,y2:44},
+    {t:'box',x:412,y:18,w:154,h:52,label:'algorithms',fs:14},
+    {t:'arrow',x1:566,y1:44,x2:606,y2:44},
+    {t:'box',x:606,y:18,w:130,h:52,label:'NISQ',fs:14},
+    {t:'text',x:101,y:96,label:'1965 — scaling',fs:11.5},
+    {t:'text',x:295,y:96,label:'1982–85 — model',fs:11.5},
+    {t:'text',x:489,y:96,label:'1994–96 — algorithms',fs:11.5},
+    {t:'text',x:671,y:96,label:'2018 — regime',fs:11.5},
+    {t:'line',d:'M42,128 h676'},
+    {t:'text',x:380,y:158,label:'different questions, one evidence standard',fs:12}
+  ]});
+}
+
 /* ---- pictograms for the how-to-read strip ----
    Four small emblems, one per habit the reader needs. Each is a shape, not a
    diagram: it marks the card the way an icon marks a control. */
@@ -5812,6 +5837,31 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.3 ---- */
+{ id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From semiconductor scaling to the NISQ engineering regime',
+  objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
+  keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
+  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 0 · The frame of the course'},
+  {t:'title', text:'From semiconductor scaling to the NISQ engineering regime'},
+  {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
+  {t:'fig', frame:true, svg:()=>figRegimes(),
+    caption:'Four landmarks, from device scaling to the present noisy-hardware regime.'},
+  {t:'reveal', at:1, items:[
+    {t:'grid', cols:3, gap:'18px', items:[
+      [{t:'card', head:'The model', items:[{t:'small', html:'Feynman framed quantum simulation. Deutsch gave a general computational model. Neither step selected one hardware platform.'}]}],
+      [{t:'card', head:'The algorithms', items:[{t:'small', html:'Shor and Grover proved different advantages under stated resource models. They did not make every task easy.'}]}],
+      [{t:'card', head:'The regime', items:[{t:'small', html:'NISQ processors support calibration studies and small demonstrations. Noise, leakage, crosstalk, drift and limited coherence remain part of each result.'}]}]
+    ]}
+  ]},
+  {t:'reveal', at:2, items:[
+    {t:'note', kind:'warn', head:'Mitigation is not fault tolerance', html:'Mitigation reduces or estimates bias with extra circuits, a noise model or calibration. It does not encode logical qubits that correct faults during a computation. A mitigated result supports that experiment under its stated conditions, not a long fault-tolerant computation.'}
+  ]},
+  {t:'reveal', at:3, items:[
+    {t:'note', kind:'ok', head:'A defensible NISQ claim', html:'Report the task, classical baseline, hardware conditions, shot count, uncertainty and mitigation cost. Without them, an improvement cannot be separated from a favourable comparison, sampling variation or calibration choice.'}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 0.4 ---- */
 { id:'m0-scale', module:'M0', nav:'The size of the state', title:'The size of the state, and why size alone buys nothing',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',
@@ -6377,6 +6427,30 @@ function figAdjoint(){
     cell(360,86,'A_{12}^{*}'), cell(460,86,'A_{22}^{*}'),
     {t:'text',x:40,y:156,anchor:'start',label:'conjugate every entry, then move it across the diagonal',fs:12}
   ]});
+}
+
+/* A finite-dimensional column and a square-integrable function are shown as
+   the same vector-space construction with different index sets. */
+function figFunctionVector(){
+  const a = P.Axes({w:560,h:270,xr:[-Math.PI,Math.PI],yr:[-0.8,0.8],
+    xlabel:'x', ylabel:'u(x)', pad:{l:52,r:22,t:24,b:42}, xtarget:5, ytarget:5});
+  const s = 1/Math.sqrt(Math.PI);
+  a.curve(x=>s*Math.sin(x),{color:C.in,width:2.4});
+  a.curve(x=>s*Math.cos(x),{color:C.out,width:2.0,dash:'5 4'});
+  return a.svg();
+}
+
+/* Parseval drawn as energy accounted for by retained coefficients. The
+   omitted tail is the squared truncation error, not a visual metaphor. */
+function figParseval(){
+  const vals=[];
+  for(let n=1;n<=9;n++) vals.push([n,1/(n*n)]);
+  const a=P.Axes({w:560,h:270,xr:[0.3,9.7],yr:[0,1.12],
+    xlabel:'n',ylabel:'|c_n|^2',pad:{l:58,r:22,t:24,b:42},xtarget:5,ytarget:5});
+  a.stem(vals,{color:C.in,r:4});
+  a.vline(4.5,{color:C.err,width:1.4,dash:'4 4'});
+  a.note(5.0,0.78,'omitted tail',{fs:12.5,color:C.err});
+  return a.svg();
 }
 
 const SC = [
@@ -7104,6 +7178,62 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.9.1 -- */
+{ id:'m1-wavefunctions', module:'M1', nav:'Functions as vectors', title:'A wavefunction is a vector with a continuous index',
+  objective:'Use the inner product for square-integrable functions and recognise it as the continuous version of a complex column.',
+  keywords:'wavefunction function vector Hilbert space square integrable L2 inner product integral norm orthogonal sine cosine',
+  src:'L4 · square-integrable functions as vectors', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 1 · Function spaces'},
+  {t:'title', text:'A wavefunction is a vector with a continuous index'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A column labels its entries by an integer. A function labels them by a continuous coordinate. The vector-space rules stay the same, but the sum in the inner product becomes an integral:</p>'},
+    {t:'eq', key:true, tex:'\\langle f|g\\rangle = \\int_{a}^{b} f^{*}(x)\\,g(x)\\,\\mathrm{d}x, \\qquad \\|f\\|^{2}=\\int_{a}^{b}|f(x)|^{2}\\,\\mathrm{d}x'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'The space $L^{2}[a,b]$', html:'A function belongs to $L^{2}[a,b]$ when its squared modulus has a finite integral. That condition gives the function a finite norm, so it can be normalised and used as a state. Addition and multiplication by complex numbers work exactly as they do for columns.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figFunctionVector(),
+      caption:'Two normalised functions on $[-\\pi,\\pi]$: $\\sin x/\\sqrt\\pi$ and $\\cos x/\\sqrt\\pi$. Their inner product is zero, so they are orthogonal vectors even though their curves cross many times.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$u(x)=\\sin x/\\sqrt\\pi$ and $v(x)=\\cos x/\\sqrt\\pi$ on $[-\\pi,\\pi]$.'],
+        ['Work', '$\\langle u|v\\rangle=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin x\\cos x\\,\\mathrm dx=0$. Also $\\|u\\|^{2}=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin^{2}x\\,\\mathrm dx=1$.'],
+        ['Answer', '$u$ and $v$ are orthonormal vectors in a function space.'],
+        ['Check', 'The product is odd on a symmetric interval, so its integral must vanish.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'Finite at every point is not enough', html:'A function can have a finite value at each point and still have an infinite squared norm over an unbounded interval. Membership in the state space is decided by the integral of $|f|^{2}$, not by inspecting the height of the curve.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 1.9.2 -- */
+{ id:'m1-completeness', module:'M1', nav:'Completeness and truncation', title:'Completeness turns a function into coefficients and measures what truncation loses',
+  objective:'Use a complete orthonormal basis, Parseval identity and the coefficient tail to quantify a truncated expansion.',
+  keywords:'complete basis Parseval Fourier expansion coefficients truncation error norm convergence function space',
+  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 1 · Function spaces'},
+  {t:'title', text:'Completeness turns a function into coefficients and measures what truncation loses'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>An orthonormal family is complete when no non-zero vector is orthogonal to every member. Then every function in the space is recovered from its inner products with the basis:</p>'},
+    {t:'eq', key:true, tex:'|f\\rangle=\\sum_{n=1}^{\\infty}c_{n}|u_{n}\\rangle, \\qquad c_{n}=\\langle u_{n}|f\\rangle'},
+    {t:'eq', tex:'\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_{n}|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_{n}u_{n}\\right\\|^{2}=\\sum_{n>N}|c_{n}|^{2}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The first equality is Parseval identity. The second makes a numerical promise: the coefficient tail is exactly the squared error of the truncated approximation. It is not an informal sign that later terms look small.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figParseval(),
+      caption:'A coefficient spectrum with the first four terms retained. Parseval says the total bar height is the squared norm; the bars to the right of the dashed line add to the squared truncation error.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Fourier expansion is one basis choice', html:'On a finite interval, the constant, sine and cosine functions form an orthonormal basis after normalisation. Multiplying an expansion by one basis function and integrating isolates its coefficient, just as multiplying a column by a basis bra selects one entry.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Norm convergence is not pointwise convergence', html:'A Fourier approximation can converge in squared norm while behaving poorly at selected points. Parseval controls the integrated error. It does not state that every plotted point approaches the target at the same rate.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 1.10.1 - */
 { id:'m1-synth', module:'M1', nav:'Summary', title:'What this chapter leaves you with',
   objective:'Collect the four constructions and the three derivation moves the rest of the course uses.',
   keywords:'summary module 1 review constructions moves inner outer tensor spectral checklist',
@@ -7134,7 +7264,7 @@ const SC = [
 ]}
 ,
 
-/* ---------------------------------------------------------------- 1.9.2 ----
+/* ---------------------------------------------------------------- 1.10.2 ---
    The promise made in the course map — that each chapter names the shapes of
    question it sets before it sets them — is kept here. The list is the same
    object the questions themselves are labelled from, so a shape cannot be
@@ -7473,6 +7603,30 @@ function figLoop(){
   ]});
 }
 
+/* A normalisable packet beside the oscillation that supplies its local wave
+   number. The envelope is what makes the squared norm finite. */
+function figWavePacket(){
+  const a=P.Axes({w:560,h:270,xr:[-6,6],yr:[-1.15,1.15],
+    xlabel:'x',ylabel:'\\operatorname{Re}\\psi(x)',pad:{l:58,r:22,t:24,b:42},xtarget:6,ytarget:5});
+  a.curve(x=>Math.exp(-x*x/8)*Math.cos(3*x),{color:C.in,width:2.3});
+  a.curve(x=>Math.exp(-x*x/8),{color:C.muted,width:1.2,dash:'4 4'});
+  a.curve(x=>-Math.exp(-x*x/8),{color:C.muted,width:1.2,dash:'4 4'});
+  return a.svg();
+}
+
+/* The first three well eigenfunctions, shifted to their energy levels. */
+function figWell(){
+  const a=P.Axes({w:560,h:300,xr:[-0.15,1.15],yr:[0,10.2],
+    xlabel:'x/a',ylabel:'E/E_1',pad:{l:58,r:22,t:24,b:42},xtarget:5,ytarget:5});
+  a.vline(0,{color:C.err,width:2}); a.vline(1,{color:C.err,width:2});
+  [1,2,3].forEach((n,i)=>{
+    const col=[C.in,C.out,C.h][i];
+    a.hline(n*n,{color:C.grid,width:1,dash:'3 4'});
+    a.curve(x=>n*n+0.55*Math.sin(n*Math.PI*x),{color:col,width:2.1,from:0,to:1});
+  });
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
@@ -7541,8 +7695,9 @@ const SC = [
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Two things in this course are both called "changing the basis" and they are not the same thing at all.</p>'},
     {t:'body', html:'<p>A <b>passive change of coordinates</b> rewrites the same state and the same operator in a different orthonormal basis. Every physical prediction is unchanged, because an inner product does not care which basis it is computed in. Chapter 1 ended on exactly this.</p>'},
+    {t:'eq', tex:'|\\psi\\rangle^{\\prime}=V^{\\dagger}|\\psi\\rangle, \\qquad A^{\\prime}=V^{\\dagger}AV, \\qquad \\langle\\psi|A|\\psi\\rangle=\\langle\\psi^{\\prime}|A^{\\prime}|\\psi^{\\prime}\\rangle'},
     {t:'reveal', at:1, items:[
-      {t:'body', html:'<p><b>Choosing what to measure</b> is different. Building an instrument whose outcomes are the $X$ eigenstates rather than the $Z$ eigenstates is building a different instrument, and it returns a different distribution from the same state. Three bases are used constantly:</p>'},
+      {t:'body', html:'<p>An <b>active transformation</b> instead changes the state while the coordinates and observable stay fixed: $|\\psi\\rangle\\mapsto U|\\psi\\rangle$. Its probabilities generally change. <b>Choosing what to measure</b> is different again: an instrument with $X$ eigenstates is not the instrument with $Z$ eigenstates.</p>'},
       {t:'eq', tex:'\\{|0\\rangle,|1\\rangle\\}, \\qquad \\{|+\\rangle,|-\\rangle\\}, \\qquad \\{|{+}i\\rangle,|{-}i\\rangle\\}'},
       {t:'small', html:'They are the eigenbases of $Z$, $X$ and $Y$, which is why the three measurements are usually named after those operators rather than after their outcomes.'}
     ]}
@@ -7550,7 +7705,7 @@ const SC = [
     {t:'fig', frame:true, svg:()=>figThreeBases(),
       caption:'One state, read by three different instruments. The bars are computed from the state itself, so the three groups are three genuine predictions and not three drawings. Nothing about the state changed between them.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'ok', head:'How to tell them apart', html:'Ask what the apparatus does. If the answer is "nothing, I rewrote the numbers", it is a change of coordinates and no probability moved. If the answer is "it now sorts the atoms along a different axis", it is a different experiment and the probabilities are allowed to move — and generally do.'}
+      {t:'note', kind:'ok', head:'Three operations, three questions', html:'Passive: did only the numbers used to describe the same objects change? Active: did a gate or physical evolution move the state? Measurement choice: did the apparatus select a different set of projectors? Only the first must leave every prediction unchanged.'}
     ]},
     {t:'reveal', at:3, items:[
       {t:'note', kind:'warn', head:'And why it matters in practice', html:'Real hardware measures in one basis only, almost always the computational one. Measuring $X$ means applying a gate that rotates the $X$ eigenstates onto the computational ones and then measuring as usual. So a change of measurement basis costs a gate, and that gate has an error; a scheme that needs many bases pays for each of them.'}
@@ -7657,7 +7812,7 @@ const SC = [
 
 /* ---------------------------------------------------------------- 2.2.3 -- */
 { id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'The general measurement, and what a readout error looks like',
-  objective:'Write a set of effects that sum to the identity and use it to model an imperfect readout.',
+  objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
   src:'L5 · general measurements: POVMs and instruments', steps:3, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
@@ -7683,7 +7838,7 @@ const SC = [
     {t:'reveal', at:3, items:[
       {t:'note', kind:'warn', head:'Inverting the calibration is not free', html:'The line above can be inverted to recover $q$ from the reported frequency, and that is what readout-error mitigation does. Dividing by $1-2\\epsilon$ removes the bias and multiplies the statistical error by the same factor, so a badly calibrated readout turns a small sampling error into a large one. The correction is exact in expectation and noisier in practice, and a report that gives the corrected number without the widened error bar is not reporting the measurement it made.'}
     ]},
-    {t:'note', kind:'def', head:'Effects do not fix the state afterwards', html:'A set of effects gives the outcome probabilities and says nothing about what the system is left in; two very different devices can share one set of effects. Saying what the state becomes needs the operators the effects were built from, and that is a construction chapter 3 has the language for.'}
+    {t:'note', kind:'def', head:'Effects do not fix the state afterwards', html:'A set of effects fixes the outcome probabilities but not the conditional state. A measurement <b>instrument</b> supplies operators $M_{m\\alpha}$ with $E_m=\\sum_\\alpha M_{m\\alpha}^{\\dagger}M_{m\\alpha}$ and $\\rho_m=\\sum_\\alpha M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}/p(m)$. Different instruments can have the same effects and disturb the state differently. For a projective measurement, $M_m=P_m$.'}
   ]}
 ]},
 
@@ -7901,6 +8056,33 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.1 -- */
+{ id:'m2-position', module:'M2', nav:'Position representation', title:'Position and momentum are operators on a wavefunction',
+  objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
+  keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
+  src:'L5 · coordinate representation and the free particle', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 2 · Dynamics'},
+  {t:'title', text:'Position and momentum are operators on a wavefunction'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The function-space vectors of chapter 1 become physical wavefunctions when the coordinate is position. In one dimension, position multiplies the function and momentum differentiates it:</p>'},
+    {t:'eq', key:true, tex:'(\\hat{x}\\psi)(x)=x\\psi(x), \\qquad (\\hat{p}\\psi)(x)=-i\\hbar\\frac{\\mathrm d\\psi}{\\mathrm dx}'},
+    {t:'body', html:'<p>A free particle has kinetic energy only, so its Hamiltonian is</p>'},
+    {t:'eq', key:true, tex:'\\hat{H}_{0}=\\frac{\\hat{p}^{2}}{2m}=-\\frac{\\hbar^{2}}{2m}\\frac{\\mathrm d^{2}}{\\mathrm dx^{2}}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The plane wave $e^{ikx}$ is an eigenfunction of momentum with $p=\\hbar k$ and of free-particle energy with $E=\\hbar^{2}k^{2}/(2m)$. The differential operator has turned the wavelength into a measured momentum.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figWavePacket(),
+      caption:'A travelling oscillation inside a decaying envelope. The local oscillation supplies the wave number; the envelope makes the state square-integrable and therefore normalisable.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Why the plane wave is still useful', html:'A plane wave extends across all space, so its squared norm is infinite and it is not a physical state by itself. It is a generalised eigenfunction. A physical free-particle state is a wave packet, built as a continuous superposition of plane waves.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Continuous normalisation is different', html:'Momentum eigenfunctions are normalised with a Dirac delta, not to unit norm. Treating the constant amplitude of a plane wave as if it could make an integral over all space equal one hides this distinction.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 2.6.2 -- */
 { id:'m2-schrod', module:'M2', nav:'Evolution', title:'Evolution: one Hermitian operator, one unitary family',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
@@ -7931,7 +8113,7 @@ const SC = [
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 2.6.2 -- */
+/* ---------------------------------------------------------------- 2.6.3 -- */
 { id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Why one energy eigenstate does nothing and two of them beat',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
@@ -7960,7 +8142,38 @@ const SC = [
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 2.6.3 -- */
+/* ---------------------------------------------------------------- 2.6.4 -- */
+{ id:'m2-well', module:'M2', nav:'The infinite square well', title:'Boundary conditions turn a continuous wave number into discrete energies',
+  objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
+  keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
+  src:'L5 · infinite square well', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 2 · Dynamics'},
+  {t:'title', text:'Boundary conditions turn a continuous wave number into discrete energies'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Confine a particle to $0<x<a$ with an infinite potential outside. The wavefunction must vanish at both walls. The free-particle equation still holds inside, but only standing waves that meet both boundary conditions survive:</p>'},
+    {t:'eq', key:true, tex:'\\phi_{n}(x)=\\sqrt{\\frac{2}{a}}\\sin\\!\\left(\\frac{n\\pi x}{a}\\right), \\qquad n=1,2,\\ldots'},
+    {t:'eq', key:true, tex:'E_{n}=\\frac{\\hbar^{2}\\pi^{2}n^{2}}{2ma^{2}}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The walls have not changed the kinetic-energy operator inside the box. They have restricted its domain. That restriction selects $k_n=n\\pi/a$ and turns a continuous free-particle spectrum into discrete energies.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figWell(),
+      caption:'The first three normalised standing-wave shapes, shifted to their energy levels. The nodes meet the walls, and the levels rise as $n^{2}$ rather than at equal spacing.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', 'A well of width $a$, and the first two levels.'],
+        ['Work', '$E_{2}/E_{1}=2^{2}/1^{2}=4$, so $E_{2}-E_{1}=3E_{1}$.'],
+        ['Answer', 'An equal superposition of $\\phi_{1}$ and $\\phi_{2}$ has relative phase frequency $(E_{2}-E_{1})/\\hbar$ and period $T=2\\pi\\hbar/(3E_{1})$.'],
+        ['Check', 'Either eigenstate alone has a time-independent probability density. Only the cross term of the superposition moves.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'There is no $n=0$ state', html:'Putting $n=0$ into the sine gives the zero function, which cannot be normalised and is not a state. The ground state is $n=1$, with non-zero energy. Confinement therefore has an energy cost even before any excitation is added.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 2.6.5 -- */
 { id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Why a gate is an exponential, and what a pulse controls',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',
@@ -10191,8 +10404,8 @@ const SC = [
 
 /* ---------------------------------------------------------------- 4.4.1 -- */
 { id:'m4-rev', module:'M4', nav:'Reversible embeddings', title:'A classical gate that throws information away cannot be unitary',
-  objective:'Embed an irreversible Boolean function in a reversible gate and say what it costs.',
-  keywords:'reversible computation irreversible AND XOR landauer erasure bijection cnot embedding classical logic',
+  objective:'Embed an irreversible Boolean function and a half adder in reversible gates, and state the extra wires they require.',
+  keywords:'reversible computation irreversible AND XOR half adder sum carry landauer erasure bijection cnot toffoli embedding classical logic',
   src:'L7 · classical logic, information loss and reversible embeddings', steps:3, blocks:[
   {t:'eyebrow', text:'Module 4 · Reversible embeddings'},
   {t:'title', text:'A classical gate that throws information away cannot be unitary'},
@@ -10209,10 +10422,10 @@ const SC = [
       caption:'The two kinds of classical gate. The left one erases two of its four inputs; the right one only relabels them. A quantum gate has to be of the second kind, and the first kind reaches a quantum computer only by being rewritten as the second.'},
     {t:'reveal', at:2, items:[
       {t:'wex', rows:[
-        ['Given', 'AND, to be made reversible.'],
-        ['Work', 'Keep both inputs and add a third wire for the answer: $(a,b,c)\\mapsto(a,\\,b,\\,c\\oplus ab)$.'],
-        ['Answer', 'That is the Toffoli gate. Set $c=0$ and the third wire leaves carrying $ab$, with $a$ and $b$ untouched.'],
-        ['Check', 'Eight inputs, eight outputs, and applying it twice restores everything, because $ab\\oplus ab = 0$. So it is a permutation of the eight basis states, and a permutation matrix is unitary.']
+        ['Given', 'A half adder with sum $s=a\\oplus b$ and carry $c=ab$, to be made reversible.'],
+        ['Work', 'Keep both inputs and initialise two output wires to zero: $(a,b,0,0)\\mapsto(a,b,a\\oplus b,ab)$. Two CNOTs write the sum, and one Toffoli writes the carry.'],
+        ['Answer', 'The four-wire map preserves $a$ and $b$, so every output identifies its input. The last two wires carry the ordinary half-adder result.'],
+        ['Check', 'Run the gates backwards: the Toffoli clears $ab$, and the two CNOTs clear $a\\oplus b$. All four wires return to $(a,b,0,0)$, so no information was erased.']
       ]}
     ]},
     {t:'reveal', at:3, items:[
@@ -13600,7 +13813,7 @@ CONTENT.CHAPTERS = [
 CONTENT.SECTIONS = {
 
   M0: [
-    { n:'0', ids:['m0-open','m0-what','m0-scale','m0-phase','m0-fringe','m0-map','m0-how'] }
+    { n:'0', ids:['m0-open','m0-what','m0-regimes','m0-scale','m0-phase','m0-fringe','m0-map','m0-how'] }
   ],
 
   /* Chapter 1 carries two source lectures, so it is long. The section titles
@@ -13623,7 +13836,8 @@ CONTENT.SECTIONS = {
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
         'm1-eig','m1-spectral','m1-fofa'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
-    { n:'1.9', title:'Summary and practice',              ids:['m1-synth','m1-shapes'] }
+    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness'] },
+    { n:'1.10', title:'Summary and practice',             ids:['m1-synth','m1-shapes'] }
   ],
 
   /* Chapter 2 carries the other two postulates. The measurement sections come
@@ -13642,7 +13856,7 @@ CONTENT.SECTIONS = {
     { n:'2.5', title:'The Pauli algebra',                 ids:[
         'm2-pauli','m2-paulialg','m2-ndotsigma'] },
     { n:'2.6', title:'Dynamics',                          ids:[
-        'm2-schrod','m2-stationary','m2-gate','m2-lab-d'] },
+        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
   ],
@@ -14208,12 +14422,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'The resolution of the identity in the $X$ basis is $|+\\rangle\\langle+|+|-\\rangle\\langle-|=I$.',
   parts:['Insert it into $\\langle 0|1\\rangle$ and write the resulting sum.',
          'Evaluate every factor and give the total.',
-         'Say what the calculation demonstrates.'],
+         'Say what the calculation demonstrates.',
+         'For a complete function basis with coefficients $c_n$, state Parseval identity and the squared error after retaining only $n\\le N$.'],
   sol:'<b>Given.</b> Two computational basis states and a different orthonormal basis.<br>'
      +'<b>Method.</b> Insert the identity between the bra and the ket, then evaluate the four overlaps.<br>'
      +'<b>Solution — (a).</b> $\\langle0|1\\rangle=\\langle0|I|1\\rangle=\\langle0|+\\rangle\\langle+|1\\rangle+\\langle0|-\\rangle\\langle-|1\\rangle$.<br>'
      +'<b>Solution — (b).</b> $\\langle0|+\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle+|1\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle0|-\\rangle=\\tfrac{1}{\\sqrt2}$, $\\langle-|1\\rangle=-\\tfrac{1}{\\sqrt2}$. The sum is $\\tfrac12-\\tfrac12=0$.<br>'
      +'<b>Solution — (c).</b> The answer is $\\langle0|1\\rangle=0$, which was known from the start. What the calculation shows is that inserting the identity is exact: it changes the route and not the number.<br>'
+     +'<b>Solution — (d).</b> Parseval gives $\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_n|^{2}$. The truncated approximation $f_N=\\sum_{n=1}^{N}c_nu_n$ has squared error $\\|f-f_N\\|^{2}=\\sum_{n>N}|c_n|^{2}$. The finite resolution of the identity has become a complete infinite expansion.<br>'
      +'<b>Check.</b> Run the same insertion on $\\langle0|0\\rangle$: $\\tfrac12+\\tfrac12=1$, again the known answer. A basis that gave anything else would not be orthonormal.',
   err:'Dropping the minus sign in $\\langle-|1\\rangle$. The sum then comes to one, and $|0\\rangle$ and $|1\\rangle$ appear to be the same state.',
   teach:'This is the move, not the result. Set it again with a basis the student chooses, and the point lands: the answer cannot depend on which identity was inserted.' },
@@ -14617,12 +14833,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A readout reports the wrong bit with probability $\\epsilon=0.05$, in either direction, so its effects are $E_{0}=(1-\\epsilon)|0\\rangle\\langle0|+\\epsilon|1\\rangle\\langle1|$ and $E_{1}=I-E_{0}$.',
   parts:['Give the probability of reporting $0$ for a qubit truly in $|0\\rangle$.',
          'For a state with true $p(0)=q$, give the reported probability.',
-         'A long run reports $0$ a fraction $0.62$ of the time. Give the corrected estimate of $q$, and say what the correction does to the error bar.'],
+         'A long run reports $0$ a fraction $0.62$ of the time. Give the corrected estimate of $q$, and say what the correction does to the error bar.',
+         'Do the effects determine the state after outcome $m$? Name the extra object and give its update rule.'],
   sol:'<b>Given.</b> A symmetric assignment error of five per cent.<br>'
      +'<b>Method.</b> Sandwich the effect; the answer is linear in $q$, so invert the line.<br>'
      +'<b>Solution — (a).</b> $\\langle0|E_{0}|0\\rangle=1-\\epsilon=0.95$.<br>'
      +'<b>Solution — (b).</b> $p_{\\text{rep}}(0)=(1-\\epsilon)q+\\epsilon(1-q)=\\epsilon+(1-2\\epsilon)q=0.05+0.9\\,q$.<br>'
      +'<b>Solution — (c).</b> $q=(0.62-0.05)/0.9=0.6333$. Inverting divides by $0.9$, so every error is multiplied by $1/0.9=1.111$: the corrected estimate is unbiased and about eleven per cent noisier.<br>'
+     +'<b>Solution — (d).</b> No. The effects fix only the probabilities. A measurement instrument supplies operators $M_{m\\alpha}$ with $E_m=\\sum_\\alpha M_{m\\alpha}^{\\dagger}M_{m\\alpha}$ and $\\rho_m=\\sum_\\alpha M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}/p(m)$. Different instruments can share the same effects and leave different states.<br>'
      +'<b>Check.</b> $E_{0}+E_{1}=I$ and both are positive, so this is a legal measurement. At $\\epsilon=\\tfrac12$ the slope is zero, the correction divides by zero, and the instrument has indeed stopped reporting anything about the state — the formula fails exactly where the device does.',
   err:'Reporting the corrected number without widening the error bar. Mitigation removes a bias and buys it with variance, and a corrected value quoted at the raw precision claims an accuracy the run does not have.',
   teach:'Worth extending: with an asymmetric error the two rows differ and the correction is a matrix inversion, whose condition number is what the last sentence of the solution is really about.' },
@@ -14737,12 +14955,16 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A system has $H|E_{1}\\rangle=E_{1}|E_{1}\\rangle$ and $H|E_{2}\\rangle=E_{2}|E_{2}\\rangle$, with $E_{2}>E_{1}$.',
   parts:['Show that $|E_{1}\\rangle$ is stationary.',
          'Give $|\\psi(t)\\rangle$ for the initial state $\\tfrac{1}{\\sqrt2}\\left(|E_{1}\\rangle+|E_{2}\\rangle\\right)$, with the global phase removed.',
-         'Give the period of any observable quantity, and say what happens to it when both energies are raised by the same amount.'],
+         'Give the period of any observable quantity, and say what happens to it when both energies are raised by the same amount.',
+         'For an infinite square well of width $a$, give $\\phi_n(x)$ and $E_n$, and show that $E_2=4E_1$.',
+         'In the coordinate representation, give $\\hat p$ and the free-particle Hamiltonian. Why is one plane wave not a normalisable physical state on the whole line?'],
   sol:'<b>Given.</b> Two energy eigenstates and an equal superposition of them.<br>'
      +'<b>Method.</b> The exponential acts on the eigenvalues; then pull out one phase as global.<br>'
      +'<b>Solution — (a).</b> $|E_{1}(t)\\rangle=e^{-iE_{1}t}|E_{1}\\rangle$, which differs from $|E_{1}\\rangle$ by a global phase. Every probability of every measurement is therefore unchanged for all time.<br>'
      +'<b>Solution — (b).</b> $\\tfrac{1}{\\sqrt2}\\left(e^{-iE_{1}t}|E_{1}\\rangle+e^{-iE_{2}t}|E_{2}\\rangle\\right)\\equiv\\tfrac{1}{\\sqrt2}\\left(|E_{1}\\rangle+e^{-i(E_{2}-E_{1})t}|E_{2}\\rangle\\right)$.<br>'
      +'<b>Solution — (c).</b> The relative phase returns after $(E_{2}-E_{1})T=2\\pi$, so $T=2\\pi/(E_{2}-E_{1})$. Raising both energies by $c$ multiplies the state by $e^{-ict}$, a global phase, and leaves $T$ untouched.<br>'
+     +'<b>Solution — (d).</b> Restoring physical units, $\\phi_n(x)=\\sqrt{2/a}\\sin(n\\pi x/a)$ and $E_n=\\hbar^{2}\\pi^{2}n^{2}/(2ma^{2})$ for $n=1,2,\\ldots$. Therefore $E_2/E_1=2^{2}=4$; $n=0$ would give the zero function and is not a state.<br>'
+     +'<b>Solution — (e).</b> $(\\hat p\\psi)(x)=-i\\hbar\\,\\mathrm d\\psi/\\mathrm dx$ and $\\hat H_0=\\hat p^{2}/(2m)=-\\hbar^{2}\\mathrm d^{2}/(2m\\,\\mathrm dx^{2})$. A plane wave has constant $|\\psi|^{2}$, so its integral over the whole line is infinite. A physical state is a normalisable wave packet.<br>'
      +'<b>Check.</b> Part (a) is part (c) with the two energies equal: the difference is zero, the period is infinite, and nothing ever happens. The two answers are the same statement.',
   err:'Reporting a period of $2\\pi/E_{2}$, using one energy rather than the difference. Only differences are observable, and part (c) is the demonstration.',
   teach:'This is the whole of spectroscopy in one question: every line an experiment sees is a difference, and the zero of energy is a convention.' },
@@ -15555,12 +15777,14 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
   stem:'A chip couples $q_0$ to $q_1$ and $q_1$ to $q_2$, and nothing else. A CNOT is wanted with $q_0$ as control and $q_2$ as target.',
   parts:['Give the SWAP gate as a matrix, in the ordering $|q_1q_0\\rangle$.',
          'How many CNOTs does the whole job cost if the qubits may be left in their new positions?',
-         'And if they must be returned to where they started?'],
+         'And if they must be returned to where they started?',
+         'A reversible half adder must also write $s=a\\oplus b$ and $c=ab$. Give an embedding that preserves its inputs, and name the gates that write the two outputs.'],
   sol:'<b>Given.</b> A coupling map with a missing edge, and a gate that needs it.<br>'
      +'<b>Method.</b> SWAP exchanges the two labels; three CNOTs build one when CNOT is the native gate.<br>'
      +'<b>Solution — (a).</b> $\\mathrm{SWAP}|q_1q_0\\rangle=|q_0q_1\\rangle$ exchanges the middle two basis states, so $\\mathrm{SWAP}=\\begin{bmatrix}1&0&0&0\\\\0&0&1&0\\\\0&1&0&0\\\\0&0&0&1\\end{bmatrix}$.<br>'
      +'<b>Solution — (b).</b> Swap $q_0$ with $q_1$ so that the state of $q_0$ sits next to $q_2$ — three CNOTs — then apply the wanted CNOT: four in total.<br>'
      +'<b>Solution — (c).</b> Swap back afterwards: three more, so seven.<br>'
+     +'<b>Solution — (d).</b> Initialise two output wires to zero and use $(a,b,0,0)\\mapsto(a,b,a\\oplus b,ab)$. Two CNOTs write the sum on the third wire and one Toffoli writes the carry on the fourth. Keeping $a$ and $b$ makes the map invertible.<br>'
      +'<b>Check.</b> SWAP creates no entanglement, so none of the extra six gates does any of the work; all of it is done by the one CNOT in the middle. That is the honest way to read the cost of limited connectivity.',
   err:'Assuming a SWAP is free because it "only relabels". It only relabels when the algorithm is indifferent to the labels, in which case no gate is needed at all. Here the coupling map is fixed and the qubits really must move.',
   teach:'Ask whether the swap back in part (c) is ever avoidable. It usually is, by renaming the qubits for the rest of the circuit, and noticing that is what a routing pass in a compiler does.' },

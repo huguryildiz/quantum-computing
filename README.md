@@ -43,7 +43,7 @@ formal second, a worked example before a general theorem, and nothing the course
 
 **Status: version 1.0.** All seven chapters are written: the frame of the course, the mathematics of
 quantum states, states and measurement and dynamics, mixed states and entanglement, the Bloch sphere
-and quantum gates, circuits and protocols, and quantum algorithms. That is 172 scenes, eleven
+and quantum gates, circuits and protocols, and quantum algorithms. That is 177 scenes, eleven
 interactive laboratories and 120 worked practice questions, with every number in them re-derived by
 a separate numerical suite.
 

@@ -307,6 +307,30 @@ function figLoop(){
   ]});
 }
 
+/* A normalisable packet beside the oscillation that supplies its local wave
+   number. The envelope is what makes the squared norm finite. */
+function figWavePacket(){
+  const a=P.Axes({w:560,h:270,xr:[-6,6],yr:[-1.15,1.15],
+    xlabel:'x',ylabel:'\\operatorname{Re}\\psi(x)',pad:{l:58,r:22,t:24,b:42},xtarget:6,ytarget:5});
+  a.curve(x=>Math.exp(-x*x/8)*Math.cos(3*x),{color:C.in,width:2.3});
+  a.curve(x=>Math.exp(-x*x/8),{color:C.muted,width:1.2,dash:'4 4'});
+  a.curve(x=>-Math.exp(-x*x/8),{color:C.muted,width:1.2,dash:'4 4'});
+  return a.svg();
+}
+
+/* The first three well eigenfunctions, shifted to their energy levels. */
+function figWell(){
+  const a=P.Axes({w:560,h:300,xr:[-0.15,1.15],yr:[0,10.2],
+    xlabel:'x/a',ylabel:'E/E_1',pad:{l:58,r:22,t:24,b:42},xtarget:5,ytarget:5});
+  a.vline(0,{color:C.err,width:2}); a.vline(1,{color:C.err,width:2});
+  [1,2,3].forEach((n,i)=>{
+    const col=[C.in,C.out,C.h][i];
+    a.hline(n*n,{color:C.grid,width:1,dash:'3 4'});
+    a.curve(x=>n*n+0.55*Math.sin(n*Math.PI*x),{color:col,width:2.1,from:0,to:1});
+  });
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
@@ -375,8 +399,9 @@ const SC = [
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Two things in this course are both called "changing the basis" and they are not the same thing at all.</p>'},
     {t:'body', html:'<p>A <b>passive change of coordinates</b> rewrites the same state and the same operator in a different orthonormal basis. Every physical prediction is unchanged, because an inner product does not care which basis it is computed in. Chapter 1 ended on exactly this.</p>'},
+    {t:'eq', tex:'|\\psi\\rangle^{\\prime}=V^{\\dagger}|\\psi\\rangle, \\qquad A^{\\prime}=V^{\\dagger}AV, \\qquad \\langle\\psi|A|\\psi\\rangle=\\langle\\psi^{\\prime}|A^{\\prime}|\\psi^{\\prime}\\rangle'},
     {t:'reveal', at:1, items:[
-      {t:'body', html:'<p><b>Choosing what to measure</b> is different. Building an instrument whose outcomes are the $X$ eigenstates rather than the $Z$ eigenstates is building a different instrument, and it returns a different distribution from the same state. Three bases are used constantly:</p>'},
+      {t:'body', html:'<p>An <b>active transformation</b> instead changes the state while the coordinates and observable stay fixed: $|\\psi\\rangle\\mapsto U|\\psi\\rangle$. Its probabilities generally change. <b>Choosing what to measure</b> is different again: an instrument with $X$ eigenstates is not the instrument with $Z$ eigenstates.</p>'},
       {t:'eq', tex:'\\{|0\\rangle,|1\\rangle\\}, \\qquad \\{|+\\rangle,|-\\rangle\\}, \\qquad \\{|{+}i\\rangle,|{-}i\\rangle\\}'},
       {t:'small', html:'They are the eigenbases of $Z$, $X$ and $Y$, which is why the three measurements are usually named after those operators rather than after their outcomes.'}
     ]}
@@ -384,7 +409,7 @@ const SC = [
     {t:'fig', frame:true, svg:()=>figThreeBases(),
       caption:'One state, read by three different instruments. The bars are computed from the state itself, so the three groups are three genuine predictions and not three drawings. Nothing about the state changed between them.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'ok', head:'How to tell them apart', html:'Ask what the apparatus does. If the answer is "nothing, I rewrote the numbers", it is a change of coordinates and no probability moved. If the answer is "it now sorts the atoms along a different axis", it is a different experiment and the probabilities are allowed to move — and generally do.'}
+      {t:'note', kind:'ok', head:'Three operations, three questions', html:'Passive: did only the numbers used to describe the same objects change? Active: did a gate or physical evolution move the state? Measurement choice: did the apparatus select a different set of projectors? Only the first must leave every prediction unchanged.'}
     ]},
     {t:'reveal', at:3, items:[
       {t:'note', kind:'warn', head:'And why it matters in practice', html:'Real hardware measures in one basis only, almost always the computational one. Measuring $X$ means applying a gate that rotates the $X$ eigenstates onto the computational ones and then measuring as usual. So a change of measurement basis costs a gate, and that gate has an error; a scheme that needs many bases pays for each of them.'}
@@ -491,7 +516,7 @@ const SC = [
 
 /* ---------------------------------------------------------------- 2.2.3 -- */
 { id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'The general measurement, and what a readout error looks like',
-  objective:'Write a set of effects that sum to the identity and use it to model an imperfect readout.',
+  objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
   src:'L5 · general measurements: POVMs and instruments', steps:3, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
@@ -517,7 +542,7 @@ const SC = [
     {t:'reveal', at:3, items:[
       {t:'note', kind:'warn', head:'Inverting the calibration is not free', html:'The line above can be inverted to recover $q$ from the reported frequency, and that is what readout-error mitigation does. Dividing by $1-2\\epsilon$ removes the bias and multiplies the statistical error by the same factor, so a badly calibrated readout turns a small sampling error into a large one. The correction is exact in expectation and noisier in practice, and a report that gives the corrected number without the widened error bar is not reporting the measurement it made.'}
     ]},
-    {t:'note', kind:'def', head:'Effects do not fix the state afterwards', html:'A set of effects gives the outcome probabilities and says nothing about what the system is left in; two very different devices can share one set of effects. Saying what the state becomes needs the operators the effects were built from, and that is a construction chapter 3 has the language for.'}
+    {t:'note', kind:'def', head:'Effects do not fix the state afterwards', html:'A set of effects fixes the outcome probabilities but not the conditional state. A measurement <b>instrument</b> supplies operators $M_{m\\alpha}$ with $E_m=\\sum_\\alpha M_{m\\alpha}^{\\dagger}M_{m\\alpha}$ and $\\rho_m=\\sum_\\alpha M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}/p(m)$. Different instruments can have the same effects and disturb the state differently. For a projective measurement, $M_m=P_m$.'}
   ]}
 ]},
 
@@ -735,6 +760,33 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.1 -- */
+{ id:'m2-position', module:'M2', nav:'Position representation', title:'Position and momentum are operators on a wavefunction',
+  objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
+  keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
+  src:'L5 · coordinate representation and the free particle', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 2 · Dynamics'},
+  {t:'title', text:'Position and momentum are operators on a wavefunction'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>The function-space vectors of chapter 1 become physical wavefunctions when the coordinate is position. In one dimension, position multiplies the function and momentum differentiates it:</p>'},
+    {t:'eq', key:true, tex:'(\\hat{x}\\psi)(x)=x\\psi(x), \\qquad (\\hat{p}\\psi)(x)=-i\\hbar\\frac{\\mathrm d\\psi}{\\mathrm dx}'},
+    {t:'body', html:'<p>A free particle has kinetic energy only, so its Hamiltonian is</p>'},
+    {t:'eq', key:true, tex:'\\hat{H}_{0}=\\frac{\\hat{p}^{2}}{2m}=-\\frac{\\hbar^{2}}{2m}\\frac{\\mathrm d^{2}}{\\mathrm dx^{2}}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The plane wave $e^{ikx}$ is an eigenfunction of momentum with $p=\\hbar k$ and of free-particle energy with $E=\\hbar^{2}k^{2}/(2m)$. The differential operator has turned the wavelength into a measured momentum.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figWavePacket(),
+      caption:'A travelling oscillation inside a decaying envelope. The local oscillation supplies the wave number; the envelope makes the state square-integrable and therefore normalisable.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Why the plane wave is still useful', html:'A plane wave extends across all space, so its squared norm is infinite and it is not a physical state by itself. It is a generalised eigenfunction. A physical free-particle state is a wave packet, built as a continuous superposition of plane waves.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Continuous normalisation is different', html:'Momentum eigenfunctions are normalised with a Dirac delta, not to unit norm. Treating the constant amplitude of a plane wave as if it could make an integral over all space equal one hides this distinction.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 2.6.2 -- */
 { id:'m2-schrod', module:'M2', nav:'Evolution', title:'Evolution: one Hermitian operator, one unitary family',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
@@ -765,7 +817,7 @@ const SC = [
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 2.6.2 -- */
+/* ---------------------------------------------------------------- 2.6.3 -- */
 { id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Why one energy eigenstate does nothing and two of them beat',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
@@ -794,7 +846,38 @@ const SC = [
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 2.6.3 -- */
+/* ---------------------------------------------------------------- 2.6.4 -- */
+{ id:'m2-well', module:'M2', nav:'The infinite square well', title:'Boundary conditions turn a continuous wave number into discrete energies',
+  objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
+  keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
+  src:'L5 · infinite square well', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 2 · Dynamics'},
+  {t:'title', text:'Boundary conditions turn a continuous wave number into discrete energies'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>Confine a particle to $0<x<a$ with an infinite potential outside. The wavefunction must vanish at both walls. The free-particle equation still holds inside, but only standing waves that meet both boundary conditions survive:</p>'},
+    {t:'eq', key:true, tex:'\\phi_{n}(x)=\\sqrt{\\frac{2}{a}}\\sin\\!\\left(\\frac{n\\pi x}{a}\\right), \\qquad n=1,2,\\ldots'},
+    {t:'eq', key:true, tex:'E_{n}=\\frac{\\hbar^{2}\\pi^{2}n^{2}}{2ma^{2}}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The walls have not changed the kinetic-energy operator inside the box. They have restricted its domain. That restriction selects $k_n=n\\pi/a$ and turns a continuous free-particle spectrum into discrete energies.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figWell(),
+      caption:'The first three normalised standing-wave shapes, shifted to their energy levels. The nodes meet the walls, and the levels rise as $n^{2}$ rather than at equal spacing.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', 'A well of width $a$, and the first two levels.'],
+        ['Work', '$E_{2}/E_{1}=2^{2}/1^{2}=4$, so $E_{2}-E_{1}=3E_{1}$.'],
+        ['Answer', 'An equal superposition of $\\phi_{1}$ and $\\phi_{2}$ has relative phase frequency $(E_{2}-E_{1})/\\hbar$ and period $T=2\\pi\\hbar/(3E_{1})$.'],
+        ['Check', 'Either eigenstate alone has a time-independent probability density. Only the cross term of the superposition moves.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'There is no $n=0$ state', html:'Putting $n=0$ into the sine gives the zero function, which cannot be normalised and is not a state. The ground state is $n=1$, with non-zero energy. Confinement therefore has an energy cost even before any excitation is added.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 2.6.5 -- */
 { id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Why a gate is an exponential, and what a pulse controls',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',

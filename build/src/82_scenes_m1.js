@@ -402,6 +402,30 @@ function figAdjoint(){
   ]});
 }
 
+/* A finite-dimensional column and a square-integrable function are shown as
+   the same vector-space construction with different index sets. */
+function figFunctionVector(){
+  const a = P.Axes({w:560,h:270,xr:[-Math.PI,Math.PI],yr:[-0.8,0.8],
+    xlabel:'x', ylabel:'u(x)', pad:{l:52,r:22,t:24,b:42}, xtarget:5, ytarget:5});
+  const s = 1/Math.sqrt(Math.PI);
+  a.curve(x=>s*Math.sin(x),{color:C.in,width:2.4});
+  a.curve(x=>s*Math.cos(x),{color:C.out,width:2.0,dash:'5 4'});
+  return a.svg();
+}
+
+/* Parseval drawn as energy accounted for by retained coefficients. The
+   omitted tail is the squared truncation error, not a visual metaphor. */
+function figParseval(){
+  const vals=[];
+  for(let n=1;n<=9;n++) vals.push([n,1/(n*n)]);
+  const a=P.Axes({w:560,h:270,xr:[0.3,9.7],yr:[0,1.12],
+    xlabel:'n',ylabel:'|c_n|^2',pad:{l:58,r:22,t:24,b:42},xtarget:5,ytarget:5});
+  a.stem(vals,{color:C.in,r:4});
+  a.vline(4.5,{color:C.err,width:1.4,dash:'4 4'});
+  a.note(5.0,0.78,'omitted tail',{fs:12.5,color:C.err});
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
@@ -1127,6 +1151,62 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.9.1 -- */
+{ id:'m1-wavefunctions', module:'M1', nav:'Functions as vectors', title:'A wavefunction is a vector with a continuous index',
+  objective:'Use the inner product for square-integrable functions and recognise it as the continuous version of a complex column.',
+  keywords:'wavefunction function vector Hilbert space square integrable L2 inner product integral norm orthogonal sine cosine',
+  src:'L4 · square-integrable functions as vectors', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 1 · Function spaces'},
+  {t:'title', text:'A wavefunction is a vector with a continuous index'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>A column labels its entries by an integer. A function labels them by a continuous coordinate. The vector-space rules stay the same, but the sum in the inner product becomes an integral:</p>'},
+    {t:'eq', key:true, tex:'\\langle f|g\\rangle = \\int_{a}^{b} f^{*}(x)\\,g(x)\\,\\mathrm{d}x, \\qquad \\|f\\|^{2}=\\int_{a}^{b}|f(x)|^{2}\\,\\mathrm{d}x'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'The space $L^{2}[a,b]$', html:'A function belongs to $L^{2}[a,b]$ when its squared modulus has a finite integral. That condition gives the function a finite norm, so it can be normalised and used as a state. Addition and multiplication by complex numbers work exactly as they do for columns.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figFunctionVector(),
+      caption:'Two normalised functions on $[-\\pi,\\pi]$: $\\sin x/\\sqrt\\pi$ and $\\cos x/\\sqrt\\pi$. Their inner product is zero, so they are orthogonal vectors even though their curves cross many times.'},
+    {t:'reveal', at:2, items:[
+      {t:'wex', rows:[
+        ['Given', '$u(x)=\\sin x/\\sqrt\\pi$ and $v(x)=\\cos x/\\sqrt\\pi$ on $[-\\pi,\\pi]$.'],
+        ['Work', '$\\langle u|v\\rangle=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin x\\cos x\\,\\mathrm dx=0$. Also $\\|u\\|^{2}=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin^{2}x\\,\\mathrm dx=1$.'],
+        ['Answer', '$u$ and $v$ are orthonormal vectors in a function space.'],
+        ['Check', 'The product is odd on a symmetric interval, so its integral must vanish.']
+      ]}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'err', head:'Finite at every point is not enough', html:'A function can have a finite value at each point and still have an infinite squared norm over an unbounded interval. Membership in the state space is decided by the integral of $|f|^{2}$, not by inspecting the height of the curve.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 1.9.2 -- */
+{ id:'m1-completeness', module:'M1', nav:'Completeness and truncation', title:'Completeness turns a function into coefficients and measures what truncation loses',
+  objective:'Use a complete orthonormal basis, Parseval identity and the coefficient tail to quantify a truncated expansion.',
+  keywords:'complete basis Parseval Fourier expansion coefficients truncation error norm convergence function space',
+  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 1 · Function spaces'},
+  {t:'title', text:'Completeness turns a function into coefficients and measures what truncation loses'},
+  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
+    {t:'body', html:'<p>An orthonormal family is complete when no non-zero vector is orthogonal to every member. Then every function in the space is recovered from its inner products with the basis:</p>'},
+    {t:'eq', key:true, tex:'|f\\rangle=\\sum_{n=1}^{\\infty}c_{n}|u_{n}\\rangle, \\qquad c_{n}=\\langle u_{n}|f\\rangle'},
+    {t:'eq', tex:'\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_{n}|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_{n}u_{n}\\right\\|^{2}=\\sum_{n>N}|c_{n}|^{2}'},
+    {t:'reveal', at:1, items:[
+      {t:'small', html:'The first equality is Parseval identity. The second makes a numerical promise: the coefficient tail is exactly the squared error of the truncated approximation. It is not an informal sign that later terms look small.'}
+    ]}
+  ], right:[
+    {t:'fig', frame:true, svg:()=>figParseval(),
+      caption:'A coefficient spectrum with the first four terms retained. Parseval says the total bar height is the squared norm; the bars to the right of the dashed line add to the squared truncation error.'},
+    {t:'reveal', at:2, items:[
+      {t:'note', kind:'def', head:'Fourier expansion is one basis choice', html:'On a finite interval, the constant, sine and cosine functions form an orthonormal basis after normalisation. Multiplying an expansion by one basis function and integrating isolates its coefficient, just as multiplying a column by a basis bra selects one entry.'}
+    ]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'warn', head:'Norm convergence is not pointwise convergence', html:'A Fourier approximation can converge in squared norm while behaving poorly at selected points. Parseval controls the integrated error. It does not state that every plotted point approaches the target at the same rate.'}
+    ]}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 1.10.1 - */
 { id:'m1-synth', module:'M1', nav:'Summary', title:'What this chapter leaves you with',
   objective:'Collect the four constructions and the three derivation moves the rest of the course uses.',
   keywords:'summary module 1 review constructions moves inner outer tensor spectral checklist',
@@ -1157,7 +1237,7 @@ const SC = [
 ]}
 ,
 
-/* ---------------------------------------------------------------- 1.9.2 ----
+/* ---------------------------------------------------------------- 1.10.2 ---
    The promise made in the course map — that each chapter names the shapes of
    question it sets before it sets them — is kept here. The list is the same
    object the questions themselves are labelled from, so a shape cannot be

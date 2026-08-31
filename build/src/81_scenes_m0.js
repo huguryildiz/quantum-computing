@@ -128,6 +128,26 @@ function figFringe(){
   return a.svg();
 }
 
+/* The field's development as a change in engineering regime. The dates are
+   landmarks, not a claim that one resource model superseded all the others. */
+function figRegimes(){
+  return P.blocks({w:760,h:178,items:[
+    {t:'box',x:24,y:18,w:154,h:52,label:'device scaling',fs:14},
+    {t:'arrow',x1:178,y1:44,x2:218,y2:44},
+    {t:'box',x:218,y:18,w:154,h:52,label:'quantum models',fs:14},
+    {t:'arrow',x1:372,y1:44,x2:412,y2:44},
+    {t:'box',x:412,y:18,w:154,h:52,label:'algorithms',fs:14},
+    {t:'arrow',x1:566,y1:44,x2:606,y2:44},
+    {t:'box',x:606,y:18,w:130,h:52,label:'NISQ',fs:14},
+    {t:'text',x:101,y:96,label:'1965 — scaling',fs:11.5},
+    {t:'text',x:295,y:96,label:'1982–85 — model',fs:11.5},
+    {t:'text',x:489,y:96,label:'1994–96 — algorithms',fs:11.5},
+    {t:'text',x:671,y:96,label:'2018 — regime',fs:11.5},
+    {t:'line',d:'M42,128 h676'},
+    {t:'text',x:380,y:158,label:'different questions, one evidence standard',fs:12}
+  ]});
+}
+
 /* ---- pictograms for the how-to-read strip ----
    Four small emblems, one per habit the reader needs. Each is a shape, not a
    diagram: it marks the card the way an icon marks a control. */
@@ -238,6 +258,31 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.3 ---- */
+{ id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From semiconductor scaling to the NISQ engineering regime',
+  objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
+  keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
+  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, blocks:[
+  {t:'eyebrow', text:'Module 0 · The frame of the course'},
+  {t:'title', text:'From semiconductor scaling to the NISQ engineering regime'},
+  {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
+  {t:'fig', frame:true, svg:()=>figRegimes(),
+    caption:'Four landmarks, from device scaling to the present noisy-hardware regime.'},
+  {t:'reveal', at:1, items:[
+    {t:'grid', cols:3, gap:'18px', items:[
+      [{t:'card', head:'The model', items:[{t:'small', html:'Feynman framed quantum simulation. Deutsch gave a general computational model. Neither step selected one hardware platform.'}]}],
+      [{t:'card', head:'The algorithms', items:[{t:'small', html:'Shor and Grover proved different advantages under stated resource models. They did not make every task easy.'}]}],
+      [{t:'card', head:'The regime', items:[{t:'small', html:'NISQ processors support calibration studies and small demonstrations. Noise, leakage, crosstalk, drift and limited coherence remain part of each result.'}]}]
+    ]}
+  ]},
+  {t:'reveal', at:2, items:[
+    {t:'note', kind:'warn', head:'Mitigation is not fault tolerance', html:'Mitigation reduces or estimates bias with extra circuits, a noise model or calibration. It does not encode logical qubits that correct faults during a computation. A mitigated result supports that experiment under its stated conditions, not a long fault-tolerant computation.'}
+  ]},
+  {t:'reveal', at:3, items:[
+    {t:'note', kind:'ok', head:'A defensible NISQ claim', html:'Report the task, classical baseline, hardware conditions, shot count, uncertainty and mitigation cost. Without them, an improvement cannot be separated from a favourable comparison, sampling variation or calibration choice.'}
+  ]}
+]},
+
+/* ---------------------------------------------------------------- 0.4 ---- */
 { id:'m0-scale', module:'M0', nav:'The size of the state', title:'The size of the state, and why size alone buys nothing',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',

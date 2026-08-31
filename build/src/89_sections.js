@@ -54,7 +54,7 @@ CONTENT.CHAPTERS = [
 CONTENT.SECTIONS = {
 
   M0: [
-    { n:'0', ids:['m0-open','m0-what','m0-scale','m0-phase','m0-fringe','m0-map','m0-how'] }
+    { n:'0', ids:['m0-open','m0-what','m0-regimes','m0-scale','m0-phase','m0-fringe','m0-map','m0-how'] }
   ],
 
   /* Chapter 1 carries two source lectures, so it is long. The section titles
@@ -77,7 +77,8 @@ CONTENT.SECTIONS = {
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
         'm1-eig','m1-spectral','m1-fofa'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
-    { n:'1.9', title:'Summary and practice',              ids:['m1-synth','m1-shapes'] }
+    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness'] },
+    { n:'1.10', title:'Summary and practice',             ids:['m1-synth','m1-shapes'] }
   ],
 
   /* Chapter 2 carries the other two postulates. The measurement sections come
@@ -96,7 +97,7 @@ CONTENT.SECTIONS = {
     { n:'2.5', title:'The Pauli algebra',                 ids:[
         'm2-pauli','m2-paulialg','m2-ndotsigma'] },
     { n:'2.6', title:'Dynamics',                          ids:[
-        'm2-schrod','m2-stationary','m2-gate','m2-lab-d'] },
+        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
   ],

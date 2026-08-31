@@ -175,12 +175,14 @@ window.C1 = [
 {t:'p', text:'Four conventions apply everywhere, and the first two are worth fixing now because getting either wrong costs an error that nothing on the page reveals. A register of $n$ qubits is written $|q_{n-1}\\ldots q_1q_0\\rangle$, and entry $x$ of its column of amplitudes is the amplitude of $|x\\rangle$ with $x$ read as a binary number. A phase on the whole state is not physical and may be dropped; a phase between two terms is physical and may never be dropped. The inner product conjugates its first argument, $\\langle u|v\\rangle=\\sum_k u_k^{*}v_k$, which in NumPy is <code>np.vdot(u, v)</code> and never <code>np.dot</code>. And $\\hbar=1$, so a Hamiltonian is measured in angular frequency and evolution is $U(t)=e^{-iHt}$.'},
 {t:'p', text:'The contents below carries a third column. An entry such as <b>NC CH2.1.4</b> points into the course textbook, Nielsen and Chuang, <i>Quantum Computation and Quantum Information</i>, tenth anniversary edition, where the same material is developed at length. The <b>NC</b> marker is what tells the two numbering systems apart, and it is not decorative: this chapter is chapter 1 here and section 2.1 there, and every later chapter disagrees with the book by a different amount.'},
 
+{t:'box', kind:'def', hd:'The engineering regime these notes assume', html:'Semiconductor scaling made quantum effects unavoidable at small dimensions. Quantum engineering asks when selected effects can instead be controlled as resources. The field then added a general computational model, algorithms with proved advantages under stated resource models, and today\u2019s noisy intermediate-scale quantum (NISQ) processors. NISQ hardware supports calibration studies, small demonstrations and experiments with noise. It is not fault-tolerant hardware, and error mitigation is not error correction. A defensible result names the task, classical baseline, hardware conditions, shot count, uncertainty and mitigation cost.'},
+
 {t:'toc', items:[
  ['1','The mathematics of quantum states',
-  'States as complex columns; bras and the inner product; length, orthogonality and overlap; orthonormal bases. Amplitude and phase, and the difference between a global and a relative one. Outer products, projectors and the resolution of the identity. Gram–Schmidt. The tensor product and where the exponential comes from. The adjoint, Hermitian and unitary operators, and the exponential that joins them. Eigenvectors, the spectral theorem and functions of an operator. Dirac notation.',
+  'States as complex columns; bras and the inner product; length, orthogonality and overlap; orthonormal bases. Amplitude and phase, and the difference between a global and a relative one. Outer products, projectors and the resolution of the identity. Gram–Schmidt. The tensor product and where the exponential comes from. The adjoint, Hermitian and unitary operators, and the exponential that joins them. Eigenvectors, the spectral theorem and functions of an operator. Dirac notation. Square-integrable functions as vectors, complete bases, Parseval and truncation.',
   'NC CH2.1 · NC CH2.2.7'],
  ['2','States, measurement and dynamics',
-  'The Born rule, and why choosing a measurement basis is choosing an experiment. Projective measurement, the state it leaves behind, and the general measurement an imperfect readout is. Observables, means and spreads. Compatibility, the commutator, and the uncertainty relation. The Pauli algebra and a measurement along any direction. Evolution, stationary states and why a gate is an exponential. What a finite run of shots is worth.',
+  'The Born rule, active and passive transformations, and why choosing a measurement basis is choosing an experiment. Projective measurement, the state it leaves behind, and the instrument behind a general measurement. Observables, means and spreads. Compatibility, the commutator, and the uncertainty relation. The Pauli algebra and a measurement along any direction. Position and momentum, the free particle, the infinite square well, stationary states and why a gate is an exponential. What a finite run of shots is worth.',
   'NC CH2.2, NC CH2.1.3, NC CH2.1.9'],
  ['3','Mixed states and entanglement',
   'The density operator, and the two situations no state vector describes. Which matrices are states, and the purity that says how mixed one is. Quantum channels in Kraus form, amplitude damping and dephasing, and the two decay times they become in continuous time. The partial trace, and a pure pair whose halves are mixed. Separability, the Schmidt decomposition and the entropy that weighs it. The Bell states, CHSH, and why entanglement sends nothing.',
@@ -399,7 +401,22 @@ window.C1 = [
 {t:'p', text:'A matrix product acts on a ket from the right, so the operator written <b>last</b> in a product is applied <b>first</b>: a circuit that runs $H$, then $R_z$, then $H$ is the operator $HR_zH$. Circuit diagrams run left to right and algebra runs right to left, and the two are not in conflict — they are two orders for the same sequence. An operator can also be written entirely in the notation, with no matrix anywhere, by inserting the identity on both sides: $A=\\sum_{j,k}|e_j\\rangle\\langle e_j|A|e_k\\rangle\\langle e_k|$, where $\\langle e_j|A|e_k\\rangle$ is the matrix entry $A_{jk}$. The matrix is not a different object from the operator; it is the operator, read in a basis.'},
 
 /* ---- 1.9 ---- */
-{t:'h2', num:'1.9', text:'Summary'},
+{t:'h2', num:'1.9', text:'Square-integrable functions, completeness and truncation'},
+
+{t:'p', text:'A column labels its entries with integers. A function labels them with a continuous coordinate. The same vector-space construction therefore uses an integral in place of a sum. A function belongs to $L^{2}[a,b]$ when its squared modulus has a finite integral, which gives it a finite norm and allows it to be normalised.'},
+
+{t:'eqbox', cap:'the function-space inner product', tex:['\\langle f|g\\rangle=\\int_a^b f^{*}(x)g(x)\\,\\mathrm dx', '\\|f\\|^{2}=\\int_a^b |f(x)|^{2}\\,\\mathrm dx'],
+ after:'For example, $\\sin x/\\sqrt\\pi$ and $\\cos x/\\sqrt\\pi$ are orthonormal on $[-\\pi,\\pi]$. Their curves cross, but orthogonality is decided by the integral of their product.'},
+
+{t:'p', text:'An orthonormal family is <b>complete</b> when no non-zero vector is orthogonal to every member. Then the inner products with the basis recover the function. Fourier expansion is this statement for the normalised constant, sine and cosine functions on a finite interval.'},
+
+{t:'eqbox', cap:'completeness, Parseval and truncation', tex:['|f\\rangle=\\sum_{n=1}^{\\infty}c_n|u_n\\rangle, \\qquad c_n=\\langle u_n|f\\rangle', '\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_n|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_nu_n\\right\\|^{2}=\\sum_{n>N}|c_n|^{2}'],
+ after:'Parseval turns the coefficient tail into an exact squared error for the truncated approximation. It controls convergence in norm, not uniform or pointwise convergence at every coordinate.'},
+
+{t:'box', kind:'err', hd:'Two tests that a plot cannot replace', html:'A function can be finite at every point and still have an infinite squared norm on an unbounded interval. A truncated Fourier plot can also look accurate while its pointwise error is poor at selected coordinates. Test the integral for membership in $L^{2}$ and use the coefficient tail for the norm error.'},
+
+/* ---- 1.10 ---- */
+{t:'h2', num:'1.10', text:'Summary'},
 
 {t:'ul', items:[
  'A state is a normalised column of complex amplitudes. Its coefficients in a basis are inner products with that basis, and they change when the basis does while the state does not.',
@@ -408,7 +425,8 @@ window.C1 = [
  'A ket beside a bra is an operator; the projectors of an orthonormal basis add to the identity, and inserting that identity is a derivation step with a name.',
  'Two systems make one by the tensor product, so dimensions multiply and $n$ qubits carry $2^{n}$ amplitudes. A measurement returns $n$ bits.',
  'Hermitian means real eigenvalues and an orthonormal eigenbasis, which is what an observable needs. Unitary means every inner product is preserved, which is what a gate needs. The exponential of a Hermitian operator is unitary.',
- 'A function of an operator acts on its eigenvalues and leaves its projectors alone.']},
+ 'A function of an operator acts on its eigenvalues and leaves its projectors alone.',
+ 'Square-integrable functions are vectors with an integral inner product. In a complete orthonormal basis, Parseval gives both the norm and the exact truncation error.']},
 
 {t:'box', kind:'ok', hd:'Six lines to be able to write without looking', html:'$\\langle a|b\\rangle=\\sum_k a_k^{*}b_k$ &nbsp;·&nbsp; $v_j=\\langle e_j|v\\rangle$ &nbsp;·&nbsp; $\\sum_k|e_k\\rangle\\langle e_k|=I$ &nbsp;·&nbsp; $A=\\sum_k\\lambda_kP_k$ &nbsp;·&nbsp; $f(A)=\\sum_kf(\\lambda_k)P_k$ &nbsp;·&nbsp; $e^{-i\\theta\\sigma/2}=\\cos(\\theta/2)I-i\\sin(\\theta/2)\\sigma$.'},
 

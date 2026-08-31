@@ -70,6 +70,9 @@ window.CA = [
 {t:'eqbox', cap:'the spectral decomposition, and a function of an operator', tex:['A = \\sum_{k}\\lambda_{k}P_{k}, \\qquad P_{j}P_{k} = \\delta_{jk}P_{k}, \\qquad \\sum_{k}P_{k} = I', 'f(A) = \\sum_{k} f(\\lambda_{k})\\,P_{k}, \\qquad e^{-iAt} = \\sum_{k} e^{-i\\lambda_{k}t}\\,P_{k}'],
  after:'The second line is what makes an evolution operator computable at all. Chapter 1, section 1.7.'},
 
+{t:'eqbox', cap:'functions as vectors, Parseval and truncation', tex:['\\langle f|g\\rangle=\\int_a^b f^{*}(x)g(x)\\,\\mathrm dx, \\qquad |f\\rangle=\\sum_{n=1}^{\\infty}c_n|u_n\\rangle, \\qquad c_n=\\langle u_n|f\\rangle', '\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_n|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_nu_n\\right\\|^{2}=\\sum_{n>N}|c_n|^{2}'],
+ after:'The coefficient tail is the exact squared norm error of a truncated complete orthonormal expansion. Chapter 1, section 1.9.'},
+
 {t:'page'},
 
 /* ============================================================= chapter 2 */
@@ -78,11 +81,14 @@ window.CA = [
 {t:'eqbox', cap:'the Born rule', tex:'p(n) = \\left|\\langle n|\\psi\\rangle\\right|^{2}',
  after:'The one postulate that connects a state to a number an instrument prints. Chapter 2, section 2.1.'},
 
+{t:'eqbox', cap:'passive coordinates against an active transformation', tex:['|\\psi\\rangle^{\\prime}=V^{\\dagger}|\\psi\\rangle, \\qquad A^{\\prime}=V^{\\dagger}AV, \\qquad \\langle\\psi|A|\\psi\\rangle=\\langle\\psi^{\\prime}|A^{\\prime}|\\psi^{\\prime}\\rangle', '|\\psi\\rangle\\longmapsto U|\\psi\\rangle \\qquad \\text{with } A \\text{ fixed}'],
+ after:'Passive coordinates preserve every prediction; an active operation generally changes them. Choosing new measurement projectors is a third operation. Chapter 2, section 2.1.'},
+
 {t:'eqbox', cap:'a projective measurement, and the state it leaves', tex:['p(a) = \\langle\\psi|P_{a}|\\psi\\rangle, \\qquad P_{j}P_{k}=\\delta_{jk}P_{k}, \\qquad \\sum_{a}P_{a}=I', '|\\psi_{a}\\rangle = \\frac{P_{a}|\\psi\\rangle}{\\sqrt{p(a)}}'],
  after:'Orthogonality makes the outcomes exclusive and completeness makes them add to one. Chapter 2, section 2.2.'},
 
-{t:'eqbox', cap:'a general measurement', tex:'p(m) = \\langle\\psi|M_{m}^{\\dagger}M_{m}|\\psi\\rangle, \\qquad \\sum_{m} M_{m}^{\\dagger}M_{m} = I, \\qquad E_{m}=M_{m}^{\\dagger}M_{m}',
- after:'What an imperfect readout is. The projective case is $M_{m}=P_{m}$. Chapter 2, section 2.2.'},
+{t:'eqbox', cap:'a POVM and its measurement instrument', tex:['E_m=\\sum_{\\alpha}M_{m\\alpha}^{\\dagger}M_{m\\alpha}, \\qquad p(m)=\\operatorname{Tr}(\\rho E_m), \\qquad \\sum_mE_m=I', '\\rho_m=\\frac{\\sum_{\\alpha}M_{m\\alpha}\\rho M_{m\\alpha}^{\\dagger}}{p(m)}'],
+ after:'The effects fix the probabilities; the instrument also fixes the conditional state. The projective case is $M_m=P_m$. Chapter 2, section 2.2.'},
 
 {t:'eqbox', cap:'expectation and variance', tex:['\\langle A\\rangle = \\langle\\psi|A|\\psi\\rangle = \\sum_{a} a\\,p(a)', '\\operatorname{Var}(A) = \\langle A^{2}\\rangle - \\langle A\\rangle^{2}, \\qquad \\Delta A = \\sqrt{\\operatorname{Var}(A)}'],
  after:'For any Pauli $A^{2}=I$, so $\\operatorname{Var}(A)=1-\\langle A\\rangle^{2}$ and no second sandwich is needed. Chapter 2, section 2.3.'},
@@ -100,6 +106,12 @@ window.CA = [
 
 {t:'eqbox', cap:'measuring along a direction', tex:['\\mathbf{n}\\cdot\\boldsymbol\\sigma, \\qquad P_{\\pm}=\\tfrac12\\left(I\\pm\\mathbf{n}\\cdot\\boldsymbol\\sigma\\right), \\qquad r_{a}=\\langle\\sigma_{a}\\rangle', 'p(\\pm) = \\tfrac12\\left(1 \\pm \\mathbf{n}\\cdot\\mathbf{r}\\right) , \\qquad p(+) = \\cos^{2}\\frac{\\alpha}{2}'],
  after:'$\\alpha$ is the angle between two vectors, which is twice the angle between the two states. Chapter 2, section 2.5.'},
+
+{t:'eqbox', cap:'coordinate operators and a free particle', tex:['(\\hat{x}\\psi)(x)=x\\psi(x), \\qquad (\\hat{p}\\psi)(x)=-i\\hbar\\frac{\\mathrm d\\psi}{\\mathrm dx}', '\\hat H_0=\\frac{\\hat p^{2}}{2m}=-\\frac{\\hbar^{2}}{2m}\\frac{\\mathrm d^{2}}{\\mathrm dx^{2}}, \\qquad p=\\hbar k, \\qquad E=\\frac{\\hbar^{2}k^{2}}{2m}'],
+ after:'A plane wave is a generalised eigenfunction; a physical free-particle state is a normalisable wave packet. Chapter 2, section 2.6.'},
+
+{t:'eqbox', cap:'the infinite square well', tex:['\\phi_n(x)=\\sqrt{\\frac{2}{a}}\\sin\\!\\left(\\frac{n\\pi x}{a}\\right), \\qquad n=1,2,\\ldots', 'E_n=\\frac{\\hbar^{2}\\pi^{2}n^{2}}{2ma^{2}}'],
+ after:'The boundary conditions select discrete wave numbers. There is no $n=0$ state, and $E_2=4E_1$. Chapter 2, section 2.6.'},
 
 {t:'eqbox', cap:'closed-system evolution', tex:['i\\,\\frac{\\mathrm{d}}{\\mathrm{d}t}|\\psi(t)\\rangle = H\\,|\\psi(t)\\rangle', '|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle, \\qquad U(t)=e^{-iHt}'],
  after:'Replacing $H$ by $H+cI$ multiplies $U$ by a global phase, so only energy differences are physical. Chapter 2, section 2.6.'},
@@ -191,6 +203,9 @@ window.CA = [
 
 {t:'eqbox', cap:'reversible embeddings and the oracle pattern', tex:['(a,\\,b) \\longmapsto (a,\\;a\\oplus b) \\qquad \\text{is exactly CNOT}', '|x\\rangle|y\\rangle \\longmapsto |x\\rangle\\,|y\\oplus f(x)\\rangle \\qquad \\text{for any } f'],
  after:'AND needs a third wire, $(a,b,c)\\mapsto(a,b,c\\oplus ab)$, which is the Toffoli gate. Chapter 4, section 4.5.'},
+
+{t:'eqbox', cap:'a reversible half adder', tex:'(a,b,0,0)\\longmapsto(a,b,a\\oplus b,ab)',
+ after:'Two CNOTs write the sum and one Toffoli writes the carry. Preserving the inputs makes the map invertible. Chapter 4, section 4.5.'},
 
 {t:'eqbox', cap:'compute, copy out, uncompute', tex:'V_{f}^{\\dagger}\\;\\left(\\text{copy}\\right)\\;V_{f} \\;:\\; |x\\rangle|0\\rangle|y\\rangle \\;\\longmapsto\\; |x\\rangle|0\\rangle|y\\oplus f(x)\\rangle',
  after:'An ancilla that leaves in a state depending on $x$ stays entangled with the register, and the interference at the end does not happen. Chapter 4, section 4.5.'},
