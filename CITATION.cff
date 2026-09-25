@@ -5,12 +5,14 @@ type: software
 authors:
   - family-names: "Yıldız"
     given-names: "Hüseyin Uğur"
-url: "https://quantum-computing-course.vercel.app"
+url: "https://quantum-computing-tedu.vercel.app"
 repository-code: "https://github.com/huguryildiz/quantum-computing"
 license: CC-BY-4.0
 version: "1.0"
+date-released: "2026-08-31"
 keywords:
   - quantum computing
   - engineering education
   - open educational resources
+  - quantum circuits
   - quantum algorithms

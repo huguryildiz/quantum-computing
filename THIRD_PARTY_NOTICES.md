@@ -1,8 +1,9 @@
 # Third-Party Notices
 
 The repository contains or uses the following third-party components. Their
-licences are not changed by the licence of this repository. The full
-attribution for the adapted course material is in `NOTICE`.
+licenses are not changed by the licenses for the software or course content in
+this repository. The attribution for the adapted course material is in
+`NOTICE`.
 
 ## KaTeX 0.16.11
 
@@ -11,6 +12,9 @@ is embedded in the generated HTML editions. It is distributed under the MIT
 License.
 
 Copyright (c) 2013–2020 Khan Academy and other contributors.
+
+The MIT license text is included in `LICENSE` and applies to this component
+under its original copyright notice.
 
 ## Radiant Shaders, “Moiré Interference”
 

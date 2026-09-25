@@ -14,10 +14,10 @@ venv/
 # --- Node ---
 node_modules/
 
-# --- Large / restricted source material (kept on disk, never tracked) ---
-# Third-party and oversized source material. Never redistributed, never in
-# history. The whole directory, not file by file, so a new subdirectory is not
-# let in by default. A fresh clone will not contain any of it.
+# --- Third-party source material (kept on disk, never tracked) ---
+# source/ is a clone of the open course this one adapts. It is the syllabus,
+# never redistributed from here. The whole directory, not file by file, so a
+# new subdirectory is not let in by default. A fresh clone will not contain it.
 source/
 
 # --- Pipeline output that is not a deliverable ---
@@ -30,11 +30,11 @@ dist/Formula_Reference.html
 # The lecture notes, student workbook and formula reference PDFs are published
 # deliverables and stay tracked. The instructor edition is not published at all.
 dist/Instructor_Solutions.*
-# build/qa.js screenshot dumps and build/textclash.js report.
+# build/qa.js and build/shot.js screenshot dumps and build/textclash.js report.
 shots/
 shots-m/
 textclash.json
-# pdftoppm renders of the source pages, made for the visual audit.
+# pdftoppm renders, made for visual audits.
 pages/
 
 # --- Scratch ---
@@ -42,22 +42,32 @@ _to_delete/
 *.tmp
 *.log
 
-# Local working area. Here the whole directory stays local, as it always has in
-# this repository: prompts, plans, reports and the agent instructions.
-.claude/
-.Codex/notes/
+# impeccable design tool: config.json is tracked; caches and local overrides are not.
+.impeccable/*
+!.impeccable/config.json
+/.impeccable.md
 
-# The agent instruction files are local in this repository; the design and
-# product documents are tracked at the root.
+# Local working area. The agent instructions and guards are tracked; commands,
+# plans, specs, notes, references, and other working records remain ignored.
+.claude/*
+!.claude/README.md
+!.claude/settings.json
+!.claude/rules/
+!.claude/hooks/
+.claude/hooks/__pycache__/
+
+# FUSE mount leftovers
+.fuse_hidden*
+
+# The root instruction files are tracked; ignore copies anywhere else.
 CLAUDE.md
 AGENTS.md
 DESIGN.md
 PRODUCT.md
+!/CLAUDE.md
+!/AGENTS.md
 !/DESIGN.md
 !/PRODUCT.md
-
-# FUSE mount leftovers
-.fuse_hidden*
 
 # Editor settings: a local convenience, not a property of the project.
 .vscode/

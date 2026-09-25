@@ -1,6 +1,7 @@
-# The host builds the site with `node web/build-site.js`, from `build/src`, the
-# tracked PDFs in `dist/` and the cover page in `web/`. Nothing else is needed,
-# and the first entries must never leave this machine.
+# Nothing here is needed to build the site, and the first entry must never
+# leave this machine: `source/` is the third-party course this one adapts.
+# The deploy is a build from `build/src`, the tracked PDFs in `dist/` and the
+# cover page in `web/`, so excluding these costs nothing.
 source/
 .venv/
 .claude/
