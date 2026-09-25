@@ -660,7 +660,7 @@ const SC = [
 { id:'m5-circuit', module:'M5', nav:'What a circuit is', title:'A circuit is a program, and its picture is not a picture of hardware',
   objective:'Read a circuit diagram: wires, gates, layers, and the order the gates act in.',
   keywords:'quantum circuit diagram wires gates layers program abstract not hardware time left to right qubit lines',
-  src:'L8 · building an abstract circuit', steps:3, blocks:[
+  src:'L8 · building an abstract circuit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'A circuit is a program, and its picture is not a picture of hardware'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -690,7 +690,7 @@ const SC = [
 { id:'m5-model', module:'M5', nav:'The circuit model', title:'What the circuit model of computation allows, and nothing more',
   objective:'State the four steps of the circuit model and say what each one fixes.',
   keywords:'circuit model computation prepare unitary measure repeat computational basis finite gate set model of computation',
-  src:'L8 · a circuit is an abstract program', steps:3, blocks:[
+  src:'L8 · a circuit is an abstract program', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'What the circuit model of computation allows, and nothing more'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -716,7 +716,7 @@ const SC = [
 { id:'m5-read', module:'M5', nav:'Reading the wires', title:'The wire at the top is the last digit of the ket',
   objective:'Translate between the wire order in a diagram, the ket, the vector index and the printed bit string.',
   keywords:'bit order convention wire order ket index vector entry classical register string little endian least significant',
-  src:'L8 · bit order: wires, integers, kets and strings', steps:3, blocks:[
+  src:'L8 · bit order: wires, integers, kets and strings', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'The wire at the top is the last digit of the ket'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -747,7 +747,7 @@ const SC = [
 { id:'m5-depth', module:'M5', nav:'Depth against gate count', title:'Depth is what a coherence time is spent against, and it is not the gate count',
   objective:'Compute the depth and the gate count of a circuit and say which one a coherence budget limits.',
   keywords:'depth gate count layers parallel ghz chain tree coherence time budget circuit length two qubit count',
-  src:'L8 · GHZ state, transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · GHZ state, transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'Depth is what a coherence time is spent against, and it is not the gate count'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -778,7 +778,7 @@ const SC = [
 { id:'m5-state', module:'M5', nav:'Exact simulation', title:'An exact statevector is a debugging tool, and it stops at about thirty qubits',
   objective:'Say what an exact statevector simulation gives and where it stops being possible.',
   keywords:'statevector simulation exact amplitudes deterministic memory exponential debugging tool classical simulation limit',
-  src:'L8 · exact statevector evolution and the operator representation', steps:3, blocks:[
+  src:'L8 · exact statevector evolution and the operator representation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'An exact statevector is a debugging tool, and it stops at about thirty qubits'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -809,7 +809,7 @@ const SC = [
 { id:'m5-shots', module:'M5', nav:'Shots and their error', title:'A probability read from a finite run carries an error bar, and it is not noise',
   objective:'Give the standard error of a probability estimated from N shots and separate it from device noise.',
   keywords:'shots sampling binomial standard error one over root n estimation finite statistics not physical noise systematic',
-  src:'L8 · measurement, barriers and finite shots', steps:3, blocks:[
+  src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A probability read from a finite run carries an error bar, and it is not noise'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -840,7 +840,7 @@ const SC = [
 { id:'m5-measure', module:'M5', nav:'Measurement inside a circuit', title:'A measurement in the middle can be moved to the end, and a gate cannot be moved past one',
   objective:'Apply the deferred-measurement rule and say which rearrangements it does not permit.',
   keywords:'deferred measurement principle mid circuit measurement implicit measurement control classical equivalence commute barrier',
-  src:'L8 · measurement, barriers and finite shots', steps:3, blocks:[
+  src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A measurement in the middle can be moved to the end, and a gate cannot be moved past one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -866,7 +866,7 @@ const SC = [
 { id:'m5-feed', module:'M5', nav:'Classical feedforward', title:'A gate chosen by a bit that did not exist when the circuit was written',
   objective:'Read a dynamic circuit and say what feedforward costs that a fixed circuit does not.',
   keywords:'dynamic circuit classical feedforward conditional gate mid circuit measurement latency reset real time control flow',
-  src:'L8 · dynamic circuits and classical feedforward', steps:3, blocks:[
+  src:'L8 · dynamic circuits and classical feedforward', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A gate chosen by a bit that did not exist when the circuit was written'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -896,7 +896,7 @@ const SC = [
 { id:'m5-iset', module:'M5', nav:'The instruction set', title:'A machine runs a few gates, and every other gate is rewritten into them',
   objective:'Rewrite a gate into a stated instruction set and count what the rewrite costs.',
   keywords:'instruction set native gates basis gates translation rewriting hadamard cz decomposition compile target isa',
-  src:'L8 · transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'A machine runs a few gates, and every other gate is rewritten into them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -928,7 +928,7 @@ const SC = [
 { id:'m5-transpile', module:'M5', nav:'Layout and routing', title:'Two qubits that are not neighbours cannot share a gate until one of them moves',
   objective:'Count what routing a gate between distant qubits costs on a stated coupling map.',
   keywords:'transpilation layout routing coupling map connectivity swap overhead physical qubits virtual mapping compiler passes',
-  src:'L8 · transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'Two qubits that are not neighbours cannot share a gate until one of them moves'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -958,7 +958,7 @@ const SC = [
 { id:'m5-cost', module:'M5', nav:'What a resource claim names', title:'Five things, or it is not yet a claim',
   objective:'State the five components of a resource claim and reject a claim that is missing one.',
   keywords:'resource claim task input model accuracy hardware model classical baseline speedup comparison honest reporting',
-  src:'L8 · execution time, usage and experimental cost', steps:3, blocks:[
+  src:'L8 · execution time, usage and experimental cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'Five things, or it is not yet a claim'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -988,7 +988,7 @@ const SC = [
 { id:'m5-fault', module:'M5', nav:'Physical and logical qubits', title:'One logical qubit is a protected encoding, not one better physical qubit',
   objective:'Distinguish physical and logical qubits, explain syndrome checks and the threshold, and identify space and time overhead.',
   keywords:'quantum error correction physical qubit logical qubit code block syndrome checks decoder threshold code distance fault tolerance space overhead time overhead',
-  src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, blocks:[
+  src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'One logical qubit is a protected encoding, not one better physical qubit'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1013,7 +1013,7 @@ const SC = [
 { id:'m5-ramsey', module:'M5', nav:'Turning phase into counts', title:'A phase is invisible until two Hadamards turn it into a population',
   objective:'Trace the Hadamard sandwich and give the probability it produces from a phase.',
   keywords:'ramsey interference hadamard sandwich phase to population conversion fringe measurement basis change cosine squared',
-  src:'L8 · Ramsey-style phase-to-population conversion', steps:3, blocks:[
+  src:'L8 · Ramsey-style phase-to-population conversion', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Interference in a circuit'},
   {t:'title', text:'A phase is invisible until two Hadamards turn it into a population'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1044,7 +1044,7 @@ const SC = [
 { id:'m5-nocopy', module:'M5', nav:'Why not just copy it', title:'No circuit copies an unknown state, and the obvious one entangles instead',
   objective:'Show that a universal copier is impossible and say what the CNOT copier actually does.',
   keywords:'no cloning theorem copy unknown state inner product proof cnot copier entangles instead orthogonal states classical bit',
-  src:'L9 · the no-cloning theorem', steps:3, blocks:[
+  src:'L9 · the no-cloning theorem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'No circuit copies an unknown state, and the obvious one entangles instead'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1076,7 +1076,7 @@ const SC = [
 { id:'m5-tele', module:'M5', nav:'The teleportation circuit', title:'Teleportation, as a circuit with three qubits and two classical wires',
   objective:'Read the teleportation circuit stage by stage, name what each stage does, and state its role in a quantum network.',
   keywords:'teleportation circuit quantum network primitive nodes link bell pair bell measurement basis rotation classical wires correction three qubits protocol stages',
-  src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, blocks:[
+  src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Teleportation, as a circuit with three qubits and two classical wires'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1104,7 +1104,7 @@ const SC = [
 { id:'m5-teleid', module:'M5', nav:'The identity, derived', title:'The teleportation identity, one step at a time',
   objective:'Derive the four-branch teleportation identity from the initial product state.',
   keywords:'teleportation identity derivation four branches expansion cnot hadamard algebra three qubit state pauli frame',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'The teleportation identity, one step at a time'},
   {t:'body', html:'<p>The protocol is one algebraic identity. It is worth doing in full once, because every claim about teleportation — the correction table, the resource count, the no-signalling argument — is read straight off the last line. Write $|\\psi\\rangle = \\alpha|0\\rangle+\\beta|1\\rangle$ on $q_{0}$, and the shared pair on $q_{1}$ and $q_{2}$. Kets are written $|q_{2}q_{1}q_{0}\\rangle$ throughout.</p>'},
@@ -1136,7 +1136,7 @@ const SC = [
 { id:'m5-telecorr', module:'M5', nav:'The correction table', title:'Two measured bits choose one of four corrections, and nothing else does',
   objective:'Read the correction out of the two measured bits and verify one branch by hand.',
   keywords:'correction table pauli frame measured bits branches x z gates classical feedforward teleportation recovery four cases',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Two measured bits choose one of four corrections, and nothing else does'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1167,7 +1167,7 @@ const SC = [
 { id:'m5-nosig', module:'M5', nav:'Nothing is sent', title:'Before the two bits arrive, Bob holds the same thing whatever was sent',
   objective:'Show that Bob\u2019s reduced state is independent of the input and say what that rules out.',
   keywords:'no signaling reduced state maximally mixed independent of input classical channel light speed entanglement alone sends nothing',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Before the two bits arrive, Bob holds the same thing whatever was sent'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1194,7 +1194,7 @@ const SC = [
 { id:'m5-teleres', module:'M5', nav:'What it costs, and what counts as working', title:'One entangled pair and two bits for one qubit, and two thirds to beat',
   objective:'Account for the resources one teleportation consumes and state the fidelity benchmark it must exceed.',
   keywords:'resources ebit classical bits fidelity benchmark two thirds measure and prepare singlet fraction average fidelity claim',
-  src:'L9 · teleportation fidelity and experimental claims', steps:3, blocks:[
+  src:'L9 · teleportation fidelity and experimental claims', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'One entangled pair and two bits for one qubit, and two thirds to beat'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1225,7 +1225,7 @@ const SC = [
 { id:'m5-lab-i', module:'M5', nav:'Laboratory I', title:'Laboratory I · Teleportation, stepped, with the correction the bits choose',
   objective:'Let the reader step the teleportation circuit and see the correction selected by the measured bits.',
   keywords:'laboratory teleportation stepped branches correction measured bits reduced state bloch no signaling classical channel',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Laboratory I · Teleportation, stepped, with the correction the bits choose'},
   {t:'small', html:'Choose the state to send with the two angles, then walk the circuit one stage at a time. The left panel is the Bloch vector of Bob\u2019s qubit at the chosen stage; the right panel is the fidelity against the tilt of the input. Three things to find: the four branches all have probability one quarter whatever the input is, Bob\u2019s vector sits exactly at the centre until the correction is applied, and applying the wrong correction is not a small error but a completely different state.'},
@@ -1236,7 +1236,7 @@ const SC = [
 { id:'m5-search', module:'M5', nav:'The search problem', title:'An unstructured search, and what a query is allowed to be',
   objective:'State the search problem in the query model and say what the oracle is and is not.',
   keywords:'unstructured search oracle query model black box marked items reversible embedding classical baseline n over two',
-  src:'L9 · Grover search and the oracle', steps:3, blocks:[
+  src:'L9 · Grover search and the oracle', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'An unstructured search, and what a query is allowed to be'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1262,7 +1262,7 @@ const SC = [
 { id:'m5-kick', module:'M5', nav:'Phase kickback', title:'The oracle writes a phase instead of a bit, and that is the only trick',
   objective:'Derive phase kickback and use it to turn the standard oracle into a phase oracle.',
   keywords:'phase kickback minus state eigenstate oracle sign marked items reflection relative phase mechanism interference algorithms',
-  src:'L9 · oracles and hidden implementation cost', steps:3, blocks:[
+  src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The oracle writes a phase instead of a bit, and that is the only trick'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1295,7 +1295,7 @@ const SC = [
 { id:'m5-geom', module:'M5', nav:'The plane it happens in', title:'The whole algorithm lives in a plane spanned by two states',
   objective:'Write the uniform superposition in the marked and unmarked basis and give the angle it makes.',
   keywords:'grover geometry two dimensional subspace good bad states uniform superposition angle theta arcsin marked fraction plane',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The whole algorithm lives in a plane spanned by two states'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1327,7 +1327,7 @@ const SC = [
 { id:'m5-rotate', module:'M5', nav:'Two reflections make a turn', title:'One iteration is two reflections, and two reflections are a rotation',
   objective:'Show that the Grover iteration rotates the state by twice the angle theta.',
   keywords:'grover iteration oracle reflection diffusion operator inversion about the mean rotation two theta amplitude amplification',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'One iteration is two reflections, and two reflections are a rotation'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1355,7 +1355,7 @@ const SC = [
 { id:'m5-iter', module:'M5', nav:'How many iterations', title:'There is a best number of iterations, and going past it makes things worse',
   objective:'Compute the optimal iteration count and the success probability, and describe the overshoot.',
   keywords:'optimal iterations grover success probability sine squared overshoot rotate past unknown m quantum counting stopping',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'There is a best number of iterations, and going past it makes things worse'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1387,7 +1387,7 @@ const SC = [
 { id:'m5-claim', module:'M5', nav:'What the square root claims', title:'The square root is a count of queries, and a query is not a runtime',
   objective:'Write Grover\u2019s claim against the five components and say precisely what it does and does not assert.',
   keywords:'grover claim query complexity optimality lower bound end to end cost data loading error correction baseline speedup honest',
-  src:'L9 · oracles and hidden implementation cost', steps:3, blocks:[
+  src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The square root is a count of queries, and a query is not a runtime'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1417,7 +1417,7 @@ const SC = [
 { id:'m5-lab-j', module:'M5', nav:'Laboratory J', title:'Laboratory J · Grover iterations, the angle, and the overshoot',
   objective:'Let the reader turn the problem size and the iteration count and watch the success probability rise and fall.',
   keywords:'laboratory grover amplitude amplification iterations angle success probability overshoot optimum marked items amplitudes',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'Laboratory J · Grover iterations, the angle, and the overshoot'},
   {t:'small', html:'Choose the number of qubits and how many candidates are marked, then step the iterations. The left panel is the plane of the last two scenes with the state drawn where it actually is; the right panel is the success probability against the iteration count, with every integer marked. Three things to find: the optimum is near $\\tfrac{\\pi}{4}\\sqrt{N/M}$ and is only occasionally exact, running twice the optimum returns almost exactly the probability you started with, and marking a quarter of the candidates makes the algorithm useless because the first step already overshoots.'},

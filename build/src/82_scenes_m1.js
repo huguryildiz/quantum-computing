@@ -456,7 +456,7 @@ const SC = [
 { id:'m1-ket', module:'M1', nav:'A state is a column', title:'A state is a column of complex numbers',
   objective:'Write a qubit state as a normalised complex column and read superposition as linearity.',
   keywords:'ket state vector complex vector space superposition linearity normalisation amplitude column',
-  src:'L2 · vectors and dual vectors', steps:3, blocks:[
+  src:'L2 · vectors and dual vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'A state is a column of complex numbers'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -490,7 +490,7 @@ const SC = [
 { id:'m1-bra', module:'M1', nav:'Bras and the inner product', title:'The bra, and the inner product it computes',
   objective:'Form the adjoint of a ket and compute an inner product with the conjugate in the right place.',
   keywords:'bra dual vector adjoint conjugate transpose inner product vdot overlap dagger',
-  src:'L3 · Dirac notation', steps:3, blocks:[
+  src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'The bra, and the inner product it computes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -523,7 +523,7 @@ const SC = [
 { id:'m1-overlap', module:'M1', nav:'Length and overlap', title:'Length, orthogonality and how alike two states are',
   objective:'Read the modulus of an inner product as a measure of similarity, bounded by Cauchy-Schwarz.',
   keywords:'norm length orthogonality cauchy schwarz overlap distinguishable states unit vector angle',
-  src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, blocks:[
+  src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'Length, orthogonality and how alike two states are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -557,7 +557,7 @@ const SC = [
 { id:'m1-basis', module:'M1', nav:'Orthonormal bases', title:'An orthonormal basis, and reading the coefficients off',
   objective:'Derive the expansion coefficient as an inner product and see that coefficients are basis dependent.',
   keywords:'orthonormal basis kronecker delta expansion coefficients change of basis completeness dimension',
-  src:'L2 · dimension and bases', steps:3, blocks:[
+  src:'L2 · dimension and bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'An orthonormal basis, and reading the coefficients off'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -592,7 +592,7 @@ const SC = [
 { id:'m1-amp', module:'M1', nav:'Modulus and phase', title:'What a complex amplitude carries: a size and an angle',
   objective:'Split a complex amplitude into modulus and phase and compute both without losing the quadrant.',
   keywords:'complex number modulus phase argument euler formula conjugate polar form atan2 amplitude',
-  src:'L3 · complex numbers', steps:3, blocks:[
+  src:'L3 · complex numbers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'What a complex amplitude carries: a size and an angle'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -626,7 +626,7 @@ const SC = [
 { id:'m1-phase', module:'M1', nav:'Global and relative phase', title:'A global phase is invisible; a relative phase is everything',
   objective:'Show that a phase on the whole state changes no probability, and that a phase between two terms changes them all.',
   keywords:'global phase relative phase interference hadamard plus minus indistinguishable equivalence class',
-  src:'L3 · global phase, relative phase and interference', steps:4, blocks:[
+  src:'L3 · global phase, relative phase and interference', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'A global phase is invisible; a relative phase is everything'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -659,7 +659,7 @@ const SC = [
 { id:'m1-lab-a', module:'M1', nav:'Laboratory A', title:'Laboratory A · The relative-phase interferometer',
   objective:'Let the reader move a global phase and a relative phase and watch only one of them do anything.',
   keywords:'laboratory interferometer relative phase global phase hadamard probabilities amplitudes interactive',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'Laboratory A · The relative-phase interferometer'},
   {t:'body', html:'<p>The state is $|\\psi\\rangle = e^{i\\gamma}\\left[\\cos(\\theta/2)|0\\rangle + e^{i\\varphi}\\sin(\\theta/2)|1\\rangle\\right]$. Three controls set the mixing angle $\\theta$, the relative phase $\\varphi$ and the global phase $\\gamma$. The left plot draws the two amplitudes in the complex plane; the right one gives the outcome probabilities in the computational basis and in the $X$ basis, which is the basis a Hadamard measures in.</p>'},
@@ -671,7 +671,7 @@ const SC = [
 { id:'m1-outer', module:'M1', nav:'The outer product', title:'A ket beside a bra is an operator',
   objective:'Build an operator from two states and tell the outer product apart from the inner and tensor products.',
   keywords:'outer product operator matrix unit dyad column times row rank one shapes',
-  src:'L2 · outer products are not tensor products', steps:3, blocks:[
+  src:'L2 · outer products are not tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'A ket beside a bra is an operator'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -704,7 +704,7 @@ const SC = [
 { id:'m1-proj', module:'M1', nav:'Projectors', title:'The projector, and the part of a state it keeps',
   objective:'Define a rank-one projector, verify idempotence, and split a state into a kept and a discarded part.',
   keywords:'projector idempotent hermitian rank one complement subspace component parallel orthogonal',
-  src:'L2 · projectors and the resolution of identity', steps:3, blocks:[
+  src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projector, and the part of a state it keeps'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -735,7 +735,7 @@ const SC = [
 { id:'m1-resid', module:'M1', nav:'Resolving the identity', title:'The projectors of a basis add to the identity',
   objective:'State the completeness relation and use inserting it as a named derivation step.',
   keywords:'resolution of identity completeness relation basis expansion insert identity sum of projectors',
-  src:'L2 · projectors and the resolution of identity', steps:3, blocks:[
+  src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projectors of a basis add to the identity'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -764,7 +764,7 @@ const SC = [
 { id:'m1-gs', module:'M1', nav:'Gram-Schmidt', title:'Gram-Schmidt: making an orthonormal basis out of what you have',
   objective:'Run the Gram-Schmidt recursion by hand and say what makes it fail numerically.',
   keywords:'gram schmidt orthonormalisation qr factorisation projection subtract normalise conditioning stability',
-  src:'L2 · constructing an orthonormal basis', steps:3, blocks:[
+  src:'L2 · constructing an orthonormal basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Gram-Schmidt: making an orthonormal basis out of what you have'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -795,7 +795,7 @@ const SC = [
 { id:'m1-lab-b', module:'M1', nav:'Laboratory B', title:'Laboratory B · Gram-Schmidt, one step at a time',
   objective:'Let the reader choose three vectors, step the orthogonalisation, and drive it to failure.',
   keywords:'laboratory gram schmidt orthonormalisation steps conditioning near dependent modified stability',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Laboratory B · Gram-Schmidt, one step at a time'},
   {t:'small', html:'Three vectors in space. One control sets the angle between the first two, one sets the height of the third above their plane, both over nine decades. The step control runs the recursion one vector at a time: amber is the piece being removed, green is the orthonormal set so far. The right-hand plot counts how many digits of $\\langle e_{i}|e_{j}\\rangle=\\delta_{ij}$ survive, for the recursion of the last scene and for the <b>modified</b> one, which subtracts each projection from what is left rather than from the original vector. Bring both controls down together and watch the two part company.'},
@@ -806,7 +806,7 @@ const SC = [
 { id:'m1-tensor', module:'M1', nav:'The tensor product', title:'Two systems make one, and the dimensions multiply',
   objective:'Form a tensor product of columns and of matrices, under the bit order this course fixes.',
   keywords:'tensor product kronecker composite system dimension multiply bit order qubit register basis strings',
-  src:'L2 · tensor products', steps:4, blocks:[
+  src:'L2 · tensor products', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Two systems make one, and the dimensions multiply'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -840,7 +840,7 @@ const SC = [
 { id:'m1-expo', module:'M1', nav:'Where the exponential comes from', title:'Where the exponential comes from, and what it does not buy',
   objective:'Derive the 2^n dimension from the tensor product and separate size from advantage.',
   keywords:'exponential dimension two to the n state space size readout n bits advantage structure scaling',
-  src:'L2 · tensor products', steps:3, blocks:[
+  src:'L2 · tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Where the exponential comes from, and what it does not buy'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -866,7 +866,7 @@ const SC = [
 { id:'m1-adjoint', module:'M1', nav:'The adjoint', title:'The adjoint, and how to take one without losing a conjugate',
   objective:'Form the adjoint of an operator, test a matrix for Hermiticity, and apply the order-reversal rule.',
   keywords:'adjoint dagger conjugate transpose hermitian test order reversal product numpy conj',
-  src:'L3 · Hermitian matrices', steps:3, blocks:[
+  src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The adjoint, and how to take one without losing a conjugate'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -899,7 +899,7 @@ const SC = [
 { id:'m1-herm', module:'M1', nav:'Why observables are Hermitian', title:'A Hermitian operator has real eigenvalues',
   objective:'Prove that Hermiticity forces real eigenvalues and say why an observable therefore has to be Hermitian.',
   keywords:'hermitian real eigenvalues proof observable measurement outcomes orthonormal eigenbasis spectrum',
-  src:'L3 · Hermitian matrices', steps:3, blocks:[
+  src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian operator has real eigenvalues'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -928,7 +928,7 @@ const SC = [
 { id:'m1-unit', module:'M1', nav:'Unitary operators', title:'Unitary operators preserve every inner product',
   objective:'Derive the unitarity condition from the requirement that overlaps are preserved.',
   keywords:'unitary inner product preserved norm reversible gate adjoint inverse orthonormal columns',
-  src:'L3 · unitary operators', steps:3, blocks:[
+  src:'L3 · unitary operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'Unitary operators preserve every inner product'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -960,7 +960,7 @@ const SC = [
 { id:'m1-gen', module:'M1', nav:'Hermitian generators', title:'A Hermitian generator makes a family of unitaries',
   objective:'Show that the exponential of a Hermitian operator is unitary and derive its closed form for a Pauli.',
   keywords:'generator exponential unitary family pauli series even odd terms closed form cosine sine',
-  src:'L3 · Hermitian generators produce unitary transformations', steps:3, blocks:[
+  src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian generator makes a family of unitaries'},
   {t:'lede', text:'The two kinds of operator this course needs are joined by one construction. Feed a Hermitian operator to an exponential and a unitary comes out, one for every value of a real parameter.'},
@@ -989,7 +989,7 @@ const SC = [
 { id:'m1-halfangle', module:'M1', nav:'The half angle', title:'The half angle, and what a full turn leaves behind',
   objective:'Evaluate a Pauli rotation at a given angle and read the sign a full turn produces.',
   keywords:'half angle double cover full turn minus identity rotation rz worked example global phase period',
-  src:'L3 · Hermitian generators produce unitary transformations', steps:3, blocks:[
+  src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The half angle, and what a full turn leaves behind'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1020,7 +1020,7 @@ const SC = [
 { id:'m1-eig', module:'M1', nav:'Eigenvectors', title:'Eigenvectors: the directions an operator leaves alone',
   objective:'Solve a two-by-two eigenvalue problem and say what an eigenvector is determined up to.',
   keywords:'eigenvector eigenvalue characteristic polynomial invariant direction degeneracy eigh eig scale phase',
-  src:'L3 · eigenvectors and eigenvalues', steps:3, blocks:[
+  src:'L3 · eigenvectors and eigenvalues', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'Eigenvectors: the directions an operator leaves alone'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1053,7 +1053,7 @@ const SC = [
 { id:'m1-spectral', module:'M1', nav:'The spectral theorem', title:'The spectral theorem: eigenvalues, and the projectors that belong to them',
   objective:'Write a Hermitian operator as a weighted sum of projectors and verify the two properties they satisfy.',
   keywords:'spectral theorem decomposition projectors orthogonal eigenbasis diagonalisation weighted sum degeneracy',
-  src:'L3 · the finite-dimensional spectral theorem', steps:3, blocks:[
+  src:'L3 · the finite-dimensional spectral theorem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'The spectral theorem: eigenvalues, and the projectors that belong to them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1086,7 +1086,7 @@ const SC = [
 { id:'m1-fofa', module:'M1', nav:'Functions of an operator', title:'A function of an operator acts on its eigenvalues',
   objective:'Evaluate a function of a Hermitian operator through its spectral decomposition.',
   keywords:'operator function exponential spectral eigenvalues matrix exponential not elementwise square root',
-  src:'L3 · spectral projectors and functions of an operator', steps:4, blocks:[
+  src:'L3 · spectral projectors and functions of an operator', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'A function of an operator acts on its eigenvalues'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -1120,7 +1120,7 @@ const SC = [
 { id:'m1-dirac', module:'M1', nav:'Dirac notation', title:'Dirac notation is a way of writing what is already there',
   objective:'Translate between Dirac notation and matrix notation in both directions and read a product right to left.',
   keywords:'dirac notation bra ket translation matrix column row expectation value basis independent order',
-  src:'L3 · Dirac notation', steps:3, blocks:[
+  src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Dirac notation'},
   {t:'title', text:'Dirac notation is a way of writing what is already there'},
   {t:'lede', text:'Nothing in this chapter needed the notation. Every result was a statement about columns, rows and matrices, and could have been written that way throughout. The notation earns its place because it says which object is which without naming a basis, and because the shapes then check themselves.'},
@@ -1154,7 +1154,7 @@ const SC = [
 { id:'m1-wavefunctions', module:'M1', nav:'Functions as vectors', title:'A wavefunction is a vector with a continuous index',
   objective:'Use the inner product for square-integrable functions and recognise it as the continuous version of a complex column.',
   keywords:'wavefunction function vector Hilbert space square integrable L2 inner product integral norm orthogonal sine cosine',
-  src:'L4 · square-integrable functions as vectors', steps:3, blocks:[
+  src:'L4 · square-integrable functions as vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'A wavefunction is a vector with a continuous index'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1184,7 +1184,7 @@ const SC = [
 { id:'m1-completeness', module:'M1', nav:'Completeness and truncation', title:'Completeness turns a function into coefficients and measures what truncation loses',
   objective:'Use a complete orthonormal basis, Parseval identity and the coefficient tail to quantify a truncated expansion.',
   keywords:'complete basis Parseval Fourier expansion coefficients truncation error norm convergence function space',
-  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, blocks:[
+  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'Completeness turns a function into coefficients and measures what truncation loses'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[

@@ -232,7 +232,7 @@ const SC = [
 { id:'m0-what', module:'M0', nav:'What it is for', title:'What a quantum computer is for',
   objective:'Give the honest scope of the machine, and the shape of a defensible advantage claim.',
   keywords:'quantum advantage claim coprocessor simulation cannot replace classical baseline resources',
-  src:'L0 · quantum computers do not replace classical computers', steps:3, blocks:[
+  src:'L0 · quantum computers do not replace classical computers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'What a quantum computer is for'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -261,7 +261,7 @@ const SC = [
 { id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From semiconductor scaling to the NISQ engineering regime',
   objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
   keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
-  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, blocks:[
+  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'From semiconductor scaling to the NISQ engineering regime'},
   {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
@@ -286,7 +286,7 @@ const SC = [
 { id:'m0-scale', module:'M0', nav:'The size of the state', title:'The size of the state, and why size alone buys nothing',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',
-  src:'L0 · the state-space scaling challenge', steps:3, blocks:[
+  src:'L0 · the state-space scaling challenge', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'The size of the state, and why size alone buys nothing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -314,7 +314,7 @@ const SC = [
 { id:'m0-phase', module:'M0', nav:'Phase becomes probability', title:'How a phase becomes something you can count',
   objective:'Follow the three-gate interferometer that turns a relative phase into a measurable population.',
   keywords:'interference relative phase hadamard rz interferometer ramsey probability cos squared sensing',
-  src:'L0 · converting phase into a measurable probability', steps:4, blocks:[
+  src:'L0 · converting phase into a measurable probability', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'How a phase becomes something you can count'},
   {t:'lede', text:'A phase is not observable. A probability is. This scene is the smallest machine that turns one into the other, and every algorithm in Module 6 is a larger version of it.'},
@@ -351,7 +351,7 @@ const SC = [
 { id:'m0-fringe', module:'M0', nav:'Reading the fringe', title:'Reading the fringe, and the same machine as a sensor',
   objective:'Read the interference curve as a measurement, and identify the phase source that turns it into a sensor.',
   keywords:'fringe interference curve ramsey sensing magnetometry coherence time shots estimate field',
-  src:'L0 · why the same sequence is useful for sensing', steps:2, blocks:[
+  src:'L0 · why the same sequence is useful for sensing', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'Reading the fringe, and the same machine as a sensor'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -374,7 +374,7 @@ const SC = [
 { id:'m0-map', module:'M0', nav:'The course map', title:'What is in the six modules',
   objective:'Give the shape of the course and how the modules depend on each other.',
   keywords:'course map modules overview structure dependencies linear algebra measurement entanglement gates circuits algorithms',
-  steps:2, blocks:[
+  steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'What is in the six modules'},
   {t:'cols', ratio:'c-5-7', vcenter:true, left:[
@@ -408,7 +408,7 @@ const SC = [
 { id:'m0-how', module:'M0', nav:'How to read this', title:'How to read this, and where the numbers come from',
   objective:'Explain the reveal, the laboratories, the editions and the textbook anchor convention.',
   keywords:'how to read reveal steps laboratories editions anchors textbook convention notation bit order',
-  steps:1, blocks:[
+  steps:1, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'How to read this, and where the numbers come from'},
   {t:'grid', cols:4, gap:'20px', items:[

@@ -7774,7 +7774,7 @@ const SC = [
 { id:'m0-what', module:'M0', nav:'What it is for', title:'What a quantum computer is for',
   objective:'Give the honest scope of the machine, and the shape of a defensible advantage claim.',
   keywords:'quantum advantage claim coprocessor simulation cannot replace classical baseline resources',
-  src:'L0 · quantum computers do not replace classical computers', steps:3, blocks:[
+  src:'L0 · quantum computers do not replace classical computers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'What a quantum computer is for'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -7803,7 +7803,7 @@ const SC = [
 { id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From semiconductor scaling to the NISQ engineering regime',
   objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
   keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
-  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, blocks:[
+  src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'From semiconductor scaling to the NISQ engineering regime'},
   {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
@@ -7828,7 +7828,7 @@ const SC = [
 { id:'m0-scale', module:'M0', nav:'The size of the state', title:'The size of the state, and why size alone buys nothing',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',
-  src:'L0 · the state-space scaling challenge', steps:3, blocks:[
+  src:'L0 · the state-space scaling challenge', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'The size of the state, and why size alone buys nothing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -7856,7 +7856,7 @@ const SC = [
 { id:'m0-phase', module:'M0', nav:'Phase becomes probability', title:'How a phase becomes something you can count',
   objective:'Follow the three-gate interferometer that turns a relative phase into a measurable population.',
   keywords:'interference relative phase hadamard rz interferometer ramsey probability cos squared sensing',
-  src:'L0 · converting phase into a measurable probability', steps:4, blocks:[
+  src:'L0 · converting phase into a measurable probability', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'How a phase becomes something you can count'},
   {t:'lede', text:'A phase is not observable. A probability is. This scene is the smallest machine that turns one into the other, and every algorithm in Module 6 is a larger version of it.'},
@@ -7893,7 +7893,7 @@ const SC = [
 { id:'m0-fringe', module:'M0', nav:'Reading the fringe', title:'Reading the fringe, and the same machine as a sensor',
   objective:'Read the interference curve as a measurement, and identify the phase source that turns it into a sensor.',
   keywords:'fringe interference curve ramsey sensing magnetometry coherence time shots estimate field',
-  src:'L0 · why the same sequence is useful for sensing', steps:2, blocks:[
+  src:'L0 · why the same sequence is useful for sensing', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'Reading the fringe, and the same machine as a sensor'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -7916,7 +7916,7 @@ const SC = [
 { id:'m0-map', module:'M0', nav:'The course map', title:'What is in the six modules',
   objective:'Give the shape of the course and how the modules depend on each other.',
   keywords:'course map modules overview structure dependencies linear algebra measurement entanglement gates circuits algorithms',
-  steps:2, blocks:[
+  steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'What is in the six modules'},
   {t:'cols', ratio:'c-5-7', vcenter:true, left:[
@@ -7950,7 +7950,7 @@ const SC = [
 { id:'m0-how', module:'M0', nav:'How to read this', title:'How to read this, and where the numbers come from',
   objective:'Explain the reveal, the laboratories, the editions and the textbook anchor convention.',
   keywords:'how to read reveal steps laboratories editions anchors textbook convention notation bit order',
-  steps:1, blocks:[
+  steps:1, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
   {t:'title', text:'How to read this, and where the numbers come from'},
   {t:'grid', cols:4, gap:'20px', items:[
@@ -8446,7 +8446,7 @@ const SC = [
 { id:'m1-ket', module:'M1', nav:'A state is a column', title:'A state is a column of complex numbers',
   objective:'Write a qubit state as a normalised complex column and read superposition as linearity.',
   keywords:'ket state vector complex vector space superposition linearity normalisation amplitude column',
-  src:'L2 · vectors and dual vectors', steps:3, blocks:[
+  src:'L2 · vectors and dual vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'A state is a column of complex numbers'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8480,7 +8480,7 @@ const SC = [
 { id:'m1-bra', module:'M1', nav:'Bras and the inner product', title:'The bra, and the inner product it computes',
   objective:'Form the adjoint of a ket and compute an inner product with the conjugate in the right place.',
   keywords:'bra dual vector adjoint conjugate transpose inner product vdot overlap dagger',
-  src:'L3 · Dirac notation', steps:3, blocks:[
+  src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'The bra, and the inner product it computes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8513,7 +8513,7 @@ const SC = [
 { id:'m1-overlap', module:'M1', nav:'Length and overlap', title:'Length, orthogonality and how alike two states are',
   objective:'Read the modulus of an inner product as a measure of similarity, bounded by Cauchy-Schwarz.',
   keywords:'norm length orthogonality cauchy schwarz overlap distinguishable states unit vector angle',
-  src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, blocks:[
+  src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'Length, orthogonality and how alike two states are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8547,7 +8547,7 @@ const SC = [
 { id:'m1-basis', module:'M1', nav:'Orthonormal bases', title:'An orthonormal basis, and reading the coefficients off',
   objective:'Derive the expansion coefficient as an inner product and see that coefficients are basis dependent.',
   keywords:'orthonormal basis kronecker delta expansion coefficients change of basis completeness dimension',
-  src:'L2 · dimension and bases', steps:3, blocks:[
+  src:'L2 · dimension and bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'An orthonormal basis, and reading the coefficients off'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8582,7 +8582,7 @@ const SC = [
 { id:'m1-amp', module:'M1', nav:'Modulus and phase', title:'What a complex amplitude carries: a size and an angle',
   objective:'Split a complex amplitude into modulus and phase and compute both without losing the quadrant.',
   keywords:'complex number modulus phase argument euler formula conjugate polar form atan2 amplitude',
-  src:'L3 · complex numbers', steps:3, blocks:[
+  src:'L3 · complex numbers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'What a complex amplitude carries: a size and an angle'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8616,7 +8616,7 @@ const SC = [
 { id:'m1-phase', module:'M1', nav:'Global and relative phase', title:'A global phase is invisible; a relative phase is everything',
   objective:'Show that a phase on the whole state changes no probability, and that a phase between two terms changes them all.',
   keywords:'global phase relative phase interference hadamard plus minus indistinguishable equivalence class',
-  src:'L3 · global phase, relative phase and interference', steps:4, blocks:[
+  src:'L3 · global phase, relative phase and interference', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'A global phase is invisible; a relative phase is everything'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8649,7 +8649,7 @@ const SC = [
 { id:'m1-lab-a', module:'M1', nav:'Laboratory A', title:'Laboratory A · The relative-phase interferometer',
   objective:'Let the reader move a global phase and a relative phase and watch only one of them do anything.',
   keywords:'laboratory interferometer relative phase global phase hadamard probabilities amplitudes interactive',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'Laboratory A · The relative-phase interferometer'},
   {t:'body', html:'<p>The state is $|\\psi\\rangle = e^{i\\gamma}\\left[\\cos(\\theta/2)|0\\rangle + e^{i\\varphi}\\sin(\\theta/2)|1\\rangle\\right]$. Three controls set the mixing angle $\\theta$, the relative phase $\\varphi$ and the global phase $\\gamma$. The left plot draws the two amplitudes in the complex plane; the right one gives the outcome probabilities in the computational basis and in the $X$ basis, which is the basis a Hadamard measures in.</p>'},
@@ -8661,7 +8661,7 @@ const SC = [
 { id:'m1-outer', module:'M1', nav:'The outer product', title:'A ket beside a bra is an operator',
   objective:'Build an operator from two states and tell the outer product apart from the inner and tensor products.',
   keywords:'outer product operator matrix unit dyad column times row rank one shapes',
-  src:'L2 · outer products are not tensor products', steps:3, blocks:[
+  src:'L2 · outer products are not tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'A ket beside a bra is an operator'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8694,7 +8694,7 @@ const SC = [
 { id:'m1-proj', module:'M1', nav:'Projectors', title:'The projector, and the part of a state it keeps',
   objective:'Define a rank-one projector, verify idempotence, and split a state into a kept and a discarded part.',
   keywords:'projector idempotent hermitian rank one complement subspace component parallel orthogonal',
-  src:'L2 · projectors and the resolution of identity', steps:3, blocks:[
+  src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projector, and the part of a state it keeps'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -8725,7 +8725,7 @@ const SC = [
 { id:'m1-resid', module:'M1', nav:'Resolving the identity', title:'The projectors of a basis add to the identity',
   objective:'State the completeness relation and use inserting it as a named derivation step.',
   keywords:'resolution of identity completeness relation basis expansion insert identity sum of projectors',
-  src:'L2 · projectors and the resolution of identity', steps:3, blocks:[
+  src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projectors of a basis add to the identity'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8754,7 +8754,7 @@ const SC = [
 { id:'m1-gs', module:'M1', nav:'Gram-Schmidt', title:'Gram-Schmidt: making an orthonormal basis out of what you have',
   objective:'Run the Gram-Schmidt recursion by hand and say what makes it fail numerically.',
   keywords:'gram schmidt orthonormalisation qr factorisation projection subtract normalise conditioning stability',
-  src:'L2 · constructing an orthonormal basis', steps:3, blocks:[
+  src:'L2 · constructing an orthonormal basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Gram-Schmidt: making an orthonormal basis out of what you have'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -8785,7 +8785,7 @@ const SC = [
 { id:'m1-lab-b', module:'M1', nav:'Laboratory B', title:'Laboratory B · Gram-Schmidt, one step at a time',
   objective:'Let the reader choose three vectors, step the orthogonalisation, and drive it to failure.',
   keywords:'laboratory gram schmidt orthonormalisation steps conditioning near dependent modified stability',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Laboratory B · Gram-Schmidt, one step at a time'},
   {t:'small', html:'Three vectors in space. One control sets the angle between the first two, one sets the height of the third above their plane, both over nine decades. The step control runs the recursion one vector at a time: amber is the piece being removed, green is the orthonormal set so far. The right-hand plot counts how many digits of $\\langle e_{i}|e_{j}\\rangle=\\delta_{ij}$ survive, for the recursion of the last scene and for the <b>modified</b> one, which subtracts each projection from what is left rather than from the original vector. Bring both controls down together and watch the two part company.'},
@@ -8796,7 +8796,7 @@ const SC = [
 { id:'m1-tensor', module:'M1', nav:'The tensor product', title:'Two systems make one, and the dimensions multiply',
   objective:'Form a tensor product of columns and of matrices, under the bit order this course fixes.',
   keywords:'tensor product kronecker composite system dimension multiply bit order qubit register basis strings',
-  src:'L2 · tensor products', steps:4, blocks:[
+  src:'L2 · tensor products', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Two systems make one, and the dimensions multiply'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8830,7 +8830,7 @@ const SC = [
 { id:'m1-expo', module:'M1', nav:'Where the exponential comes from', title:'Where the exponential comes from, and what it does not buy',
   objective:'Derive the 2^n dimension from the tensor product and separate size from advantage.',
   keywords:'exponential dimension two to the n state space size readout n bits advantage structure scaling',
-  src:'L2 · tensor products', steps:3, blocks:[
+  src:'L2 · tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Where the exponential comes from, and what it does not buy'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8856,7 +8856,7 @@ const SC = [
 { id:'m1-adjoint', module:'M1', nav:'The adjoint', title:'The adjoint, and how to take one without losing a conjugate',
   objective:'Form the adjoint of an operator, test a matrix for Hermiticity, and apply the order-reversal rule.',
   keywords:'adjoint dagger conjugate transpose hermitian test order reversal product numpy conj',
-  src:'L3 · Hermitian matrices', steps:3, blocks:[
+  src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The adjoint, and how to take one without losing a conjugate'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8889,7 +8889,7 @@ const SC = [
 { id:'m1-herm', module:'M1', nav:'Why observables are Hermitian', title:'A Hermitian operator has real eigenvalues',
   objective:'Prove that Hermiticity forces real eigenvalues and say why an observable therefore has to be Hermitian.',
   keywords:'hermitian real eigenvalues proof observable measurement outcomes orthonormal eigenbasis spectrum',
-  src:'L3 · Hermitian matrices', steps:3, blocks:[
+  src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian operator has real eigenvalues'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8918,7 +8918,7 @@ const SC = [
 { id:'m1-unit', module:'M1', nav:'Unitary operators', title:'Unitary operators preserve every inner product',
   objective:'Derive the unitarity condition from the requirement that overlaps are preserved.',
   keywords:'unitary inner product preserved norm reversible gate adjoint inverse orthonormal columns',
-  src:'L3 · unitary operators', steps:3, blocks:[
+  src:'L3 · unitary operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'Unitary operators preserve every inner product'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -8950,7 +8950,7 @@ const SC = [
 { id:'m1-gen', module:'M1', nav:'Hermitian generators', title:'A Hermitian generator makes a family of unitaries',
   objective:'Show that the exponential of a Hermitian operator is unitary and derive its closed form for a Pauli.',
   keywords:'generator exponential unitary family pauli series even odd terms closed form cosine sine',
-  src:'L3 · Hermitian generators produce unitary transformations', steps:3, blocks:[
+  src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian generator makes a family of unitaries'},
   {t:'lede', text:'The two kinds of operator this course needs are joined by one construction. Feed a Hermitian operator to an exponential and a unitary comes out, one for every value of a real parameter.'},
@@ -8979,7 +8979,7 @@ const SC = [
 { id:'m1-halfangle', module:'M1', nav:'The half angle', title:'The half angle, and what a full turn leaves behind',
   objective:'Evaluate a Pauli rotation at a given angle and read the sign a full turn produces.',
   keywords:'half angle double cover full turn minus identity rotation rz worked example global phase period',
-  src:'L3 · Hermitian generators produce unitary transformations', steps:3, blocks:[
+  src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The half angle, and what a full turn leaves behind'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9010,7 +9010,7 @@ const SC = [
 { id:'m1-eig', module:'M1', nav:'Eigenvectors', title:'Eigenvectors: the directions an operator leaves alone',
   objective:'Solve a two-by-two eigenvalue problem and say what an eigenvector is determined up to.',
   keywords:'eigenvector eigenvalue characteristic polynomial invariant direction degeneracy eigh eig scale phase',
-  src:'L3 · eigenvectors and eigenvalues', steps:3, blocks:[
+  src:'L3 · eigenvectors and eigenvalues', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'Eigenvectors: the directions an operator leaves alone'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9043,7 +9043,7 @@ const SC = [
 { id:'m1-spectral', module:'M1', nav:'The spectral theorem', title:'The spectral theorem: eigenvalues, and the projectors that belong to them',
   objective:'Write a Hermitian operator as a weighted sum of projectors and verify the two properties they satisfy.',
   keywords:'spectral theorem decomposition projectors orthogonal eigenbasis diagonalisation weighted sum degeneracy',
-  src:'L3 · the finite-dimensional spectral theorem', steps:3, blocks:[
+  src:'L3 · the finite-dimensional spectral theorem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'The spectral theorem: eigenvalues, and the projectors that belong to them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9076,7 +9076,7 @@ const SC = [
 { id:'m1-fofa', module:'M1', nav:'Functions of an operator', title:'A function of an operator acts on its eigenvalues',
   objective:'Evaluate a function of a Hermitian operator through its spectral decomposition.',
   keywords:'operator function exponential spectral eigenvalues matrix exponential not elementwise square root',
-  src:'L3 · spectral projectors and functions of an operator', steps:4, blocks:[
+  src:'L3 · spectral projectors and functions of an operator', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'A function of an operator acts on its eigenvalues'},
   {t:'cols', ratio:'c-7-5', vcenter:true, left:[
@@ -9110,7 +9110,7 @@ const SC = [
 { id:'m1-dirac', module:'M1', nav:'Dirac notation', title:'Dirac notation is a way of writing what is already there',
   objective:'Translate between Dirac notation and matrix notation in both directions and read a product right to left.',
   keywords:'dirac notation bra ket translation matrix column row expectation value basis independent order',
-  src:'L3 · Dirac notation', steps:3, blocks:[
+  src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Dirac notation'},
   {t:'title', text:'Dirac notation is a way of writing what is already there'},
   {t:'lede', text:'Nothing in this chapter needed the notation. Every result was a statement about columns, rows and matrices, and could have been written that way throughout. The notation earns its place because it says which object is which without naming a basis, and because the shapes then check themselves.'},
@@ -9144,7 +9144,7 @@ const SC = [
 { id:'m1-wavefunctions', module:'M1', nav:'Functions as vectors', title:'A wavefunction is a vector with a continuous index',
   objective:'Use the inner product for square-integrable functions and recognise it as the continuous version of a complex column.',
   keywords:'wavefunction function vector Hilbert space square integrable L2 inner product integral norm orthogonal sine cosine',
-  src:'L4 · square-integrable functions as vectors', steps:3, blocks:[
+  src:'L4 · square-integrable functions as vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'A wavefunction is a vector with a continuous index'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9174,7 +9174,7 @@ const SC = [
 { id:'m1-completeness', module:'M1', nav:'Completeness and truncation', title:'Completeness turns a function into coefficients and measures what truncation loses',
   objective:'Use a complete orthonormal basis, Parseval identity and the coefficient tail to quantify a truncated expansion.',
   keywords:'complete basis Parseval Fourier expansion coefficients truncation error norm convergence function space',
-  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, blocks:[
+  src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'Completeness turns a function into coefficients and measures what truncation loses'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9619,7 +9619,7 @@ const SC = [
 { id:'m2-born', module:'M2', nav:'The Born rule', title:'The Born rule: from an amplitude to a count',
   objective:'State the Born rule and check that the probabilities it gives add to one.',
   keywords:'born rule probability amplitude squared modulus outcome basis completeness shot',
-  src:'L4 · Born rule', steps:3, blocks:[
+  src:'L4 · Born rule', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'The Born rule: from an amplitude to a count'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9652,7 +9652,7 @@ const SC = [
 { id:'m2-bases', module:'M2', nav:'Choosing a basis is choosing an experiment', title:'A measurement basis is an experiment, not a coordinate system',
   objective:'Separate a passive change of coordinates from the choice of what to measure.',
   keywords:'measurement basis Z X Y eigenbasis passive change of coordinates different experiment pauli',
-  src:'L4 · three standard qubit bases', steps:3, blocks:[
+  src:'L4 · three standard qubit bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'A measurement basis is an experiment, not a coordinate system'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9680,7 +9680,7 @@ const SC = [
 { id:'m2-distinguish', module:'M2', nav:'Telling two states apart', title:'When two states can be told apart, and when they cannot',
   objective:'Show that one measurement separates two states with certainty exactly when they are orthogonal.',
   keywords:'distinguishing states orthogonal certainty overlap single shot no cloning discrimination',
-  src:'L4 · projectors and measurement geometry', steps:3, blocks:[
+  src:'L4 · projectors and measurement geometry', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'When two states can be told apart, and when they cannot'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9706,7 +9706,7 @@ const SC = [
 { id:'m2-lab-c', module:'M2', nav:'Laboratory C', title:'Laboratory C · Exact probability against a finite sample',
   objective:'Let the reader set a state, a measurement basis and a shot count, and read the exact answer beside the sampled one.',
   keywords:'laboratory measurement basis shots histogram exact probability sampling error wilson interval',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'Laboratory C · Exact probability against a finite sample'},
   {t:'small', html:'The state is $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$ and the instrument measures along $Z$, $X$ or $Y$. The left panel puts the exact Born probabilities beside the frequencies of a simulated run; the right one follows the estimate as the shots accumulate, inside the band the sampling error allows. Nothing here is noisy hardware: the device is perfect and the spread is the counting alone.'},
@@ -9717,7 +9717,7 @@ const SC = [
 { id:'m2-proj', module:'M2', nav:'Projective measurement', title:'Projective measurement, and what a degenerate outcome is',
   objective:'Write a measurement as a set of orthogonal projectors and compute an outcome probability from them.',
   keywords:'projective measurement projectors orthogonal complete degenerate eigenspace born probability rank',
-  src:'L5 · projective measurement', steps:3, blocks:[
+  src:'L5 · projective measurement', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'Projective measurement, and what a degenerate outcome is'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9743,7 +9743,7 @@ const SC = [
 { id:'m2-collapse', module:'M2', nav:'The state afterwards', title:'What the state is after a reading has been taken',
   objective:'Apply the projection update rule and show that an immediate repeat gives the same answer.',
   keywords:'state update luders rule collapse conditioning renormalise repeatable measurement disturbance',
-  src:'L5 · projective measurement', steps:4, blocks:[
+  src:'L5 · projective measurement', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'What the state is after a reading has been taken'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9777,7 +9777,7 @@ const SC = [
 { id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'The general measurement, and what a readout error looks like',
   objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
-  src:'L5 · general measurements: POVMs and instruments', steps:3, blocks:[
+  src:'L5 · general measurements: POVMs and instruments', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'The general measurement, and what a readout error looks like'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9809,7 +9809,7 @@ const SC = [
 { id:'m2-obs', module:'M2', nav:'Expectation values', title:'The expectation value, and why it is often not an outcome',
   objective:'Compute an expectation value two ways and say what it is an average over.',
   keywords:'observable expectation value ensemble average hermitian eigenvalue mean not an outcome',
-  src:'L5 · expectation values and variance', steps:3, blocks:[
+  src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
   {t:'title', text:'The expectation value, and why it is often not an outcome'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9841,7 +9841,7 @@ const SC = [
 { id:'m2-var', module:'M2', nav:'Spread', title:'Variance, and the states on which an observable is sharp',
   objective:'Compute a variance and identify the states for which it vanishes.',
   keywords:'variance standard deviation spread sharp eigenstate certainty delta A observable',
-  src:'L5 · expectation values and variance', steps:3, blocks:[
+  src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
   {t:'title', text:'Variance, and the states on which an observable is sharp'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9874,7 +9874,7 @@ const SC = [
 { id:'m2-comm', module:'M2', nav:'Compatibility', title:'The commutator, and when two readings can both be sharp',
   objective:'Compute a commutator and connect it to whether two observables share an eigenbasis.',
   keywords:'commutator compatible observables shared eigenbasis simultaneous sharp sequential measurement disturbance',
-  src:'L5 · compatibility, commutators and uncertainty', steps:3, blocks:[
+  src:'L5 · compatibility, commutators and uncertainty', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
   {t:'title', text:'The commutator, and when two readings can both be sharp'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9902,7 +9902,7 @@ const SC = [
 { id:'m2-uncert', module:'M2', nav:'The uncertainty relation', title:'The uncertainty relation, and what it is a statement about',
   objective:'State the Robertson relation, check it on a family of states, and say what it does not claim.',
   keywords:'uncertainty relation robertson bound commutator spread product cauchy schwarz saturated',
-  src:'L5 · Robertson uncertainty relation', steps:3, blocks:[
+  src:'L5 · Robertson uncertainty relation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
   {t:'title', text:'The uncertainty relation, and what it is a statement about'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9930,7 +9930,7 @@ const SC = [
 { id:'m2-pauli', module:'M2', nav:'The Pauli operators', title:'The Pauli operators: observable and gate at once',
   objective:'List the three Pauli operators with their eigenvalues and eigenstates, and say why each is both an observable and a gate.',
   keywords:'pauli matrices X Y Z hermitian unitary traceless square identity eigenstates spin stern gerlach',
-  src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, blocks:[
+  src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'The Pauli operators: observable and gate at once'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9962,7 +9962,7 @@ const SC = [
 { id:'m2-paulialg', module:'M2', nav:'The Pauli algebra', title:'One product rule, and everything else follows from it',
   objective:'Use the Pauli product rule to get any commutator or anticommutator without multiplying matrices.',
   keywords:'pauli algebra product rule commutator anticommutator cyclic levi civita identity operator basis',
-  src:'L5 · Pauli algebra', steps:3, blocks:[
+  src:'L5 · Pauli algebra', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'One product rule, and everything else follows from it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -9995,7 +9995,7 @@ const SC = [
 { id:'m2-ndotsigma', module:'M2', nav:'Measuring along any direction', title:'Measuring along a direction, and the first sight of a vector',
   objective:'Build the projectors for a measurement along an arbitrary axis and read off the outcome probability.',
   keywords:'n dot sigma arbitrary direction projector half identity plus axis bloch vector cos squared',
-  src:'L5 · Stern-Gerlach experiment', steps:3, blocks:[
+  src:'L5 · Stern-Gerlach experiment', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'Measuring along a direction, and the first sight of a vector'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10022,7 +10022,7 @@ const SC = [
 { id:'m2-position', module:'M2', nav:'Position representation', title:'Position and momentum are operators on a wavefunction',
   objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
   keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
-  src:'L5 · coordinate representation and the free particle', steps:3, blocks:[
+  src:'L5 · coordinate representation and the free particle', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Position and momentum are operators on a wavefunction'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10049,7 +10049,7 @@ const SC = [
 { id:'m2-schrod', module:'M2', nav:'Evolution', title:'Evolution: one Hermitian operator, one unitary family',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
-  src:'L5 · closed-system time evolution', steps:3, blocks:[
+  src:'L5 · closed-system time evolution', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Evolution: one Hermitian operator, one unitary family'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10080,7 +10080,7 @@ const SC = [
 { id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Why one energy eigenstate does nothing and two of them beat',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
-  src:'L5 · stationary states and superpositions', steps:3, blocks:[
+  src:'L5 · stationary states and superpositions', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Why one energy eigenstate does nothing and two of them beat'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10109,7 +10109,7 @@ const SC = [
 { id:'m2-well', module:'M2', nav:'The infinite square well', title:'Boundary conditions turn a continuous wave number into discrete energies',
   objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
   keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
-  src:'L5 · infinite square well', steps:3, blocks:[
+  src:'L5 · infinite square well', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Boundary conditions turn a continuous wave number into discrete energies'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10140,7 +10140,7 @@ const SC = [
 { id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Why a gate is an exponential, and what a pulse controls',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',
-  src:'L5 · driven qubit: Hamiltonians become gates', steps:3, blocks:[
+  src:'L5 · driven qubit: Hamiltonians become gates', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Why a gate is an exponential, and what a pulse controls'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10167,7 +10167,7 @@ const SC = [
 { id:'m2-lab-d', module:'M2', nav:'Laboratory D', title:'Laboratory D · Driving a qubit: strength, detuning and time',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
   keywords:'laboratory rabi oscillation drive strength detuning population resonance pulse area pi pulse',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Laboratory D · Driving a qubit: strength, detuning and time'},
   {t:'small', html:'The qubit starts in $|0\\rangle$ under $H=\\tfrac12(\\Omega_{x}X+\\Delta Z)$. The left panel is the population of $|1\\rangle$ against time, with the elapsed time marked; the right one is the largest population the drive can ever reach, against the detuning. The transport runs the clock forward. Find the pulse length that flips the qubit, then detune and watch that pulse stop working.'},
@@ -10178,7 +10178,7 @@ const SC = [
 { id:'m2-shots', module:'M2', nav:'What a count is worth', title:'Finite shots: a histogram is an estimate, not a distribution',
   objective:'Give the standard error of a probability estimated from N shots and say what it is not.',
   keywords:'shots binomial standard error sampling noise estimate histogram confidence square root scaling',
-  src:'L5 · finite-shot estimation', steps:3, blocks:[
+  src:'L5 · finite-shot estimation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Finite shots'},
   {t:'title', text:'Finite shots: a histogram is an estimate, not a distribution'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10679,7 +10679,7 @@ const SC = [
 { id:'m3-rho', module:'M3', nav:'The density operator', title:'The density operator, and what its four entries are',
   objective:'Write the density operator of a pure state and of a mixture, and name the meaning of each entry.',
   keywords:'density operator density matrix outer product ensemble populations coherences mixture pure state',
-  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'The density operator, and what its four entries are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10711,7 +10711,7 @@ const SC = [
 { id:'m3-physical', module:'M3', nav:'Which matrices are states', title:'Which matrices are physical states, and which are not',
   objective:'Test a candidate matrix against the three conditions and say which one a given matrix fails.',
   keywords:'hermitian positive semidefinite trace one physical density matrix eigenvalues test coherence bound',
-  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  src:'L6 · which matrices are physical states?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'Which matrices are physical states, and which are not'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10744,7 +10744,7 @@ const SC = [
 { id:'m3-expect', module:'M3', nav:'Predictions from the matrix', title:'Every prediction, from one trace',
   objective:'Compute an outcome probability and an expectation value from a density operator.',
   keywords:'trace rho A expectation probability povm effects cyclicity born rule mixed state prediction',
-  src:'L6 · expectation values and measurement probabilities', steps:3, blocks:[
+  src:'L6 · expectation values and measurement probabilities', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'Every prediction, from one trace'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10774,7 +10774,7 @@ const SC = [
 { id:'m3-ensemble', module:'M3', nav:'Ensembles are not unique', title:'One matrix, many preparations, and no experiment between them',
   objective:'Show two different ensembles with the same density operator and say what follows.',
   keywords:'ensemble decomposition not unique maximally mixed identity over two operationally identical preparation',
-  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'One matrix, many preparations, and no experiment between them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10803,7 +10803,7 @@ const SC = [
 { id:'m3-purity', module:'M3', nav:'Purity', title:'Purity: one number that says how mixed a state is',
   objective:'Compute the purity of a state and place it between its two bounds.',
   keywords:'purity trace rho squared bounds maximally mixed pure state rank one idempotent dimension',
-  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  src:'L6 · which matrices are physical states?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Purity and the ball'},
   {t:'title', text:'Purity: one number that says how mixed a state is'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10834,7 +10834,7 @@ const SC = [
 { id:'m3-ball', module:'M3', nav:'The ball of qubit states', title:'A qubit state is a vector of length at most one',
   objective:'Write a qubit density operator in the Pauli basis and read purity off the length of its vector.',
   keywords:'bloch vector ball pauli expansion length purity eigenvalues mixed inside sphere surface qubit',
-  src:'L6 · example: a pure qubit', steps:3, blocks:[
+  src:'L6 · example: a pure qubit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Purity and the ball'},
   {t:'title', text:'A qubit state is a vector of length at most one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10864,7 +10864,7 @@ const SC = [
 { id:'m3-kraus', module:'M3', nav:'Quantum channels', title:'A channel: what a unitary looks like from inside',
   objective:'State the Kraus form of a channel and check that it preserves the trace.',
   keywords:'quantum channel kraus operators cptp completely positive trace preserving operator sum environment',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'A channel: what a unitary looks like from inside'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10890,7 +10890,7 @@ const SC = [
 { id:'m3-damp', module:'M3', nav:'Amplitude damping', title:'Amplitude damping: energy leaves, and the coherence follows',
   objective:'Apply the amplitude-damping Kraus operators and say what happens to each entry.',
   keywords:'amplitude damping relaxation energy loss spontaneous emission kraus population coherence square root',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Amplitude damping: energy leaves, and the coherence follows'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10922,7 +10922,7 @@ const SC = [
 { id:'m3-dephase', module:'M3', nav:'Dephasing', title:'Dephasing: the populations never move and the phase is lost anyway',
   objective:'Apply the phase-flip channel and identify what it does and does not change.',
   keywords:'dephasing phase flip channel decoherence coherence populations unchanged measured and ignored basis',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Dephasing: the populations never move and the phase is lost anyway'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10949,7 +10949,7 @@ const SC = [
 { id:'m3-lab-e', module:'M3', nav:'Laboratory E', title:'Laboratory E · A channel applied to the ball of states',
   objective:'Let the reader choose a state and a channel and watch the ball of states deform.',
   keywords:'laboratory channel bloch ball depolarising amplitude damping dephasing purity contraction fixed point',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Laboratory E · A channel applied to the ball of states'},
   {t:'small', html:'The left panel is the flat cross-section of the ball again, with the chosen input state and where the channel sends it, and with the whole rim carried along so the deformation of the set is visible. The right panel follows the purity as the strength is turned up. Find the state each channel leaves alone, and notice that two of the three channels have one and the third has a whole line of them.'},
@@ -10960,7 +10960,7 @@ const SC = [
 { id:'m3-t1t2', module:'M3', nav:'T1 and T2', title:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$',
   objective:'Write the two exponential decays and derive the inequality between their times.',
   keywords:'T1 T2 relaxation dephasing lindblad master equation exponential decay coherence time inequality echo',
-  src:'L6 · Markovian relaxation and dephasing', steps:3, blocks:[
+  src:'L6 · Markovian relaxation and dephasing', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Relaxation and dephasing'},
   {t:'title', text:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -10988,7 +10988,7 @@ const SC = [
 { id:'m3-order', module:'M3', nav:'Two qubits, and their order', title:'Two qubits, and the ordering that silently breaks results',
   objective:'Write a two-qubit state in the fixed ordering and locate each amplitude.',
   keywords:'two qubits tensor product basis ordering convention kronecker significant bit index product state',
-  src:'L6 · composite systems and tensor products', steps:3, blocks:[
+  src:'L6 · composite systems and tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'Two qubits, and the ordering that silently breaks results'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11015,7 +11015,7 @@ const SC = [
 { id:'m3-ptrace', module:'M3', nav:'The partial trace', title:'The partial trace: the state of one system alone',
   objective:'Compute a partial trace by the block rule and say what characterises it.',
   keywords:'partial trace reduced density operator subsystem block matrix trace out marginal characterisation',
-  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'The partial trace: the state of one system alone'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11047,7 +11047,7 @@ const SC = [
 { id:'m3-local', module:'M3', nav:'A pure whole with mixed parts', title:'A pure pair whose halves are as mixed as a state can be',
   objective:'Show that a maximally entangled pair has maximally mixed parts and say what that rules out.',
   keywords:'entanglement local mixedness reduced state maximally mixed pure joint state purity contrast product',
-  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'A pure pair whose halves are as mixed as a state can be'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11073,7 +11073,7 @@ const SC = [
 { id:'m3-sep', module:'M3', nav:'Product or entangled', title:'Separable or entangled: the test on four amplitudes',
   objective:'Decide whether a two-qubit pure state factors, and factor it when it does.',
   keywords:'separable product state entangled test determinant factor amplitudes bipartite pure mixed convex',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'Separable or entangled: the test on four amplitudes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11104,7 +11104,7 @@ const SC = [
 { id:'m3-schmidt', module:'M3', nav:'The Schmidt decomposition', title:'The Schmidt decomposition: two bases in which the state is diagonal',
   objective:'State the Schmidt decomposition and read the entanglement off its rank.',
   keywords:'schmidt decomposition coefficients rank orthonormal bases bipartite pure state reduced eigenvalues',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'The Schmidt decomposition: two bases in which the state is diagonal'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11137,7 +11137,7 @@ const SC = [
 { id:'m3-svd', module:'M3', nav:'Computing it', title:'How the decomposition is actually computed',
   objective:'Reshape a state vector into a coefficient matrix and get the Schmidt data from its singular values.',
   keywords:'singular value decomposition svd reshape coefficient matrix numerical rank tolerance schmidt computation',
-  src:'L6 · computing Schmidt decompositions with an SVD', steps:3, blocks:[
+  src:'L6 · computing Schmidt decompositions with an SVD', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'How the decomposition is actually computed'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11168,7 +11168,7 @@ const SC = [
 { id:'m3-entropy', module:'M3', nav:'Entropy', title:'Entropy: how much entanglement, in bits',
   objective:'Compute the von Neumann entropy of a reduced state and interpret it as an amount of entanglement.',
   keywords:'von neumann entropy entanglement entropy ebit bits log base two reduced state pure zero maximal',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Entropy'},
   {t:'title', text:'Entropy: how much entanglement, in bits'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11201,7 +11201,7 @@ const SC = [
 { id:'m3-bell', module:'M3', nav:'The Bell states', title:'The four Bell states, and the correlations that separate them',
   objective:'List the Bell states and compute the three Pauli correlations of one of them.',
   keywords:'bell states phi psi plus minus basis maximally entangled correlations XX YY ZZ classical mixture',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'The four Bell states, and the correlations that separate them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11234,7 +11234,7 @@ const SC = [
 { id:'m3-chsh', module:'M3', nav:'The classical bound', title:'CHSH: the number every classical model is trapped below',
   objective:'Assemble the CHSH combination and derive the bound a model with pre-existing values obeys.',
   keywords:'chsh bell inequality local hidden variable classical bound two pre-existing values correlations',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'CHSH: the number every classical model is trapped below'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11262,7 +11262,7 @@ const SC = [
 { id:'m3-violate', module:'M3', nav:'The violation', title:'What quantum mechanics reaches, and what that refutes',
   objective:'Evaluate the CHSH combination on a Bell state and say precisely which assumption fails.',
   keywords:'chsh violation tsirelson 2 root 2 bell state measurement angles refutation realism error bar shots',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'What quantum mechanics reaches, and what that refutes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11292,7 +11292,7 @@ const SC = [
 { id:'m3-lab-f', module:'M3', nav:'Laboratory F', title:'Laboratory F · CHSH: four angles and one number',
   objective:'Let the reader set the four measurement directions and read the CHSH value against the classical bound.',
   keywords:'laboratory chsh bell inequality four angles classical bound tsirelson correlations violation sweep',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'Laboratory F · CHSH: four angles and one number'},
   {t:'small', html:'Both parties measure $|\\Phi^{+}\\rangle$ along a direction in the $z$–$x$ plane, and each of the four directions is a slider. The left panel is the four correlations; the right one sweeps the first of the other party\u2019s two settings with the rest held where they are, against the classical bound and the largest value quantum mechanics permits. Find a setting that violates the bound, then find one that does not, and notice how much of the circle each occupies.'},
@@ -11303,7 +11303,7 @@ const SC = [
 { id:'m3-nosig', module:'M3', nav:'No signalling', title:'Why entanglement sends nothing',
   objective:'Show that one party\u2019s outcome distribution does not depend on the other party\u2019s choice.',
   keywords:'no signalling faster than light communication reduced state unchanged partial trace correlation classical channel',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'Why entanglement sends nothing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -11979,7 +11979,7 @@ const SC = [
 { id:'m4-sphere', module:'M4', nav:'The sphere and the half angle', title:'The two angles of a qubit, and why one of them is halved',
   objective:'Write a pure qubit state in its two angles and give the Bloch vector it names.',
   keywords:'bloch sphere polar azimuthal angle theta phi half angle parameterisation pure state north south pole',
-  src:'L7 · pure qubit states and the Bloch sphere', steps:3, blocks:[
+  src:'L7 · pure qubit states and the Bloch sphere', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
   {t:'title', text:'The two angles of a qubit, and why one of them is halved'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12011,7 +12011,7 @@ const SC = [
 { id:'m4-cardinal', module:'M4', nav:'The six states', title:'Six states worth knowing by their positions',
   objective:'Place the six eigenstates of the Pauli operators on the sphere and read a Bloch vector back into a state.',
   keywords:'cardinal states eigenstates pauli plus minus plus i basis axes positions poles equator six points',
-  src:'L7 · computational, X and Y basis states', steps:3, blocks:[
+  src:'L7 · computational, X and Y basis states', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
   {t:'title', text:'Six states worth knowing by their positions'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12041,7 +12041,7 @@ const SC = [
 { id:'m4-overlap', module:'M4', nav:'Angles and overlaps', title:'Opposite means orthogonal, and a right angle means a coin',
   objective:'Use the overlap formula to turn an angle on the sphere into a probability.',
   keywords:'overlap fidelity angle between bloch vectors antipodal orthogonal half angle distinguishability coin',
-  src:'L7 · pure qubit states and the Bloch sphere', steps:2, blocks:[
+  src:'L7 · pure qubit states and the Bloch sphere', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
   {t:'title', text:'Opposite means orthogonal, and a right angle means a coin'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12069,7 +12069,7 @@ const SC = [
 { id:'m4-glob', module:'M4', nav:'Global against relative phase', title:'One phase moves nothing, the other moves everything',
   objective:'Say which phase changes the Bloch vector and demonstrate it on a pair of states.',
   keywords:'global phase relative phase azimuth unobservable interference distinguishable density operator picture',
-  src:'L7 · global phase, relative phase and the double cover', steps:3, blocks:[
+  src:'L7 · global phase, relative phase and the double cover', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
   {t:'title', text:'One phase moves nothing, the other moves everything'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12099,7 +12099,7 @@ const SC = [
 { id:'m4-cover', module:'M4', nav:'Two turns to come back', title:'The state needs two full turns and the vector needs one',
   objective:'Show that a full rotation returns minus the identity and say when that sign is observable.',
   keywords:'double cover su2 so3 spinor two pi rotation minus identity four pi controlled phase observable',
-  src:'L7 · global phase, relative phase and the double cover', steps:3, blocks:[
+  src:'L7 · global phase, relative phase and the double cover', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
   {t:'title', text:'The state needs two full turns and the vector needs one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12131,7 +12131,7 @@ const SC = [
 { id:'m4-rot', module:'M4', nav:'Every gate is a rotation', title:'Every one-qubit gate is a rotation, and here is its axis',
   objective:'Write a one-qubit unitary as a rotation and read its axis and angle.',
   keywords:'rotation operator exponential pauli axis angle generator half angle unitary one qubit gate geometry',
-  src:'L7 · single-qubit gates as rotations', steps:3, blocks:[
+  src:'L7 · single-qubit gates as rotations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Single-qubit gates as rotations'},
   {t:'title', text:'Every one-qubit gate is a rotation, and here is its axis'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12164,7 +12164,7 @@ const SC = [
 { id:'m4-pauli', module:'M4', nav:'The Pauli gates', title:'The three Pauli gates, as three half turns',
   objective:'Give the axis and angle of each Pauli gate and its action on the six cardinal states.',
   keywords:'pauli gates X Y Z bit flip phase flip half turn axis fixed points eigenstates action',
-  src:'L7 · the X, Y and Z gates', steps:3, blocks:[
+  src:'L7 · the X, Y and Z gates', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Single-qubit gates as rotations'},
   {t:'title', text:'The three Pauli gates, as three half turns'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12196,7 +12196,7 @@ const SC = [
 { id:'m4-had', module:'M4', nav:'The Hadamard', title:'The Hadamard: one half turn about a diagonal axis',
   objective:'Give the Hadamard as a rotation and use it to exchange the two bases.',
   keywords:'hadamard gate superposition basis change diagonal axis half turn self inverse HXH HZH conjugation',
-  src:'L7 · the Hadamard gate', steps:3, blocks:[
+  src:'L7 · the Hadamard gate', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Single-qubit gates as rotations'},
   {t:'title', text:'The Hadamard: one half turn about a diagonal axis'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12230,7 +12230,7 @@ const SC = [
 { id:'m4-phase', module:'M4', nav:'Phase gates', title:'The phase gates: turning the equator by a chosen angle',
   objective:'Write the phase gate family and place S and T inside it.',
   keywords:'phase gate P S T gate quarter turn eighth turn clifford non clifford diagonal z rotation equator',
-  src:'L7 · the phase, S and T gates', steps:3, blocks:[
+  src:'L7 · the phase, S and T gates', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Single-qubit gates as rotations'},
   {t:'title', text:'The phase gates: turning the equator by a chosen angle'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12262,7 +12262,7 @@ const SC = [
 { id:'m4-time', module:'M4', nav:'The order gates compose in', title:'A circuit reads left to right and its matrices multiply right to left',
   objective:'Convert a drawn gate sequence into the correct matrix product.',
   keywords:'circuit order matrix multiplication right to left composition time order non commuting gates sequence',
-  src:'L7 · the quantum circuit model', steps:3, blocks:[
+  src:'L7 · the quantum circuit model', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Composing gates'},
   {t:'title', text:'A circuit reads left to right and its matrices multiply right to left'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12295,7 +12295,7 @@ const SC = [
 { id:'m4-euler', module:'M4', nav:'Three turns are enough', title:'Any one-qubit gate in three turns and a phase',
   objective:'Decompose a one-qubit unitary into two z rotations and one y rotation.',
   keywords:'euler decomposition zyz rotation three angles universal one qubit synthesis native gate set compiler',
-  src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, blocks:[
+  src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Composing gates'},
   {t:'title', text:'Any one-qubit gate in three turns and a phase'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12326,7 +12326,7 @@ const SC = [
 { id:'m4-ugate', module:'M4', nav:'The gate a machine takes', title:'The three-parameter gate an instruction set actually offers',
   objective:'Read the standard three-parameter gate matrix and recover the named gates from it.',
   keywords:'u gate three parameters theta phi lambda instruction set native gate qiskit parameterised unitary',
-  src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, blocks:[
+  src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Composing gates'},
   {t:'title', text:'The three-parameter gate an instruction set actually offers'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12358,7 +12358,7 @@ const SC = [
 { id:'m4-lab-g', module:'M4', nav:'Laboratory G', title:'Laboratory G · A gate sequence, and the vector it moves',
   objective:'Let the reader build a single-qubit sequence and follow the Bloch vector through it.',
   keywords:'laboratory gate sequence bloch vector path intermediate states net rotation axis angle composition order',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Composing gates'},
   {t:'title', text:'Laboratory G · A gate sequence, and the vector it moves'},
   {t:'small', html:'Build a sequence by pressing gates and watch where the Bloch vector goes. The left panel is the sphere with the path on it; the right panel is the three components against the step number, so every intermediate state can be read exactly. Find a pair of gates whose order changes the answer, and a sequence of four or more whose net effect is still one rotation.'},
@@ -12369,7 +12369,7 @@ const SC = [
 { id:'m4-rev', module:'M4', nav:'Reversible embeddings', title:'A classical gate that throws information away cannot be unitary',
   objective:'Embed an irreversible Boolean function and a half adder in reversible gates, and state the extra wires they require.',
   keywords:'reversible computation irreversible AND XOR half adder sum carry landauer erasure bijection cnot toffoli embedding classical logic',
-  src:'L7 · classical logic, information loss and reversible embeddings', steps:3, blocks:[
+  src:'L7 · classical logic, information loss and reversible embeddings', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Reversible embeddings'},
   {t:'title', text:'A classical gate that throws information away cannot be unitary'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12401,7 +12401,7 @@ const SC = [
 { id:'m4-toffoli', module:'M4', nav:'Ancillas and uncomputing', title:'Ancillas, and why the workings have to be cleaned up',
   objective:'Explain uncomputation and say what goes wrong when a workspace is left dirty.',
   keywords:'toffoli ancilla uncompute garbage entangled workspace interference reversible circuit clean up bennett',
-  src:'L7 · classical logic, information loss and reversible embeddings', steps:3, blocks:[
+  src:'L7 · classical logic, information loss and reversible embeddings', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Reversible embeddings'},
   {t:'title', text:'Ancillas, and why the workings have to be cleaned up'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12434,7 +12434,7 @@ const SC = [
 { id:'m4-order', module:'M4', nav:'Which qubit is which', title:'Two qubits, and the ordering a gate is silently wrong about',
   objective:'Apply a one-qubit gate to a named qubit of a pair without ambiguity.',
   keywords:'qubit order convention tensor product significant bit index kron identity gate wrong qubit silent error',
-  src:'L7 · qubit and bit-order conventions', steps:3, blocks:[
+  src:'L7 · qubit and bit-order conventions', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Two-qubit gates'},
   {t:'title', text:'Two qubits, and the ordering a gate is silently wrong about'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12466,7 +12466,7 @@ const SC = [
 { id:'m4-cnot', module:'M4', nav:'The controlled-NOT', title:'The controlled-NOT, and why the control is not a spectator',
   objective:'Write the CNOT matrix for a stated control and target and use it in both bases.',
   keywords:'cnot controlled not gate control target matrix permutation phase kickback X basis conjugation entangling',
-  src:'L7 · the CNOT gate', steps:3, blocks:[
+  src:'L7 · the CNOT gate', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Two-qubit gates'},
   {t:'title', text:'The controlled-NOT, and why the control is not a spectator'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12498,7 +12498,7 @@ const SC = [
 { id:'m4-cz', module:'M4', nav:'The controlled-Z', title:'The controlled-Z: the same gate with no target',
   objective:'Write CZ and convert between it and CNOT with one Hadamard.',
   keywords:'controlled z gate cz symmetric diagonal locally equivalent hadamard conjugation native gate hardware',
-  src:'L7 · the controlled-Z gate', steps:3, blocks:[
+  src:'L7 · the controlled-Z gate', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Two-qubit gates'},
   {t:'title', text:'The controlled-Z: the same gate with no target'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12531,7 +12531,7 @@ const SC = [
 { id:'m4-swap', module:'M4', nav:'The SWAP', title:'SWAP: three entangling gates to move nothing',
   objective:'Write the SWAP gate and build it from three CNOTs.',
   keywords:'swap gate exchange qubits three cnots connectivity routing transpilation coupling map cost depth',
-  src:'L7 · the SWAP gate', steps:3, blocks:[
+  src:'L7 · the SWAP gate', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Two-qubit gates'},
   {t:'title', text:'SWAP: three entangling gates to move nothing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12558,7 +12558,7 @@ const SC = [
 { id:'m4-entangle', module:'M4', nav:'Which gates entangle', title:'What a local gate cannot do, and what one CNOT can',
   objective:'Say why local gates cannot entangle and how much entanglement one CNOT makes.',
   keywords:'entangling gate local unitary schmidt coefficients invariant bell state preparation ebit cnot hadamard',
-  src:'L7 · local gates, entangling gates and universality', steps:3, blocks:[
+  src:'L7 · local gates, entangling gates and universality', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Entanglement from a gate'},
   {t:'title', text:'What a local gate cannot do, and what one CNOT can'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -12591,7 +12591,7 @@ const SC = [
 { id:'m4-lab-h', module:'M4', nav:'Laboratory H', title:'Laboratory H · The Bell circuit, and both halves of what it makes',
   objective:'Let the reader run the Bell circuit and watch the joint state and both reduced states.',
   keywords:'laboratory bell circuit hadamard cnot joint state reduced states entropy four bell states input bits',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Entanglement from a gate'},
   {t:'title', text:'Laboratory H · The Bell circuit, and both halves of what it makes'},
   {t:'small', html:'Two input bits, one tilt and one phase, and the circuit of the last scene. The left panel is the joint state at the chosen stage, drawn as the four amplitudes; the right panel is the entanglement against the tilt. The readout carries both reduced states. Three things to find: the four input bit patterns give the four Bell states, the phase control moves the joint state without changing the entanglement at all, and there is exactly one tilt at which the output is a product.'},
@@ -12602,7 +12602,7 @@ const SC = [
 { id:'m4-univ', module:'M4', nav:'Universality', title:'What a universal gate set promises, and what it does not',
   objective:'State a universal gate set and say what universality costs in circuit length.',
   keywords:'universal gate set clifford T solovay kitaev approximation exact synthesis discrete continuous cost',
-  src:'L7 · local gates, entangling gates and universality', steps:3, blocks:[
+  src:'L7 · local gates, entangling gates and universality', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 4 · Universality'},
   {t:'title', text:'What a universal gate set promises, and what it does not'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13343,7 +13343,7 @@ const SC = [
 { id:'m5-circuit', module:'M5', nav:'What a circuit is', title:'A circuit is a program, and its picture is not a picture of hardware',
   objective:'Read a circuit diagram: wires, gates, layers, and the order the gates act in.',
   keywords:'quantum circuit diagram wires gates layers program abstract not hardware time left to right qubit lines',
-  src:'L8 · building an abstract circuit', steps:3, blocks:[
+  src:'L8 · building an abstract circuit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'A circuit is a program, and its picture is not a picture of hardware'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13373,7 +13373,7 @@ const SC = [
 { id:'m5-model', module:'M5', nav:'The circuit model', title:'What the circuit model of computation allows, and nothing more',
   objective:'State the four steps of the circuit model and say what each one fixes.',
   keywords:'circuit model computation prepare unitary measure repeat computational basis finite gate set model of computation',
-  src:'L8 · a circuit is an abstract program', steps:3, blocks:[
+  src:'L8 · a circuit is an abstract program', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'What the circuit model of computation allows, and nothing more'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13399,7 +13399,7 @@ const SC = [
 { id:'m5-read', module:'M5', nav:'Reading the wires', title:'The wire at the top is the last digit of the ket',
   objective:'Translate between the wire order in a diagram, the ket, the vector index and the printed bit string.',
   keywords:'bit order convention wire order ket index vector entry classical register string little endian least significant',
-  src:'L8 · bit order: wires, integers, kets and strings', steps:3, blocks:[
+  src:'L8 · bit order: wires, integers, kets and strings', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'The wire at the top is the last digit of the ket'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13430,7 +13430,7 @@ const SC = [
 { id:'m5-depth', module:'M5', nav:'Depth against gate count', title:'Depth is what a coherence time is spent against, and it is not the gate count',
   objective:'Compute the depth and the gate count of a circuit and say which one a coherence budget limits.',
   keywords:'depth gate count layers parallel ghz chain tree coherence time budget circuit length two qubit count',
-  src:'L8 · GHZ state, transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · GHZ state, transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · The circuit model'},
   {t:'title', text:'Depth is what a coherence time is spent against, and it is not the gate count'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13461,7 +13461,7 @@ const SC = [
 { id:'m5-state', module:'M5', nav:'Exact simulation', title:'An exact statevector is a debugging tool, and it stops at about thirty qubits',
   objective:'Say what an exact statevector simulation gives and where it stops being possible.',
   keywords:'statevector simulation exact amplitudes deterministic memory exponential debugging tool classical simulation limit',
-  src:'L8 · exact statevector evolution and the operator representation', steps:3, blocks:[
+  src:'L8 · exact statevector evolution and the operator representation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'An exact statevector is a debugging tool, and it stops at about thirty qubits'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13492,7 +13492,7 @@ const SC = [
 { id:'m5-shots', module:'M5', nav:'Shots and their error', title:'A probability read from a finite run carries an error bar, and it is not noise',
   objective:'Give the standard error of a probability estimated from N shots and separate it from device noise.',
   keywords:'shots sampling binomial standard error one over root n estimation finite statistics not physical noise systematic',
-  src:'L8 · measurement, barriers and finite shots', steps:3, blocks:[
+  src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A probability read from a finite run carries an error bar, and it is not noise'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13523,7 +13523,7 @@ const SC = [
 { id:'m5-measure', module:'M5', nav:'Measurement inside a circuit', title:'A measurement in the middle can be moved to the end, and a gate cannot be moved past one',
   objective:'Apply the deferred-measurement rule and say which rearrangements it does not permit.',
   keywords:'deferred measurement principle mid circuit measurement implicit measurement control classical equivalence commute barrier',
-  src:'L8 · measurement, barriers and finite shots', steps:3, blocks:[
+  src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A measurement in the middle can be moved to the end, and a gate cannot be moved past one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13549,7 +13549,7 @@ const SC = [
 { id:'m5-feed', module:'M5', nav:'Classical feedforward', title:'A gate chosen by a bit that did not exist when the circuit was written',
   objective:'Read a dynamic circuit and say what feedforward costs that a fixed circuit does not.',
   keywords:'dynamic circuit classical feedforward conditional gate mid circuit measurement latency reset real time control flow',
-  src:'L8 · dynamic circuits and classical feedforward', steps:3, blocks:[
+  src:'L8 · dynamic circuits and classical feedforward', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Running a circuit'},
   {t:'title', text:'A gate chosen by a bit that did not exist when the circuit was written'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13579,7 +13579,7 @@ const SC = [
 { id:'m5-iset', module:'M5', nav:'The instruction set', title:'A machine runs a few gates, and every other gate is rewritten into them',
   objective:'Rewrite a gate into a stated instruction set and count what the rewrite costs.',
   keywords:'instruction set native gates basis gates translation rewriting hadamard cz decomposition compile target isa',
-  src:'L8 · transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'A machine runs a few gates, and every other gate is rewritten into them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13611,7 +13611,7 @@ const SC = [
 { id:'m5-transpile', module:'M5', nav:'Layout and routing', title:'Two qubits that are not neighbours cannot share a gate until one of them moves',
   objective:'Count what routing a gate between distant qubits costs on a stated coupling map.',
   keywords:'transpilation layout routing coupling map connectivity swap overhead physical qubits virtual mapping compiler passes',
-  src:'L8 · transpilation and instruction-set compliance', steps:3, blocks:[
+  src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'Two qubits that are not neighbours cannot share a gate until one of them moves'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13641,7 +13641,7 @@ const SC = [
 { id:'m5-cost', module:'M5', nav:'What a resource claim names', title:'Five things, or it is not yet a claim',
   objective:'State the five components of a resource claim and reject a claim that is missing one.',
   keywords:'resource claim task input model accuracy hardware model classical baseline speedup comparison honest reporting',
-  src:'L8 · execution time, usage and experimental cost', steps:3, blocks:[
+  src:'L8 · execution time, usage and experimental cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'Five things, or it is not yet a claim'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13671,7 +13671,7 @@ const SC = [
 { id:'m5-fault', module:'M5', nav:'Physical and logical qubits', title:'One logical qubit is a protected encoding, not one better physical qubit',
   objective:'Distinguish physical and logical qubits, explain syndrome checks and the threshold, and identify space and time overhead.',
   keywords:'quantum error correction physical qubit logical qubit code block syndrome checks decoder threshold code distance fault tolerance space overhead time overhead',
-  src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, blocks:[
+  src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
   {t:'title', text:'One logical qubit is a protected encoding, not one better physical qubit'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13696,7 +13696,7 @@ const SC = [
 { id:'m5-ramsey', module:'M5', nav:'Turning phase into counts', title:'A phase is invisible until two Hadamards turn it into a population',
   objective:'Trace the Hadamard sandwich and give the probability it produces from a phase.',
   keywords:'ramsey interference hadamard sandwich phase to population conversion fringe measurement basis change cosine squared',
-  src:'L8 · Ramsey-style phase-to-population conversion', steps:3, blocks:[
+  src:'L8 · Ramsey-style phase-to-population conversion', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Interference in a circuit'},
   {t:'title', text:'A phase is invisible until two Hadamards turn it into a population'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13727,7 +13727,7 @@ const SC = [
 { id:'m5-nocopy', module:'M5', nav:'Why not just copy it', title:'No circuit copies an unknown state, and the obvious one entangles instead',
   objective:'Show that a universal copier is impossible and say what the CNOT copier actually does.',
   keywords:'no cloning theorem copy unknown state inner product proof cnot copier entangles instead orthogonal states classical bit',
-  src:'L9 · the no-cloning theorem', steps:3, blocks:[
+  src:'L9 · the no-cloning theorem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'No circuit copies an unknown state, and the obvious one entangles instead'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13759,7 +13759,7 @@ const SC = [
 { id:'m5-tele', module:'M5', nav:'The teleportation circuit', title:'Teleportation, as a circuit with three qubits and two classical wires',
   objective:'Read the teleportation circuit stage by stage, name what each stage does, and state its role in a quantum network.',
   keywords:'teleportation circuit quantum network primitive nodes link bell pair bell measurement basis rotation classical wires correction three qubits protocol stages',
-  src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, blocks:[
+  src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Teleportation, as a circuit with three qubits and two classical wires'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13787,7 +13787,7 @@ const SC = [
 { id:'m5-teleid', module:'M5', nav:'The identity, derived', title:'The teleportation identity, one step at a time',
   objective:'Derive the four-branch teleportation identity from the initial product state.',
   keywords:'teleportation identity derivation four branches expansion cnot hadamard algebra three qubit state pauli frame',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'The teleportation identity, one step at a time'},
   {t:'body', html:'<p>The protocol is one algebraic identity. It is worth doing in full once, because every claim about teleportation — the correction table, the resource count, the no-signalling argument — is read straight off the last line. Write $|\\psi\\rangle = \\alpha|0\\rangle+\\beta|1\\rangle$ on $q_{0}$, and the shared pair on $q_{1}$ and $q_{2}$. Kets are written $|q_{2}q_{1}q_{0}\\rangle$ throughout.</p>'},
@@ -13819,7 +13819,7 @@ const SC = [
 { id:'m5-telecorr', module:'M5', nav:'The correction table', title:'Two measured bits choose one of four corrections, and nothing else does',
   objective:'Read the correction out of the two measured bits and verify one branch by hand.',
   keywords:'correction table pauli frame measured bits branches x z gates classical feedforward teleportation recovery four cases',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Two measured bits choose one of four corrections, and nothing else does'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13850,7 +13850,7 @@ const SC = [
 { id:'m5-nosig', module:'M5', nav:'Nothing is sent', title:'Before the two bits arrive, Bob holds the same thing whatever was sent',
   objective:'Show that Bob\u2019s reduced state is independent of the input and say what that rules out.',
   keywords:'no signaling reduced state maximally mixed independent of input classical channel light speed entanglement alone sends nothing',
-  src:'L9 · teleportation identity, resources and no signaling', steps:3, blocks:[
+  src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Before the two bits arrive, Bob holds the same thing whatever was sent'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13877,7 +13877,7 @@ const SC = [
 { id:'m5-teleres', module:'M5', nav:'What it costs, and what counts as working', title:'One entangled pair and two bits for one qubit, and two thirds to beat',
   objective:'Account for the resources one teleportation consumes and state the fidelity benchmark it must exceed.',
   keywords:'resources ebit classical bits fidelity benchmark two thirds measure and prepare singlet fraction average fidelity claim',
-  src:'L9 · teleportation fidelity and experimental claims', steps:3, blocks:[
+  src:'L9 · teleportation fidelity and experimental claims', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'One entangled pair and two bits for one qubit, and two thirds to beat'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13908,7 +13908,7 @@ const SC = [
 { id:'m5-lab-i', module:'M5', nav:'Laboratory I', title:'Laboratory I · Teleportation, stepped, with the correction the bits choose',
   objective:'Let the reader step the teleportation circuit and see the correction selected by the measured bits.',
   keywords:'laboratory teleportation stepped branches correction measured bits reduced state bloch no signaling classical channel',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Teleportation'},
   {t:'title', text:'Laboratory I · Teleportation, stepped, with the correction the bits choose'},
   {t:'small', html:'Choose the state to send with the two angles, then walk the circuit one stage at a time. The left panel is the Bloch vector of Bob\u2019s qubit at the chosen stage; the right panel is the fidelity against the tilt of the input. Three things to find: the four branches all have probability one quarter whatever the input is, Bob\u2019s vector sits exactly at the centre until the correction is applied, and applying the wrong correction is not a small error but a completely different state.'},
@@ -13919,7 +13919,7 @@ const SC = [
 { id:'m5-search', module:'M5', nav:'The search problem', title:'An unstructured search, and what a query is allowed to be',
   objective:'State the search problem in the query model and say what the oracle is and is not.',
   keywords:'unstructured search oracle query model black box marked items reversible embedding classical baseline n over two',
-  src:'L9 · Grover search and the oracle', steps:3, blocks:[
+  src:'L9 · Grover search and the oracle', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'An unstructured search, and what a query is allowed to be'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13945,7 +13945,7 @@ const SC = [
 { id:'m5-kick', module:'M5', nav:'Phase kickback', title:'The oracle writes a phase instead of a bit, and that is the only trick',
   objective:'Derive phase kickback and use it to turn the standard oracle into a phase oracle.',
   keywords:'phase kickback minus state eigenstate oracle sign marked items reflection relative phase mechanism interference algorithms',
-  src:'L9 · oracles and hidden implementation cost', steps:3, blocks:[
+  src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The oracle writes a phase instead of a bit, and that is the only trick'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -13978,7 +13978,7 @@ const SC = [
 { id:'m5-geom', module:'M5', nav:'The plane it happens in', title:'The whole algorithm lives in a plane spanned by two states',
   objective:'Write the uniform superposition in the marked and unmarked basis and give the angle it makes.',
   keywords:'grover geometry two dimensional subspace good bad states uniform superposition angle theta arcsin marked fraction plane',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The whole algorithm lives in a plane spanned by two states'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14010,7 +14010,7 @@ const SC = [
 { id:'m5-rotate', module:'M5', nav:'Two reflections make a turn', title:'One iteration is two reflections, and two reflections are a rotation',
   objective:'Show that the Grover iteration rotates the state by twice the angle theta.',
   keywords:'grover iteration oracle reflection diffusion operator inversion about the mean rotation two theta amplitude amplification',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'One iteration is two reflections, and two reflections are a rotation'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14038,7 +14038,7 @@ const SC = [
 { id:'m5-iter', module:'M5', nav:'How many iterations', title:'There is a best number of iterations, and going past it makes things worse',
   objective:'Compute the optimal iteration count and the success probability, and describe the overshoot.',
   keywords:'optimal iterations grover success probability sine squared overshoot rotate past unknown m quantum counting stopping',
-  src:'L9 · geometry of amplitude amplification', steps:3, blocks:[
+  src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'There is a best number of iterations, and going past it makes things worse'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14070,7 +14070,7 @@ const SC = [
 { id:'m5-claim', module:'M5', nav:'What the square root claims', title:'The square root is a count of queries, and a query is not a runtime',
   objective:'Write Grover\u2019s claim against the five components and say precisely what it does and does not assert.',
   keywords:'grover claim query complexity optimality lower bound end to end cost data loading error correction baseline speedup honest',
-  src:'L9 · oracles and hidden implementation cost', steps:3, blocks:[
+  src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'The square root is a count of queries, and a query is not a runtime'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14100,7 +14100,7 @@ const SC = [
 { id:'m5-lab-j', module:'M5', nav:'Laboratory J', title:'Laboratory J · Grover iterations, the angle, and the overshoot',
   objective:'Let the reader turn the problem size and the iteration count and watch the success probability rise and fall.',
   keywords:'laboratory grover amplitude amplification iterations angle success probability overshoot optimum marked items amplitudes',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'Laboratory J · Grover iterations, the angle, and the overshoot'},
   {t:'small', html:'Choose the number of qubits and how many candidates are marked, then step the iterations. The left panel is the plane of the last two scenes with the state drawn where it actually is; the right panel is the success probability against the iteration count, with every integer marked. Three things to find: the optimum is near $\\tfrac{\\pi}{4}\\sqrt{N/M}$ and is only occasionally exact, running twice the optimum returns almost exactly the probability you started with, and marking a quarter of the candidates makes the algorithm useless because the first step already overshoots.'},
@@ -14902,7 +14902,7 @@ const SC = [
 { id:'m6-query', module:'M6', nav:'What a query counts', title:'A query count is one number, and it is not the cost of anything',
   objective:'Distinguish query complexity, gate complexity and end-to-end cost, and say what each one omits.',
   keywords:'query model oracle black box query complexity gate complexity end to end cost separation counting calls resource claim',
-  src:'L10 · computational models: what is being counted?', steps:3, blocks:[
+  src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'A query count is one number, and it is not the cost of anything'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14933,7 +14933,7 @@ const SC = [
 { id:'m6-classes', module:'M6', nav:'What the classes mean', title:'The classes name what is settled in polynomial time, and P is inside all of them',
   objective:'State what P, BPP, BQP and NP contain, and which containments are known.',
   keywords:'complexity classes P BPP BQP NP decision problem polynomial time bounded error containment factoring np complete input length',
-  src:'L10 · computational models: what is being counted?', steps:3, blocks:[
+  src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'The classes name what is settled in polynomial time, and P is inside all of them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14964,7 +14964,7 @@ const SC = [
 { id:'m6-kick', module:'M6', nav:'Phase kickback', title:'Point the oracle at the state it cannot change and it writes a phase instead',
   objective:'Derive phase kickback for a Boolean oracle and say why the target register is left untouched.',
   keywords:'phase kickback minus state eigenstate of x oracle boolean function sign relative phase mechanism ancilla unchanged',
-  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, blocks:[
+  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'Point the oracle at the state it cannot change and it writes a phase instead'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -14996,7 +14996,7 @@ const SC = [
 { id:'m6-eigen', module:'M6', nav:'The general form', title:'The same move with any unitary: an eigenstate sends its phase up to the control',
   objective:'Show that a controlled unitary acting on one of its eigenstates writes the eigenphase onto the control qubit.',
   keywords:'controlled unitary eigenstate eigenphase kickback general form control qubit relative phase estimation preparation',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'The same move with any unitary: an eigenstate sends its phase up to the control'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15028,7 +15028,7 @@ const SC = [
 { id:'m6-cancel', module:'M6', nav:'Why a superposition is free', title:'A superposition costs one layer and buys nothing until the wrong terms cancel',
   objective:'Explain why quantum parallelism alone gives no advantage, and what interference has to do before a measurement is worth taking.',
   keywords:'quantum parallelism superposition free interference cancellation readout small state large amplitudes measurement one string',
-  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, blocks:[
+  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'A superposition costs one layer and buys nothing until the wrong terms cancel'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15056,7 +15056,7 @@ const SC = [
 { id:'m6-deutsch', module:'M6', nav:'Deutsch\u2019s problem', title:'One query decides a property that two are needed for classically',
   objective:'State Deutsch\u2019s promise problem, run the three-gate circuit, and say exactly what the reading means.',
   keywords:'deutsch algorithm promise problem constant balanced one query four functions circuit hadamard oracle single bit',
-  src:'L10 · Deutsch\u2019s promise problem', steps:3, blocks:[
+  src:'L10 · Deutsch\u2019s promise problem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'One query decides a property that two are needed for classically'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15088,7 +15088,7 @@ const SC = [
 { id:'m6-dj', module:'M6', nav:'Deutsch\u2013Jozsa', title:'The same circuit on n bits, and every balanced function cancels exactly',
   objective:'Run the Deutsch-Jozsa circuit on n query qubits and evaluate the amplitude of the all-zero string.',
   keywords:'deutsch jozsa n qubits balanced constant promise all zero string amplitude mean of signs certainty hadamard transform',
-  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, blocks:[
+  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The same circuit on n bits, and every balanced function cancels exactly'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15119,7 +15119,7 @@ const SC = [
 { id:'m6-djcost', module:'M6', nav:'What the separation is', title:'The exponential gap is against an exact classical algorithm, and only that one',
   objective:'Compare the quantum query count with the exact and the randomised classical query counts, and say which separation is real.',
   keywords:'separation exact deterministic randomised bounded error queries worst case exponential gap honest statement promise problem',
-  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, blocks:[
+  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The exponential gap is against an exact classical algorithm, and only that one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15153,7 +15153,7 @@ const SC = [
 { id:'m6-qft', module:'M6', nav:'The Fourier transform', title:'The transform sends a basis state to a phase that winds at a rate the state sets',
   objective:'Write the quantum Fourier transform, apply it to one basis state, and describe the result.',
   keywords:'quantum fourier transform definition basis state phase ramp winding rate unitary discrete fourier amplitudes equal magnitude',
-  src:'L10 · quantum Fourier transform', steps:3, blocks:[
+  src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform sends a basis state to a phase that winds at a rate the state sets'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15184,7 +15184,7 @@ const SC = [
 { id:'m6-qftcirc', module:'M6', nav:'The circuit', title:'A Hadamard and a triangle of small rotations, and the whole thing is quadratic',
   objective:'Read the QFT circuit, count its gates, and say what an approximate version trades away.',
   keywords:'qft circuit hadamard controlled rotation R_k swaps gate count quadratic n squared approximate qft truncation depth',
-  src:'L10 · QFT circuit in Qiskit', steps:3, blocks:[
+  src:'L10 · QFT circuit in Qiskit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'A Hadamard and a triangle of small rotations, and the whole thing is quadratic'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15217,7 +15217,7 @@ const SC = [
 { id:'m6-qftnot', module:'M6', nav:'What it does not return', title:'The transform produces amplitudes, and a measurement still returns one index',
   objective:'Say what a run of the quantum Fourier transform actually gives back, and why it is not a spectrum.',
   keywords:'qft limitation not a spectrum amplitudes measurement one sample fft comparison input output model advantage inference',
-  src:'L10 · what the QFT does and does not return', steps:3, blocks:[
+  src:'L10 · what the QFT does and does not return', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform produces amplitudes, and a measurement still returns one index'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15248,7 +15248,7 @@ const SC = [
 { id:'m6-qpe', module:'M6', nav:'Phase estimation', title:'Write the phase into t qubits at once, then undo the transform to read it',
   objective:'Assemble the phase-estimation circuit and say what each of its three parts does.',
   keywords:'quantum phase estimation circuit counting register controlled powers inverse qft eigenphase binary expansion measurement',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Write the phase into t qubits at once, then undo the transform to read it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15275,7 +15275,7 @@ const SC = [
 { id:'m6-qpeexact', module:'M6', nav:'When it is exact', title:'A phase that fits in t bits comes out certain, and every wrong outcome cancels',
   objective:'Show that a phase of the form y/2^t is returned with probability one, and identify the cancellation that makes it so.',
   keywords:'phase estimation exact case binary fraction certainty geometric sum cancellation all wrong outcomes zero amplitude',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that fits in t bits comes out certain, and every wrong outcome cancels'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15307,7 +15307,7 @@ const SC = [
 { id:'m6-qpeprec', module:'M6', nav:'Precision and confidence', title:'A phase that does not fit gives a distribution, and more qubits narrow it',
   objective:'Describe the outcome distribution for a general phase and say how many counting qubits a stated accuracy and confidence need.',
   keywords:'phase estimation precision success probability distribution nearest outcome eight over pi squared extra qubits accuracy confidence',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that does not fit gives a distribution, and more qubits narrow it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15340,7 +15340,7 @@ const SC = [
 { id:'m6-qpecost', module:'M6', nav:'Where the cost is', title:'The controlled powers cost exponentially more than the transform that reads them',
   objective:'Compare the cost of the controlled powers with the cost of the inverse transform and say which one a resource estimate must be about.',
   keywords:'phase estimation cost controlled powers 2^t applications inverse qft quadratic dominant term resource estimate coherent evolution',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'The controlled powers cost exponentially more than the transform that reads them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15371,7 +15371,7 @@ const SC = [
 { id:'m6-count', module:'M6', nav:'Counting the marked', title:'Point the estimator at the Grover step and it returns how many answers there are',
   objective:'Explain quantum counting and use it to close the gap chapter 5 left open about an unknown number of marked items.',
   keywords:'quantum counting grover iterate eigenvalue two theta estimate M number of solutions unknown marked items decide existence',
-  src:'L10 · Grover search and amplitude amplification', steps:3, blocks:[
+  src:'L10 · Grover search and amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Point the estimator at the Grover step and it returns how many answers there are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15402,7 +15402,7 @@ const SC = [
 { id:'m6-lab-k', module:'M6', nav:'Laboratory K', title:'Laboratory K · Phase estimation: the phase, the register, and the distribution',
   objective:'Let the reader turn the phase and the number of counting qubits and watch the outcome distribution answer.',
   keywords:'laboratory phase estimation counting qubits distribution outcomes precision success probability exact case tails guarantee',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Laboratory K · Phase estimation: the phase, the register, and the distribution'},
   {t:'small', html:'Choose a phase and a number of counting qubits. The left panel is the distribution over the $2^{t}$ possible readings; the right panel is how the probability of landing on the nearest reading behaves as the register grows. Three things to find: a phase that is a $t$-bit fraction gives one outcome with probability one and an exact zero at every other reading, the two nearest readings always carry at least $8/\\pi^{2}$ however badly the phase fits, and the worst case is a phase sitting exactly halfway between two readings.'},
@@ -15413,7 +15413,7 @@ const SC = [
 { id:'m6-order', module:'M6', nav:'The order of a number', title:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order',
   objective:'Define the order of a modulo N and the unitary whose eigenphases carry it.',
   keywords:'order finding modular multiplication cycle period coprime permutation unitary reversible work register definition',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15445,7 +15445,7 @@ const SC = [
 { id:'m6-ordereig', module:'M6', nav:'Where the order hides', title:'The eigenphases of the multiplier are the fractions s over r, and the state one can prepare is their even mixture',
   objective:'Give the eigenstates and eigenphases of the modular multiplier and explain why the register is started in the state one.',
   keywords:'eigenstates modular multiplier eigenphase s over r superposition state one even mixture sampling eigenphase preparation trick',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The eigenphases of the multiplier are the fractions s over r, and the state one can prepare is their even mixture'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15479,7 +15479,7 @@ const SC = [
 { id:'m6-modexp', module:'M6', nav:'What it costs to build', title:'The controlled powers are modular exponentiation, and they are the whole cost',
   objective:'Say how the controlled powers of the modular multiplier are built and which term dominates the circuit.',
   keywords:'modular exponentiation repeated squaring controlled multiplication cost cubic L gate count dominant term qft small',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The controlled powers are modular exponentiation, and they are the whole cost'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15510,7 +15510,7 @@ const SC = [
 { id:'m6-cf', module:'M6', nav:'Reading the order out', title:'Continued fractions turn a measured fraction into the small denominator hiding in it',
   objective:'Use the continued-fraction expansion to recover r from a measured y over Q, and check the candidate.',
   keywords:'continued fractions convergents denominator recover order classical post processing candidate check modular exponentiation verify',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Continued fractions turn a measured fraction into the small denominator hiding in it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15541,7 +15541,7 @@ const SC = [
 { id:'m6-repeat', module:'M6', nav:'When a run fails', title:'Several things can go wrong, all of them are detected, and none of the repairs is quantum',
   objective:'List the ways an order-finding run fails, say how each is detected, and describe the repetition strategy.',
   keywords:'failure modes s zero common factor odd order minus one repeat runs detection classical check probability constant expected runs',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Several things can go wrong, all of them are detected, and none of the repairs is quantum'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15573,7 +15573,7 @@ const SC = [
 { id:'m6-shor', module:'M6', nav:'Factoring, assembled', title:'One box in five needs a quantum computer, and the other four are integer arithmetic',
   objective:'Assemble the factoring algorithm from order finding and the classical steps around it, and identify which step is quantum.',
   keywords:'shor factoring algorithm workflow reduction order finding gcd classical steps square root difference of squares assembly',
-  src:'L10 · Shor\u2019s factoring algorithm', steps:3, blocks:[
+  src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'One box in five needs a quantum computer, and the other four are integer arithmetic'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15600,7 +15600,7 @@ const SC = [
 { id:'m6-shor15', module:'M6', nav:'Fifteen, worked', title:'The smallest example, worked to the end, including the choice that fails',
   objective:'Factor fifteen through order finding, and show a choice of a for which the same procedure fails.',
   keywords:'worked example fifteen factoring order four gcd three five failure case fourteen minus one repeat choose another base',
-  src:'L10 · worked order-finding example: N = 15', steps:3, blocks:[
+  src:'L10 · worked order-finding example: N = 15', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'The smallest example, worked to the end, including the choice that fails'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15632,7 +15632,7 @@ const SC = [
 { id:'m6-rsa', module:'M6', nav:'What is actually threatened', title:'Public-key cryptography breaks, symmetric cryptography does not, and the timing is the problem',
   objective:'Say which cryptographic systems a large fault-tolerant machine would break and why migration cannot wait for one.',
   keywords:'rsa public key discrete logarithm broken symmetric aes hash grover square root post quantum migration harvest now decrypt later',
-  src:'L10 · RSA and the scope of the quantum threat', steps:3, blocks:[
+  src:'L10 · RSA and the scope of the quantum threat', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Public-key cryptography breaks, symmetric cryptography does not, and the timing is the problem'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15662,7 +15662,7 @@ const SC = [
 { id:'m6-shorclaim', module:'M6', nav:'What Shor claims', title:'A superpolynomial gap against the best known method, and no lower bound behind it',
   objective:'Write the factoring claim against the five components and say precisely what it does and does not assert.',
   keywords:'shor claim resource five components fault tolerance physical qubits number field sieve baseline no lower bound superpolynomial',
-  src:'L10 · Shor\u2019s factoring algorithm', steps:3, blocks:[
+  src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'A superpolynomial gap against the best known method, and no lower bound behind it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -15692,7 +15692,7 @@ const SC = [
 { id:'m6-family', module:'M6', nav:'The family', title:'Order finding is one case of period finding, and period finding is one case of something larger',
   objective:'Place order finding inside the family of problems the same mechanism solves, and say what is outside it.',
   keywords:'period finding hidden subgroup problem discrete logarithm family abelian structure grover outside quadratic limits of the method',
-  src:'L10 · quantum Fourier transform', steps:2, blocks:[
+  src:'L10 · quantum Fourier transform', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Order finding is one case of period finding, and period finding is one case of something larger'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[

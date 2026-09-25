@@ -360,7 +360,7 @@ const SC = [
 { id:'m2-born', module:'M2', nav:'The Born rule', title:'The Born rule: from an amplitude to a count',
   objective:'State the Born rule and check that the probabilities it gives add to one.',
   keywords:'born rule probability amplitude squared modulus outcome basis completeness shot',
-  src:'L4 · Born rule', steps:3, blocks:[
+  src:'L4 · Born rule', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'The Born rule: from an amplitude to a count'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -393,7 +393,7 @@ const SC = [
 { id:'m2-bases', module:'M2', nav:'Choosing a basis is choosing an experiment', title:'A measurement basis is an experiment, not a coordinate system',
   objective:'Separate a passive change of coordinates from the choice of what to measure.',
   keywords:'measurement basis Z X Y eigenbasis passive change of coordinates different experiment pauli',
-  src:'L4 · three standard qubit bases', steps:3, blocks:[
+  src:'L4 · three standard qubit bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'A measurement basis is an experiment, not a coordinate system'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -421,7 +421,7 @@ const SC = [
 { id:'m2-distinguish', module:'M2', nav:'Telling two states apart', title:'When two states can be told apart, and when they cannot',
   objective:'Show that one measurement separates two states with certainty exactly when they are orthogonal.',
   keywords:'distinguishing states orthogonal certainty overlap single shot no cloning discrimination',
-  src:'L4 · projectors and measurement geometry', steps:3, blocks:[
+  src:'L4 · projectors and measurement geometry', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'When two states can be told apart, and when they cannot'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -447,7 +447,7 @@ const SC = [
 { id:'m2-lab-c', module:'M2', nav:'Laboratory C', title:'Laboratory C · Exact probability against a finite sample',
   objective:'Let the reader set a state, a measurement basis and a shot count, and read the exact answer beside the sampled one.',
   keywords:'laboratory measurement basis shots histogram exact probability sampling error wilson interval',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
   {t:'title', text:'Laboratory C · Exact probability against a finite sample'},
   {t:'small', html:'The state is $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$ and the instrument measures along $Z$, $X$ or $Y$. The left panel puts the exact Born probabilities beside the frequencies of a simulated run; the right one follows the estimate as the shots accumulate, inside the band the sampling error allows. Nothing here is noisy hardware: the device is perfect and the spread is the counting alone.'},
@@ -458,7 +458,7 @@ const SC = [
 { id:'m2-proj', module:'M2', nav:'Projective measurement', title:'Projective measurement, and what a degenerate outcome is',
   objective:'Write a measurement as a set of orthogonal projectors and compute an outcome probability from them.',
   keywords:'projective measurement projectors orthogonal complete degenerate eigenspace born probability rank',
-  src:'L5 · projective measurement', steps:3, blocks:[
+  src:'L5 · projective measurement', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'Projective measurement, and what a degenerate outcome is'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -484,7 +484,7 @@ const SC = [
 { id:'m2-collapse', module:'M2', nav:'The state afterwards', title:'What the state is after a reading has been taken',
   objective:'Apply the projection update rule and show that an immediate repeat gives the same answer.',
   keywords:'state update luders rule collapse conditioning renormalise repeatable measurement disturbance',
-  src:'L5 · projective measurement', steps:4, blocks:[
+  src:'L5 · projective measurement', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'What the state is after a reading has been taken'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -518,7 +518,7 @@ const SC = [
 { id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'The general measurement, and what a readout error looks like',
   objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
-  src:'L5 · general measurements: POVMs and instruments', steps:3, blocks:[
+  src:'L5 · general measurements: POVMs and instruments', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
   {t:'title', text:'The general measurement, and what a readout error looks like'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -550,7 +550,7 @@ const SC = [
 { id:'m2-obs', module:'M2', nav:'Expectation values', title:'The expectation value, and why it is often not an outcome',
   objective:'Compute an expectation value two ways and say what it is an average over.',
   keywords:'observable expectation value ensemble average hermitian eigenvalue mean not an outcome',
-  src:'L5 · expectation values and variance', steps:3, blocks:[
+  src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
   {t:'title', text:'The expectation value, and why it is often not an outcome'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -582,7 +582,7 @@ const SC = [
 { id:'m2-var', module:'M2', nav:'Spread', title:'Variance, and the states on which an observable is sharp',
   objective:'Compute a variance and identify the states for which it vanishes.',
   keywords:'variance standard deviation spread sharp eigenstate certainty delta A observable',
-  src:'L5 · expectation values and variance', steps:3, blocks:[
+  src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
   {t:'title', text:'Variance, and the states on which an observable is sharp'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -615,7 +615,7 @@ const SC = [
 { id:'m2-comm', module:'M2', nav:'Compatibility', title:'The commutator, and when two readings can both be sharp',
   objective:'Compute a commutator and connect it to whether two observables share an eigenbasis.',
   keywords:'commutator compatible observables shared eigenbasis simultaneous sharp sequential measurement disturbance',
-  src:'L5 · compatibility, commutators and uncertainty', steps:3, blocks:[
+  src:'L5 · compatibility, commutators and uncertainty', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
   {t:'title', text:'The commutator, and when two readings can both be sharp'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -643,7 +643,7 @@ const SC = [
 { id:'m2-uncert', module:'M2', nav:'The uncertainty relation', title:'The uncertainty relation, and what it is a statement about',
   objective:'State the Robertson relation, check it on a family of states, and say what it does not claim.',
   keywords:'uncertainty relation robertson bound commutator spread product cauchy schwarz saturated',
-  src:'L5 · Robertson uncertainty relation', steps:3, blocks:[
+  src:'L5 · Robertson uncertainty relation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
   {t:'title', text:'The uncertainty relation, and what it is a statement about'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -671,7 +671,7 @@ const SC = [
 { id:'m2-pauli', module:'M2', nav:'The Pauli operators', title:'The Pauli operators: observable and gate at once',
   objective:'List the three Pauli operators with their eigenvalues and eigenstates, and say why each is both an observable and a gate.',
   keywords:'pauli matrices X Y Z hermitian unitary traceless square identity eigenstates spin stern gerlach',
-  src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, blocks:[
+  src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'The Pauli operators: observable and gate at once'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -703,7 +703,7 @@ const SC = [
 { id:'m2-paulialg', module:'M2', nav:'The Pauli algebra', title:'One product rule, and everything else follows from it',
   objective:'Use the Pauli product rule to get any commutator or anticommutator without multiplying matrices.',
   keywords:'pauli algebra product rule commutator anticommutator cyclic levi civita identity operator basis',
-  src:'L5 · Pauli algebra', steps:3, blocks:[
+  src:'L5 · Pauli algebra', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'One product rule, and everything else follows from it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -736,7 +736,7 @@ const SC = [
 { id:'m2-ndotsigma', module:'M2', nav:'Measuring along any direction', title:'Measuring along a direction, and the first sight of a vector',
   objective:'Build the projectors for a measurement along an arbitrary axis and read off the outcome probability.',
   keywords:'n dot sigma arbitrary direction projector half identity plus axis bloch vector cos squared',
-  src:'L5 · Stern-Gerlach experiment', steps:3, blocks:[
+  src:'L5 · Stern-Gerlach experiment', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
   {t:'title', text:'Measuring along a direction, and the first sight of a vector'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -763,7 +763,7 @@ const SC = [
 { id:'m2-position', module:'M2', nav:'Position representation', title:'Position and momentum are operators on a wavefunction',
   objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
   keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
-  src:'L5 · coordinate representation and the free particle', steps:3, blocks:[
+  src:'L5 · coordinate representation and the free particle', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Position and momentum are operators on a wavefunction'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -790,7 +790,7 @@ const SC = [
 { id:'m2-schrod', module:'M2', nav:'Evolution', title:'Evolution: one Hermitian operator, one unitary family',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
-  src:'L5 · closed-system time evolution', steps:3, blocks:[
+  src:'L5 · closed-system time evolution', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Evolution: one Hermitian operator, one unitary family'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -821,7 +821,7 @@ const SC = [
 { id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Why one energy eigenstate does nothing and two of them beat',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
-  src:'L5 · stationary states and superpositions', steps:3, blocks:[
+  src:'L5 · stationary states and superpositions', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Why one energy eigenstate does nothing and two of them beat'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -850,7 +850,7 @@ const SC = [
 { id:'m2-well', module:'M2', nav:'The infinite square well', title:'Boundary conditions turn a continuous wave number into discrete energies',
   objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
   keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
-  src:'L5 · infinite square well', steps:3, blocks:[
+  src:'L5 · infinite square well', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Boundary conditions turn a continuous wave number into discrete energies'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -881,7 +881,7 @@ const SC = [
 { id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Why a gate is an exponential, and what a pulse controls',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',
-  src:'L5 · driven qubit: Hamiltonians become gates', steps:3, blocks:[
+  src:'L5 · driven qubit: Hamiltonians become gates', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Why a gate is an exponential, and what a pulse controls'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -908,7 +908,7 @@ const SC = [
 { id:'m2-lab-d', module:'M2', nav:'Laboratory D', title:'Laboratory D · Driving a qubit: strength, detuning and time',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
   keywords:'laboratory rabi oscillation drive strength detuning population resonance pulse area pi pulse',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
   {t:'title', text:'Laboratory D · Driving a qubit: strength, detuning and time'},
   {t:'small', html:'The qubit starts in $|0\\rangle$ under $H=\\tfrac12(\\Omega_{x}X+\\Delta Z)$. The left panel is the population of $|1\\rangle$ against time, with the elapsed time marked; the right one is the largest population the drive can ever reach, against the detuning. The transport runs the clock forward. Find the pulse length that flips the qubit, then detune and watch that pulse stop working.'},
@@ -919,7 +919,7 @@ const SC = [
 { id:'m2-shots', module:'M2', nav:'What a count is worth', title:'Finite shots: a histogram is an estimate, not a distribution',
   objective:'Give the standard error of a probability estimated from N shots and say what it is not.',
   keywords:'shots binomial standard error sampling noise estimate histogram confidence square root scaling',
-  src:'L5 · finite-shot estimation', steps:3, blocks:[
+  src:'L5 · finite-shot estimation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Finite shots'},
   {t:'title', text:'Finite shots: a histogram is an estimate, not a distribution'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[

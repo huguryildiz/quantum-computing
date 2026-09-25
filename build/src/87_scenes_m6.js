@@ -737,7 +737,7 @@ const SC = [
 { id:'m6-query', module:'M6', nav:'What a query counts', title:'A query count is one number, and it is not the cost of anything',
   objective:'Distinguish query complexity, gate complexity and end-to-end cost, and say what each one omits.',
   keywords:'query model oracle black box query complexity gate complexity end to end cost separation counting calls resource claim',
-  src:'L10 · computational models: what is being counted?', steps:3, blocks:[
+  src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'A query count is one number, and it is not the cost of anything'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -768,7 +768,7 @@ const SC = [
 { id:'m6-classes', module:'M6', nav:'What the classes mean', title:'The classes name what is settled in polynomial time, and P is inside all of them',
   objective:'State what P, BPP, BQP and NP contain, and which containments are known.',
   keywords:'complexity classes P BPP BQP NP decision problem polynomial time bounded error containment factoring np complete input length',
-  src:'L10 · computational models: what is being counted?', steps:3, blocks:[
+  src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'The classes name what is settled in polynomial time, and P is inside all of them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -799,7 +799,7 @@ const SC = [
 { id:'m6-kick', module:'M6', nav:'Phase kickback', title:'Point the oracle at the state it cannot change and it writes a phase instead',
   objective:'Derive phase kickback for a Boolean oracle and say why the target register is left untouched.',
   keywords:'phase kickback minus state eigenstate of x oracle boolean function sign relative phase mechanism ancilla unchanged',
-  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, blocks:[
+  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'Point the oracle at the state it cannot change and it writes a phase instead'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -831,7 +831,7 @@ const SC = [
 { id:'m6-eigen', module:'M6', nav:'The general form', title:'The same move with any unitary: an eigenstate sends its phase up to the control',
   objective:'Show that a controlled unitary acting on one of its eigenstates writes the eigenphase onto the control qubit.',
   keywords:'controlled unitary eigenstate eigenphase kickback general form control qubit relative phase estimation preparation',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'The same move with any unitary: an eigenstate sends its phase up to the control'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -863,7 +863,7 @@ const SC = [
 { id:'m6-cancel', module:'M6', nav:'Why a superposition is free', title:'A superposition costs one layer and buys nothing until the wrong terms cancel',
   objective:'Explain why quantum parallelism alone gives no advantage, and what interference has to do before a measurement is worth taking.',
   keywords:'quantum parallelism superposition free interference cancellation readout small state large amplitudes measurement one string',
-  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, blocks:[
+  src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'A superposition costs one layer and buys nothing until the wrong terms cancel'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -891,7 +891,7 @@ const SC = [
 { id:'m6-deutsch', module:'M6', nav:'Deutsch\u2019s problem', title:'One query decides a property that two are needed for classically',
   objective:'State Deutsch\u2019s promise problem, run the three-gate circuit, and say exactly what the reading means.',
   keywords:'deutsch algorithm promise problem constant balanced one query four functions circuit hadamard oracle single bit',
-  src:'L10 · Deutsch\u2019s promise problem', steps:3, blocks:[
+  src:'L10 · Deutsch\u2019s promise problem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'One query decides a property that two are needed for classically'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -923,7 +923,7 @@ const SC = [
 { id:'m6-dj', module:'M6', nav:'Deutsch\u2013Jozsa', title:'The same circuit on n bits, and every balanced function cancels exactly',
   objective:'Run the Deutsch-Jozsa circuit on n query qubits and evaluate the amplitude of the all-zero string.',
   keywords:'deutsch jozsa n qubits balanced constant promise all zero string amplitude mean of signs certainty hadamard transform',
-  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, blocks:[
+  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The same circuit on n bits, and every balanced function cancels exactly'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -954,7 +954,7 @@ const SC = [
 { id:'m6-djcost', module:'M6', nav:'What the separation is', title:'The exponential gap is against an exact classical algorithm, and only that one',
   objective:'Compare the quantum query count with the exact and the randomised classical query counts, and say which separation is real.',
   keywords:'separation exact deterministic randomised bounded error queries worst case exponential gap honest statement promise problem',
-  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, blocks:[
+  src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The exponential gap is against an exact classical algorithm, and only that one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -988,7 +988,7 @@ const SC = [
 { id:'m6-qft', module:'M6', nav:'The Fourier transform', title:'The transform sends a basis state to a phase that winds at a rate the state sets',
   objective:'Write the quantum Fourier transform, apply it to one basis state, and describe the result.',
   keywords:'quantum fourier transform definition basis state phase ramp winding rate unitary discrete fourier amplitudes equal magnitude',
-  src:'L10 · quantum Fourier transform', steps:3, blocks:[
+  src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform sends a basis state to a phase that winds at a rate the state sets'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1019,7 +1019,7 @@ const SC = [
 { id:'m6-qftcirc', module:'M6', nav:'The circuit', title:'A Hadamard and a triangle of small rotations, and the whole thing is quadratic',
   objective:'Read the QFT circuit, count its gates, and say what an approximate version trades away.',
   keywords:'qft circuit hadamard controlled rotation R_k swaps gate count quadratic n squared approximate qft truncation depth',
-  src:'L10 · QFT circuit in Qiskit', steps:3, blocks:[
+  src:'L10 · QFT circuit in Qiskit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'A Hadamard and a triangle of small rotations, and the whole thing is quadratic'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1052,7 +1052,7 @@ const SC = [
 { id:'m6-qftnot', module:'M6', nav:'What it does not return', title:'The transform produces amplitudes, and a measurement still returns one index',
   objective:'Say what a run of the quantum Fourier transform actually gives back, and why it is not a spectrum.',
   keywords:'qft limitation not a spectrum amplitudes measurement one sample fft comparison input output model advantage inference',
-  src:'L10 · what the QFT does and does not return', steps:3, blocks:[
+  src:'L10 · what the QFT does and does not return', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform produces amplitudes, and a measurement still returns one index'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1083,7 +1083,7 @@ const SC = [
 { id:'m6-qpe', module:'M6', nav:'Phase estimation', title:'Write the phase into t qubits at once, then undo the transform to read it',
   objective:'Assemble the phase-estimation circuit and say what each of its three parts does.',
   keywords:'quantum phase estimation circuit counting register controlled powers inverse qft eigenphase binary expansion measurement',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Write the phase into t qubits at once, then undo the transform to read it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1110,7 +1110,7 @@ const SC = [
 { id:'m6-qpeexact', module:'M6', nav:'When it is exact', title:'A phase that fits in t bits comes out certain, and every wrong outcome cancels',
   objective:'Show that a phase of the form y/2^t is returned with probability one, and identify the cancellation that makes it so.',
   keywords:'phase estimation exact case binary fraction certainty geometric sum cancellation all wrong outcomes zero amplitude',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that fits in t bits comes out certain, and every wrong outcome cancels'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1142,7 +1142,7 @@ const SC = [
 { id:'m6-qpeprec', module:'M6', nav:'Precision and confidence', title:'A phase that does not fit gives a distribution, and more qubits narrow it',
   objective:'Describe the outcome distribution for a general phase and say how many counting qubits a stated accuracy and confidence need.',
   keywords:'phase estimation precision success probability distribution nearest outcome eight over pi squared extra qubits accuracy confidence',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that does not fit gives a distribution, and more qubits narrow it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1175,7 +1175,7 @@ const SC = [
 { id:'m6-qpecost', module:'M6', nav:'Where the cost is', title:'The controlled powers cost exponentially more than the transform that reads them',
   objective:'Compare the cost of the controlled powers with the cost of the inverse transform and say which one a resource estimate must be about.',
   keywords:'phase estimation cost controlled powers 2^t applications inverse qft quadratic dominant term resource estimate coherent evolution',
-  src:'L10 · quantum phase estimation: interface and limitations', steps:3, blocks:[
+  src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'The controlled powers cost exponentially more than the transform that reads them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1206,7 +1206,7 @@ const SC = [
 { id:'m6-count', module:'M6', nav:'Counting the marked', title:'Point the estimator at the Grover step and it returns how many answers there are',
   objective:'Explain quantum counting and use it to close the gap chapter 5 left open about an unknown number of marked items.',
   keywords:'quantum counting grover iterate eigenvalue two theta estimate M number of solutions unknown marked items decide existence',
-  src:'L10 · Grover search and amplitude amplification', steps:3, blocks:[
+  src:'L10 · Grover search and amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Point the estimator at the Grover step and it returns how many answers there are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1237,7 +1237,7 @@ const SC = [
 { id:'m6-lab-k', module:'M6', nav:'Laboratory K', title:'Laboratory K · Phase estimation: the phase, the register, and the distribution',
   objective:'Let the reader turn the phase and the number of counting qubits and watch the outcome distribution answer.',
   keywords:'laboratory phase estimation counting qubits distribution outcomes precision success probability exact case tails guarantee',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Laboratory K · Phase estimation: the phase, the register, and the distribution'},
   {t:'small', html:'Choose a phase and a number of counting qubits. The left panel is the distribution over the $2^{t}$ possible readings; the right panel is how the probability of landing on the nearest reading behaves as the register grows. Three things to find: a phase that is a $t$-bit fraction gives one outcome with probability one and an exact zero at every other reading, the two nearest readings always carry at least $8/\\pi^{2}$ however badly the phase fits, and the worst case is a phase sitting exactly halfway between two readings.'},
@@ -1248,7 +1248,7 @@ const SC = [
 { id:'m6-order', module:'M6', nav:'The order of a number', title:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order',
   objective:'Define the order of a modulo N and the unitary whose eigenphases carry it.',
   keywords:'order finding modular multiplication cycle period coprime permutation unitary reversible work register definition',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1280,7 +1280,7 @@ const SC = [
 { id:'m6-ordereig', module:'M6', nav:'Where the order hides', title:'The eigenphases of the multiplier are the fractions s over r, and the state one can prepare is their even mixture',
   objective:'Give the eigenstates and eigenphases of the modular multiplier and explain why the register is started in the state one.',
   keywords:'eigenstates modular multiplier eigenphase s over r superposition state one even mixture sampling eigenphase preparation trick',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The eigenphases of the multiplier are the fractions s over r, and the state one can prepare is their even mixture'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1314,7 +1314,7 @@ const SC = [
 { id:'m6-modexp', module:'M6', nav:'What it costs to build', title:'The controlled powers are modular exponentiation, and they are the whole cost',
   objective:'Say how the controlled powers of the modular multiplier are built and which term dominates the circuit.',
   keywords:'modular exponentiation repeated squaring controlled multiplication cost cubic L gate count dominant term qft small',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The controlled powers are modular exponentiation, and they are the whole cost'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1345,7 +1345,7 @@ const SC = [
 { id:'m6-cf', module:'M6', nav:'Reading the order out', title:'Continued fractions turn a measured fraction into the small denominator hiding in it',
   objective:'Use the continued-fraction expansion to recover r from a measured y over Q, and check the candidate.',
   keywords:'continued fractions convergents denominator recover order classical post processing candidate check modular exponentiation verify',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Continued fractions turn a measured fraction into the small denominator hiding in it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1376,7 +1376,7 @@ const SC = [
 { id:'m6-repeat', module:'M6', nav:'When a run fails', title:'Several things can go wrong, all of them are detected, and none of the repairs is quantum',
   objective:'List the ways an order-finding run fails, say how each is detected, and describe the repetition strategy.',
   keywords:'failure modes s zero common factor odd order minus one repeat runs detection classical check probability constant expected runs',
-  src:'L10 · order-finding workflow', steps:3, blocks:[
+  src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Several things can go wrong, all of them are detected, and none of the repairs is quantum'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1408,7 +1408,7 @@ const SC = [
 { id:'m6-shor', module:'M6', nav:'Factoring, assembled', title:'One box in five needs a quantum computer, and the other four are integer arithmetic',
   objective:'Assemble the factoring algorithm from order finding and the classical steps around it, and identify which step is quantum.',
   keywords:'shor factoring algorithm workflow reduction order finding gcd classical steps square root difference of squares assembly',
-  src:'L10 · Shor\u2019s factoring algorithm', steps:3, blocks:[
+  src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'One box in five needs a quantum computer, and the other four are integer arithmetic'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1435,7 +1435,7 @@ const SC = [
 { id:'m6-shor15', module:'M6', nav:'Fifteen, worked', title:'The smallest example, worked to the end, including the choice that fails',
   objective:'Factor fifteen through order finding, and show a choice of a for which the same procedure fails.',
   keywords:'worked example fifteen factoring order four gcd three five failure case fourteen minus one repeat choose another base',
-  src:'L10 · worked order-finding example: N = 15', steps:3, blocks:[
+  src:'L10 · worked order-finding example: N = 15', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'The smallest example, worked to the end, including the choice that fails'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1467,7 +1467,7 @@ const SC = [
 { id:'m6-rsa', module:'M6', nav:'What is actually threatened', title:'Public-key cryptography breaks, symmetric cryptography does not, and the timing is the problem',
   objective:'Say which cryptographic systems a large fault-tolerant machine would break and why migration cannot wait for one.',
   keywords:'rsa public key discrete logarithm broken symmetric aes hash grover square root post quantum migration harvest now decrypt later',
-  src:'L10 · RSA and the scope of the quantum threat', steps:3, blocks:[
+  src:'L10 · RSA and the scope of the quantum threat', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Public-key cryptography breaks, symmetric cryptography does not, and the timing is the problem'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1497,7 +1497,7 @@ const SC = [
 { id:'m6-shorclaim', module:'M6', nav:'What Shor claims', title:'A superpolynomial gap against the best known method, and no lower bound behind it',
   objective:'Write the factoring claim against the five components and say precisely what it does and does not assert.',
   keywords:'shor claim resource five components fault tolerance physical qubits number field sieve baseline no lower bound superpolynomial',
-  src:'L10 · Shor\u2019s factoring algorithm', steps:3, blocks:[
+  src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'A superpolynomial gap against the best known method, and no lower bound behind it'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1527,7 +1527,7 @@ const SC = [
 { id:'m6-family', module:'M6', nav:'The family', title:'Order finding is one case of period finding, and period finding is one case of something larger',
   objective:'Place order finding inside the family of problems the same mechanism solves, and say what is outside it.',
   keywords:'period finding hidden subgroup problem discrete logarithm family abelian structure grover outside quadratic limits of the method',
-  src:'L10 · quantum Fourier transform', steps:2, blocks:[
+  src:'L10 · quantum Fourier transform', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Order finding is one case of period finding, and period finding is one case of something larger'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[

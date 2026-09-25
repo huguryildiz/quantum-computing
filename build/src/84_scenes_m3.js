@@ -416,7 +416,7 @@ const SC = [
 { id:'m3-rho', module:'M3', nav:'The density operator', title:'The density operator, and what its four entries are',
   objective:'Write the density operator of a pure state and of a mixture, and name the meaning of each entry.',
   keywords:'density operator density matrix outer product ensemble populations coherences mixture pure state',
-  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'The density operator, and what its four entries are'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -448,7 +448,7 @@ const SC = [
 { id:'m3-physical', module:'M3', nav:'Which matrices are states', title:'Which matrices are physical states, and which are not',
   objective:'Test a candidate matrix against the three conditions and say which one a given matrix fails.',
   keywords:'hermitian positive semidefinite trace one physical density matrix eigenvalues test coherence bound',
-  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  src:'L6 · which matrices are physical states?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'Which matrices are physical states, and which are not'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -481,7 +481,7 @@ const SC = [
 { id:'m3-expect', module:'M3', nav:'Predictions from the matrix', title:'Every prediction, from one trace',
   objective:'Compute an outcome probability and an expectation value from a density operator.',
   keywords:'trace rho A expectation probability povm effects cyclicity born rule mixed state prediction',
-  src:'L6 · expectation values and measurement probabilities', steps:3, blocks:[
+  src:'L6 · expectation values and measurement probabilities', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'Every prediction, from one trace'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -511,7 +511,7 @@ const SC = [
 { id:'m3-ensemble', module:'M3', nav:'Ensembles are not unique', title:'One matrix, many preparations, and no experiment between them',
   objective:'Show two different ensembles with the same density operator and say what follows.',
   keywords:'ensemble decomposition not unique maximally mixed identity over two operationally identical preparation',
-  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, blocks:[
+  src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · The density operator'},
   {t:'title', text:'One matrix, many preparations, and no experiment between them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -540,7 +540,7 @@ const SC = [
 { id:'m3-purity', module:'M3', nav:'Purity', title:'Purity: one number that says how mixed a state is',
   objective:'Compute the purity of a state and place it between its two bounds.',
   keywords:'purity trace rho squared bounds maximally mixed pure state rank one idempotent dimension',
-  src:'L6 · which matrices are physical states?', steps:3, blocks:[
+  src:'L6 · which matrices are physical states?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Purity and the ball'},
   {t:'title', text:'Purity: one number that says how mixed a state is'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -571,7 +571,7 @@ const SC = [
 { id:'m3-ball', module:'M3', nav:'The ball of qubit states', title:'A qubit state is a vector of length at most one',
   objective:'Write a qubit density operator in the Pauli basis and read purity off the length of its vector.',
   keywords:'bloch vector ball pauli expansion length purity eigenvalues mixed inside sphere surface qubit',
-  src:'L6 · example: a pure qubit', steps:3, blocks:[
+  src:'L6 · example: a pure qubit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Purity and the ball'},
   {t:'title', text:'A qubit state is a vector of length at most one'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -601,7 +601,7 @@ const SC = [
 { id:'m3-kraus', module:'M3', nav:'Quantum channels', title:'A channel: what a unitary looks like from inside',
   objective:'State the Kraus form of a channel and check that it preserves the trace.',
   keywords:'quantum channel kraus operators cptp completely positive trace preserving operator sum environment',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'A channel: what a unitary looks like from inside'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -627,7 +627,7 @@ const SC = [
 { id:'m3-damp', module:'M3', nav:'Amplitude damping', title:'Amplitude damping: energy leaves, and the coherence follows',
   objective:'Apply the amplitude-damping Kraus operators and say what happens to each entry.',
   keywords:'amplitude damping relaxation energy loss spontaneous emission kraus population coherence square root',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Amplitude damping: energy leaves, and the coherence follows'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -659,7 +659,7 @@ const SC = [
 { id:'m3-dephase', module:'M3', nav:'Dephasing', title:'Dephasing: the populations never move and the phase is lost anyway',
   objective:'Apply the phase-flip channel and identify what it does and does not change.',
   keywords:'dephasing phase flip channel decoherence coherence populations unchanged measured and ignored basis',
-  src:'L6 · quantum channels and Kraus operators', steps:3, blocks:[
+  src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Dephasing: the populations never move and the phase is lost anyway'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -686,7 +686,7 @@ const SC = [
 { id:'m3-lab-e', module:'M3', nav:'Laboratory E', title:'Laboratory E · A channel applied to the ball of states',
   objective:'Let the reader choose a state and a channel and watch the ball of states deform.',
   keywords:'laboratory channel bloch ball depolarising amplitude damping dephasing purity contraction fixed point',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Quantum channels'},
   {t:'title', text:'Laboratory E · A channel applied to the ball of states'},
   {t:'small', html:'The left panel is the flat cross-section of the ball again, with the chosen input state and where the channel sends it, and with the whole rim carried along so the deformation of the set is visible. The right panel follows the purity as the strength is turned up. Find the state each channel leaves alone, and notice that two of the three channels have one and the third has a whole line of them.'},
@@ -697,7 +697,7 @@ const SC = [
 { id:'m3-t1t2', module:'M3', nav:'T1 and T2', title:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$',
   objective:'Write the two exponential decays and derive the inequality between their times.',
   keywords:'T1 T2 relaxation dephasing lindblad master equation exponential decay coherence time inequality echo',
-  src:'L6 · Markovian relaxation and dephasing', steps:3, blocks:[
+  src:'L6 · Markovian relaxation and dephasing', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Relaxation and dephasing'},
   {t:'title', text:'Relaxation and dephasing in time, and why $T_{2}\\le 2T_{1}$'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -725,7 +725,7 @@ const SC = [
 { id:'m3-order', module:'M3', nav:'Two qubits, and their order', title:'Two qubits, and the ordering that silently breaks results',
   objective:'Write a two-qubit state in the fixed ordering and locate each amplitude.',
   keywords:'two qubits tensor product basis ordering convention kronecker significant bit index product state',
-  src:'L6 · composite systems and tensor products', steps:3, blocks:[
+  src:'L6 · composite systems and tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'Two qubits, and the ordering that silently breaks results'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -752,7 +752,7 @@ const SC = [
 { id:'m3-ptrace', module:'M3', nav:'The partial trace', title:'The partial trace: the state of one system alone',
   objective:'Compute a partial trace by the block rule and say what characterises it.',
   keywords:'partial trace reduced density operator subsystem block matrix trace out marginal characterisation',
-  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'The partial trace: the state of one system alone'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -784,7 +784,7 @@ const SC = [
 { id:'m3-local', module:'M3', nav:'A pure whole with mixed parts', title:'A pure pair whose halves are as mixed as a state can be',
   objective:'Show that a maximally entangled pair has maximally mixed parts and say what that rules out.',
   keywords:'entanglement local mixedness reduced state maximally mixed pure joint state purity contrast product',
-  src:'L6 · partial trace: the state of a subsystem', steps:3, blocks:[
+  src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Two systems'},
   {t:'title', text:'A pure pair whose halves are as mixed as a state can be'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -810,7 +810,7 @@ const SC = [
 { id:'m3-sep', module:'M3', nav:'Product or entangled', title:'Separable or entangled: the test on four amplitudes',
   objective:'Decide whether a two-qubit pure state factors, and factor it when it does.',
   keywords:'separable product state entangled test determinant factor amplitudes bipartite pure mixed convex',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'Separable or entangled: the test on four amplitudes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -841,7 +841,7 @@ const SC = [
 { id:'m3-schmidt', module:'M3', nav:'The Schmidt decomposition', title:'The Schmidt decomposition: two bases in which the state is diagonal',
   objective:'State the Schmidt decomposition and read the entanglement off its rank.',
   keywords:'schmidt decomposition coefficients rank orthonormal bases bipartite pure state reduced eigenvalues',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'The Schmidt decomposition: two bases in which the state is diagonal'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -874,7 +874,7 @@ const SC = [
 { id:'m3-svd', module:'M3', nav:'Computing it', title:'How the decomposition is actually computed',
   objective:'Reshape a state vector into a coefficient matrix and get the Schmidt data from its singular values.',
   keywords:'singular value decomposition svd reshape coefficient matrix numerical rank tolerance schmidt computation',
-  src:'L6 · computing Schmidt decompositions with an SVD', steps:3, blocks:[
+  src:'L6 · computing Schmidt decompositions with an SVD', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
   {t:'title', text:'How the decomposition is actually computed'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -905,7 +905,7 @@ const SC = [
 { id:'m3-entropy', module:'M3', nav:'Entropy', title:'Entropy: how much entanglement, in bits',
   objective:'Compute the von Neumann entropy of a reduced state and interpret it as an amount of entanglement.',
   keywords:'von neumann entropy entanglement entropy ebit bits log base two reduced state pure zero maximal',
-  src:'L6 · separability and the Schmidt decomposition', steps:3, blocks:[
+  src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Entropy'},
   {t:'title', text:'Entropy: how much entanglement, in bits'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -938,7 +938,7 @@ const SC = [
 { id:'m3-bell', module:'M3', nav:'The Bell states', title:'The four Bell states, and the correlations that separate them',
   objective:'List the Bell states and compute the three Pauli correlations of one of them.',
   keywords:'bell states phi psi plus minus basis maximally entangled correlations XX YY ZZ classical mixture',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'The four Bell states, and the correlations that separate them'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -971,7 +971,7 @@ const SC = [
 { id:'m3-chsh', module:'M3', nav:'The classical bound', title:'CHSH: the number every classical model is trapped below',
   objective:'Assemble the CHSH combination and derive the bound a model with pre-existing values obeys.',
   keywords:'chsh bell inequality local hidden variable classical bound two pre-existing values correlations',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'CHSH: the number every classical model is trapped below'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -999,7 +999,7 @@ const SC = [
 { id:'m3-violate', module:'M3', nav:'The violation', title:'What quantum mechanics reaches, and what that refutes',
   objective:'Evaluate the CHSH combination on a Bell state and say precisely which assumption fails.',
   keywords:'chsh violation tsirelson 2 root 2 bell state measurement angles refutation realism error bar shots',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'What quantum mechanics reaches, and what that refutes'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
@@ -1029,7 +1029,7 @@ const SC = [
 { id:'m3-lab-f', module:'M3', nav:'Laboratory F', title:'Laboratory F · CHSH: four angles and one number',
   objective:'Let the reader set the four measurement directions and read the CHSH value against the classical bound.',
   keywords:'laboratory chsh bell inequality four angles classical bound tsirelson correlations violation sweep',
-  steps:0, blocks:[
+  steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'Laboratory F · CHSH: four angles and one number'},
   {t:'small', html:'Both parties measure $|\\Phi^{+}\\rangle$ along a direction in the $z$–$x$ plane, and each of the four directions is a slider. The left panel is the four correlations; the right one sweeps the first of the other party\u2019s two settings with the rest held where they are, against the classical bound and the largest value quantum mechanics permits. Find a setting that violates the bound, then find one that does not, and notice how much of the circle each occupies.'},
@@ -1040,7 +1040,7 @@ const SC = [
 { id:'m3-nosig', module:'M3', nav:'No signalling', title:'Why entanglement sends nothing',
   objective:'Show that one party\u2019s outcome distribution does not depend on the other party\u2019s choice.',
   keywords:'no signalling faster than light communication reduced state unchanged partial trace correlation classical channel',
-  src:'L6 · Bell states, correlations, and no signaling', steps:3, blocks:[
+  src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'Why entanglement sends nothing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
