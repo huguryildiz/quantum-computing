@@ -31,6 +31,7 @@ const MARK = JSON.stringify(
     .replace(/\swidth="\d+"\sheight="\d+"/, ''));
 
 const html=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="author" content="Hüseyin Uğur Yıldız"><meta name="license" content="CC BY 4.0">
 <title>Quantum Computing — Lecture Notes</title>
 <style>${fs.readFileSync(path.join(B,'20_katex.css'),'utf8')}</style>
 <style>${S('src/notes.css')}</style></head><body><div id="doc"></div>
@@ -39,7 +40,7 @@ const html=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <script>window.ICON_SVG=${MARK};</script>
 <script>${g(S('src/render.js'))}</script>
 ${chapters.map(f=>`<script>${g(S('src/'+f))}</script>`).join('\n')}
-<script>renderNotes([].concat(${globals.join(',') || ''}), document.getElementById('doc')); document.title=document.title;</script>
+<script>renderNotes([{t:'cover', kicker:'Quantum Computing', text:'Quantum Computing', sub:'Lecture Notes', foot:'Chapters 1&ndash;6 &middot; Appendix A'},{t:'page'}].concat(${globals.join(',') || ''}, [{t:'colophon',doc:'Lecture Notes'}]), document.getElementById('doc'), {captions:true}); document.title=document.title;</script>
 </body></html>`;
 fs.mkdirSync(path.join(__dirname,'..','dist'),{recursive:true});
 fs.writeFileSync(path.join(__dirname,'..','dist','Lecture_Notes.html'), html);

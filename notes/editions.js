@@ -8,6 +8,7 @@
      Student_Workbook.html    every question, no answers and no solutions
      Instructor_Solutions.html every question with its full solution, plus provenance
      Formula_Reference.html   the conventions, the summary of formulas, the glossary
+     PDF_VERSIONS.md          the version history of the PDFs, as a table
 
    The renderer, the stylesheet and the KaTeX build are the ones the lecture notes
    use, so the four documents are one typographic family.
@@ -32,7 +33,9 @@ const MARK = JSON.stringify(
     .replace(/^<svg /, '<svg class="eelogo" aria-hidden="true" focusable="false" ')
     .replace(/\swidth="\d+"\sheight="\d+"/, ''));
 
-const doc = (title, builder, extra = '') => `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+const doc = (title, builder, extra = '') => `<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="author" content="Hüseyin Uğur Yıldız"><meta name="license" content="CC BY 4.0">
 <title>${title}</title>
 <style>${R('20_katex.css')}</style>
 <style>${S('src/notes.css')}</style>
@@ -50,8 +53,21 @@ const doc = (title, builder, extra = '') => `<!DOCTYPE html><html lang="en"><hea
 .qcard .key{ border-left:2px solid var(--accent); padding-left:8pt; margin-top:6pt; }
 .qcard .why{ margin-top:4pt; }
 .workspace{ border:1px dashed var(--rule2); height:58pt; margin-top:6pt; border-radius:2px; }
-.gloss dt{ font-family:var(--mono); font-size:9pt; margin-top:5pt; }
-.gloss dd{ margin:0 0 0 22pt; }
+/* The worked solution as information cards, the print form of the artifact's
+   slide card: a tinted panel with a coloured left edge and a filled tab. */
+.qcard.sol{ break-inside:auto; }
+.qcard.sol > .qh, .qcard.sol > p, .qcard.sol > .opts{ break-after:avoid; }
+.sblk{ --c:var(--slate); margin:8pt 0 0; break-inside:avoid; }
+.sblk.ok{ --c:var(--out); } .sblk.warn{ --c:#8A5E12; } .sblk.err{ --c:var(--err); }
+.sblk > .tab{ display:inline-block; padding:1.6pt 7pt 1.4pt; background:var(--c); color:#fff;
+  border-radius:2px 2px 0 0; font-family:var(--mono); font-size:7.4pt; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; line-height:1.35; }
+.sblk > .tab .katex{ text-transform:none; letter-spacing:normal; }
+.scard{ padding:7pt 10pt 6pt; border:0.6pt solid var(--rule2); border-left:2.2pt solid var(--c);
+  border-radius:0 2px 2px 2px; background:color-mix(in srgb, var(--c) 4%, #fff); }
+.sblk.err .scard{ background:color-mix(in srgb, var(--err) 7%, #fff); }
+.scard .nsep{ height:0; border-top:0.6pt solid var(--rule2); margin:5pt 0 4pt; }
+.scard .fig, .scard figure{ margin-bottom:0; }
 </style></head><body><div id="doc"></div>
 <script>${g(R('30_katex.js'))}</script>
 <script>${g(R('60_plot.js'))}</script>
@@ -80,6 +96,8 @@ const GROUP = `const BY = {};
 const workbook = `
 ${MODULE_TITLE}${KIND}${GROUP}
 const B = [
+{t:'cover', kicker:'Quantum Computing', text:'Quantum Computing', sub:'Student Workbook', foot:CONTENT.DRILL.length + ' questions &middot; Chapters 1&ndash;6'},
+ {t:'page'},
  {t:'title', kicker:'Quantum Computing', text:'Student Workbook',
   sub:'Every question in the course, with no answer and no solution. Work each one on the page, then check it against the artifact or against the instructor edition.',
   meta:[['Contains', CONTENT.DRILL.length + ' questions across ' + MODS.length + ' modules'],
@@ -104,12 +122,27 @@ MODS.forEach((id,i)=>{
   });
   if(i < MODS.length-1) B.push({t:'page'});
 });
+B.push({t:'colophon', doc:'Student Workbook'});
 renderNotes(B, document.getElementById('doc'));`;
+
+/* The worked solution is one string of <b>Head.</b> sections (R7). It is
+   printed as cards, as the artifact draws it: Given with Find under a hairline,
+   Method, one green card per solved part, Check, and the common error. */
+function solParts(sol){
+  const parts = [];
+  sol.split(/(?:<br>)?<b>(Given|Find|Method|Solution(?: — [^<]*)?|Check|Contrast with discrete time)\.<\/b>\s*/)
+    .forEach((s,i,a)=>{ if(i%2) parts.push({head:s, html:a[i+1].replace(/(<br>\s*)+$/,'')}); });
+  return parts;
+}
 
 /* ------------------------------------------------------ instructor solutions */
 const solutions = `
+${solParts.toString()}
+const card = (kind, head, html) => '<div class="sblk ' + kind + '"><span class="tab">' + renderInline(head) + '</span><div class="scard">' + renderInline(html);
 ${MODULE_TITLE}${KIND}${GROUP}
 const B = [
+{t:'cover', kicker:'Quantum Computing', text:'Quantum Computing', sub:'Instructor Solutions', foot:'Instructor edition'},
+ {t:'page'},
  {t:'title', kicker:'Quantum Computing', text:'Instructor Solutions',
   sub:'Every question with its worked solution, the error it is built to catch, and a teaching note. Not for distribution to students.',
   meta:[['Contains', CONTENT.DRILL.length + ' questions, fully worked'],
@@ -123,25 +156,36 @@ const B = [
 MODS.forEach((id,i)=>{
   B.push({t:'h1', num:'MODULE ' + id.replace('M',''), text: MT[id]});
   BY[id].forEach(q=>{
-    B.push({t:'raw', html:'<div class="qcard"><div class="qh">' + q.id + ' &middot; ' + KIND(id,q.type) +
+    B.push({t:'raw', html:'<div class="qcard sol"><div class="qh">' + q.id + ' &middot; ' + KIND(id,q.type) +
       (q.src ? ' &middot; ref ' + q.src : '') + '</div>'});
     B.push({t:'p', text:q.stem});
     if(q.figure) B.push({t:'fig', svg:q.figure});
     B.push({t:'raw', html:'<ul class="opts">' + (q.parts||[]).map((o,k)=>
       '<li><b>' + 'abcde'[k] + ')</b>&nbsp; ' + renderInline(o) + '</li>').join('') + '</ul>'});
-    if(q.figSol) B.push({t:'fig', svg:q.figSol});
-    if(q.sol) B.push({t:'raw', html:'<div class="why"><b>Worked solution.</b> ' + renderInline(q.sol) + '</div>'});
-    if(q.err) B.push({t:'raw', html:'<div class="why"><b>The error this catches.</b> ' + renderInline(q.err) + '</div>'});
+    const parts = solParts(q.sol||'');
+    const lastOk = parts.map(p=>p.head.startsWith('Solution')).lastIndexOf(true);
+    B.push({t:'raw', html:card('def','Given', parts.filter(p=>p.head==='Given'||p.head==='Find').map(p=>p.html).join('<div class="nsep"></div>')) + '</div></div>'});
+    parts.forEach((p,k)=>{
+      if(p.head==='Given'||p.head==='Find') return;
+      const kind = p.head.startsWith('Solution') ? 'ok' : p.head==='Contrast with discrete time' ? 'warn' : 'def';
+      B.push({t:'raw', html:card(kind, p.head, p.html)});
+      if(k===lastOk && q.figSol) B.push({t:'fig', svg:q.figSol});
+      B.push({t:'raw', html:'</div></div>'});
+    });
+    if(q.err) B.push({t:'raw', html:card('err','Common error', q.err) + '</div></div>'});
     if(q.teach) B.push({t:'raw', html:'<div class="why"><b>Teaching note.</b> ' + renderInline(q.teach) + '</div>'});
     B.push({t:'raw', html:'</div>'});
   });
   if(i < MODS.length-1) B.push({t:'page'});
 });
+B.push({t:'colophon', doc:'Instructor Solutions'});
 renderNotes(B, document.getElementById('doc'));`;
 
 /* -------------------------------------------------------- formula reference */
 const reference = `
 const B = [
+{t:'cover', kicker:'Quantum Computing', text:'Quantum Computing', sub:'Formula and Notation Reference', foot:'Conventions &middot; formulas &middot; notation'},
+ {t:'page'},
  {t:'title', kicker:'Quantum Computing', text:'Formula and Notation Reference',
   sub:'The conventions used throughout the course, every formula it establishes, and every symbol it defines. Nothing here is derived; the derivations are in the lecture notes.',
   meta:[['Contains','Conventions, formulas, notation'],
@@ -175,10 +219,11 @@ B.push.apply(B, APP.filter(b=>b.t!=='title'));
 B.push({t:'page'});
 B.push({t:'h1', num:'PART 3', text:'Notation'});
 B.push({t:'p', lead:true, text:'Every symbol the course defines, with the chapter that defines it. A symbol is never reused for a second meaning.'});
-B.push({t:'raw', html:'<dl class="gloss">' + Object.keys(CONTENT.GLOSS).map(k=>{
+B.push({t:'table', head:['Symbol','Meaning'], rows: Object.keys(CONTENT.GLOSS).map(k=>{
   const e = CONTENT.GLOSS[k];
-  return '<dt>' + renderInline('$' + (e.s||'').replace(/\\$/g,'') + '$') + '</dt><dd>' + renderInline(e.d||'') + '</dd>';
-}).join('') + '</dl>'});
+  return ['$' + (e.s||'').replace(/\\$/g,'') + '$', e.d||''];
+})});
+B.push({t:'colophon', doc:'Formula and Notation Reference'});
 renderNotes(B, document.getElementById('doc'));`;
 
 const OUT = path.join(__dirname, '..', 'dist');
@@ -191,3 +236,13 @@ write('Student_Workbook.html', doc('Quantum Computing — Student Workbook', wor
 write('Instructor_Solutions.html', doc('Quantum Computing — Instructor Solutions', solutions));
 write('Formula_Reference.html', doc('Quantum Computing — Formula and Notation Reference', reference,
   `<script>${g(S('src/ca.js'))}</script>`));
+
+/* The version history of the PDFs, as a table beside them. The rows are read
+   from DOC_HISTORY in render.js, the list each PDF prints on its last page, so
+   the two cannot disagree. */
+const HIST = require('vm').runInNewContext(
+  S('src/render.js').match(/window\.DOC_HISTORY\s*=\s*(\[[\s\S]*?\]);/)[1]);
+write('PDF_VERSIONS.md', '# PDF version history\n\n' +
+  'Applies to Lecture_Notes.pdf, Student_Workbook.pdf, Instructor_Solutions.pdf and Formula_Reference.pdf. Newest first.\n\n' +
+  '| Version | Date | Description |\n| --- | --- | --- |\n' +
+  HIST.map(r => '| ' + r.join(' | ') + ' |').join('\n') + '\n');
