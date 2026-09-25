@@ -1,13 +1,7 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Moiré Interference — four concentric wave sources, drifting, whose products
-   beat against each other and leave fringes. The figure is the mechanism the
-   whole course is about, so it is a statement rather than decoration: bright
-   where the waves arrive in phase and dark where they cancel.
+/* ==========================================================================
+   web/backdrop.js — the cover page's backdrop.
 
-   Adapted from the "Moiré Interference" shader in Radiant Shaders, MIT
-   licensed. The palette is retuned to the three stops of this course's mark —
-   teal, violet, amber — and the canvas is bound to the hero rather than to the
-   window.
+   Radiant Shaders, "Moiré Interference".
 
      MIT License. Copyright (c) 2025 Paul Bakaus.
      Permission is hereby granted, free of charge, to any person obtaining a
@@ -25,15 +19,26 @@
      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
      DEALINGS IN THE SOFTWARE.
-   ───────────────────────────────────────────────────────────────────────── */
+
+   Four concentric wave sources, drifting, whose products beat against each
+   other and leave fringes: bright where the waves arrive in phase and dark
+   where they cancel. It is the mechanism the whole course is about, so it is
+   a statement rather than decoration.
+
+   Changed from the original: the palette is retuned to the three stops of
+   this course's mark (teal, violet, amber). It sits inside the pinned frame
+   of the cover, blended by CSS (`#backdrop` in `index.html`). One fragment
+   shader, no dependency. It renders at 0.6 of CSS resolution and 30 frames a
+   second, starts after the page has loaded, pauses when the tab is hidden or
+   the canvas is off screen, and draws one still frame under reduced motion.
+   ========================================================================== */
 (function () {
-  var canvas = document.getElementById('grid');
+  var canvas = document.getElementById('backdrop');
   if (!canvas) return;
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var gl = canvas.getContext('webgl', { alpha: false, antialias: false });
-  /* No WebGL is not a failure. The scrim already paints the hero, so the page
-     simply stands still and every word on it is still there. */
-  if (!gl) { canvas.style.display = 'none'; return; }
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var gl = canvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: false });
+  if (!gl) return;
 
   var RING_DENSITY = 0.78;
   var DRIFT_SPEED  = 0.34;
@@ -139,59 +144,64 @@
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-  var uTime = gl.getUniformLocation(prog, 'u_time');
-  var uRes  = gl.getUniformLocation(prog, 'u_res');
-  var uDen  = gl.getUniformLocation(prog, 'u_ringDensity');
-  var uDrift= gl.getUniformLocation(prog, 'u_driftSpeed');
-  var uMouse= gl.getUniformLocation(prog, 'u_mouse');
+  var uTime  = gl.getUniformLocation(prog, 'u_time');
+  var uRes   = gl.getUniformLocation(prog, 'u_res');
+  var uDen   = gl.getUniformLocation(prog, 'u_ringDensity');
+  var uDrift = gl.getUniformLocation(prog, 'u_driftSpeed');
+  var uMouse = gl.getUniformLocation(prog, 'u_mouse');
 
-  /* One and a half device pixels is enough for a pattern this soft, and it
-     keeps a phone from rendering four times the fragments it needs to. */
-  var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  var mouseX = -1, mouseY = -1, needsResize = true;
-
-  /* The canvas fills the hero and not the window, so a pointer position has to
-     be measured against the canvas box rather than against the page. */
-  canvas.addEventListener('mousemove', function (e) {
-    var r = canvas.getBoundingClientRect();
-    mouseX = (e.clientX - r.left) * dpr;
-    mouseY = (r.bottom - e.clientY) * dpr;
-  });
-  canvas.addEventListener('mouseleave', function () { mouseX = -1; mouseY = -1; });
+  var dpr = 0.6;          // a texture at low opacity; full resolution buys nothing
+  var last = 0;
+  var needsResize = true;
+  var running = true;
 
   function resize() {
     needsResize = false;
-    var w = Math.max(1, Math.round(canvas.clientWidth  * dpr));
+    var w = Math.max(1, Math.round(canvas.clientWidth * dpr));
     var h = Math.max(1, Math.round(canvas.clientHeight * dpr));
     if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w; canvas.height = h;
+      canvas.width = w;
+      canvas.height = h;
       gl.viewport(0, 0, w, h);
-      gl.uniform2f(uRes, w, h);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
     }
   }
 
-  /* Two reasons to stop drawing: the tab is hidden, or the hero has scrolled
-     away. Neither is visible to the reader and both cost a whole core. */
-  var visible = true, onScreen = true;
-  document.addEventListener('visibilitychange', function () { visible = !document.hidden; });
-  if (window.IntersectionObserver) {
-    new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; })
-      .observe(canvas);
-  }
-
-  window.addEventListener('resize', function () { needsResize = true; });
-  resize();
-
-  function frame(now) {
-    requestAnimationFrame(frame);
-    if (!visible || !onScreen) return;
+  function render(now) {
+    if (!running) return;
+    if (!prefersReduced && now - last < 33) { requestAnimationFrame(render); return; }
+    last = now;
     if (needsResize) resize();
-    gl.uniform1f(uTime, reduced ? 6.0 : now * 0.001);
+    gl.uniform1f(uTime, prefersReduced ? 6.0 : now * 0.001);
     gl.uniform1f(uDen, RING_DENSITY);
     gl.uniform1f(uDrift, DRIFT_SPEED);
-    gl.uniform2f(uMouse, mouseX, mouseY);
+    gl.uniform2f(uMouse, -1, -1);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    if (reduced) { visible = false; }
+    if (!prefersReduced) requestAnimationFrame(render);
   }
-  requestAnimationFrame(frame);
+
+  window.addEventListener('resize', function () {
+    needsResize = true;
+  });
+
+  var onScreen = true;
+  function wake() {
+    var want = onScreen && !document.hidden;
+    if (want && !running) { running = true; requestAnimationFrame(render); }
+    else if (!want) running = false;
+  }
+
+  function start() {
+    resize();
+    requestAnimationFrame(render);
+    canvas.classList.add('is-on');
+    document.addEventListener('visibilitychange', wake);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; wake(); })
+        .observe(canvas);
+    }
+  }
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', function () { setTimeout(start, 120); });
+
 })();

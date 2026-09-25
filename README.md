@@ -58,7 +58,8 @@ every one of them and a formula is written in one place only:
 | `dist/Formula_Reference.pdf` | the conventions, every formula, and every symbol |
 
 A fifth, the instructor solutions, prints every question fully worked and is not published.
-`site/index.html` is the public page that introduces them.
+`web/index.html` is the public page that introduces them; `node web/build-site.js` assembles the
+published site in `site/`, and `web/sitecheck.js` checks it.
 
 ---
 

@@ -1,39 +1,19 @@
-# What is deployed is the page in `site/`, the mark in `assets/`, and the
-# student-facing documents in `dist/`. Everything that makes those is left
-# behind: the build, the gates and the notes pipeline have no business on a
-# web host.
-#
-# A `.vercelignore` replaces `.gitignore` for the upload rather than adding to
-# it, so anything that must stay off the host is named here even if git already
-# ignores it. `dist/Instructor_Solutions.*` is the one that matters.
-
-build/
-notes/
-verify/
-tools/
-docs/
+# The host builds the site with `node web/build-site.js`, from `build/src`, the
+# tracked PDFs in `dist/` and the cover page in `web/`. Nothing else is needed,
+# and the first entries must never leave this machine.
 source/
+.venv/
+.claude/
 shots/
 pages/
-.venv/
-node_modules/
-.claude/
-__pycache__/
-.pytest_cache/
-.DS_Store
-*.md
+site/
 textclash.json
-
-# The pin for the numerical suite in verify/, which does not ship. Left on the
-# host it makes the platform read the project as a Python application and the
-# deploy fails looking for an entrypoint; this is a directory of static files.
-requirements.txt
+*.tmp
 
 # Instructor material is not published.
 dist/Instructor_Solutions.*
 
-# The three HTML editions duplicate the PDFs beside them and nothing links to
-# them, so they are not carried.
-dist/Lecture_Notes.html
-dist/Student_Workbook.html
-dist/Formula_Reference.html
+# The pin for the numerical suite in verify/, which does not run on the host.
+# Left there it makes the platform read the project as a Python application
+# and the deploy fails looking for an entrypoint.
+requirements.txt
