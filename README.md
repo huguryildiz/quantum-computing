@@ -17,6 +17,7 @@
   <img src="https://img.shields.io/badge/NumPy_%C2%B7_SciPy_%C2%B7_SymPy-0b1220?style=for-the-badge&logo=numpy&logoColor=4DABCF" alt="NumPy, SciPy and SymPy">
   <img src="https://img.shields.io/badge/Playwright-0b1220?style=for-the-badge&logo=playwright&logoColor=45BA4B" alt="Playwright">
   <a href="https://quantum-computing-tedu.vercel.app"><img src="https://img.shields.io/badge/quantum--computing--tedu.vercel.app-0b1220?style=for-the-badge&logo=vercel&logoColor=white" alt="Live"></a>
+  <a href="https://github.com/huguryildiz/quantum-computing/actions/workflows/checks.yml"><img src="https://img.shields.io/github/actions/workflow/status/huguryildiz/quantum-computing/checks.yml?branch=main&style=for-the-badge&label=checks" alt="Checks"></a>
 </p>
 
 <h3 align="center">
