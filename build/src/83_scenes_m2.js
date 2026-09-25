@@ -178,7 +178,7 @@ function figUncertainty(){
     {color:C.in, width:2.4});
   a.curve(t => Math.abs(Math.sin(t)*sp), {color:C.err, width:2.2, dash:'5 4'});
   a.note(0.34,0.74,'\\Delta X\\,\\Delta Z',{fs:13,color:C.in,tex:true});
-  a.note(1.95,0.36,'\\tfrac12|\\langle[X,Z]\\rangle|',{fs:13,color:C.err,tex:true});
+  a.note(1.95,0.26,'\\tfrac12|\\langle[X,Z]\\rangle|',{fs:13,color:C.err,tex:true});
   return a.svg();
 }
 

@@ -534,11 +534,14 @@ const PLOT = (() => {
         const names=[];
         const NAME_SIZE = EMPH ? (W < 500 ? 15.5 : 16.5) : 15;
         if(o.xlabel) names.push(texName(o.xlabel, { xRight:x1+(o.xnameRight??8), baseline:xnameY(P.b), size:NAME_SIZE, color:CH.name, role:'axisname', figW:W }));
-        /* Keep the dependent-variable name at the upper-left edge of the data
-           area. Putting it beside an interior zero axis makes it compete with
-           peaks, span labels and impulse weights near the centre. */
+        /* The reference course keeps the dependent-variable name at the
+           upper-left edge of the data area, where it does not compete with
+           peaks near the centre. This course's figures were drawn with the
+           name beside the vertical axis, and at the left edge it would cross
+           an interior one, so here the axis is the default and `ynameAtAxis:
+           false` asks for the edge. */
         if(o.ylabel) names.push(texName(o.ylabel, EMPH
-          ? { xLeft:(o.ynameAtAxis && xz!=null ? xz+14 : x0+14), baseline:y1-NAME_GAP*LBLS, size:NAME_SIZE, boxHeight:NAME_H,
+          ? { xLeft:((o.ynameAtAxis ?? true) && xz!=null ? xz+14 : x0+14), baseline:y1-NAME_GAP*LBLS, size:NAME_SIZE, boxHeight:NAME_H,
               color:CH.name, role:'axisname', figW:W }
           : { xLeft:(xz!=null?xz+9:x0), baseline:y1-7, size:NAME_SIZE,
               color:CH.name, role:'axisname', figW:W }));
