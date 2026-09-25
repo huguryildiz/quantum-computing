@@ -40,12 +40,19 @@ const PLOT = (() => {
   const COL = Object.assign({}, LIGHT);
   let LBLS = 1;   /* label scale  */
   let STRW = 1;   /* stroke scale */
+  let EMPH = false; /* lecture slides and laboratories use the back-row scale */
+  let FEATHER = false; /* the soft outer edge of a TeX label's halo: the app turns it
+                          on through setTheme; the printed notes never call setTheme
+                          and leave it off, because a PDF stores every blurred edge
+                          as its own raster mask (about a quarter of the notes' size) */
   let CLIPN = 0;  /* serial number for the data-area clip of each figure */
   function setTheme(o){
     o = o || {};
     Object.assign(COL, o.dark ? DARK : LIGHT);
     LBLS = o.scale || 1;
     STRW = 1 + (LBLS - 1) * 0.75;
+    EMPH = !!o.emphasis;
+    FEATHER = true;
   }
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -73,6 +80,52 @@ const PLOT = (() => {
      paragraph and as source in a figure. The two renderers must agree. */
   const TEXOPT = { throwOnError:true, strict:false, output:'html',
     macros:{ '\\d':'\\mathrm{d}', '\\Ev':'\\mathcal{E}\\mathrm{v}', '\\Od':'\\mathcal{O}\\mathrm{d}' } };
+  /* Safari and every browser on an iPad paint a positioned element inside a
+     foreignObject as if the svg were drawn at its own size: the label leaves
+     its place whenever the figure is scaled, which it always is. KaTeX places
+     the rows of a sub- or superscript with position:relative and a top offset.
+     The same rows are laid out here in normal flow, each one moved by a top
+     margin equal to the step from the row above (the rows have no height), so
+     the label sets exactly as before and holds no positioned element. */
+  const FLOW = ['base','vlist','delimcenter','op-symbol','rule','accent-body'];
+  function flatTeX(html){
+    if(typeof document === 'undefined') return html;
+    const t = document.createElement('template'); t.innerHTML = html;
+    t.content.querySelectorAll('.vlist').forEach(v=>{
+      let prev = 0;
+      for(const row of v.children){
+        const m = /top:\s*(-?[\d.]+)em/.exec(row.getAttribute('style')||'');
+        const top = m ? +m[1] : 0;
+        row.style.removeProperty('top');
+        row.style.marginTop = +(top-prev).toFixed(5)+'em';
+        row.style.position = 'static';
+        prev = top;
+      }
+    });
+    /* an accent is set sideways by a left offset: the same shift as margins
+       that give back to the right what they take on the left */
+    t.content.querySelectorAll(FLOW.map(c=>'.'+c).join(',')).forEach(e=>{
+      /* a top below a hundredth of an em (the lift of a small integral) is not seen */
+      if(e.style.top && Math.abs(parseFloat(e.style.top))<0.01) e.style.removeProperty('top');
+      if(e.style.top) return;
+      const m = /^(-?[\d.]+)em$/.exec(e.style.left);
+      if(m){
+        const em = v => parseFloat(v)||0;
+        e.style.marginLeft = +(em(e.style.marginLeft)+(+m[1])).toFixed(5)+'em';
+        e.style.marginRight = +(em(e.style.marginRight)-(+m[1])).toFixed(5)+'em';
+        e.style.removeProperty('left');
+      } else if(e.style.left) return;
+      e.style.position = 'static'; });
+    /* a root sign is an svg cut to its box; the svg clips itself, so the box
+       needs neither a position nor a clip of its own. Its width is taken from
+       the box and never given to it, as when it stood outside the flow. */
+    t.content.querySelectorAll('.hide-tail').forEach(e=>{
+      e.style.position = 'static'; e.style.overflow = 'visible';
+      for(const g of e.children) if(g.tagName.toLowerCase()==='svg'){
+        g.style.position = 'static'; g.style.width = '0'; g.style.minWidth = '100%'; }
+    });
+    return t.innerHTML;
+  }
   function texName(src, opts){
     const { xRight, xLeft, xMid, baseline, size } = opts;
     const ink = opts.color || COL.ink;
@@ -83,7 +136,7 @@ const PLOT = (() => {
        fitScene() answers by scaling the whole scene down. `figW` is the width of
        the figure the label belongs to; without it the box keeps its full width. */
     const figW = opts.figW;
-    const BWMAX = 460, BH = 34*LBLS;
+    const BWMAX = 460, BH = (opts.boxHeight||34)*LBLS;
     const fs = size*LBLS;
     let x, BW, just;
     if(xRight!=null){ x = Math.max(0, xRight-BWMAX); BW = xRight-x; just='flex-end'; }
@@ -94,7 +147,7 @@ const PLOT = (() => {
       x = xLeft; BW = figW!=null ? Math.max(40, Math.min(BWMAX, figW-xLeft)) : BWMAX; just='flex-start';
     }
     let html;
-    try { html = katex.renderToString(String(src), TEXOPT); }
+    try { html = flatTeX(katex.renderToString(String(src), TEXOPT)); }
     catch(e){
       console.error('PLOT: figure label is not valid TeX: ' + src + ' — ' + e.message);
       const x = xRight!=null ? xRight : xMid!=null ? xMid : xLeft;
@@ -108,7 +161,7 @@ const PLOT = (() => {
     const c = 'var(--fig-halo,#FCF9F3)';
     const r = (2.2*LBLS).toFixed(2), d = (1.6*LBLS).toFixed(2);
     const ring = [[r,0],[-r,0],[0,r],[0,-r],[d,d],[d,-d],[-d,d],[-d,-d]]
-      .map(([a,b]) => `${a}px ${b}px 0 ${c}`).join(',') + `,0 0 ${r}px ${c}`;
+      .map(([a,b]) => `${a}px ${b}px 0 ${c}`).join(',') + (FEATHER ? `,0 0 ${r}px ${c}` : '');
     return `<foreignObject x="${x.toFixed(2)}" y="${(baseline-BH).toFixed(2)}" width="${BW}" height="${BH}"
       overflow="visible" data-texlabel="1"${role} style="overflow:visible;pointer-events:none">
       <div xmlns="http://www.w3.org/1999/xhtml" style="height:${BH}px;display:flex;align-items:flex-end;
@@ -142,14 +195,58 @@ const PLOT = (() => {
     for(let v=start; v<=hi+1e-9; v+=s) out.push(Math.abs(v)<1e-12?0:v);
     return out;
   }
+  /* ---------- a frequency axis is read in multiples of pi ----------
+     piTick(v) writes v radians as a rational multiple of pi (0, π/4, -π/2,
+     3π/2, -6π). A tick number is part of the scale, not of the running
+     mathematics, so it stays plain text. piTicks(lo,hi,step) lists the
+     multiples of `step` inside [lo,hi]. Axes takes `xpi: step` to use both. */
+  function piTick(v){
+    const r = v/Math.PI;
+    if(Math.abs(r) < 1e-9) return '0';
+    for(const den of [1,2,3,4,5,6,8,12]){
+      const num = r*den;
+      if(Math.abs(num-Math.round(num)) < 1e-7){
+        const k = Math.round(num), sg = k<0?'-':'', m = Math.abs(k);
+        const head = m===1 ? 'π' : m+'π';
+        return den===1 ? sg+head : sg+head+'/'+den;
+      }
+    }
+    return fmt(v,2);
+  }
+  function piTicks(lo,hi,step){ const o=[];
+    for(let k=Math.ceil(lo/step-1e-9); k<=hi/step+1e-9; k++) o.push(k===0?0:k*step);
+    return o; }
 
   /* ======================================================================
      Axes — a plotting frame with mathematical coordinates.
      opt: {w,h,xr,yr,xlabel,ylabel,xticks,yticks,pad,grid,xstep,ystep,
-           xtickfmt,ytickfmt,zeroAxes}
+           xnameDrop,
+           xtickfmt,ytickfmt,zeroAxes,yticksLeft,xpi}
      xlabel and ylabel are TeX source — see texName above.
+     xpi: a frequency axis. Ticks at every multiple of xpi (radians) in the
+     range, written in pi form; xpi:true chooses the step from xtarget;
+     xticksOverride or xtickfmt still win.
      ====================================================================== */
+  function isotropic(opt){
+    if(!opt || !opt.xr || !opt.yr) return false;
+    const p = Object.assign({l:52,r:22,t:20,b:40}, opt.pad||{});
+    const sx = ((opt.w||640) - p.l - p.r) / (opt.xr[1]-opt.xr[0]);
+    const sy = ((opt.h||300) - p.t - p.b) / (opt.yr[1]-opt.yr[0]);
+    return Math.abs(sx/sy - 1) < 0.03;
+  }
   function Axes(opt){
+    /* A slide figure is drawn again, taller, to fill the spare height of its
+       column. `PLOT.hOverride` carries that height for exactly one call: it is
+       set immediately before a block's svg() runs and cleared here, so a block
+       that draws a second figure keeps the height its author gave it. */
+    if(opt && API.hOverride){ opt = Object.assign({}, opt, { h: API.hOverride }); API.hOverride = null; }
+    /* A laboratory's plots are drawn taller by `PLOT.labScale` so they fill the
+       height of their column (RENDER, growLabs). It is 1 outside a laboratory. */
+    /* A frame drawn with equal pixels to the unit on both axes is left at its
+       height: in this course a circle in such a frame is the claim (the rim of
+       the Bloch ball, the unit circle of the complex plane), and a taller
+       frame would draw it as an ellipse. */
+    else if(API.labScale !== 1 && !isotropic(opt)) opt = Object.assign({}, opt, { h: ((opt && opt.h) || 300) * API.labScale });
     const o = Object.assign({
       w:640, h:300, xr:[-1,1], yr:[-1,1], pad:{l:52,r:22,t:20,b:40},
       xlabel:'', ylabel:'', grid:true, zeroAxes:true,
@@ -157,7 +254,19 @@ const PLOT = (() => {
       xtickfmt:v=>fmt(v,3), ytickfmt:v=>fmt(v,3),
       xticksOverride:null, yticksOverride:null, arrows:true
     }, opt);
+    /* On a phone a laboratory's plot is the width of the screen, and a plot
+       drawn four times wider than tall comes out a strip a finger high. There
+       it is drawn no flatter than `PLOT.maxAspect` (RENDER sets it; 0 is off). */
+    if(API.maxAspect && o.w / o.h > API.maxAspect) o.h = Math.round(o.w / API.maxAspect);
     const [xa,xb]=o.xr, [ya,yb]=o.yr;
+    if(o.xpi){
+      /* xpi:true picks the step itself: the finest multiple of pi that keeps
+         the tick count within xtarget, for a range a laboratory sets at run time */
+      const PIS = [1/4,1/2,1,2,3,4,5,6,8,10,20,50,100,200,500,1000,2000,5000];
+      const step = o.xpi===true ? Math.PI*(PIS.find(m => (xb-xa)/(m*Math.PI) <= o.xtarget) || 10000) : o.xpi;
+      if(!opt.xticksOverride) o.xticksOverride = piTicks(xa,xb,step);
+      if(!opt.xtickfmt) o.xtickfmt = piTick;
+    }
     /* A scene that carries its own page colour — a navy module opening — needs
        the axis, the tick numbers and the axis names in that page's ink, not in
        the ink of the surrounding theme, or the frame of the figure disappears
@@ -173,13 +282,15 @@ const PLOT = (() => {
        a tall bracket down to the tail of a parenthesis. NAMEBOX is that height at
        the size axis names use, so the strip reserved above the data area holds the
        whole name and nothing is cut off by the edge of the figure. */
-    const NAMEBOX = 21*LBLS;
-    if(o.ylabel) P.t = Math.max(P.t, NAMEBOX + 8);
+    const NAME_H = W < 500 ? 24 : 26;
+    const NAME_GAP = W < 500 ? 9 : 10;
+    const NAMEBOX = (EMPH ? NAME_H : 21)*LBLS;
+    if(o.ylabel) P.t = Math.max(P.t, EMPH ? NAME_H*LBLS + NAME_GAP*LBLS + 2 : NAMEBOX + 8);
     /* The name of the independent variable sits just under the lower edge of the
        data area, clear of the tick row wherever the zero line happens to fall.
        A tick number is set 20 below the axis it belongs to and reaches about 4
        further down; the name above its own baseline is one line tall. Leaving the
-       name 45 below the axis keeps a clear gap between the two, so the last tick
+       name 62 below the axis keeps a clear gap between the two, so the last tick
        number and the name never touch even at the right-hand edge, where they
        share the same column.
        Every one of those distances is a label size, so all of them are measured
@@ -187,14 +298,19 @@ const PLOT = (() => {
        tall, and a drop left at a flat 45 closes the gap as soon as the labels
        are enlarged. At the ordinary label scale the numbers below are exactly
        the ones above, so nothing on a normal screen or in print moves; what
-       they fix is the projected room and the phone, where the labels are
-       drawn larger and the name was landing on the last tick number. */
-    const XNAME_DROP = 45*LBLS;
+       they fix is the phone, where the labels are drawn larger still and the
+       name was landing on the last tick number. Desktop normal and the
+       projector keep the flat 62 this figure family has always used, so
+       neither moves; only the phone's own label scale opens the extra room
+       the enlarged labels need. A slide or a laboratory (EMPH) sets its tick
+       numbers and names larger, so its name sits lower. */
+    const XSCALE = (typeof APP!=='undefined' && APP.state.layout==='phone') ? LBLS : 1;
+    const XNAME_DROP = o.xnameDrop ?? (EMPH ? 66 : 62)*XSCALE;
     const xnameY = (Pb) => {
       const yy0 = H - Pb;
       if(!zeroInside) return yy0 + XNAME_DROP + 1;
       const zeroPx = (0-ya)/(yb-ya)*(H - P.t - Pb);
-      return Math.max(yy0 + 16*LBLS, yy0 - zeroPx + XNAME_DROP);
+      return Math.max(yy0 + 16*XSCALE, yy0 - zeroPx + XNAME_DROP);
     };
     if(o.xlabel){
       P.b = Math.max(P.b, 24);
@@ -215,13 +331,15 @@ const PLOT = (() => {
     const CLIP_PAD = 4*STRW;
     const clipId = 'pclip'+(++CLIPN);
     const clip = ` clip-path="url(#${clipId})"`;
-    const parts=[];
+    const parts=[], underParts=[];
     const api={
       o, sx, sy, W, H, x0, x1, y0, y1,
       raw(s){ parts.push(s); return api; },
+      /* markup drawn above the grid but below the axes and tick numbers */
+      under(s){ underParts.push(s); return api; },
       /* ---- continuous curve from a function ---- */
       curve(f, opts={}){
-        const n = opts.n||520, col=opts.color||COL.in, wdt=(opts.width||2.2)*STRW;
+        const n = opts.n||520, col=opts.color||COL.in, wdt=(opts.width||(EMPH?2.4:2.2))*STRW;
         const seg=[]; let cur=[];
         for(let i=0;i<=n;i++){
           const t = xa + (xb-xa)*i/n;
@@ -231,19 +349,26 @@ const PLOT = (() => {
           cur.push([sx(t),sy(yv)]);
         }
         if(cur.length) seg.push(cur);
+        /* opts.anim {delay, sweep}: the trace draws itself in after delay seconds,
+           and sweep, a colour, sends a highlight along it on the 7 s cycle */
+        const an=opts.anim;
         seg.forEach(s=>{
           if(s.length<2) return;
           const d='M'+s.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join('L');
-          parts.push(`<path d="${d}"${clip} fill="none" stroke="${col}" stroke-width="${wdt}"
+          const mv=an?` class="mtf-trace" pathLength="1" style="--len:1;animation-delay:${an.delay||0}s"`:'';
+          parts.push(`<path d="${d}"${clip}${mv} fill="none" stroke="${col}" stroke-width="${wdt}"
             stroke-linejoin="round" stroke-linecap="round"${opts.dash?` stroke-dasharray="${opts.dash}"`:''}
             ${opts.opacity?` opacity="${opts.opacity}"`:''}/>`);
+          if(an && an.sweep)
+            parts.push(`<g class="mtf-sparkwrap"${clip}><path class="mtf-sweep" pathLength="1" d="${d}" fill="none"
+              stroke="${an.sweep}" stroke-width="${wdt*1.3}" stroke-linejoin="round" stroke-linecap="round"/></g>`);
         });
         return api;
       },
       /* ---- polyline through explicit points ---- */
       poly(pts, opts={}){
         if(pts.length<2) return api;
-        const col=opts.color||COL.in, wdt=(opts.width||2.2)*STRW;
+        const col=opts.color||COL.in, wdt=(opts.width||(EMPH?2.4:2.2))*STRW;
         const d='M'+pts.map(p=>sx(p[0]).toFixed(2)+','+sy(p[1]).toFixed(2)).join('L');
         parts.push(`<path d="${d}"${clip} fill="none" stroke="${col}" stroke-width="${wdt}"
           stroke-linejoin="round" stroke-linecap="round"${opts.dash?` stroke-dasharray="${opts.dash}"`:''}/>`);
@@ -272,16 +397,23 @@ const PLOT = (() => {
       },
       /* ---- discrete-time stems ---- */
       stem(pairs, opts={}){
-        const col=opts.color||COL.in, r=(opts.r||3.6)*STRW;
+        const col=opts.color||COL.in, r=(opts.r||(EMPH?4:3.6))*STRW;
+        /* opts.anim {delay, step, tip}: stem i rises at delay + i*step seconds;
+           tip makes a pop run along the tips on the 7 s cycle. --i must be set:
+           the .mtf-stem rule uses it, and an undefined var drops the animation */
+        const an=opts.anim; let i=0;
         pairs.forEach(([n,v])=>{
           if(n<xa-1e-9||n>xb+1e-9) return;
           const X=sx(n).toFixed(2);
+          if(an) parts.push(`<g class="mtf-stem" style="--i:0;transform-origin:${X}px ${sy(0).toFixed(2)}px;animation-delay:${((an.delay||0)+i*(an.step??.085)).toFixed(3)}s">`);
+          const tip=an&&an.tip?` class="mtf-tip" style="animation-delay:${(2.1+i*(an.step??.085)).toFixed(3)}s"`:'';
           parts.push(`<line x1="${X}" y1="${sy(0).toFixed(2)}" x2="${X}" y2="${sy(v).toFixed(2)}"
-            stroke="${col}" stroke-width="${(opts.width||1.8)*STRW}"/>`);
+            stroke="${col}" stroke-width="${(opts.width||(EMPH?2:1.8))*STRW}"/>`);
           if(Math.abs(v)>1e-12 || opts.showZero)
-            parts.push(`<circle cx="${X}" cy="${sy(v).toFixed(2)}" r="${r}" fill="${col}"/>`);
+            parts.push(`<circle${tip} cx="${X}" cy="${sy(v).toFixed(2)}" r="${r}" fill="${col}"/>`);
           else
             parts.push(`<circle cx="${X}" cy="${sy(0).toFixed(2)}" r="${r*0.62}" fill="${col}" opacity=".55"/>`);
+          if(an){ parts.push('</g>'); i++; }
         });
         return api;
       },
@@ -312,7 +444,7 @@ const PLOT = (() => {
         return api;
       },
       point(t,v,opts={}){
-        parts.push(`<circle cx="${sx(t).toFixed(2)}" cy="${sy(v).toFixed(2)}" r="${(opts.r||4)*STRW}"
+        parts.push(`<circle cx="${sx(t).toFixed(2)}" cy="${sy(v).toFixed(2)}" r="${(opts.r||(EMPH?4:3.6))*STRW}"
           fill="${opts.color||COL.coral}" stroke="${opts.ring||'#FCF9F3'}" stroke-width="${opts.ringw||1.4}"/>`);
         return api;
       },
@@ -351,7 +483,7 @@ const PLOT = (() => {
       svg(){
         const g=[];
         g.push(`<clipPath id="${clipId}"><rect x="${(x0-CLIP_PAD).toFixed(2)}" y="${(y1-CLIP_PAD).toFixed(2)}"
-          width="${(x1-x0+2*CLIP_PAD).toFixed(2)}" height="${(y0-y1+2*CLIP_PAD).toFixed(2)}"/></clipPath>`);
+          width="${Math.max(0,x1-x0+2*CLIP_PAD).toFixed(2)}" height="${Math.max(0,y0-y1+2*CLIP_PAD).toFixed(2)}"/></clipPath>`);
         /* grid */
         const xt = o.xticksOverride || ticks(xa,xb,o.xtarget,o.xstep);
         const yt = o.yticksOverride || ticks(ya,yb,o.ytarget,o.ystep);
@@ -359,6 +491,7 @@ const PLOT = (() => {
           xt.forEach(v=>g.push(`<line x1="${sx(v).toFixed(2)}" y1="${y1}" x2="${sx(v).toFixed(2)}" y2="${y0}" stroke="${CH.grid}" stroke-width="1"/>`));
           yt.forEach(v=>g.push(`<line x1="${x0}" y1="${sy(v).toFixed(2)}" x2="${x1}" y2="${sy(v).toFixed(2)}" stroke="${CH.grid}" stroke-width="1"/>`));
         }
+        g.push(...underParts);
         /* zero axes */
         const yz = (ya<=0&&yb>=0)? sy(0) : null;
         const xz = (xa<=0&&xb>=0)? sx(0) : null;
@@ -370,27 +503,47 @@ const PLOT = (() => {
         }
         /* frame when zero axes are outside the view */
         if(yz==null||xz==null)
-          g.push(`<rect x="${x0}" y="${y1}" width="${x1-x0}" height="${y0-y1}" fill="none" stroke="${CH.axis}" stroke-width="1"/>`);
-        /* tick labels */
+          g.push(`<rect x="${x0}" y="${y1}" width="${Math.max(0,x1-x0)}" height="${Math.max(0,y0-y1)}" fill="none" stroke="${CH.axis}" stroke-width="1"/>`);
+        /* Tick labels on compact two-up plots stay at the established size.
+           A full-width signal plot gets the larger lecture-slide size. */
+        const TICK_SIZE = (EMPH ? (W < 500 ? 12.5 : 13.5) : 13) * LBLS;
         const yBase = yz!=null? yz : y0;
+        /* x tick numbers sit below the axis, where a negative stem or curve runs.
+           They are drawn after the data, so the halo interrupts the trace and the
+           number stays readable. */
+        const tl=[];
         xt.forEach(v=>{ const L=o.xtickfmt(v); if(L==='')return;
           if(Math.abs(v)<1e-12 && xz!=null && yz!=null) return;
+          /* a number at the very left would sit on the rule of yticksLeft */
+          if(o.yticksLeft && xz!=null && sx(v)-x0 < 16) return;
           g.push(`<line x1="${sx(v).toFixed(2)}" y1="${yBase.toFixed(2)}" x2="${sx(v).toFixed(2)}" y2="${(yBase+5).toFixed(2)}" stroke="${CH.axis}" stroke-width="${1.2*STRW}"/>`);
-          g.push(`<text x="${sx(v).toFixed(2)}" y="${(yBase+20*LBLS).toFixed(2)}" ${halo(3.4)} font-size="${13*LBLS}" fill="${CH.tick}" text-anchor="middle">${esc(L)}</text>`); });
-        const xBase = xz!=null? xz : x0;
+          tl.push(`<text x="${sx(v).toFixed(2)}" y="${(yBase+20*LBLS).toFixed(2)}" ${halo(3.4)} font-size="${TICK_SIZE}" fill="${CH.tick}" text-anchor="middle">${esc(L)}</text>`); });
+        /* A spectrum drawn about k = 0 peaks on its own zero axis, where the
+           tick numbers would sit on the trace. yticksLeft sets them against the
+           left edge of the data area instead, on a rule of their own. */
+        if(o.yticksLeft && xz!=null) g.push(`<line x1="${x0}" y1="${y1}" x2="${x0}" y2="${y0}" stroke="${CH.axis}" stroke-width="1"/>`);
+        const xBase = (xz!=null && !o.yticksLeft)? xz : x0;
         yt.forEach(v=>{ const L=o.ytickfmt(v); if(L==='')return;
           if(Math.abs(v)<1e-12 && xz!=null && yz!=null) return;
           g.push(`<line x1="${xBase.toFixed(2)}" y1="${sy(v).toFixed(2)}" x2="${(xBase-5).toFixed(2)}" y2="${sy(v).toFixed(2)}" stroke="${CH.axis}" stroke-width="${1.2*STRW}"/>`);
-          g.push(`<text x="${(xBase-10).toFixed(2)}" y="${(sy(v)+4.5).toFixed(2)}" ${halo(3.4)} font-size="${13*LBLS}" fill="${CH.tick}" text-anchor="end">${esc(L)}</text>`); });
+          g.push(`<text x="${(xBase-10).toFixed(2)}" y="${(sy(v)+4.5).toFixed(2)}" ${halo(3.4)} font-size="${TICK_SIZE}" fill="${CH.tick}" text-anchor="end">${esc(L)}</text>`); });
         /* axis names — below the data area for the independent variable, above
            it for the dependent one. They are drawn after the data, so a signal
            that leaves the data area is interrupted by the name rather than
            drawn across it. */
         const names=[];
-        if(o.xlabel) names.push(texName(o.xlabel, { xRight:x1+8, baseline:xnameY(P.b), size:15, color:CH.name, role:'axisname', figW:W }));
-        if(o.ylabel) names.push(texName(o.ylabel, { xLeft:(xz!=null?xz+9:x0), baseline:y1-7, size:15, color:CH.name, role:'axisname', figW:W }));
+        const NAME_SIZE = EMPH ? (W < 500 ? 15.5 : 16.5) : 15;
+        if(o.xlabel) names.push(texName(o.xlabel, { xRight:x1+(o.xnameRight??8), baseline:xnameY(P.b), size:NAME_SIZE, color:CH.name, role:'axisname', figW:W }));
+        /* Keep the dependent-variable name at the upper-left edge of the data
+           area. Putting it beside an interior zero axis makes it compete with
+           peaks, span labels and impulse weights near the centre. */
+        if(o.ylabel) names.push(texName(o.ylabel, EMPH
+          ? { xLeft:(o.ynameAtAxis && xz!=null ? xz+14 : x0+14), baseline:y1-NAME_GAP*LBLS, size:NAME_SIZE, boxHeight:NAME_H,
+              color:CH.name, role:'axisname', figW:W }
+          : { xLeft:(xz!=null?xz+9:x0), baseline:y1-7, size:NAME_SIZE,
+              color:CH.name, role:'axisname', figW:W }));
         return `<svg viewBox="0 0 ${W} ${H}" xmlns="${NS}" role="img" font-family="Inter,-apple-system,'Segoe UI',sans-serif">`
-          + g.join('') + parts.join('') + names.join('') + `</svg>`;
+          + g.join('') + parts.join('') + tl.join('') + names.join('') + `</svg>`;
       }
     };
     return api;
@@ -459,5 +612,7 @@ const PLOT = (() => {
     return out;
   };
 
-  return { Axes, blocks, texName, COL, ticks, fmt, niceStep, setTheme, decade, decades };
+  const API = { Axes, blocks, texName, COL, ticks, fmt, niceStep, piTick, piTicks, setTheme, decade, decades, hOverride:null, labScale:1, maxAspect:0,
+    labelScale:()=>LBLS };
+  return API;
 })();

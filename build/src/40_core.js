@@ -33,6 +33,7 @@ const APP = (() => {
     display: 'normal',  // 'normal' | 'projector'
     pointer: 'laser',   // 'laser' | 'arrow'  — projector mode only
     trail:   'fade',    // 'fade' | 'hold' | 'off' — ink drawn while the button is held
+    trailSec: 1,        // seconds a faded trail stays fully visible
     quiz: {},           // qid -> {picked, correct, attempts, revealed}
     drillPage: {},      // module id -> index of the drill question on screen
     secOpen: {},        // section number -> the reader's own open/closed choice
@@ -48,21 +49,24 @@ const APP = (() => {
      honest the stage is not shrunk further — it is dropped. The scene becomes
      one fluid column of real pixels that scrolls, the contents rail becomes a
      drawer over it, and the header keeps only the controls a thumb reaches for.
-     The measure is content-driven, and there are three ways to fail it. A
-     window narrower than 760 px cannot hold the two-column editorial grid or a
-     readable line at the scale the basis is then reduced to, whatever is
-     showing it. A screen under 480 px tall with a finger on it is a phone
-     lying on its side, where the factor is set by the height and comes out
-     smaller still. A screen up to 1024 px wide, upright, with a finger on it is
-     a tablet held as a page, which the stage fits at about two fifths — small
-     print at arm's length. Every one of the three asks for the same thing: the
-     column, in real pixels. A laptop window is none of them, because a mouse is
-     not a finger. */
+     The measure is content-driven and holds only for a screen held upright.
+     A window narrower than 760 px cannot hold the two-column editorial grid or a
+     readable line at the scale the basis is then reduced to, and a screen up to
+     1024 px wide with a finger on it is a tablet held as a page, which the
+     stage fits at about two fifths — small print at arm's length. Both ask for
+     the column, in real pixels. A screen on its side, a phone included, gets
+     the slide exactly as the desktop does: the stage scaled to its height, the
+     same page the lecture shows. A laptop window is neither, because a mouse
+     is not a finger. */
   const NARROW = matchMedia(
-    '(max-width:760px),'
-  + '(max-height:480px) and (pointer:coarse),'
+    '(max-width:760px) and (orientation:portrait),'
   + '(max-width:1024px) and (orientation:portrait) and (pointer:coarse)');
   const layoutNow = () => NARROW.matches ? 'phone' : 'wide';
+  /* A phone on its side keeps the wide layout, but at 390 px of height the
+     contents rail takes half the stage from the slide. There the rail opens
+     closed, and the reader's stored choice is left for the desktop. */
+  const SHORT = matchMedia('(max-height:480px) and (pointer:coarse)');
+  const railRoom = () => !SHORT.matches;
 
   let SCENES = [], MODULES = [], CHAPTERS = [], onRender = ()=>{};
 
@@ -79,6 +83,7 @@ const APP = (() => {
       display: saved.display || 'normal',
       pointer: saved.pointer || 'laser',
       trail:   saved.trail==='on' ? 'fade' : (saved.trail || 'fade'),
+      trailSec: saved.trailLen || 1,
       visited: saved.visited || {},
       quiz: saved.quiz || {},
       drillPage: saved.drillPage || {}
@@ -90,10 +95,11 @@ const APP = (() => {
        desktop the same reader comes back to. */
     state.layout = layoutNow();
     state.rail = state.sidebar;
-    if(state.layout==='phone') state.sidebar = 'off';
+    if(state.layout==='phone' || !railRoom()) state.sidebar = 'off';
     applyBodyFlags();
     relayoutChrome();
     bindKeys();
+    bindSwipe();
     bindChrome();
     window.addEventListener('hashchange', fromHash);
     watchSize();
@@ -103,9 +109,9 @@ const APP = (() => {
 
   function persist(){
     /* what is stored for the rail is always the wide-layout choice */
-    if(state.layout!=='phone') state.rail = state.sidebar;
+    if(state.layout!=='phone' && railRoom()) state.rail = state.sidebar;
     store.write({ mode:state.mode, edition:state.edition, motion:state.motion, sidebar:state.rail,
-                  theme:state.theme, display:state.display, pointer:state.pointer, trail:state.trail,
+                  theme:state.theme, display:state.display, pointer:state.pointer, trail:state.trail, trailLen:state.trailSec,
                   visited:state.visited, quiz:state.quiz, drillPage:state.drillPage,
                   at:SCENES[state.i]&&SCENES[state.i].id });
   }
@@ -144,44 +150,42 @@ const APP = (() => {
                document.querySelector('#chrome .byline')])
       .filter(Boolean);
     if(!_home) _home = items.map(el=>({el, parent:el.parentNode, next:el.nextSibling}));
+    /* The settings menu is emptied onto the drawer's foot, so on a phone the
+       gear opens the drawer, where its switches now sit, and not an empty menu. */
+    const gear = document.getElementById('btn-settings');
     if(state.layout==='phone'){
       const reset = foot.querySelector('[data-act=reset]');
       items.forEach(el=>{ el.classList.add('hmoved'); foot.insertBefore(el, reset); });
+      if(gear){ gear.removeAttribute('popovertarget'); gear.dataset.act = 'settings'; }
     } else {
       _home.forEach(h=>{ h.el.classList.remove('hmoved'); h.parent.insertBefore(h.el, h.next); });
+      if(gear){ gear.setAttribute('popovertarget', 'setmenu'); delete gear.dataset.act; }
     }
   }
 
   /* ---------- laser pointer, projector mode only ----------
      In front of a class the pointer is an instrument, not a control: the
      system arrow is too small to follow from the back of a room. In
-     projector mode it becomes a red dot. Holding the mouse button down draws
-     with it, the way a finger draws on a tablet. Strokes accumulate, so a
-     term can be ringed and a word written beside it, and the drawing goes
-     all at once a few seconds after the last stroke ends — or is held until
-     it is cleared, which the header decides. Moving without holding the
-     button moves the dot alone, so pointing leaves no ink. The dot never
-     leaves, because it is standing in for the arrow. Everything is drawn on
+     projector mode it becomes a red dot. Holding the mouse button down, or
+     pressing a pen such as the Apple Pencil to a tablet, draws with it; a
+     finger still scrolls. Strokes accumulate and fade together after a pause, or remain
+     until cleared, according to the header control. Everything is drawn on
      one fixed canvas above the page that takes no clicks, so nothing else
      changes. Under reduced motion the stroke is left out and only the dot is
-     drawn. Both the pointer and the ink can be turned off from the header. */
+     drawn. */
   const laser = (() => {
-    const HOLD = 3000;         /* ms the ink stays after the button is let go */
-    const FADE = 900;          /* ms it then takes to go */
-    const KEEP = 6000;         /* most points held across all strokes */
+    const FADE = 900, KEEP = 6000;
+    const hold = () => state.trailSec*1000;
     let cv=null, cx=null, on=false, raf=0, dpr=1, W=0, H=0;
-    let head=null;             /* {x,y} where the dot is now */
-    let drawing=false, released=0;
-    const strokes = [];        /* each one a list of {x,y}; oldest first */
-
+    let head=null, drawing=false, released=0;
+    const strokes = [];
     function count(){ let n=0; for(const s of strokes) n+=s.length; return n; }
-    function drop(){                       /* forget the oldest ink first */
+    function drop(){
       while(count()>KEEP && strokes.length){
         strokes[0].shift();
         if(strokes[0].length<2) strokes.shift();
       }
     }
-
     function size(){
       dpr = Math.min(window.devicePixelRatio||1, 2);
       W = window.innerWidth; H = window.innerHeight;
@@ -191,119 +195,77 @@ const APP = (() => {
     }
     function frame(){
       raf = 0;
-      /* `hold` keeps the ink until it is cleared; `fade` gives it HOLD at full
-         strength after the button is let go — long enough to say a sentence
-         over it — and then takes the whole drawing away together, rather than
-         tail first, so a word does not lose its first letter while it is
-         still being read */
       const keep = state.trail==='hold';
       const idle = (drawing||keep) ? 0 : performance.now() - released;
-      let a = idle<=HOLD ? 1 : 1 - (idle-HOLD)/FADE;
+      let a = idle<=hold() ? 1 : 1 - (idle-hold())/FADE;
       if(a<=0){ a=0; strokes.length=0; }
       cx.clearRect(0,0,W,H);
       if(a>0 && strokes.length && state.trail!=='off' && state.motion==='full'){
-        /* every stroke in one path, stroked three times — a wide soft halo,
-           the red body, a pale core. Stroking each piece on its own instead
-           leaves a bead at every round cap and doubles the ink where two
-           strokes cross. */
-        cx.lineCap='round'; cx.lineJoin='round'; cx.globalAlpha = a;
+        cx.lineCap='round'; cx.lineJoin='round'; cx.globalAlpha=a;
         cx.beginPath();
         for(const pts of strokes){
           if(pts.length<2) continue;
           cx.moveTo(pts[0].x, pts[0].y);
-          for(let k=1;k<pts.length-1;k++){        /* midpoint smoothing */
-            cx.quadraticCurveTo(pts[k].x, pts[k].y,
-                                (pts[k].x+pts[k+1].x)/2, (pts[k].y+pts[k+1].y)/2);
-          }
-          const b = pts[pts.length-1];
-          cx.lineTo(b.x, b.y);
+          for(let k=1;k<pts.length-1;k++) cx.quadraticCurveTo(pts[k].x,pts[k].y,(pts[k].x+pts[k+1].x)/2,(pts[k].y+pts[k+1].y)/2);
+          const b=pts[pts.length-1]; cx.lineTo(b.x,b.y);
         }
         cx.strokeStyle='rgba(255,66,44,0.26)'; cx.lineWidth=21; cx.stroke();
         cx.strokeStyle='rgba(228,38,22,0.94)'; cx.lineWidth=11; cx.stroke();
         cx.strokeStyle='rgba(255,231,226,0.96)'; cx.lineWidth=4; cx.stroke();
-        cx.globalAlpha = 1;
+        cx.globalAlpha=1;
       }
-      const p = head;
-      if(p){
-        const g = cx.createRadialGradient(p.x,p.y,0, p.x,p.y,19);
-        g.addColorStop(0,   'rgba(255,236,230,1)');
-        g.addColorStop(0.10,'rgba(255,64,40,1)');
-        g.addColorStop(0.32,'rgba(214,45,32,0.92)');
-        g.addColorStop(0.55,'rgba(214,45,32,0.32)');
-        g.addColorStop(1,   'rgba(214,45,32,0)');
-        cx.fillStyle = g;
-        cx.beginPath(); cx.arc(p.x,p.y,19,0,Math.PI*2); cx.fill();
+      if(head){
+        const g=cx.createRadialGradient(head.x,head.y,0,head.x,head.y,19);
+        g.addColorStop(0,'rgba(255,236,230,1)');
+        g.addColorStop(.10,'rgba(255,64,40,1)');
+        g.addColorStop(.32,'rgba(214,45,32,.92)');
+        g.addColorStop(.55,'rgba(214,45,32,.32)');
+        g.addColorStop(1,'rgba(214,45,32,0)');
+        cx.fillStyle=g; cx.beginPath(); cx.arc(head.x,head.y,19,0,Math.PI*2); cx.fill();
       }
-      /* while the button is held the next point comes from the next event, and
-         held ink never changes on its own: only a fade has to be animated */
-      if(!drawing && state.trail!=='hold' && a>0 && strokes.length) raf = requestAnimationFrame(frame);
+      if(!drawing && state.trail!=='hold' && a>0 && strokes.length) raf=requestAnimationFrame(frame);
     }
-    function tick(){ if(!raf) raf = requestAnimationFrame(frame); }
+    function tick(){ if(!raf) raf=requestAnimationFrame(frame); }
     function mouse(e){ return !e.pointerType || e.pointerType==='mouse' || e.pointerType==='pen'; }
     function move(e){
       if(!mouse(e)) return;
-      head = {x:e.clientX, y:e.clientY};
+      head={x:e.clientX,y:e.clientY};
       if(drawing){ strokes[strokes.length-1].push(head); drop(); }
       tick();
     }
     function down(e){
-      if(!mouse(e) || e.button!==0) return;
-      /* a drawing that had begun to fade is finished with: start a clean one */
-      if(!drawing && state.trail!=='hold' && performance.now()-released > HOLD) strokes.length=0;
-      drawing = true;
-      head = {x:e.clientX, y:e.clientY};
-      strokes.push([head]);                    /* strokes accumulate: a word
-                                                  keeps every letter of it */
-      tick();
+      if(!mouse(e)||e.button!==0) return;
+      if(!drawing && state.trail!=='hold' && performance.now()-released>hold()) strokes.length=0;
+      drawing=true; head={x:e.clientX,y:e.clientY}; strokes.push([head]); tick();
     }
-    function up(){
-      if(!drawing) return;
-      drawing = false; released = performance.now();
-      tick();
-    }
-    function leave(){
-      if(drawing){ drawing=false; released=performance.now(); }
-      head=null; tick();
-    }
-
+    /* a pencil lifted from glass leaves no hover to follow, so its dot goes with it */
+    function up(e){ if(e && e.pointerType==='pen') head=null; if(!drawing) return; drawing=false; released=performance.now(); tick(); }
+    /* on a tablet the browser takes a moving pencil for a scroll and cancels the
+       stroke; while a stroke is being drawn its touch moves are kept from it */
+    function still(e){ if(drawing && e.cancelable) e.preventDefault(); }
+    /* a picture or a link would otherwise start a native drag and cut the stroke */
+    function nodrag(e){ e.preventDefault(); }
+    function leave(){ if(drawing){ drawing=false; released=performance.now(); } head=null; tick(); }
     function start(){
       if(on) return;
-      if(!window.matchMedia || !matchMedia('(pointer:fine)').matches) return;
-      if(!cv){
-        cv = document.createElement('canvas');
-        cv.id = 'laser'; cv.setAttribute('aria-hidden','true');
-        document.body.appendChild(cv);
-        cx = cv.getContext('2d');
-      }
-      on = true; cv.style.display='block'; size();
-      window.addEventListener('pointermove', move, {passive:true});
-      window.addEventListener('pointerdown', down, {passive:true});
-      window.addEventListener('pointerup', up, {passive:true});
-      window.addEventListener('pointercancel', up, {passive:true});
-      document.addEventListener('mouseleave', leave);
-      window.addEventListener('blur', leave);
-      window.addEventListener('resize', size);
+      if(!cv){ cv=document.createElement('canvas'); cv.id='laser'; cv.setAttribute('aria-hidden','true'); document.body.appendChild(cv); cx=cv.getContext('2d'); }
+      on=true; cv.style.display='block'; size();
+      window.addEventListener('pointermove',move,{passive:true});
+      window.addEventListener('pointerdown',down,{passive:true});
+      window.addEventListener('pointerup',up,{passive:true});
+      window.addEventListener('pointercancel',up,{passive:true});
+      window.addEventListener('dragstart',nodrag);
+      window.addEventListener('touchmove',still,{passive:false});
+      document.addEventListener('mouseleave',leave); window.addEventListener('blur',leave); window.addEventListener('resize',size);
     }
     function stop(){
       if(!on) return;
-      on = false;
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-      document.removeEventListener('mouseleave', leave);
-      window.removeEventListener('blur', leave);
-      window.removeEventListener('resize', size);
-      if(raf){ cancelAnimationFrame(raf); raf=0; }
-      leave();
-      if(cv) cv.style.display='none';
+      on=false; window.removeEventListener('pointermove',move); window.removeEventListener('pointerdown',down);
+      window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up); window.removeEventListener('dragstart',nodrag); window.removeEventListener('touchmove',still);
+      document.removeEventListener('mouseleave',leave); window.removeEventListener('blur',leave); window.removeEventListener('resize',size);
+      if(raf){ cancelAnimationFrame(raf); raf=0; } leave(); if(cv) cv.style.display='none';
     }
-    return {
-      sync(){ (state.display==='projector' && state.pointer==='laser') ? start() : stop(); },
-      /* clearing takes whatever is on screen with it — the C key, a change of
-         scene, and turning the ink off all use this */
-      clear(){ if(on && strokes.length){ strokes.length=0; drawing=false; tick(); } }
-    };
+    return { sync(){ (state.display==='projector'&&state.pointer==='laser') ? start() : stop(); }, clear(){ if(on&&strokes.length){ strokes.length=0; drawing=false; tick(); } } };
   })();
 
   /* ---------- stage scaling: exact 1920×1080 basis, scaled to fit ---------- */
@@ -316,15 +278,21 @@ const APP = (() => {
        real pixels and scrolls. Any transform left over from the wide layout is
        cleared here, so turning a phone from landscape to portrait does not
        leave the column shrunk. */
-    if(state.layout==='phone'){ stage.style.transform=''; stage.dataset.k='1'; return; }
+    if(state.layout==='phone'){ stage.style.transform=''; stage.style.height=''; stage.dataset.k='1'; return; }
     /* measure the painted box, not the window: inside a panel, an iframe or a
        zoomed view, window.innerWidth does not describe the area we can use. */
     const r = wrap.getBoundingClientRect();
     const w = Math.max(1, Math.min(r.width,  wrap.clientWidth  || r.width));
     const h = Math.max(1, Math.min(r.height, wrap.clientHeight || r.height));
     const k = Math.min(w/1920, h/1080);
+    /* A practice-question page scrolls rather than scales, so on a window taller
+       than 16:9 the stage grows downward to the window's foot instead of
+       leaving a letterbox band under the question. */
+    const tall = !!stage.querySelector('.dr-page');
+    const H = tall ? Math.max(1080, h/k) : 1080;
+    stage.style.height = tall ? H + 'px' : '';
     const dx = Math.round((w - 1920*k) / 2);
-    const dy = Math.round((h - 1080*k) / 2);
+    const dy = Math.round((h - H*k) / 2);
     stage.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + k + ')';
     stage.dataset.k = k.toFixed(4);
   }
@@ -343,8 +311,8 @@ const APP = (() => {
     const onLayout = () => {
       const L = layoutNow();
       if(L === state.layout) return;
-      if(L === 'phone'){ state.rail = state.sidebar; state.sidebar = 'off'; }
-      else state.sidebar = state.rail || 'on';
+      if(L === 'phone'){ if(railRoom()) state.rail = state.sidebar; state.sidebar = 'off'; }
+      else state.sidebar = railRoom() ? (state.rail || 'on') : 'off';
       state.layout = L;
       applyBodyFlags(); relayoutChrome();
       requestAnimationFrame(()=>{ fit(); onRender(); });
@@ -428,6 +396,8 @@ const APP = (() => {
       const typing = tag==='input'||tag==='textarea';
       if(e.key==='Escape'){ closeAll(); return; }
       if(typing) return;
+      /* a focused button on the slide (a prediction, a sound) takes its own Space */
+      if(e.key===' ' && tag==='button' && e.target.closest('#scene-host')) return;
       switch(e.key){
         case 'ArrowRight': case 'PageDown': case ' ': e.preventDefault(); next(); break;
         case 'ArrowLeft': case 'PageUp': e.preventDefault(); prev(); break;
@@ -451,6 +421,50 @@ const APP = (() => {
     });
   }
 
+  /* ---------- finger swipe ----------
+     A quick sideways swipe of one finger on the slide is Next or Previous,
+     as the arrow keys are. Touch events are used, not pointer events, because
+     the browser cancels a pointer as soon as it takes the finger for a scroll.
+     A pencil (touchType 'stylus') never swipes: it draws the laser trail. A
+     swipe that starts on a control, a sketch figure, or anything that scrolls
+     sideways belongs to that element, and so does one whose pointerdown a
+     laboratory already took for a drag (it called preventDefault; pointer
+     events arrive before touch events). One that starts at the screen edge
+     belongs to the browser's own back gesture; a zoomed page is being panned. */
+  function bindSwipe(){
+    let t0 = null, claimed = false;
+    const EDGE = 24, MIN = 60, MAXT = 700;
+    function owned(el){
+      const wrap = document.getElementById('stagewrap');
+      if(!wrap || !wrap.contains(el)) return true;
+      if(el.closest('input,textarea,select,[contenteditable],figure.sketch > svg')) return true;
+      for(let e = el; e && e !== wrap; e = e.parentElement){
+        if(e.scrollWidth > e.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(e).overflowX)) return true;
+      }
+      return false;
+    }
+    document.addEventListener('pointerdown', e=>{ claimed = e.pointerType==='touch' && e.defaultPrevented; });
+    document.addEventListener('touchstart', e=>{
+      t0 = null;
+      if(e.touches.length !== 1 || anyOpen() || claimed) return;
+      const p = e.touches[0];
+      if(p.touchType === 'stylus') return;
+      if(p.clientX < EDGE || p.clientX > window.innerWidth - EDGE) return;
+      if(window.visualViewport && window.visualViewport.scale > 1.05) return;
+      if(owned(e.target)) return;
+      t0 = { x:p.clientX, y:p.clientY, t:performance.now() };
+    }, {passive:true});
+    document.addEventListener('touchmove', e=>{ if(e.touches.length > 1) t0 = null; }, {passive:true});
+    document.addEventListener('touchcancel', ()=>{ t0 = null; }, {passive:true});
+    document.addEventListener('touchend', e=>{
+      if(!t0) return;
+      const p = e.changedTouches[0], s = t0; t0 = null;
+      const dx = p.clientX - s.x, dy = p.clientY - s.y;
+      if(performance.now() - s.t > MAXT || Math.abs(dx) < MIN || Math.abs(dx) < 1.5*Math.abs(dy)) return;
+      dx < 0 ? next() : prev();
+    }, {passive:true});
+  }
+
   function toggleMode(){ state.mode = state.mode==='lecture'?'study':'lecture'; applyBodyFlags(); persist(); onRender(); }
   function toggleEdition(){ state.edition = state.edition==='student'?'instructor':'student'; applyBodyFlags(); persist(); onRender(); }
   function toggleMotion(){ state.motion = state.motion==='full'?'reduced':'full'; applyBodyFlags(); persist(); onRender(); }
@@ -465,13 +479,9 @@ const APP = (() => {
     applyBodyFlags(); persist();
     requestAnimationFrame(()=>{ fit(); onRender(); });
   }
-  function togglePointer(){
-    state.pointer = state.pointer==='laser'?'arrow':'laser';
-    applyBodyFlags(); persist(); onRender();
-  }
+  function togglePointer(){ state.pointer=state.pointer==='laser'?'arrow':'laser'; applyBodyFlags(); persist(); onRender(); }
   function toggleTrail(){
-    /* fade → hold → off, and round again */
-    state.trail = state.trail==='fade' ? 'hold' : state.trail==='hold' ? 'off' : 'fade';
+    state.trail=state.trail==='fade'?'hold':state.trail==='hold'?'off':'fade';
     if(state.trail==='off') laser.clear();
     applyBodyFlags(); persist(); onRender();
   }
@@ -479,6 +489,12 @@ const APP = (() => {
     requestAnimationFrame(()=>{ fit(); onRender(); }); }
 
   function bindChrome(){
+    document.addEventListener('input', e=>{
+      if(e.target.id!=='trail-sec') return;
+      state.trailSec = +e.target.value; e.target.nextElementSibling.textContent = state.trailSec+' s'; persist();
+    });
+    /* once set, the slider gives the arrow keys back to the slides */
+    document.addEventListener('change', e=>{ if(e.target.id==='trail-sec') e.target.blur(); });
     document.addEventListener('click', e=>{
       const t = e.target.closest('[data-act]');
       if(!t) return;
@@ -495,6 +511,7 @@ const APP = (() => {
       else if(a==='edition') toggleEdition();
       else if(a==='motion') toggleMotion();
       else if(a==='sidebar') toggleSidebar();
+      else if(a==='settings'){ if(state.sidebar!=='on') toggleSidebar(); }
       else if(a==='theme') toggleTheme();
       else if(a==='display') toggleDisplay();
       else if(a==='pointer') togglePointer();
@@ -519,6 +536,19 @@ const APP = (() => {
         e.stopPropagation(); e.preventDefault(); toggleSidebar();
       }
     }, true);
+    /* page box in the footer: type a number, Enter jumps, Escape restores */
+    const pb = document.getElementById('pagebox');
+    if(pb){
+      pb.addEventListener('focus', ()=>pb.select());
+      pb.addEventListener('keydown', e=>{
+        if(e.key==='Enter'){
+          const k = parseInt(pb.value,10);
+          if(k>=1 && k<=SCENES.length) go(k-1);
+          pb.blur();
+        } else if(e.key==='Escape') pb.blur();
+      });
+      pb.addEventListener('blur', ()=>{ pb.value = state.i+1; });
+    }
   }
 
   /* ---------- contents, shared by the rail and the map ----------
@@ -536,17 +566,16 @@ const APP = (() => {
          + `<span class="ctitle">${RENDER.md(s.nav||s.title||s.id)}</span>`;
   }
 
-  /* A section is open when the reader has said so, and otherwise when the scene
-     on screen is inside it. That keeps the rail short enough to scan while never
-     hiding where the reader currently stands. */
+  /* A section is open unless the reader has closed it, so the whole contents
+     are visible on arrival. */
   function secIsOpen(n){
     if(n in state.secOpen) return state.secOpen[n];
-    const cur = SCENES[state.i];
-    return !!(cur && cur.sec && cur.sec.indexOf(n+'.') === 0);
+    return true;
   }
-  /* A chapter's questions close it: they are worked after the teaching scenes.
-     `row` is given the scene, not a position, so both surfaces place it the
-     same way. */
+  /* The practice questions follow the teaching scenes. `row` is given the
+     scene, not a position, so both surfaces place it the same way; the third
+     argument marks the practice row so the rail can draw it at heading level,
+     where the chapter heading above already names the module. */
   function chapterRows(ch, row, head, collapse){
     const out = [];
     ch.sections.forEach(sec=>{
@@ -555,7 +584,7 @@ const APP = (() => {
       if(titled) out.push(head(sec, open));
       if(open) sec.scenes.forEach(s=>out.push(row(s, titled)));
     });
-    if(ch.q.drill) out.push(row(ch.q.drill));
+    if(ch.q.drill) out.push(row(ch.q.drill, false, true));
     return out.join('');
   }
 
@@ -585,9 +614,9 @@ const APP = (() => {
       const rows = chapterRows(ch,
         /* A scene inside an open section is marked, so the rail can draw a
            rule down the left of the run and show where the section ends. */
-        (s, inSec) => `<li class="${inSec?'insec':''}"><a data-act="goto" data-id="${s.id}" tabindex="0"
+        (s, inSec, drill) => `<li class="${inSec?'insec':drill?'cdrill':''}"><a data-act="goto" data-id="${s.id}" tabindex="0"
                 class="${s.id===cur.id?'on':''}${state.visited[s.id]?' seen':''}"
-                >${label(s)}</a></li>`,
+                >${drill?`<span class="cnum">${s.sec}</span><span class="ctitle">Practice questions</span>`:label(s)}</a></li>`,
         (sec, open) => `<li class="csec"><button type="button" data-act="sec" data-sec="${sec.n}"
                 aria-expanded="${open}" class="${open?'open':''}"
                 ><span class="cnum">${sec.n}</span><span class="ctitle">${RENDER.md(sec.title)}</span
