@@ -16,6 +16,11 @@ const path = require('path');
 const fs = require('fs');
 
 const SITE = path.join(__dirname, '..', 'site');
+/* The cover links to clean addresses (/notes, not a file name), and
+   vercel.json is what maps them onto files; resolve them the same way. */
+const REWRITE = Object.fromEntries(
+  JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8')).rewrites
+    .map(r => [r.source, r.destination]));
 const url = f => 'file://' + path.join(SITE, f);
 const problems = [];
 const note = m => console.log('  ' + m);
@@ -79,7 +84,8 @@ const note = m => console.log('  ' + m);
         if (cover.facts[k] !== facts[k]) problems.push(`cover says ${cover.facts[k]} ${k}, the artifact holds ${facts[k]}`);
       for (const h of cover.links) {
         if (/^(https?:|#)/.test(h)) continue;
-        if (!fs.existsSync(path.join(SITE, h))) problems.push('cover link does not resolve: ' + h);
+        const f = REWRITE[h] || h;
+        if (!fs.existsSync(path.join(SITE, f))) problems.push('cover link does not resolve: ' + h);
       }
       note('cover facts ' + JSON.stringify(cover.facts));
     }
