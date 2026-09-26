@@ -434,12 +434,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.1 -- */
-{ id:'m2-born', module:'M2', nav:'The Born rule', title:'The Born rule: from an amplitude to a count',
+{ id:'m2-born', module:'M2', nav:'The Born rule', title:'The Born Rule',
   objective:'State the Born rule and check that the probabilities it gives add to one.',
   keywords:'born rule probability amplitude squared modulus outcome basis completeness shot',
   src:'L4 · Born rule', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
-  {t:'title', text:'The Born rule: from an amplitude to a count'},
+  {t:'title', text:'The Born Rule'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figShot(),
       caption:'One shot returns one outcome and nothing else. The amplitudes decide only how often each outcome comes back over many shots.'},
@@ -459,12 +459,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.2 -- */
-{ id:'m2-bases', module:'M2', nav:'Choosing a basis is choosing an experiment', title:'A measurement basis is an experiment, not a coordinate system',
+{ id:'m2-bases', module:'M2', nav:'Choosing a basis is choosing an experiment', title:'Measurement Bases',
   objective:'Separate a passive change of coordinates from the choice of what to measure.',
   keywords:'measurement basis Z X Y eigenbasis passive change of coordinates different experiment pauli',
   src:'L4 · three standard qubit bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
-  {t:'title', text:'A measurement basis is an experiment, not a coordinate system'},
+  {t:'title', text:'Measurement Bases'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figThreeBases(),
       caption:'One state, read by three instruments. The bars are computed from the state. The state is the same in all three groups; the experiment is not.'},
@@ -484,12 +484,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.3 -- */
-{ id:'m2-distinguish', module:'M2', nav:'Telling two states apart', title:'When two states can be told apart, and when they cannot',
+{ id:'m2-distinguish', module:'M2', nav:'Telling two states apart', title:'Distinguishing Quantum States',
   objective:'Show that one measurement separates two states with certainty exactly when they are orthogonal.',
   keywords:'distinguishing states orthogonal certainty overlap single shot no cloning discrimination',
   src:'L4 · projectors and measurement geometry', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
-  {t:'title', text:'When two states can be told apart, and when they cannot'},
+  {t:'title', text:'Distinguishing Quantum States'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figDistinguish(),
       caption:'Two states at an angle $\\theta$, with $|\\langle a|b\\rangle|=\\cos\\theta$. One measurement separates them with certainty only when $\\theta$ is a right angle.'},
@@ -509,33 +509,33 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.L1 --- */
-{ id:'m2-lab-c', module:'M2', nav:'Laboratory C', title:'Laboratory C · Exact probability against a finite sample',
+{ id:'m2-lab-c', module:'M2', nav:'Laboratory C', title:'Laboratory C \u2014 Exact Probability and Finite Samples',
   objective:'Let the reader set a state, a measurement basis and a shot count, and read the exact answer beside the sampled one.',
   keywords:'laboratory measurement basis shots histogram exact probability sampling error wilson interval',
   steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
-  {t:'title', text:'Laboratory C · Exact probability against a finite sample'},
+  {t:'title', text:'Laboratory C \u2014 Exact Probability and Finite Samples'},
   {t:'small', html:'The state is $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$ and the instrument measures along $Z$, $X$ or $Y$. The left panel puts the exact Born probabilities beside the frequencies of a simulated run; the right one follows the estimate as the shots accumulate, inside the band the sampling error allows. Nothing here is noisy hardware: the device is perfect and the spread is the counting alone.'},
   {t:'lab', id:'C'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-born', module:'M2', nav:'Code · The Born rule', title:'The Born rule in code',
+{ id:'m2-code-born', module:'M2', nav:'Code · The Born rule', title:'The Born Rule in Code',
   objective:'Turn amplitudes into probabilities, read one state in three bases, and compute the best guess between two states.',
   keywords:'code qiskit numpy program born rule probability basis measurement distinguish run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · The Born rule'},
-  {t:'title', text:'The Born rule in code'},
+  {t:'title', text:'The Born Rule in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-born')}
 ]},
 
 /* ---------------------------------------------------------------- 2.2.1 -- */
-{ id:'m2-proj', module:'M2', nav:'Projective measurement', title:'Projective measurement, and what a degenerate outcome is',
+{ id:'m2-proj', module:'M2', nav:'Projective measurement', title:'Projective Measurement',
   objective:'Write a measurement as a set of orthogonal projectors and compute an outcome probability from them.',
   keywords:'projective measurement projectors orthogonal complete degenerate eigenspace born probability rank',
   src:'L5 · projective measurement', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
-  {t:'title', text:'Projective measurement, and what a degenerate outcome is'},
+  {t:'title', text:'Projective Measurement'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figObservable(),
       caption:'An observable, taken apart. The eigenvalues are the numbers the instrument reports. The projectors decide how often each one comes back.'},
@@ -555,12 +555,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.2.2 -- */
-{ id:'m2-collapse', module:'M2', nav:'The state afterwards', title:'What the state is after a reading has been taken',
+{ id:'m2-collapse', module:'M2', nav:'The state afterwards', title:'The Post-Measurement State',
   objective:'Apply the projection update rule and show that an immediate repeat gives the same answer.',
   keywords:'state update luders rule collapse conditioning renormalise repeatable measurement disturbance',
   src:'L5 · projective measurement', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
-  {t:'title', text:'What the state is after a reading has been taken'},
+  {t:'title', text:'The Post-Measurement State'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figCollapse(),
       caption:'The state $\\tfrac{1}{\\sqrt5}\\left(|0\\rangle+2|1\\rangle\\right)$ before a $Z$ measurement, and after the reading $1$. Afterwards the state is $|1\\rangle$, so a repeat gives $1$ with certainty.'},
@@ -580,12 +580,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.2.3 -- */
-{ id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'The general measurement, and what a readout error looks like',
+{ id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'Generalized Measurements and Readout Error',
   objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
   src:'L5 · general measurements: POVMs and instruments', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
-  {t:'title', text:'The general measurement, and what a readout error looks like'},
+  {t:'title', text:'Generalized Measurements and Readout Error'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figReadout(),
       caption:'The reported $p(0)$ against the true $q$ for three error rates. At $\\epsilon=\\tfrac12$ the line is flat, and the readout says nothing about the state.'},
@@ -605,22 +605,22 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-measure', module:'M2', nav:'Code · Projective measurement', title:'Projective measurement in code',
+{ id:'m2-code-measure', module:'M2', nav:'Code · Projective measurement', title:'Projective Measurement in Code',
   objective:'Apply the update rule, follow three measurements in a row, and model a readout error with effects.',
   keywords:'code qiskit numpy program projective measurement update rule collapse readout error povm run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Projective measurement'},
-  {t:'title', text:'Projective measurement in code'},
+  {t:'title', text:'Projective Measurement in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-measure')}
 ]},
 
 /* ---------------------------------------------------------------- 2.3.1 -- */
-{ id:'m2-obs', module:'M2', nav:'Expectation values', title:'The expectation value, and why it is often not an outcome',
+{ id:'m2-obs', module:'M2', nav:'Expectation values', title:'Expectation Values',
   objective:'Compute an expectation value two ways and say what it is an average over.',
   keywords:'observable expectation value ensemble average hermitian eigenvalue mean not an outcome',
   src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
-  {t:'title', text:'The expectation value, and why it is often not an outcome'},
+  {t:'title', text:'Expectation Values'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figExpectation(),
       caption:'Outcomes $-1$ and $+1$, and the mean of many readings. The instrument returns one of the two stems and never the dashed line.'},
@@ -640,12 +640,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.3.2 -- */
-{ id:'m2-var', module:'M2', nav:'Spread', title:'Variance, and the states on which an observable is sharp',
+{ id:'m2-var', module:'M2', nav:'Spread', title:'Variance and Sharp Observables',
   objective:'Compute a variance and identify the states for which it vanishes.',
   keywords:'variance standard deviation spread sharp eigenstate certainty delta A observable',
   src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
-  {t:'title', text:'Variance, and the states on which an observable is sharp'},
+  {t:'title', text:'Variance and Sharp Observables'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figVariance(),
       caption:'The mean and the spread of $Z$ on $\\cos(\\theta/2)|0\\rangle+\\sin(\\theta/2)|1\\rangle$. At both ends the state is an eigenstate and the spread is zero.'},
@@ -665,22 +665,22 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-obs', module:'M2', nav:'Code · Observables', title:'Observables in code',
+{ id:'m2-code-obs', module:'M2', nav:'Code · Observables', title:'Observables in Code',
   objective:'Compute an expectation value by two routes, a variance, and a mean from the eigenvalues.',
   keywords:'code qiskit numpy program expectation value variance observable eigenvalues run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Observables'},
-  {t:'title', text:'Observables in code'},
+  {t:'title', text:'Observables in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-obs')}
 ]},
 
 /* ---------------------------------------------------------------- 2.4.1 -- */
-{ id:'m2-comm', module:'M2', nav:'Compatibility', title:'The commutator, and when two readings can both be sharp',
+{ id:'m2-comm', module:'M2', nav:'Compatibility', title:'Commutators and Compatibility',
   objective:'Compute a commutator and connect it to whether two observables share an eigenbasis.',
   keywords:'commutator compatible observables shared eigenbasis simultaneous sharp sequential measurement disturbance',
   src:'L5 · compatibility, commutators and uncertainty', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
-  {t:'title', text:'The commutator, and when two readings can both be sharp'},
+  {t:'title', text:'Commutators and Compatibility'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figSequence(),
       caption:'Three measurements on $|0\\rangle$. The first is certain. The $X$ measurement leaves an $X$ eigenstate, so the last $Z$ is a coin.'},
@@ -700,12 +700,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.4.2 -- */
-{ id:'m2-uncert', module:'M2', nav:'The uncertainty relation', title:'The uncertainty relation, and what it is a statement about',
+{ id:'m2-uncert', module:'M2', nav:'The uncertainty relation', title:'The Uncertainty Relation',
   objective:'State the Robertson relation, check it on a family of states, and say what it does not claim.',
   keywords:'uncertainty relation robertson bound commutator spread product cauchy schwarz saturated',
   src:'L5 · Robertson uncertainty relation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
-  {t:'title', text:'The uncertainty relation, and what it is a statement about'},
+  {t:'title', text:'The Uncertainty Relation'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figUncertainty(),
       caption:'The product $\\Delta X\\,\\Delta Z$ and the bound on $\\cos(\\theta/2)|0\\rangle+e^{i\\pi/4}\\sin(\\theta/2)|1\\rangle$. The product stays above the bound and touches it at one state.'},
@@ -725,22 +725,22 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-comm', module:'M2', nav:'Code · Compatibility', title:'Compatibility and uncertainty in code',
+{ id:'m2-code-comm', module:'M2', nav:'Code · Compatibility', title:'Compatibility and Uncertainty in Code',
   objective:'Compute a commutator, check the Robertson bound on one state, and see the order of two measurements matter.',
   keywords:'code qiskit numpy program commutator uncertainty robertson sequential measurement run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
-  {t:'title', text:'Compatibility and uncertainty in code'},
+  {t:'title', text:'Compatibility and Uncertainty in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-comm')}
 ]},
 
 /* ---------------------------------------------------------------- 2.5.1 -- */
-{ id:'m2-pauli', module:'M2', nav:'The Pauli operators', title:'The Pauli operators: observable and gate at once',
+{ id:'m2-pauli', module:'M2', nav:'The Pauli operators', title:'The Pauli Operators',
   objective:'List the three Pauli operators with their eigenvalues and eigenstates, and say why each is both an observable and a gate.',
   keywords:'pauli matrices X Y Z hermitian unitary traceless square identity eigenstates spin stern gerlach',
   src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
-  {t:'title', text:'The Pauli operators: observable and gate at once'},
+  {t:'title', text:'The Pauli Operators'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figAxes(),
       caption:'The three measurement directions of one qubit, one axis for each Pauli operator. Chapter 4 turns this picture into the Bloch sphere.'},
@@ -760,12 +760,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.5.2 -- */
-{ id:'m2-paulialg', module:'M2', nav:'The Pauli algebra', title:'One product rule, and everything else follows from it',
+{ id:'m2-paulialg', module:'M2', nav:'The Pauli algebra', title:'The Pauli Algebra',
   objective:'Use the Pauli product rule to get any commutator or anticommutator without multiplying matrices.',
   keywords:'pauli algebra product rule commutator anticommutator cyclic levi civita identity operator basis',
   src:'L5 · Pauli algebra', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
-  {t:'title', text:'One product rule, and everything else follows from it'},
+  {t:'title', text:'The Pauli Algebra'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figCycle(),
       caption:'The cyclic order $X\\to Y\\to Z\\to X$. With an arrow, the product of two is $i$ times the third; against it, $-i$ times the third.'},
@@ -785,12 +785,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.5.3 -- */
-{ id:'m2-ndotsigma', module:'M2', nav:'Measuring along any direction', title:'Measuring along a direction, and the first sight of a vector',
+{ id:'m2-ndotsigma', module:'M2', nav:'Measuring along any direction', title:'Spin Along an Arbitrary Direction',
   objective:'Build the projectors for a measurement along an arbitrary axis and read off the outcome probability.',
   keywords:'n dot sigma arbitrary direction projector half identity plus axis bloch vector cos squared',
   src:'L5 · Stern-Gerlach experiment', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
-  {t:'title', text:'Measuring along a direction, and the first sight of a vector'},
+  {t:'title', text:'Spin Along an Arbitrary Direction'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figNdotR(),
       caption:'The probability of $+1$ against the angle $\\alpha$ between the instrument direction $\\mathbf{n}$ and the vector $\\mathbf{r}$ of the state. Aligned: certain. At a right angle: a coin.'},
@@ -810,22 +810,22 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-pauli', module:'M2', nav:'Code · The Pauli algebra', title:'The Pauli algebra in code',
+{ id:'m2-code-pauli', module:'M2', nav:'Code · The Pauli algebra', title:'The Pauli Algebra in Code',
   objective:'Check the Pauli properties, the product rule, and a measurement along a tilted direction.',
   keywords:'code qiskit numpy program pauli product rule anticommute direction projector run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
-  {t:'title', text:'The Pauli algebra in code'},
+  {t:'title', text:'The Pauli Algebra in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-pauli')}
 ]},
 
 /* ---------------------------------------------------------------- 2.6.1 -- */
-{ id:'m2-position', module:'M2', nav:'Position representation', title:'Position and momentum are operators on a wavefunction',
+{ id:'m2-position', module:'M2', nav:'Position representation', title:'Position and Momentum Operators',
   objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
   keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
   src:'L5 · coordinate representation and the free particle', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Position and momentum are operators on a wavefunction'},
+  {t:'title', text:'Position and Momentum Operators'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figWavePacket(),
       caption:'An oscillation inside a decaying envelope. The oscillation gives the wave number; the envelope makes the squared norm finite, so the state can be normalised.'},
@@ -845,12 +845,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.2 -- */
-{ id:'m2-schrod', module:'M2', nav:'Evolution', title:'Evolution: one Hermitian operator, one unitary family',
+{ id:'m2-schrod', module:'M2', nav:'Evolution', title:'The Schrödinger Equation',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
   src:'L5 · closed-system time evolution', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Evolution: one Hermitian operator, one unitary family'},
+  {t:'title', text:'The Schrödinger Equation'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figPhaseCircle(),
       caption:'The $|1\\rangle$ amplitude of $|+\\rangle$ under $H=\\tfrac{\\omega}{2}Z$, measured against the $|0\\rangle$ amplitude, at four times. Its length stays $1/\\sqrt2$; only its angle turns, at rate $\\omega$.'},
@@ -870,12 +870,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.3 -- */
-{ id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Why one energy eigenstate does nothing and two of them beat',
+{ id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Stationary States and Beats',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
   src:'L5 · stationary states and superpositions', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Why one energy eigenstate does nothing and two of them beat'},
+  {t:'title', text:'Stationary States and Beats'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figBeat(),
       caption:'Start in $|+\\rangle$ under $H=\\tfrac{\\omega}{2}Z$ and measure in the $X$ basis. $P(+)$ falls to zero at $\\omega t=\\pi$ and returns to one at $\\omega t=2\\pi$.'},
@@ -895,12 +895,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.4 -- */
-{ id:'m2-well', module:'M2', nav:'The infinite square well', title:'Boundary conditions turn a continuous wave number into discrete energies',
+{ id:'m2-well', module:'M2', nav:'The infinite square well', title:'The Infinite Square Well',
   objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
   keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
   src:'L5 · infinite square well', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Boundary conditions turn a continuous wave number into discrete energies'},
+  {t:'title', text:'The Infinite Square Well'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figWell(),
       caption:'The first three standing waves, each drawn at its energy level. The levels rise as $n^{2}$, not in equal steps.'},
@@ -921,12 +921,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.5 -- */
-{ id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Why a gate is an exponential, and what a pulse controls',
+{ id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Gates as Hamiltonian Evolution',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',
   src:'L5 · driven qubit: Hamiltonians become gates', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Why a gate is an exponential, and what a pulse controls'},
+  {t:'title', text:'Gates as Hamiltonian Evolution'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figDrive(),
       caption:'The rotation axis for four detunings at fixed drive strength. On resonance it lies in the equator; far detuned it points almost along $z$ and the drive barely moves the state.'},
@@ -946,33 +946,33 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.L2 --- */
-{ id:'m2-lab-d', module:'M2', nav:'Laboratory D', title:'Laboratory D · Driving a qubit: strength, detuning and time',
+{ id:'m2-lab-d', module:'M2', nav:'Laboratory D', title:'Laboratory D \u2014 Driving a Qubit',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
   keywords:'laboratory rabi oscillation drive strength detuning population resonance pulse area pi pulse',
   steps:0, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Laboratory D · Driving a qubit: strength, detuning and time'},
+  {t:'title', text:'Laboratory D \u2014 Driving a Qubit'},
   {t:'small', html:'The qubit starts in $|0\\rangle$ under $H=\\tfrac12(\\Omega_{x}X+\\Delta Z)$. The left panel is the population of $|1\\rangle$ against time, with the elapsed time marked; the right one is the largest population the drive can ever reach, against the detuning. The transport runs the clock forward. Find the pulse length that flips the qubit, then detune and watch that pulse stop working.'},
   {t:'lab', id:'D'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-dynamics', module:'M2', nav:'Code · Dynamics', title:'Dynamics in code',
+{ id:'m2-code-dynamics', module:'M2', nav:'Code · Dynamics', title:'Dynamics in Code',
   objective:'Evolve a state under a Hamiltonian, shift the energy by a constant, and drive a qubit with a pulse.',
   keywords:'code qiskit numpy program evolution hamiltonian unitary exponential rabi pulse detuning run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Dynamics'},
-  {t:'title', text:'Dynamics in code'},
+  {t:'title', text:'Dynamics in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-dynamics')}
 ]},
 
 /* ---------------------------------------------------------------- 2.7.1 -- */
-{ id:'m2-shots', module:'M2', nav:'What a count is worth', title:'Finite shots: a histogram is an estimate, not a distribution',
+{ id:'m2-shots', module:'M2', nav:'What a count is worth', title:'Finite Shots and Estimation',
   objective:'Give the standard error of a probability estimated from N shots and say what it is not.',
   keywords:'shots binomial standard error sampling noise estimate histogram confidence square root scaling',
   src:'L5 · finite-shot estimation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 2 · Finite shots'},
-  {t:'title', text:'Finite shots: a histogram is an estimate, not a distribution'},
+  {t:'title', text:'Finite Shots and Estimation'},
   {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, grow:true, svg:()=>figShots(),
       caption:'The standard error against the shot count, on decade axes. Both lines drop half a decade for every decade of shots: that is the square root.'},
@@ -992,22 +992,22 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-shots', module:'M2', nav:'Code · Finite shots', title:'Finite shots in code',
+{ id:'m2-code-shots', module:'M2', nav:'Code · Finite shots', title:'Finite Shots in Code',
   objective:'Compute a standard error, the shots a precision needs, and the exact chance that an estimate lands near the truth.',
   keywords:'code qiskit numpy program shots standard error binomial precision estimate run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Finite shots'},
-  {t:'title', text:'Finite shots in code'},
+  {t:'title', text:'Finite Shots in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-shots')}
 ]},
 
 /* ---------------------------------------------------------------- 2.8.1 -- */
-{ id:'m2-synth', module:'M2', nav:'Summary', title:'What this chapter leaves you with',
+{ id:'m2-synth', module:'M2', nav:'Summary', title:'Summary',
   objective:'Collect the two postulates this chapter added and the four errors it exists to prevent.',
   keywords:'summary module 2 review born rule projective measurement expectation commutator evolution shots',
   steps:2, blocks:[
   {t:'eyebrow', text:'Module 2 · Summary'},
-  {t:'title', text:'What this chapter leaves you with'},
+  {t:'title', text:'Summary'},
   {t:'fig', frame:true, svg:()=>figLoop(),
     caption:'One run of a quantum computer, and where each part of this chapter sits in it. Everything in chapters 4, 5 and 6 is a way of choosing the middle two boxes so that the last one returns something useful.'},
   {t:'grid', cols:4, gap:'20px', items:[
@@ -1032,12 +1032,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.8.2 -- */
-{ id:'m2-shapes', module:'M2', nav:'The shapes of question', title:'The shapes of question this chapter sets',
+{ id:'m2-shapes', module:'M2', nav:'The shapes of question', title:'Question Types',
   objective:'Name the recurring question types of chapter 2 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice born projective expectation commutator evolution shots',
   steps:1, blocks:[
   {t:'eyebrow', text:'Module 2 · Summary and practice'},
-  {t:'title', text:'The shapes of question this chapter sets'},
+  {t:'title', text:'Question Types'},
   {t:'small', html:'Six shapes keep coming back, and a seventh — a <b>full-length question</b> — puts three to five of them in one statement, usually as one experiment worked from preparation to reported number. Name the shape before starting; the method for each is fixed.'},
   {t:'grid', cols:3, gap:'22px', items:[
     [{t:'drilltypes', module:'M2', from:0, to:2}],

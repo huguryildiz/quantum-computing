@@ -229,12 +229,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.2 ---- */
-{ id:'m0-what', module:'M0', nav:'What it is for', title:'What a quantum computer is for',
+{ id:'m0-what', module:'M0', nav:'What it is for', title:'What a Quantum Computer Is For',
   objective:'Give the honest scope of the machine, and the shape of a defensible advantage claim.',
   keywords:'quantum advantage claim coprocessor simulation cannot replace classical baseline resources',
   src:'L0 · quantum computers do not replace classical computers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'What a quantum computer is for'},
+  {t:'title', text:'What a Quantum Computer Is For'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>A classical computer is the right machine for almost everything: mail, databases, graphics, control, and most of scientific computing. The reason to build a quantum one is narrower and it is physical. Molecules, spins, electrons and light <b>are</b> quantum systems. Their states are complex amplitudes, and a general many-body state has too many of them to write down.</p>'},
     {t:'body', html:'<p>So the machine is best read as a <b>specialised coprocessor</b>. It earns its place on a task only when three things hold together.</p>'},
@@ -258,12 +258,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.3 ---- */
-{ id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From semiconductor scaling to the NISQ engineering regime',
+{ id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From Moore\u2019s Law to the NISQ Era',
   objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
   keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
   src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'From semiconductor scaling to the NISQ engineering regime'},
+  {t:'title', text:'From Moore\u2019s Law to the NISQ Era'},
   {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
   {t:'fig', frame:true, svg:()=>figRegimes(),
     caption:'Four landmarks, from device scaling to the present noisy-hardware regime.'},
@@ -283,12 +283,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.4 ---- */
-{ id:'m0-scale', module:'M0', nav:'The size of the state', title:'The size of the state, and why size alone buys nothing',
+{ id:'m0-scale', module:'M0', nav:'The size of the state', title:'The Size of the State',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',
   src:'L0 · the state-space scaling challenge', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'The size of the state, and why size alone buys nothing'},
+  {t:'title', text:'The Size of the State'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>A classical bit holds one definite value. A qubit is described by two complex amplitudes, and $n$ qubits by one amplitude for every basis string:</p>'},
     {t:'eq', key:true, tex:'N_{\\mathrm{amp}} = 2^{n}'},
@@ -311,12 +311,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.4 ---- */
-{ id:'m0-phase', module:'M0', nav:'Phase becomes probability', title:'How a phase becomes something you can count',
+{ id:'m0-phase', module:'M0', nav:'Phase becomes probability', title:'From Phase to Probability',
   objective:'Follow the three-gate interferometer that turns a relative phase into a measurable population.',
   keywords:'interference relative phase hadamard rz interferometer ramsey probability cos squared sensing',
   src:'L0 · converting phase into a measurable probability', steps:4, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'How a phase becomes something you can count'},
+  {t:'title', text:'From Phase to Probability'},
   {t:'lede', text:'A phase is not observable. A probability is. This scene is the smallest machine that turns one into the other, and every algorithm in Module 6 is a larger version of it.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Start in $|0\\rangle$ and apply three gates: a Hadamard, a rotation about $z$ by $\\varphi$, and a second Hadamard.</p>'},
@@ -348,12 +348,12 @@ const SC = [
    The fringe and the sensing reading are their own scene. Held together with
    the derivation the scene needed a scale of 0.82 to fit, which is the layout
    sweep saying what a reader would have said: that is two ideas. */
-{ id:'m0-fringe', module:'M0', nav:'Reading the fringe', title:'Reading the fringe, and the same machine as a sensor',
+{ id:'m0-fringe', module:'M0', nav:'Reading the fringe', title:'Interference Fringes and Sensing',
   objective:'Read the interference curve as a measurement, and identify the phase source that turns it into a sensor.',
   keywords:'fringe interference curve ramsey sensing magnetometry coherence time shots estimate field',
   src:'L0 · why the same sequence is useful for sensing', steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'Reading the fringe, and the same machine as a sensor'},
+  {t:'title', text:'Interference Fringes and Sensing'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>The probability derived in the last scene is a curve in the applied phase:</p>'},
     {t:'eq', key:true, tex:'P(0)=\\cos^{2}\\!\\left(\\tfrac{\\varphi}{2}\\right)'},
@@ -371,12 +371,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.5 ---- */
-{ id:'m0-map', module:'M0', nav:'The course map', title:'What is in the six modules',
+{ id:'m0-map', module:'M0', nav:'The course map', title:'The Six Modules',
   objective:'Give the shape of the course and how the modules depend on each other.',
   keywords:'course map modules overview structure dependencies linear algebra measurement entanglement gates circuits algorithms',
   steps:2, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'What is in the six modules'},
+  {t:'title', text:'The Six Modules'},
   {t:'cols', ratio:'c-5-7', vcenter:true, left:[
     {t:'fig', frame:true, svg:()=>figMap(),
       caption:'The six modules and the one question at the centre of them. Modules 1 to 4 build a single object in four passes: the state, what can be asked of it, what happens when it is not alone, and how it is moved.'}
@@ -405,12 +405,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.6 ---- */
-{ id:'m0-how', module:'M0', nav:'How to read this', title:'How to read this, and where the numbers come from',
+{ id:'m0-how', module:'M0', nav:'How to read this', title:'How to Use This Course',
   objective:'Explain the reveal, the laboratories, the editions and the textbook anchor convention.',
   keywords:'how to read reveal steps laboratories editions anchors textbook convention notation bit order',
   steps:1, slide:true, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'How to read this, and where the numbers come from'},
+  {t:'title', text:'How to Use This Course'},
   {t:'grid', cols:4, gap:'20px', items:[
     [{t:'card', head:'Scenes build in steps', items:[
       {t:'fig', svg:icoSteps},

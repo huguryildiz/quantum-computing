@@ -118,7 +118,7 @@ CONTENT.SECTIONS = {
     { n:'3.3', title:'Quantum channels',                  ids:[
         'm3-kraus','m3-damp','m3-dephase','m3-lab-e','m3-code-channels'] },
     { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2','m3-code-t1t2'] },
-    { n:'3.5', title:'Two systems, and one of them alone', ids:[
+    { n:'3.5', title:'Composite systems and the partial trace', ids:[
         'm3-order','m3-ptrace','m3-local','m3-code-ptrace'] },
     { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
         'm3-sep','m3-schmidt','m3-svd','m3-code-schmidt'] },
@@ -202,8 +202,8 @@ CONTENT.SECTIONS = {
      end is what stops the chapter reading as a list of tricks. */
   M6: [
     { n:'6.0', title:'Opening',                           ids:['m6-open'] },
-    { n:'6.1', title:'What a query model counts',         ids:['m6-query','m6-classes','m6-code-query'] },
-    { n:'6.2', title:'One mechanism: phase kickback',     ids:[
+    { n:'6.1', title:'The query model and complexity classes',   ids:['m6-query','m6-classes','m6-code-query'] },
+    { n:'6.2', title:'Phase kickback',                     ids:[
         'm6-kick','m6-eigen','m6-cancel','m6-code-kick'] },
     { n:'6.3', title:'Deutsch and Deutsch\u2013Jozsa',      ids:[
         'm6-deutsch','m6-dj','m6-djcost','m6-code-dj'] },
@@ -215,7 +215,7 @@ CONTENT.SECTIONS = {
     { n:'6.6', title:'Order finding',                     ids:[
         'm6-order','m6-ordereig','m6-modexp','m6-cf','m6-repeat',
         'm6-code-order'] },
-    { n:'6.7', title:'Factoring, and the reach of one mechanism', ids:[
+    { n:'6.7', title:'Factoring and period finding', ids:[
         'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family',
         'm6-code-shor'] },
     { n:'6.8', title:'Summary and practice',              ids:['m6-synth','m6-shapes'] }
