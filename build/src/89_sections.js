@@ -113,18 +113,19 @@ CONTENT.SECTIONS = {
   M3: [
     { n:'3.0', title:'Opening',                           ids:['m3-open'] },
     { n:'3.1', title:'The density operator',              ids:[
-        'm3-rho','m3-physical','m3-expect','m3-ensemble'] },
-    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball'] },
+        'm3-rho','m3-physical','m3-expect','m3-ensemble','m3-code-rho'] },
+    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball','m3-code-purity'] },
     { n:'3.3', title:'Quantum channels',                  ids:[
-        'm3-kraus','m3-damp','m3-dephase','m3-lab-e'] },
-    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2'] },
+        'm3-kraus','m3-damp','m3-dephase','m3-lab-e','m3-code-channels'] },
+    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2','m3-code-t1t2'] },
     { n:'3.5', title:'Two systems, and one of them alone', ids:[
-        'm3-order','m3-ptrace','m3-local'] },
+        'm3-order','m3-ptrace','m3-local','m3-code-ptrace'] },
     { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
-        'm3-sep','m3-schmidt','m3-svd'] },
-    { n:'3.7', title:'Entropy',                           ids:['m3-entropy'] },
+        'm3-sep','m3-schmidt','m3-svd','m3-code-schmidt'] },
+    { n:'3.7', title:'Entropy',                           ids:['m3-entropy','m3-code-entropy'] },
     { n:'3.8', title:'Bell correlations',                 ids:[
-        'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig'] },
+        'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig',
+        'm3-code-bell'] },
     { n:'3.9', title:'Summary and practice',              ids:['m3-synth','m3-shapes'] }
   ],
 
@@ -351,6 +352,16 @@ CONTENT.BOOK = {
   'm3-chsh':'2.6',
   'm3-violate':'2.6',
   'm3-nosig':'2.6',
+  /* The code pages take the anchor of the section they close; where a
+     section carries two, the one most of its scenes carry. */
+  'm3-code-rho':'2.4.1',
+  'm3-code-purity':'2.4.2',
+  'm3-code-channels':'8.2.3',
+  'm3-code-t1t2':'8.4.1',
+  'm3-code-ptrace':'2.4.3',
+  'm3-code-schmidt':'2.5',
+  'm3-code-entropy':'11.3',
+  'm3-code-bell':'2.6',
 
   /* Chapter 4 is spread across three chapters of the book, which is the
      sharpest illustration of why the mark exists. The sphere and the two

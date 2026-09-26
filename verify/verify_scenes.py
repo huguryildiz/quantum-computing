@@ -41,7 +41,7 @@ from scipy.stats import binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from qcheck import main                                       # noqa: E402
-from qops import (BELL_PHI_P, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
+from qops import (BELL_PHI_P, BELL_PSI_M, H, I2, KET0, KET1, KETM, KETP,  # noqa: E402
                   convergents, deutsch_jozsa, grover_best, grover_state,
                   grover_success, index, mod_order, order_finding_success,
                   order_from_reading, qft_matrix, qpe_best_prob,
@@ -648,6 +648,75 @@ def _m3_binary_entropy_max():
         rho = np.diag([l, 1 - l]).astype(complex)
         best = max(best, von_neumann(rho))
     return best
+
+
+# ── Chapter 3 prediction cards ──────────────────────────────────────────────
+# Every teaching slide of chapter 3 ends on a prediction card. Each number it
+# states is re-derived here by a route the card does not state.
+
+
+def _m3p_coherence_of_superposition():
+    """rho_01 of the superposition the card names as the wrong answer."""
+    a, b = sp.Rational(1, 2), sp.sqrt(3) / 2
+    return float(sp.nsimplify(a * sp.conjugate(b)))
+
+
+def _m3p_mean_by_trace(rho, A):
+    return float(np.trace(np.asarray(rho) @ np.asarray(A)).real)
+
+
+def _m3p_bloch_eigenvalues(r):
+    """The eigenvalues of (I + r.sigma)/2, from eigvalsh rather than from
+    (1 +- |r|)/2."""
+    return np.sort(np.linalg.eigvalsh(0.5 * (I2 + ndotsigma(r))))[::-1]
+
+
+def _m3p_t2_from_decay(t1, tphi, t=7.0):
+    """T2 read off the coherence of |+> after damping and dephasing for a time
+    t, rather than from the rate rule the card quotes."""
+    g = 1.0 - math.exp(-t / t1)
+    q = 0.5 * (1.0 - math.exp(-t / tphi))
+    rho = channel(phase_flip(q), channel(amp_damp(g), proj(KETP)))
+    return -t / math.log(2.0 * abs(rho[0, 1]))
+
+
+def _m3p_schmidt_rank(c, tol=1e-12):
+    s = np.linalg.svd(np.asarray(c, dtype=complex).reshape(2, 2), compute_uv=False)
+    return int(np.sum(s > tol))
+
+
+def _m3p_two_bell_pairs_entropy():
+    """Two Bell pairs on four qubits ordered (a1, b1, a2, b2). Regroup to
+    (a1, a2 | b1, b2), reshape to 4 x 4 and read the entropy off the singular
+    values, which never forms I/2 (x) I/2."""
+    psi = np.kron(BELL_PHI_P, BELL_PHI_P).reshape(2, 2, 2, 2)
+    C = psi.transpose(0, 2, 1, 3).reshape(4, 4)
+    lam = np.linalg.svd(C, compute_uv=False) ** 2
+    return float(-sum(l * math.log2(l) for l in lam if l > 1e-12))
+
+
+def _m3p_classical_chsh_max():
+    """The largest CHSH value over all sixteen assignments of four +-1 values."""
+    best = -10
+    for a0 in (1, -1):
+        for a1 in (1, -1):
+            for b0 in (1, -1):
+                for b1 in (1, -1):
+                    best = max(best, a0 * b0 + a0 * b1 + a1 * b0 - a1 * b1)
+    return float(best)
+
+
+def _m3p_nosig_z_p0():
+    """p(0) for the first qubit after the second is measured in Z and the
+    outcome is not read, from the two conditional branches."""
+    total = 0.0
+    for ket in (KET0, KET1):
+        P = kron(I2, proj(ket))
+        branch = P @ BELL_PHI_P
+        pm = float(np.vdot(branch, branch).real)
+        post = branch / math.sqrt(pm)
+        total += pm * float(np.vdot(post, kron(proj(KET0), I2) @ post).real)
+    return total
 
 
 # ── Chapter 4: the Bloch sphere and quantum gates ───────────────────────────
@@ -1379,6 +1448,103 @@ CHECKS = [
      "derive": lambda: max(_m3_nosignal(float(d))
                            for d in np.linspace(0.0, 180.0, 181)),
      "atol": 1e-14},
+    {"name": "3.3.1 the bit-flip Kraus operators are complete", "stated": 0.0,
+     "derive": lambda: dev(sum(K.conj().T @ K for K in
+                               (math.sqrt(0.63) * I2, math.sqrt(0.37) * X)), I2),
+     "atol": 1e-15},
+    {"name": "3.8.3 a z-x plane correlation on the Bell state is cos(a - b)",
+     "stated": math.cos(math.radians(70.0 - 25.0)),
+     "derive": lambda: _m3_corr(BELL_PHI_P, direction(70.0), direction(25.0)),
+     "rtol": 1e-12},
+
+    # ---- chapter 3 prediction cards --------------------------------------
+    {"name": "3.1.1 prediction: a 1/4, 3/4 mixture of |0>, |1> has rho01 = 0",
+     "stated": 0.0,
+     "derive": lambda: abs((0.25 * proj(KET0) + 0.75 * proj(KET1))[0, 1]),
+     "atol": 1e-15},
+    {"name": "3.1.1 and the superposition's coherence is sqrt3/4",
+     "stated": math.sqrt(3) / 4, "derive": _m3p_coherence_of_superposition,
+     "rtol": 1e-12},
+    {"name": "3.1.2 prediction: [[.9,.4],[.4,.1]] has a negative eigenvalue",
+     "stated": 1.0,
+     "derive": lambda: float(_m3_min_eigenvalue([[0.9, 0.4], [0.4, 0.1]]) < 0),
+     "rtol": 1e-12},
+    {"name": "3.1.2 and the coherence it would allow is 0.3", "stated": 0.3,
+     "derive": lambda: max(abs(c) for c in np.linspace(0, 1, 100001)
+                           if _m3_min_eigenvalue([[0.9, c], [c, 0.1]]) >= -1e-12),
+     "rtol": 1e-4},
+    {"name": "3.1.3 prediction: <Z> of half |1> and half |+>", "stated": -0.5,
+     "derive": lambda: _m3p_mean_by_trace(0.5 * proj(KET1) + 0.5 * proj(KETP), Z),
+     "rtol": 1e-12},
+    {"name": "3.1.4 prediction: the |+-i> ensemble is I/2 as well", "stated": 0.0,
+     "derive": lambda: dev(0.5 * proj((KET0 + 1j * KET1) / math.sqrt(2))
+                           + 0.5 * proj((KET0 - 1j * KET1) / math.sqrt(2)), I2 / 2),
+     "atol": 1e-15},
+    {"name": "3.2.1 prediction: purity of diag(0.8, 0.2)", "stated": 0.68,
+     "derive": lambda: 0.5 * (1 + float(np.linalg.norm(
+         bloch(np.diag([0.8, 0.2]).astype(complex)))) ** 2),
+     "rtol": 1e-12},
+    {"name": "3.2.2 prediction: the eigenvalues for r = (0.6, 0, 0)",
+     "stated": 0.0,
+     "derive": lambda: float(np.max(np.abs(
+         _m3p_bloch_eigenvalues([0.6, 0.0, 0.0]) - np.array([0.8, 0.2])))),
+     "atol": 1e-12},
+    {"name": "3.3.1 prediction: bit flip p = 1/4 on |0> leaves rho11 = 1/4",
+     "stated": 0.25,
+     "derive": lambda: channel([math.sqrt(0.75) * I2, math.sqrt(0.25) * X],
+                               proj(KET0))[1, 1].real,
+     "rtol": 1e-12},
+    {"name": "3.3.2 prediction: |1> damped with gamma = 0.3 keeps rho11 = 0.7",
+     "stated": 0.7, "derive": lambda: _m3_damped(0.3, proj(KET1))[1, 1].real,
+     "rtol": 1e-12},
+    {"name": "3.3.3 prediction: |+> dephased with p = 0.1 has |rho01| = 0.4",
+     "stated": 0.4,
+     "derive": lambda: abs(channel(phase_flip(0.1), proj(KETP))[0, 1]),
+     "rtol": 1e-12},
+    {"name": "3.4.1 prediction: T1 = 100, T_phi = 200 gives T2 = 100", "stated": 100.0,
+     "derive": lambda: _m3p_t2_from_decay(100.0, 200.0), "rtol": 1e-9},
+    {"name": "3.5.1 prediction: |+> (x) |1> has amplitude only at 1 and 3",
+     "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         np.kron(KETP, KET1) - np.array([0, 1, 0, 1], dtype=complex) / math.sqrt(2))),
+     "atol": 1e-15},
+    {"name": "3.5.2 prediction: rho_A of (|00> + |01>)/sqrt2 is |0><0|",
+     "stated": 0.0,
+     "derive": lambda: dev(_m3_reduced(np.array([1, 1, 0, 0], dtype=complex)
+                                       / math.sqrt(2)), proj(KET0)),
+     "atol": 1e-15},
+    {"name": "3.5.3 prediction: each half of the singlet has purity 1/2",
+     "stated": 0.5,
+     "derive": lambda: _m3_purity_from_eigenvalues(_m3_reduced(BELL_PSI_M)),
+     "rtol": 1e-12},
+    {"name": "3.6.1 prediction: (|00> + |01> + |10> - |11>)/2 has Schmidt rank 2",
+     "stated": 2.0,
+     "derive": lambda: float(_m3p_schmidt_rank(np.array([1, 1, 1, -1]) / 2)),
+     "rtol": 1e-12},
+    {"name": "3.6.2 prediction: the larger coefficient of (2|00> + |11>)/sqrt5",
+     "stated": 0.8,
+     "derive": lambda: float(np.linalg.eigvalsh(_m3_reduced(
+         np.array([2, 0, 0, 1], dtype=complex) / math.sqrt(5)))[1]),
+     "rtol": 1e-12},
+    {"name": "3.6.3 prediction: c = (1, -1, 1, -1)/2 has one singular value",
+     "stated": 1.0,
+     "derive": lambda: float(np.linalg.matrix_rank(
+         partial_trace(proj(np.array([1, -1, 1, -1], dtype=complex) / 2), 0))),
+     "rtol": 1e-12},
+    {"name": "3.7.1 prediction: two Bell pairs carry two ebits", "stated": 2.0,
+     "derive": _m3p_two_bell_pairs_entropy, "rtol": 1e-12},
+    {"name": "3.8.1 prediction: <Z (x) Z> on |Psi->", "stated": -1.0,
+     "derive": lambda: float(np.trace(proj(BELL_PSI_M) @ kron(Z, Z)).real),
+     "rtol": 1e-12},
+    {"name": "3.8.2 prediction: the run a0 = a1 = b0 = 1, b1 = -1 gives 2",
+     "stated": 2.0, "derive": lambda: float(1 * 1 + 1 * (-1) + 1 * 1 - 1 * (-1)),
+     "rtol": 1e-12},
+    {"name": "3.8.2 and no assignment of four values exceeds 2", "stated": 2.0,
+     "derive": _m3p_classical_chsh_max, "rtol": 1e-12},
+    {"name": "3.8.3 prediction: all four settings Z give S = 2", "stated": 2.0,
+     "derive": lambda: _m3_chsh(BELL_PHI_P, 0.0, 0.0, 0.0, 0.0), "rtol": 1e-12},
+    {"name": "3.8.4 prediction: an unread Z on B leaves p(0) = 1/2 for A",
+     "stated": 0.5, "derive": _m3p_nosig_z_p0, "rtol": 1e-12},
 
     # ── 4.1 The Bloch sphere ────────────────────────────────────────────────
     {"name": "4.1.1 r_x of the state at (60, 135) degrees", "stated": -0.6124,

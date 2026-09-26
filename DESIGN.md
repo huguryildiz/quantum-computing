@@ -213,7 +213,7 @@ uppercased by the style sheet, so Greek letters and TeX macros never go in it.
 The fixed 1920×1080 stage, scaled to the window; `fitScene()` and its floor; the fit rule that a
 scene needing below about 0.90 is split. These are the reference's.
 
-### Slides — Modules 1 and 2 converted, Modules 3 to 6 owed
+### Slides — Modules 1 to 3 converted, Modules 4 to 6 owed
 
 Every scene carries `slide:true` except the title, the chapter openings, the summaries, the
 question-type pages (`m*-shapes`) and the practice questions. That is the reference's rule.
@@ -231,8 +231,12 @@ same recipe: 19 teaching slides, 3 new figures (the state before and after a rea
 the turning relative phase), and none of its scenes under `dense`. A figure drawn with equal pixels to
 the unit on both axes does not take `grow:true`, because growing redraws it taller and breaks the
 isotropy; its card sits under it instead. `growBlocks()` in `83_scenes_m2.js` also moves a `line`
-item. Modules 3 to 6 are not converted yet and `build/qa.js` still lists many of their scenes under
-`dense`; `TODO.md` holds the state.
+item. Module 3 followed the same recipe: 23 teaching slides, 3 new figures (two routes to one
+expectation value, two ensembles of `I/2` in the disc, the product test on the amplitude array), and
+none of its scenes under `dense`. A box diagram drawn 740 px wide prints its labels too small once it
+sits in the 5 column; the partial-trace, ordering and amplitude-array figures were redrawn narrower
+(560 to 580 px) for that reason. Modules 4 to 6 are not converted yet and `build/qa.js` still lists
+many of their scenes under `dense`; `TODO.md` holds the state.
 
 ### Phone and portrait tablet — REFERENCE
 
