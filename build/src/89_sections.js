@@ -168,18 +168,18 @@ CONTENT.SECTIONS = {
   M5: [
     { n:'5.0', title:'Opening',                           ids:['m5-open'] },
     { n:'5.1', title:'The circuit model',                 ids:[
-        'm5-circuit','m5-model','m5-read','m5-depth'] },
+        'm5-circuit','m5-model','m5-read','m5-depth','m5-code-circuit'] },
     { n:'5.2', title:'Running a circuit',                 ids:[
-        'm5-state','m5-shots','m5-measure','m5-feed'] },
+        'm5-state','m5-shots','m5-measure','m5-feed','m5-code-run'] },
     { n:'5.3', title:'Compiling for a machine',           ids:[
-        'm5-iset','m5-transpile','m5-cost','m5-fault'] },
-    { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey'] },
+        'm5-iset','m5-transpile','m5-cost','m5-fault','m5-code-compile'] },
+    { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey','m5-code-ramsey'] },
     { n:'5.5', title:'Teleportation',                     ids:[
         'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',
-        'm5-lab-i'] },
+        'm5-lab-i','m5-code-tele'] },
     { n:'5.6', title:'Grover search',                     ids:[
         'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
-        'm5-lab-j'] },
+        'm5-lab-j','m5-code-grover'] },
     { n:'5.7', title:'Summary and practice',              ids:['m5-synth','m5-shapes'] }
   ],
 
@@ -472,6 +472,19 @@ CONTENT.BOOK = {
   'm5-rotate':'6.1.2',
   'm5-iter':'6.1.4',
   'm5-claim':'6.6',
+  /* The code pages take the anchor most scenes of their section carry. 5.1
+     takes 4.6 from `m5-model` and `m5-depth` (`m5-circuit` has 1.3.4 and
+     `m5-read` 2.2.8). 5.2 takes 4.4 from `m5-measure` and `m5-feed`; its
+     other two scenes have none. 5.3 carries 4.5.3, 3.2.1 and two scenes with
+     none; its code page takes 4.5.3, because it compiles. 5.6 carries five
+     different anchors over six scenes, two of them 6.1.1 (the others 6.1.2,
+     6.1.3, 6.1.4 and 6.6), and its code page takes 6.1.1. */
+  'm5-code-circuit':'4.6',
+  'm5-code-run':'4.4',
+  'm5-code-compile':'4.5.3',
+  'm5-code-ramsey':'4.2',
+  'm5-code-tele':'1.3.7',
+  'm5-code-grover':'6.1.1',
 
   /* Chapter 6 rests on three chapters of the book and on one section outside
      them. Quantum parallelism, and the argument that it buys nothing on its

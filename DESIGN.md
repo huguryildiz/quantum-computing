@@ -213,7 +213,7 @@ uppercased by the style sheet, so Greek letters and TeX macros never go in it.
 The fixed 1920×1080 stage, scaled to the window; `fitScene()` and its floor; the fit rule that a
 scene needing below about 0.90 is split. These are the reference's.
 
-### Slides — Modules 1 to 4 converted, Modules 5 and 6 owed
+### Slides — Modules 1 to 5 converted, Module 6 owed
 
 Every scene carries `slide:true` except the title, the chapter openings, the summaries, the
 question-type pages (`m*-shapes`) and the practice questions. That is the reference's rule.
@@ -240,8 +240,15 @@ ten box and circuit diagrams were redrawn 560 to 580 px wide, and `growBlocks()`
 `85_scenes_m4.js` moves every absolute `M`, `L` and `V` coordinate in a path, because a circuit wire
 such as `M140,56 V124` keeps its absolute end otherwise. The Bloch-sphere figures keep their
 isotropic frame and take no `grow:true`; their card sits under them. None of the module's teaching
-scenes is under `dense`; its two laboratories still are. Modules 5 and 6 are not converted yet and
-`build/qa.js` still lists many of their scenes under `dense`; `TODO.md` holds the state.
+scenes is under `dense`; its two laboratories still are. Module 5 followed with 25 teaching slides.
+The derivation scene `m5-teleid` had no figure; it now reuses the teleportation circuit with the
+three states of the derivation marked on it. The module's seventeen box and circuit diagrams were
+redrawn 560 px wide, with their sentences moved into the captions. The Grover plane was not
+isotropic (188.6 against 160 px to the unit) and is now 160 px to the unit on both axes; it and the
+two-ball figure of `m5-nosig` take no `grow:true`. The depth figure's tree now starts from `q_1`, so
+its two parallel CNOTs join neighbouring wires and are drawn at one horizontal position. None of the
+module's teaching scenes is under `dense`; Laboratory I still is. Module 6 is not converted yet and
+`build/qa.js` still lists many of its scenes under `dense`; `TODO.md` holds the state.
 
 ### Phone and portrait tablet — REFERENCE
 

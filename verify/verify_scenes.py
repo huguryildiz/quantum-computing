@@ -2216,6 +2216,266 @@ CHECKS += [
 ]
 
 
+# ── chapter 5 prediction cards ──────────────────────────────────────────────
+#
+# Each card states a new case, and each number it states is derived here by a
+# route of its own: depths by laying the gates into layers, probabilities by
+# following the branches or simulating the circuit, and every Grover count by
+# performing the two reflections on the full register.
+
+
+def _m5_layers(gates):
+    """The depth of a gate list, by placing each gate in the first free layer.
+
+    A gate is the tuple of the qubits it touches. It goes one layer after the
+    latest layer that used any of its qubits, which is how a schedule is built.
+    """
+    free = {}
+    depth = 0
+    for qs in gates:
+        layer = 1 + max(free.get(q, 0) for q in qs)
+        for q in qs:
+            free[q] = layer
+        depth = max(depth, layer)
+    return depth
+
+
+def _m5_tree_gates(n):
+    """The doubling tree the scene describes: H, then rounds that double."""
+    gates = [(0,)]
+    width = 1
+    while width < n:
+        for k in range(width):
+            if k + width < n:
+                gates.append((k, k + width))
+        width *= 2
+    return gates
+
+
+def _m5_figure_tree():
+    """The four-qubit tree the depth figure draws: H on q1, 1->2, 1->0, 2->3."""
+    v = on_qubit(H, 1, 4) @ ket(0, 0, 0, 0)
+    for c, t in ((1, 2), (1, 0), (2, 3)):
+        v = cnot(c, t, 4) @ v
+    return v
+
+
+def _m5_largest_n(memory_bytes):
+    n = 0
+    while 16 * 2 ** (n + 1) <= memory_bytes:
+        n += 1
+    return n
+
+
+def _m5_feed_unconditional():
+    """p(second reading 0) when the X runs on both branches."""
+    v = H @ KET0
+    return sum(abs(v[m]) ** 2 * abs((X @ (KET0 if m == 0 else KET1))[0]) ** 2
+               for m in (0, 1))
+
+
+def _m5_line_distance(a, b, n):
+    """Steps between two qubits of a line, by breadth-first search."""
+    seen, frontier, d = {a}, [a], 0
+    while b not in seen:
+        d += 1
+        frontier = [q + s for q in frontier for s in (-1, 1)
+                    if 0 <= q + s < n and q + s not in seen]
+        seen.update(frontier)
+    return d
+
+
+def _m5_majority_failure(p):
+    """Three copies, majority vote: sum over the flip patterns that fail."""
+    total = 0.0
+    for k in range(8):
+        flips = bin(k).count("1")
+        if flips >= 2:
+            total += p ** flips * (1 - p) ** (3 - flips)
+    return total
+
+
+def _m5_werner_average_fidelity(f):
+    """Teleportation with a Werner pair, as density matrices, averaged over the
+    six axis states (enough for an average of a quadratic function)."""
+    phi = BELL_PHI_P
+    pair = f * np.outer(phi, phi.conj()) + (1 - f) / 3 * (
+        np.eye(4) - np.outer(phi, phi.conj()))
+    U = (on_qubit(H, 0, 3) @ cnot(0, 1, 3))
+    inputs = [KET0, KET1, KETP, KETM, (KET0 + 1j * KET1) / math.sqrt(2),
+              (KET0 - 1j * KET1) / math.sqrt(2)]
+    total = 0.0
+    for psi in inputs:
+        rho = np.kron(pair, np.outer(psi, psi.conj()))   # |q2 q1> (x) |q0>
+        rho = U @ rho @ U.conj().T
+        out = np.zeros((2, 2), dtype=complex)
+        for m1 in (0, 1):
+            for m0 in (0, 1):
+                idx = [4 * b + 2 * m1 + m0 for b in (0, 1)]
+                block = rho[np.ix_(idx, idx)]
+                fix = (np.linalg.matrix_power(Z, m0)
+                       @ np.linalg.matrix_power(X, m1))
+                out += fix @ block @ fix.conj().T
+        total += float(np.vdot(psi, out @ psi).real)
+    return total / len(inputs)
+
+
+def _m5_grover_vector(n, marked, rmax):
+    """Success probability after 0..rmax iterations, on the full register.
+
+    The oracle negates the marked entries and the diffusion replaces each
+    amplitude by twice the mean minus itself. No angle is used.
+    """
+    v = np.full(2 ** n, 1 / math.sqrt(2 ** n))
+    out = [float(sum(v[x] ** 2 for x in marked))]
+    for _ in range(rmax):
+        v[list(marked)] *= -1
+        v = 2 * v.mean() - v
+        out.append(float(sum(v[x] ** 2 for x in marked)))
+    return out
+
+
+def _m5_grover_angle_after(n, marked, r):
+    v = grover_state(n, marked, r)
+    good = math.sqrt(sum(abs(v[x]) ** 2 for x in marked))
+    return math.degrees(math.asin(min(1.0, good)))
+
+
+_M5_G20 = None
+
+
+def _m5_g20():
+    global _M5_G20
+    if _M5_G20 is None:
+        _M5_G20 = _m5_grover_vector(20, [12345], 900)
+    return _M5_G20
+
+
+CHECKS += [
+    {"name": "5.1.1 prediction: three H then one CNOT has depth 2",
+     "stated": 2.0,
+     "derive": lambda: float(_m5_layers([(0,), (1,), (2,), (0, 1)])),
+     "atol": 1e-12},
+    {"name": "5.1.1 the figure's circuit has depth 4", "stated": 4.0,
+     "derive": lambda: float(_m5_layers([(0,), (0, 1), (1, 2), (2,)])),
+     "atol": 1e-12},
+    {"name": "5.1.2 prediction: four qubits carry sixteen amplitudes",
+     "stated": 16.0, "derive": lambda: float(len(ket(0, 0, 0, 0))),
+     "atol": 1e-12},
+    {"name": "5.1.3 prediction: the string 110 is entry 6", "stated": 6.0,
+     "derive": lambda: float(np.argmax(np.abs(ket(1, 1, 0)))), "atol": 1e-12},
+    {"name": "5.1.4 the figure's tree builds GHZ on four qubits",
+     "stated": 0.0,
+     "derive": lambda: same_state(_m5_figure_tree(), _m5_ghz_target(4)),
+     "atol": 1e-14},
+    {"name": "5.1.4 the figure's tree has depth 3 and its chain depth 4",
+     "stated": 0.0,
+     "derive": lambda: abs(_m5_layers([(1,), (1, 2), (1, 0), (2, 3)]) - 3)
+     + abs(_m5_layers([(0,), (0, 1), (1, 2), (2, 3)]) - 4),
+     "atol": 1e-12},
+    {"name": "5.1.4 prediction: a 64-qubit tree at 100 ns takes 0.7 us",
+     "stated": 0.7,
+     "derive": lambda: _m5_layers(_m5_tree_gates(64)) * 0.1, "rtol": 1e-12},
+    {"name": "5.2.1 prediction: 16 GB holds a 29-qubit state vector",
+     "stated": 29.0, "derive": lambda: float(_m5_largest_n(16e9)),
+     "atol": 1e-12},
+    {"name": "5.2.2 prediction: p = 0.1 from 900 shots has SE 0.01",
+     "stated": 0.01, "derive": lambda: binom.std(900, 0.1) / 900,
+     "rtol": 1e-12},
+    {"name": "5.2.3 prediction: reading 11 after the deferred CNOT is 0.7",
+     "stated": 0.7,
+     "derive": lambda: abs((cnot(0, 1, 2) @ kron_state(
+         KET0, np.array([math.sqrt(0.3), math.sqrt(0.7)])))[3]) ** 2,
+     "rtol": 1e-12},
+    {"name": "5.2.4 prediction: an unconditional X makes the reading a coin",
+     "stated": 0.5, "derive": _m5_feed_unconditional, "rtol": 1e-12},
+    {"name": "5.3.1 prediction: 25 CNOTs and 10 H become 105 instructions",
+     "stated": 105.0,
+     "derive": lambda: float(len(["h", "cz", "h"] * 25 + ["rz", "rx", "rz"] * 10)),
+     "atol": 1e-12},
+    {"name": "5.3.2 prediction: CNOT 0->5 on a line of six costs 13",
+     "stated": 13.0,
+     "derive": lambda: 3 * (_m5_line_distance(0, 5, 6) - 1) + 1.0,
+     "atol": 1e-12},
+    {"name": "5.3.3 prediction card: 100 queries at N = 2^14 exceed 0.99",
+     "stated": 1.0, "derive": lambda: _m5_grover_vector(14, [4321], 100)[100],
+     "atol": 1e-2},
+    {"name": "5.3.3 and half of 2^14 is 8192", "stated": 8192.0,
+     "derive": lambda: 2.0 ** 14 / 2, "atol": 1e-12},
+    {"name": "5.3.4 three copies at p = 0.01 fail with 3.0e-4",
+     "stated": 3.0e-4, "derive": lambda: _m5_majority_failure(0.01),
+     "rtol": 1e-2},
+    {"name": "5.3.4 prediction: three copies at p = 0.1 fail with 0.028",
+     "stated": 0.028, "derive": lambda: _m5_majority_failure(0.1),
+     "rtol": 1e-12},
+    {"name": "5.3.4 above p = 1/2 the code makes things worse", "stated": 0.0,
+     "derive": lambda: float(_m5_majority_failure(0.6) <= 0.6), "atol": 1e-12},
+    {"name": "5.4.1 prediction: the Ramsey circuit at sixty degrees",
+     "stated": 0.75, "derive": lambda: _m5_ramsey(60.0), "rtol": 1e-12},
+    {"name": "5.5.1 prediction: the copier's |-> overlaps |--> by zero",
+     "stated": 0.0,
+     "derive": lambda: abs(inner(kron_state(KETM, KETM),
+                                 cnot(0, 1, 2) @ kron_state(KET0, KETM))) ** 2,
+     "atol": 1e-14},
+    {"name": "5.5.2 prediction: four branches take two bits", "stated": 2.0,
+     "derive": lambda: math.log2(sum(_m5_branch_prob(a, b) > 1e-12
+                                     for a in (0, 1) for b in (0, 1))),
+     "atol": 1e-12},
+    {"name": "5.5.3 prediction: branch 10 of 0.6|0>+0.8|1> is 0.8|0>+0.6|1>",
+     "stated": 0.0,
+     "derive": lambda: same_state(teleport_branch(_M5_PSI, 0, 1)[0],
+                                  np.array([0.8, 0.6])),
+     "atol": 1e-14},
+    {"name": "5.5.4 prediction: X in place of Z leaves fidelity zero",
+     "stated": 0.0,
+     "derive": lambda: abs(inner(KET0, X @ teleport_branch(KET0, 1, 0)[0])) ** 2,
+     "atol": 1e-14},
+    {"name": "5.5.5 prediction: Bob reads |+> with probability 0.5",
+     "stated": 0.5,
+     "derive": lambda: float(np.vdot(KETP, teleport_bob(_M5_PSI) @ KETP).real),
+     "rtol": 1e-12},
+    {"name": "5.5.5 and the distractor 0.98 is |<+|psi>|^2", "stated": 0.98,
+     "derive": lambda: abs(inner(KETP, _M5_PSI)) ** 2, "rtol": 1e-12},
+    {"name": "5.5.6 prediction: a Werner pair of 0.85 teleports at 0.9",
+     "stated": 0.9, "derive": lambda: _m5_werner_average_fidelity(0.85),
+     "rtol": 1e-12},
+    {"name": "5.5.6 and a perfect pair teleports at one", "stated": 1.0,
+     "derive": lambda: _m5_werner_average_fidelity(1.0), "rtol": 1e-12},
+    {"name": "5.6.1 prediction: a scan of 2^20 takes 5.2e5 queries on average",
+     "stated": 5.2e5,
+     "derive": lambda: float(np.arange(1, 2 ** 20 + 1).mean()), "rtol": 1e-2},
+    {"name": "5.6.2 prediction: f = 1 everywhere leaves |+> up to a sign",
+     "stated": 0.0,
+     "derive": lambda: same_state(on_qubit(X, 1, 2) @ kron_state(KETM, KETP),
+                                  kron_state(KETM, KETP)),
+     "atol": 1e-14},
+    {"name": "5.6.3 prediction: four marked of 64 start at 14.5 degrees",
+     "stated": 14.5, "derive": lambda: _m5_grover_angle(6, [3, 17, 40, 58]),
+     "rtol": 2e-3},
+    {"name": "5.6.4 one iteration at N = 1024 reaches 5.37 degrees",
+     "stated": 5.37, "derive": lambda: _m5_grover_angle_after(10, [7], 1),
+     "rtol": 1e-3},
+    {"name": "5.6.4 and a success probability of 0.0088", "stated": 0.0088,
+     "derive": lambda: grover_success(10, [7], 1), "rtol": 5e-3},
+    {"name": "5.6.4 prediction: N = 16 after two iterations is at 72.4 degrees",
+     "stated": 72.4, "derive": lambda: _m5_grover_angle_after(4, [9], 2),
+     "rtol": 1e-3},
+    {"name": "5.6.5 prediction: the simulated optimum for N = 256 is 12",
+     "stated": 12.0, "derive": lambda: float(grover_best(8, [77], 30)),
+     "atol": 1e-12},
+    {"name": "5.6.5 and it succeeds with 0.99995", "stated": 0.99995,
+     "derive": lambda: grover_success(8, [77], 12), "rtol": 1e-5},
+    {"name": "5.6.6 prediction: the simulated optimum for N = 2^20 is 804",
+     "stated": 804.0,
+     "derive": lambda: float(int(np.argmax(_m5_g20()))), "atol": 1e-12},
+    {"name": "5.6.6 so the quantum run takes 8.0 ms", "stated": 8.0,
+     "derive": lambda: int(np.argmax(_m5_g20())) * 10e-3, "rtol": 1e-2},
+    {"name": "5.6.6 and the classical scan takes 5.2 ms", "stated": 5.2,
+     "derive": lambda: 2 ** 20 / 2 * 10e-6, "rtol": 1e-2},
+    {"name": "5.6.6 the two times cross near N = 2.5e6", "stated": 2.5e6,
+     "derive": lambda: (math.pi / 4 * 1e-5 / (0.5e-8)) ** 2, "rtol": 2e-2},
+]
+
 
 # ── Chapter 6 · quantum algorithms ──────────────────────────────────────────
 #
