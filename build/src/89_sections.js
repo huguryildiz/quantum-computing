@@ -202,19 +202,22 @@ CONTENT.SECTIONS = {
      end is what stops the chapter reading as a list of tricks. */
   M6: [
     { n:'6.0', title:'Opening',                           ids:['m6-open'] },
-    { n:'6.1', title:'What a query model counts',         ids:['m6-query','m6-classes'] },
+    { n:'6.1', title:'What a query model counts',         ids:['m6-query','m6-classes','m6-code-query'] },
     { n:'6.2', title:'One mechanism: phase kickback',     ids:[
-        'm6-kick','m6-eigen','m6-cancel'] },
+        'm6-kick','m6-eigen','m6-cancel','m6-code-kick'] },
     { n:'6.3', title:'Deutsch and Deutsch\u2013Jozsa',      ids:[
-        'm6-deutsch','m6-dj','m6-djcost'] },
+        'm6-deutsch','m6-dj','m6-djcost','m6-code-dj'] },
     { n:'6.4', title:'The quantum Fourier transform',     ids:[
-        'm6-qft','m6-qftcirc','m6-qftnot'] },
+        'm6-qft','m6-qftcirc','m6-qftnot','m6-code-qft'] },
     { n:'6.5', title:'Phase estimation',                  ids:[
-        'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-lab-k'] },
+        'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-lab-k',
+        'm6-code-qpe'] },
     { n:'6.6', title:'Order finding',                     ids:[
-        'm6-order','m6-ordereig','m6-modexp','m6-cf','m6-repeat'] },
+        'm6-order','m6-ordereig','m6-modexp','m6-cf','m6-repeat',
+        'm6-code-order'] },
     { n:'6.7', title:'Factoring, and the reach of one mechanism', ids:[
-        'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family'] },
+        'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family',
+        'm6-code-shor'] },
     { n:'6.8', title:'Summary and practice',              ids:['m6-synth','m6-shapes'] }
   ]
 
@@ -530,7 +533,22 @@ CONTENT.BOOK = {
   'm6-shor':'5.3.2',
   'm6-shor15':'5.3.2',
   'm6-shorclaim':'3.2.1',
-  'm6-family':'5.4.1'
+  'm6-family':'5.4.1',
+  /* The code pages take the anchor most scenes of their section carry. 6.1
+     takes 3.2.1 from `m6-query` (`m6-classes` has none). 6.2 carries three
+     different anchors over three scenes (1.4.3, 5.2, 1.4.2); its code page
+     takes 1.4.3, the book's kickback section. 6.3 takes 1.4.4 (two of three),
+     6.4 takes 5.1 (all three), 6.5 takes 5.2 (two of five; the others are
+     5.2.1 twice and 6.3), 6.6 takes 5.3.1 (four of five), and 6.7 takes 5.3.2
+     (two of five; `m6-rsa` has none, `m6-shorclaim` 3.2.1, `m6-family`
+     5.4.1). */
+  'm6-code-query':'3.2.1',
+  'm6-code-kick':'1.4.3',
+  'm6-code-dj':'1.4.4',
+  'm6-code-qft':'5.1',
+  'm6-code-qpe':'5.2',
+  'm6-code-order':'5.3.1',
+  'm6-code-shor':'5.3.2'
 };
 
 /* ---- derivation --------------------------------------------------------

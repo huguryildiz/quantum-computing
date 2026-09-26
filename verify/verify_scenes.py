@@ -2792,5 +2792,233 @@ CHECKS += [
 ]
 
 
+# ── chapter 6 prediction cards ──────────────────────────────────────────────
+#
+# Each card states a new case, and each number it states is derived here by a
+# route of its own: oracles are built as permutations and run as circuits,
+# phases are read off simulated registers, orders are found by walking the
+# cycle, and the classical arithmetic is redone with Python's own integers.
+
+
+def _m6_signed_terms(f, n):
+    """The query terms that carry a minus sign after one query on |+>^n|->.
+
+    The oracle is the permutation |x>|y> -> |x>|y xor f(x)>, applied as a
+    matrix; the sign of each |x>|0> amplitude is then read off the state.
+    """
+    d = 2 ** (n + 1)
+    U = np.zeros((d, d))
+    for x in range(2 ** n):
+        for y in range(2):
+            U[(x << 1) | (y ^ (int(f(x)) & 1)), (x << 1) | y] = 1.0
+    v = np.zeros(d)
+    for x in range(2 ** n):
+        v[(x << 1) | 0], v[(x << 1) | 1] = 1.0, -1.0
+    v = U @ v
+    return [x for x in range(2 ** n) if v[(x << 1) | 0] < 0]
+
+
+def _m6_control_after_cS():
+    """Controlled-S on |+>|0>, control as the high qubit; the fidelity of the
+    control's reduced state with |+>."""
+    S = np.diag([1, 1j])
+    cS = np.kron(np.diag([1, 0]), np.eye(2)) + np.kron(np.diag([0, 1]), S)
+    v = cS @ np.kron(KETP, KET0)
+    m = v.reshape(2, 2)
+    rho = m @ m.conj().T
+    return float(np.real(KETP.conj() @ rho @ KETP))
+
+
+def _m6_deutsch_target_one():
+    """Deutsch with f(x) = x and the target in |1>: P(query reads 0)."""
+    v = np.kron(KETP, KET1)
+    v = cnot(1, 0, 2) @ v             # control q1 (the query), target q0
+    v = on_qubit(H, 1, 2) @ v
+    return float(abs(v[0]) ** 2 + abs(v[1]) ** 2)
+
+
+def _m6_qft_gate_count(n):
+    """Hadamards and controlled rotations, counted by laying the circuit out."""
+    gates = []
+    for q in reversed(range(n)):
+        gates.append(("H", q))
+        for c in reversed(range(q)):
+            gates.append(("R", c, q))
+    return len(gates)
+
+
+def _m6_register_size(n_bits, eps):
+    """The smallest c with 2^c >= 2 + 1/(2 eps), by counting up."""
+    c = 0
+    while 2 ** c < 2 + 1 / (2 * eps):
+        c += 1
+    return n_bits + c
+
+
+def _m6_worst_within(t, n_bits):
+    """The worst simulated success probability over a grid of phases."""
+    return min(qpe_within(phi, t, n_bits)
+               for phi in np.linspace(0.0005, 0.9995, 181))
+
+
+def _m6_period_readings(r, t):
+    """Readings of a period-r function on a t-qubit register, simulated: the
+    joint state |x>|x mod r>, the inverse transform on the counting register,
+    and the work register traced out."""
+    Q = 2 ** t
+    psi = np.zeros((Q, r), dtype=complex)
+    for x in range(Q):
+        psi[x, x % r] = 1 / math.sqrt(Q)
+    psi = qft_matrix(t, inverse=True) @ psi
+    return np.sum(np.abs(psi) ** 2, axis=1)
+
+
+def _m6_powers(a, N):
+    """The cycle of a modulo N, walked from 1 until it returns."""
+    out, x = [], a % N
+    while True:
+        out.append(x)
+        if x == 1:
+            return out
+        x = x * a % N
+
+
+CHECKS += [
+    {"name": "6.1.1 prediction: the quantum run at 2000 gates a query",
+     "stated": 2.0e6, "derive": lambda: sum(2000 for _ in range(1000)),
+     "rtol": 1e-12},
+    {"name": "6.1.1 and the classical run at 50 operations a query",
+     "stated": 5.0e7, "derive": lambda: 10 ** 6 * 50.0, "rtol": 1e-12},
+    {"name": "6.1.1 a factor of 25 between them", "stated": 25.0,
+     "derive": lambda: (10 ** 6 * 50.0) / (1000 * 2000), "rtol": 1e-12},
+    {"name": "6.1.2 prediction: a 40-bit number reaches 1.1e12",
+     "stated": 1.1e12, "derive": lambda: float((1 << 40) - 1), "rtol": 1e-2},
+    {"name": "6.2.1 prediction: AND signs only the term 11", "stated": 3.0,
+     "derive": lambda: float(_m6_signed_terms(lambda x: x == 3, 2)[0]),
+     "atol": 1e-12},
+    {"name": "6.2.1 and only that one term", "stated": 1.0,
+     "derive": lambda: float(len(_m6_signed_terms(lambda x: x == 3, 2))),
+     "atol": 1e-12},
+    {"name": "6.2.2 prediction: controlled-S on |+>|0> leaves |+>",
+     "stated": 1.0, "derive": _m6_control_after_cS, "rtol": 1e-12},
+    {"name": "6.2.3 prediction: f = 1 on 000 and 001 reads 000 with 1/4",
+     "stated": 0.25,
+     "derive": lambda: float(deutsch_jozsa(lambda x: int(x < 2), 3)[0]),
+     "rtol": 1e-12},
+    {"name": "6.3.1 prediction: the target in |1> gives a fair coin",
+     "stated": 0.5, "derive": _m6_deutsch_target_one, "rtol": 1e-12},
+    {"name": "6.3.2 prediction: f = x0 xor x2 prints 101", "stated": 1.0,
+     "derive": lambda: float(deutsch_jozsa(
+         lambda x: (x & 1) ^ ((x >> 2) & 1), 3)[0b101]), "rtol": 1e-12},
+    {"name": "6.3.3 prediction: one error in a billion at n = 20 takes 31",
+     "stated": 31.0, "derive": lambda: float(_dj_randomised_queries(20, 1e-9)),
+     "atol": 1e-12},
+    {"name": "6.3.3 and the exact count there is 2^19 + 1", "stated": 524289.0,
+     "derive": lambda: float(2 ** 20 // 2 + 1), "atol": 1e-12},
+    {"name": "6.4.1 prediction: F_8|4> alternates in sign", "stated": 0.0,
+     "derive": lambda: float(np.max(np.abs(qft_matrix(3)[:, 4]
+                                           - (-1.0) ** np.arange(8) / math.sqrt(8)))),
+     "atol": 1e-12},
+    {"name": "6.4.2 prediction: the transform on six qubits is 21 gates",
+     "stated": 21.0, "derive": lambda: float(_m6_qft_gate_count(6)),
+     "atol": 1e-12},
+    {"name": "6.4.3 prediction: period two on Q = 8 reads 0 with one half",
+     "stated": 0.5,
+     "derive": lambda: float(abs(_qft_of([.5, 0, .5, 0, .5, 0, .5, 0], 3)[0]) ** 2),
+     "rtol": 1e-12},
+    {"name": "6.4.3 and 4 with the other half", "stated": 0.5,
+     "derive": lambda: float(abs(_qft_of([.5, 0, .5, 0, .5, 0, .5, 0], 3)[4]) ** 2),
+     "rtol": 1e-12},
+    {"name": "6.5.1 the phase 5/8 at t = 3 is read as y = 5", "stated": 1.0,
+     "derive": lambda: float(qpe_distribution(5 / 8, 3)[5]), "rtol": 1e-12},
+    {"name": "6.5.1 its second control collects a quarter turn", "stated": 0.25,
+     "derive": lambda: float(sp.Rational(5, 8) * 2 % 1), "rtol": 1e-12},
+    {"name": "6.5.1 prediction: at t = 4 and 3/16 the control j = 3 is half",
+     "stated": 0.5, "derive": lambda: float(sp.Rational(3, 16) * 8 % 1),
+     "rtol": 1e-12},
+    {"name": "6.5.2 prediction: 5/16 is read with certainty at t = 4",
+     "stated": 1.0, "derive": lambda: qpe_best_prob(5 / 16, 4), "rtol": 1e-12},
+    {"name": "6.5.2 and at t = 5", "stated": 1.0,
+     "derive": lambda: qpe_best_prob(5 / 16, 5), "rtol": 1e-12},
+    {"name": "6.5.2 but at t = 3 the best reading has 0.41", "stated": 0.41,
+     "derive": lambda: qpe_best_prob(5 / 16, 3), "rtol": 1e-2},
+    {"name": "6.5.3 prediction: three bits at one per cent need nine qubits",
+     "stated": 9.0, "derive": lambda: float(_m6_register_size(3, 0.01)),
+     "atol": 1e-12},
+    {"name": "6.5.3 and nine qubits deliver three bits 99 per cent of the time",
+     "stated": 0.99, "derive": lambda: min(_m6_worst_within(9, 3), 0.99),
+     "rtol": 1e-12},
+    {"name": "6.5.4 prediction: twelve counting qubits at 200 gates a use",
+     "stated": 8.2e5, "derive": lambda: sum(2 ** j for j in range(12)) * 200.0,
+     "rtol": 1e-2},
+    {"name": "6.5.5 prediction: 5.1 degrees at N = 4096 is 32 marked",
+     "stated": 32.0,
+     "derive": lambda: float(round(4096 * math.sin(math.radians(5.1)) ** 2)),
+     "atol": 1e-12},
+    {"name": "6.5.5 and 32 marked is 5.1 degrees to one decimal", "stated": 5.1,
+     "derive": lambda: round(math.degrees(math.asin(math.sqrt(32 / 4096))), 1),
+     "atol": 1e-12},
+    {"name": "6.5.5 the distractor multiplies N by theta in radians",
+     "stated": 365.0, "derive": lambda: 4096 * math.radians(5.1), "rtol": 2e-3},
+    {"name": "6.6.1 prediction: the order of two modulo 35", "stated": 12.0,
+     "derive": lambda: float(len(_m6_powers(2, 35))), "atol": 1e-12},
+    {"name": "6.6.1 and two to the sixth is 29 there", "stated": 29.0,
+     "derive": lambda: float(_m6_powers(2, 35)[5]), "atol": 1e-12},
+    {"name": "6.6.2 prediction: base 4 modulo 15 reads phase 0 half the time",
+     "stated": 0.5,
+     "derive": lambda: float(order_finding_distribution(4, 15, 4)[0]),
+     "rtol": 1e-12},
+    {"name": "6.6.2 and phase one half the other half", "stated": 0.5,
+     "derive": lambda: float(order_finding_distribution(4, 15, 4)[8]),
+     "rtol": 1e-12},
+    {"name": "6.6.3 prediction: 7^4 mod 15 by squaring twice", "stated": 1.0,
+     "derive": lambda: float((7 * 7 % 15) ** 2 % 15), "atol": 1e-12},
+    {"name": "6.6.3 and 7^2 mod 15", "stated": 4.0,
+     "derive": lambda: float(_m6_powers(7, 15)[1]), "atol": 1e-12},
+    {"name": "6.6.4 prediction: 171/512 has a convergent with denominator 3",
+     "stated": 3.0,
+     "derive": lambda: float(max(k for _, k in convergents(171, 512) if k < 21)),
+     "atol": 1e-12},
+    {"name": "6.6.4 and the procedure accepts nothing", "stated": 0.0,
+     "derive": lambda: float(order_from_reading(171, 512, 2, 21)), "atol": 1e-12},
+    {"name": "6.6.5 prediction: base 20 modulo 21 has order 2", "stated": 2.0,
+     "derive": lambda: float(mod_order(20, 21)), "atol": 1e-12},
+    {"name": "6.6.5 and its half power is -1 modulo 21", "stated": 20.0,
+     "derive": lambda: float(pow(20, 1, 21)), "atol": 1e-12},
+    {"name": "6.7.1 the example: gcd(7, 21) and gcd(9, 21) multiply to 21",
+     "stated": 21.0,
+     "derive": lambda: float(math.gcd(pow(2, mod_order(2, 21) // 2, 21) - 1, 21)
+                             * math.gcd(pow(2, mod_order(2, 21) // 2, 21) + 1, 21)),
+     "atol": 1e-12},
+    {"name": "6.7.1 prediction: base 5 modulo 33 has order 10", "stated": 10.0,
+     "derive": lambda: float(len(_m6_powers(5, 33))), "atol": 1e-12},
+    {"name": "6.7.1 and 5^5 is 23 modulo 33", "stated": 23.0,
+     "derive": lambda: float(_m6_powers(5, 33)[4]), "atol": 1e-12},
+    {"name": "6.7.1 so the factors are 11 and 3", "stated": 33.0,
+     "derive": lambda: float(math.gcd(22, 33) * math.gcd(24, 33)),
+     "atol": 1e-12},
+    {"name": "6.7.2 prediction: base 11 modulo 15 has order 2", "stated": 2.0,
+     "derive": lambda: float(len(_m6_powers(11, 15))), "atol": 1e-12},
+    {"name": "6.7.2 and gives gcd(10, 15) = 5", "stated": 5.0,
+     "derive": lambda: float(math.gcd(pow(11, 1, 15) - 1, 15)), "atol": 1e-12},
+    {"name": "6.7.2 and gcd(12, 15) = 3", "stated": 3.0,
+     "derive": lambda: float(math.gcd(pow(11, 1, 15) + 1, 15)), "atol": 1e-12},
+    {"name": "6.7.3 prediction: 10 + 5 years overruns 12 by three",
+     "stated": 3.0, "derive": lambda: float(10 + 5 - 12), "atol": 1e-12},
+    {"name": "6.7.4 prediction: 10 microseconds a gate is about 47 hours",
+     "stated": 47.0, "derive": lambda: 4096 * 2048.0 ** 2 * 1e-5 / 3600,
+     "rtol": 2e-2},
+    {"name": "6.7.5 the example: period 4 on Q = 16 reads 4 with 1/4",
+     "stated": 0.25, "derive": lambda: float(_m6_period_readings(4, 4)[4]),
+     "rtol": 1e-12},
+    {"name": "6.7.5 prediction: period 8 on Q = 64 reads 56 with 1/8",
+     "stated": 0.125, "derive": lambda: float(_m6_period_readings(8, 6)[56]),
+     "rtol": 1e-12},
+    {"name": "6.7.5 and nothing off the multiples of 8", "stated": 1.0,
+     "derive": lambda: float(sum(_m6_period_readings(8, 6)[::8])),
+     "rtol": 1e-12},
+]
+
+
 if __name__ == "__main__":
     main(CHECKS, "verify_scenes — chapters 1 to 6, teaching scenes")

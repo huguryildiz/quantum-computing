@@ -213,7 +213,7 @@ uppercased by the style sheet, so Greek letters and TeX macros never go in it.
 The fixed 1920×1080 stage, scaled to the window; `fitScene()` and its floor; the fit rule that a
 scene needing below about 0.90 is split. These are the reference's.
 
-### Slides — Modules 1 to 5 converted, Module 6 owed
+### Slides — Modules 1 to 6 converted
 
 Every scene carries `slide:true` except the title, the chapter openings, the summaries, the
 question-type pages (`m*-shapes`) and the practice questions. That is the reference's rule.
@@ -247,8 +247,15 @@ redrawn 560 px wide, with their sentences moved into the captions. The Grover pl
 isotropic (188.6 against 160 px to the unit) and is now 160 px to the unit on both axes; it and the
 two-ball figure of `m5-nosig` take no `grow:true`. The depth figure's tree now starts from `q_1`, so
 its two parallel CNOTs join neighbouring wires and are drawn at one horizontal position. None of the
-module's teaching scenes is under `dense`; Laboratory I still is. Module 6 is not converted yet and
-`build/qa.js` still lists many of its scenes under `dense`; `TODO.md` holds the state.
+module's teaching scenes is under `dense`; Laboratory I still is. Module 6 followed with 26 teaching
+slides (`m6-family` now takes three steps like the rest). Its sixteen box and circuit diagrams were
+redrawn 560 px wide with their sentences moved into the captions; the QFT and phase-estimation
+circuits now put `q_0` on the top wire, and the QFT's output swap is drawn with the swap mark rather
+than two crossing wires. The eight-phase circle keeps its isotropic frame (82.8 px to the unit on
+both axes) and takes no `grow:true`. The family figure puts the discrete logarithm beside order
+finding, inside period finding, not inside order finding. None of the module's teaching scenes is
+under `dense`, and neither is its laboratory; the summary's ladder figure lost its closing sentence
+to the caption so the summary fits too.
 
 ### Phone and portrait tablet — REFERENCE
 

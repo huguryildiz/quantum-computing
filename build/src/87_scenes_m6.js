@@ -52,6 +52,35 @@ function targ(x,y,col){ const k=col||C.h; return [
 function meter(x,y,col){ return {t:'box',x:x-24,y:y-17,w:48,h:34,label:'measure',fs:11,
   color:col||C.out}; }
 
+/* A swap is drawn as the two crosses joined by a line, the standard mark. Two
+   wires drawn crossing each other would pass straight through the wire
+   between them and read as nothing at all. */
+function swapMark(x,y0,y1,col){ const k=col||C.mid, c=(y)=>[
+    {t:'line',d:`M${x-7},${y-7} L${x+7},${y+7}`,color:k},
+    {t:'line',d:`M${x-7},${y+7} L${x+7},${y-7}`,color:k}];
+  return [{t:'line',d:`M${x},${y0} V${y1}`,color:k}].concat(c(y0)).concat(c(y1)); }
+
+/* A box diagram has no axes to stretch, so when a slide grows its figure into
+   the spare height of the column, the diagram keeps its size and is centred in
+   the taller frame. Chapter 4's helper: a wire here is drawn with absolute
+   commands (`M60,50 H250`, `M180,52 V120`), so every absolute y in a path
+   moves by the same amount, and not only the first point. The lowercase
+   commands are relative and need nothing. */
+function growBlocks(spec){
+  const h1 = P.hOverride;
+  if(!h1 || h1 <= spec.h) return P.blocks(spec);
+  const dy = (h1 - spec.h) / 2;
+  const items = spec.items.map(it => {
+    const o = Object.assign({}, it);
+    ['y','y1','y2'].forEach(k => { if(o[k] != null) o[k] += dy; });
+    if(o.t === 'line' && o.d) o.d = o.d
+      .replace(/([ML])\s*([-\d.]+),([-\d.]+)/g, (m,c,x,y) => `${c}${x},${+y + dy}`)
+      .replace(/V\s*([-\d.]+)/g, (m,y) => `V${+y + dy}`);
+    return o;
+  });
+  return P.blocks({w:spec.w, h:h1, items:items});
+}
+
 /* ---- the arithmetic the figures below compute their own numbers from -----
    Nothing in this file is a tabulated value. Each of these is the definition,
    written once, so that a figure and the caption beside it cannot drift. */
@@ -100,93 +129,82 @@ function figOpen(){
 }
 
 /* What a query counts, and what it hides: the same box, opened once, and the
-   circuit that had to be built inside it. */
+   three numbers a cost can mean. */
 function figQuery(){
-  const items = [
-    {t:'box',x:250,y:40,w:210,h:110,label:'U_{f}',tex:true,fs:22,color:C.h},
-    {t:'arrow',x1:110,y1:70,x2:250,y2:70,label:'|x\\rangle',tex:true,color:C.in},
-    {t:'arrow',x1:110,y1:120,x2:250,y2:120,label:'|y\\rangle',tex:true,color:C.in},
-    {t:'arrow',x1:460,y1:70,x2:600,y2:70,label:'|x\\rangle',tex:true,color:C.out},
-    {t:'arrow',x1:460,y1:120,x2:600,y2:120,label:'|y \\oplus f(x)\\rangle',tex:true,color:C.out},
-    {t:'text',x:355,y:178,label:'one query, whatever is inside',fs:12.5},
-    {t:'line',d:'M40,206 H720',color:C.rule},
-    {t:'text',x:150,y:238,anchor:'middle',label:'query count',fs:13,color:C.out},
-    {t:'text',x:150,y:262,anchor:'middle',label:'how many times the box is opened',fs:12},
-    {t:'text',x:380,y:238,anchor:'middle',label:'gate count',fs:13,color:C.h},
-    {t:'text',x:380,y:262,anchor:'middle',label:'what it cost to build the box',fs:12},
-    {t:'text',x:614,y:238,anchor:'middle',label:'end-to-end cost',fs:13,color:C.err},
-    {t:'text',x:614,y:262,anchor:'middle',label:'both, plus loading, correction and repeats',fs:12},
-    {t:'text',x:380,y:298,label:'A separation in the first column is a real theorem. It becomes a saving in seconds only when the other two are filled in.',fs:12.5,color:C.err}
-  ];
-  return P.blocks({w:760,h:310,items});
+  return growBlocks({w:560,h:212,items:[
+    {t:'box',x:200,y:22,w:160,h:92,label:'U_{f}',tex:true,fs:22,color:C.h},
+    {t:'arrow',x1:60,y1:48,x2:200,y2:48,label:'|x\\rangle',tex:true,color:C.in},
+    {t:'arrow',x1:60,y1:90,x2:200,y2:90,label:'|y\\rangle',tex:true,color:C.in},
+    {t:'arrow',x1:360,y1:48,x2:500,y2:48,label:'|x\\rangle',tex:true,color:C.out},
+    {t:'arrow',x1:360,y1:90,x2:500,y2:90,label:'|y \\oplus f(x)\\rangle',tex:true,color:C.out},
+    {t:'line',d:'M20,134 H540',color:C.rule},
+    {t:'text',x:95,y:166,label:'query count',fs:15,color:C.out},
+    {t:'text',x:95,y:192,label:'boxes opened',fs:13},
+    {t:'text',x:280,y:166,label:'gate count',fs:15,color:C.h},
+    {t:'text',x:280,y:192,label:'the box, built',fs:13},
+    {t:'text',x:465,y:166,label:'end-to-end',fs:15,color:C.err},
+    {t:'text',x:465,y:192,label:'plus loading, repeats',fs:13}
+  ]});
 }
 
-/* The four classes, their one-line meanings, and the containments that are
-   known. Deliberately not a Venn diagram: a nested-box picture of these four
-   has to assert something about every pair, and two of those pairs are open
-   questions, so the picture would be stating things nobody knows. */
+/* The four classes and the containments that are known. Deliberately not a
+   Venn diagram: a nested-box picture of these four has to assert something
+   about every pair, and two of those pairs are open questions, so the picture
+   would be stating things nobody knows. Four separate boxes, and the
+   containments written out underneath. */
 function figClasses(){
   const cols = [
-    ['\\mathrm{P}',   'settled by an ordinary algorithm', C.in],
-    ['\\mathrm{BPP}', 'and allowed to toss coins', C.in],
-    ['\\mathrm{BQP}', 'and allowed to be a quantum one', C.h],
-    ['\\mathrm{NP}',  'a yes answer is easy to check', C.mid]
+    ['\\mathrm{P}',   'deterministic', C.in, 12],
+    ['\\mathrm{BPP}', 'with coins',    C.in, 142],
+    ['\\mathrm{BQP}', 'quantum',       C.h,  272],
+    ['\\mathrm{NP}',  'checkable',     C.mid, 436]
   ];
   const items = [];
-  cols.forEach(([k,v,col],i)=>{
-    const x = 26 + i*184;
-    items.push({t:'box',x,y:34,w:164,h:52,label:k,tex:true,fs:18,color:col});
-    items.push({t:'text',x:x+82,y:108,label:v,fs:12});
-    if(i<3 && i!==1) return;
+  cols.forEach(([k,v,col,x])=>{
+    items.push({t:'box',x,y:22,w:112,h:50,label:k,tex:true,fs:19,color:col});
+    items.push({t:'text',x:x+56,y:96,label:v,fs:14});
   });
-  items.push({t:'arrow',x1:190,y1:60,x2:210,y2:60});
-  items.push({t:'arrow',x1:374,y1:60,x2:394,y2:60});
-  items.push({t:'line',d:'M26,138 H734',color:C.rule});
-  items.push({t:'text',x:200,y:174,anchor:'middle',label:'\\mathrm{P} \\subseteq \\mathrm{BPP} \\subseteq \\mathrm{BQP}',tex:true,fs:17,color:C.out});
-  items.push({t:'text',x:500,y:174,anchor:'middle',label:'\\mathrm{P} \\subseteq \\mathrm{NP}',tex:true,fs:17,color:C.out});
-  items.push({t:'text',x:380,y:216,anchor:'middle',label:'\\mathrm{NP} \\subseteq \\mathrm{BQP}\\,?',tex:true,fs:17,color:C.err});
-  items.push({t:'text',x:380,y:242,label:'not known, and no efficient quantum algorithm is known for any NP-complete problem',fs:12.5,color:C.err});
-  items.push({t:'text',x:380,y:284,label:'Factoring is in NP and in BQP and is not known to be NP-complete. The size of an input here is its bit length and',fs:12.5});
-  items.push({t:'text',x:380,y:308,label:'never the value of the number it encodes, which is where most of the arguments about this subject start.',fs:12.5});
-  return P.blocks({w:760,h:320,items});
+  items.push({t:'arrow',x1:124,y1:47,x2:142,y2:47});
+  items.push({t:'arrow',x1:254,y1:47,x2:272,y2:47});
+  items.push({t:'line',d:'M12,118 H548',color:C.rule});
+  items.push({t:'text',x:180,y:152,anchor:'middle',label:'\\mathrm{P} \\subseteq \\mathrm{BPP} \\subseteq \\mathrm{BQP}',tex:true,fs:17,color:C.out});
+  items.push({t:'text',x:440,y:152,anchor:'middle',label:'\\mathrm{P} \\subseteq \\mathrm{NP}',tex:true,fs:17,color:C.out});
+  items.push({t:'text',x:280,y:194,anchor:'middle',label:'\\mathrm{NP} \\subseteq \\mathrm{BQP}\\ ?\\quad\\text{open}',tex:true,fs:17,color:C.err});
+  return growBlocks({w:560,h:214,items});
 }
 
 /* Phase kickback for a Boolean oracle: the target is the one state the flip
    cannot move, so the answer comes back as a sign on the query wire. */
 function figKick(){
-  const items = [
-    wire(56,180,470), wire(126,180,470),
-    {t:'text',x:170,y:61,anchor:'end',label:'|x\\rangle',tex:true,fs:14},
-    {t:'text',x:170,y:131,anchor:'end',label:'|{-}\\rangle',tex:true,fs:14},
-    {t:'box',x:250,y:34,w:96,h:114,label:'U_{f}',tex:true,fs:19,color:C.h},
-    {t:'text',x:490,y:61,anchor:'start',label:'(-1)^{f(x)}|x\\rangle',tex:true,fs:15,color:C.out},
-    {t:'text',x:490,y:131,anchor:'start',label:'|{-}\\rangle',tex:true,fs:14,color:C.in},
-    {t:'text',x:298,y:186,label:'the target leaves unchanged',fs:12},
-    {t:'line',d:'M40,214 H720',color:C.rule},
-    {t:'text',x:380,y:250,anchor:'middle',label:'X|{-}\\rangle = -|{-}\\rangle \\quad\\Longrightarrow\\quad U_{f}|x\\rangle|{-}\\rangle = (-1)^{f(x)}|x\\rangle|{-}\\rangle',tex:true,fs:17,color:C.mid},
-    {t:'text',x:380,y:288,label:'A gate written to change a bit has written a sign instead. Nothing else in this chapter is a different idea.',fs:12.5,color:C.err}
-  ];
-  return P.blocks({w:760,h:300,items});
+  const Y0 = 52, Y1 = 124;
+  return growBlocks({w:560,h:204,items:[
+    wire(Y0,88,370), wire(Y1,88,370),
+    {t:'text',x:78,y:Y0+5,anchor:'end',label:'|x\\rangle',tex:true,fs:16},
+    {t:'text',x:78,y:Y1+5,anchor:'end',label:'|{-}\\rangle',tex:true,fs:16},
+    {t:'box',x:180,y:28,w:100,h:120,label:'U_{f}',tex:true,fs:22,color:C.h},
+    {t:'text',x:382,y:Y0+5,anchor:'start',label:'(-1)^{f(x)}|x\\rangle',tex:true,fs:16,color:C.out},
+    {t:'text',x:382,y:Y1+5,anchor:'start',label:'|{-}\\rangle',tex:true,fs:16,color:C.in},
+    {t:'text',x:382,y:Y1+36,anchor:'start',label:'unchanged',fs:14,color:C.in},
+    {t:'text',x:230,y:182,label:'one query',fs:14}
+  ]});
 }
 
-/* The same move with a general unitary: an eigenstate on the target sends its
-   eigenvalue up onto the control. */
+/* The same move with a general unitary: an eigenstate sends its eigenvalue up
+   onto the control. The control line stops at the top edge of the box. */
 function figEigen(){
-  const items = [
-    wire(54,190,470), wire(130,190,470),
-    {t:'text',x:180,y:59,anchor:'end',label:'|{+}\\rangle',tex:true,fs:14},
-    {t:'text',x:180,y:135,anchor:'end',label:'|u\\rangle',tex:true,fs:14},
-    ctrl(300,54)
-  ].concat([{t:'line',d:'M300,54 V113',color:C.h}]).concat([
-    gate(300,130,'U',true,42),
-    {t:'text',x:490,y:59,anchor:'start',label:'\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{2\\pi i\\varphi}|1\\rangle\\big)',tex:true,fs:15,color:C.out},
-    {t:'text',x:490,y:135,anchor:'start',label:'|u\\rangle',tex:true,fs:14,color:C.in},
-    {t:'text',x:330,y:186,label:'the eigenstate never moves',fs:12},
-    {t:'line',d:'M40,214 H720',color:C.rule},
-    {t:'text',x:380,y:250,anchor:'middle',label:'U|u\\rangle = e^{2\\pi i\\varphi}|u\\rangle \\quad\\Longrightarrow\\quad \\mathrm{c}U\\,|{+}\\rangle|u\\rangle = \\big(\\tfrac{1}{\\sqrt2}|0\\rangle+\\tfrac{e^{2\\pi i\\varphi}}{\\sqrt2}|1\\rangle\\big)|u\\rangle',tex:true,fs:15,color:C.mid},
-    {t:'text',x:380,y:288,label:'The number wanted is now a relative phase on one qubit, which is the one thing this course knows how to read.',fs:12.5,color:C.out}
-  ]);
-  return P.blocks({w:760,h:300,items});
+  const Y0 = 52, Y1 = 128;
+  return growBlocks({w:560,h:200,items:[
+    wire(Y0,88,322), wire(Y1,88,322),
+    {t:'text',x:78,y:Y0+5,anchor:'end',label:'|{+}\\rangle',tex:true,fs:16},
+    {t:'text',x:78,y:Y1+5,anchor:'end',label:'|u\\rangle',tex:true,fs:16},
+    {t:'line',d:`M200,${Y0} V${Y1-17}`,color:C.h},
+    ctrl(200,Y0),
+    gate(200,Y1,'U',true,44),
+    {t:'text',x:334,y:Y0+5,anchor:'start',label:'\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{2\\pi i\\varphi}|1\\rangle\\big)',tex:true,fs:15,color:C.out},
+    {t:'text',x:334,y:Y1+5,anchor:'start',label:'|u\\rangle',tex:true,fs:16,color:C.in},
+    {t:'text',x:334,y:Y1+36,anchor:'start',label:'unchanged',fs:14,color:C.in},
+    {t:'text',x:200,y:180,label:'one controlled gate',fs:14}
+  ]});
 }
 
 /* The rule the whole chapter answers to: sixteen amplitudes before the last
@@ -208,77 +226,68 @@ function figCancel(){
     before.push([k, Math.pow(-1,par(k))/Math.sqrt(Q)]);
     after.push([k, s/Q]);
   }
-  const a = P.Axes({w:600,h:310,xr:[-0.6,15.6],yr:[-0.60,1.34],
+  const a = P.Axes({w:560,h:280,xr:[-0.6,15.6],yr:[-0.60,1.34],
     xlabel:'x\\text{ or }k', ylabel:'\\text{amplitude}',
     pad:{l:70,r:26,t:30,b:48}, xtarget:8, yticksOverride:[-0.25,0,0.25,0.5,0.75,1]});
   a.stem(before,{color:C.in,r:3.4,width:1.6});
   a.stem(after,{color:C.out,r:5.0,width:2.4});
-  a.note(-0.2,1.24,'\\text{before the last layer: sixteen amplitudes of size }1/4',{fs:12,color:C.in,anchor:'start',tex:true});
-  a.note(-0.2,-0.50,'\\text{after it: one amplitude of size }1',{fs:12,color:C.out,anchor:'start',tex:true});
+  a.note(-0.2,1.24,'\\text{before the last layer: sixteen of size }1/4',{fs:13,color:C.in,anchor:'start',tex:true});
+  a.note(-0.2,-0.50,'\\text{after it: one of size }1',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
-/* Deutsch's problem: four functions, two classes, and the one bit the circuit
-   returns for each. */
+/* Deutsch's problem: the circuit, and the four promised functions with the
+   one bit the circuit returns for each. */
 function figDeutsch(){
+  const Y0 = 50, Y1 = 112;
   const items = [
-    wire(50,150,430), wire(112,150,430),
-    {t:'text',x:140,y:55,anchor:'end',label:'|0\\rangle',tex:true,fs:13.5},
-    {t:'text',x:140,y:117,anchor:'end',label:'|1\\rangle',tex:true,fs:13.5},
-    gate(190,50,'H',true), gate(190,112,'H',true),
-    {t:'box',x:240,y:30,w:80,h:102,label:'U_{f}',tex:true,fs:17,color:C.h},
-    gate(360,50,'H',true),
-    meter(420,50)
+    wire(Y0,60,290), wire(Y1,60,290),
+    {t:'text',x:52,y:Y0+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
+    {t:'text',x:52,y:Y1+5,anchor:'end',label:'|1\\rangle',tex:true,fs:15},
+    gate(92,Y0,'H',true), gate(92,Y1,'H',true),
+    {t:'box',x:126,y:28,w:64,h:106,label:'U_{f}',tex:true,fs:19,color:C.h},
+    gate(220,Y0,'H',true),
+    meter(266,Y0),
+    {t:'text',x:158,y:166,label:'one query',fs:14},
+    {t:'line',d:'M306,18 V172',color:C.rule},
+    {t:'text',x:360,y:34,label:'f',tex:true,fs:15},
+    {t:'text',x:452,y:34,label:'class',fs:14},
+    {t:'text',x:526,y:34,label:'reads',fs:14}
   ];
-  items.push({t:'line',d:'M470,26 V150',color:C.rule});
-  const rows = [
-    ['f(x)=0','constant','0'],
-    ['f(x)=1','constant','0'],
-    ['f(x)=x','balanced','1'],
-    ['f(x)=1\\oplus x','balanced','1']
-  ];
-  items.push({t:'text',x:560,y:34,anchor:'middle',label:'the four promised functions',fs:12.5});
-  rows.forEach(([f,cls,out],i)=>{
-    const y = 66 + i*30;
-    items.push({t:'text',x:530,y,anchor:'middle',label:f,tex:true,fs:13.5});
-    items.push({t:'text',x:640,y,anchor:'middle',label:cls,fs:12.5,color:i<2?C.in:C.out});
-    items.push({t:'text',x:718,y,anchor:'middle',label:out,fs:14,color:i<2?C.in:C.out});
+  [['f(x)=0','constant','0'],['f(x)=1','constant','0'],
+   ['f(x)=x','balanced','1'],['f(x)=1\\oplus x','balanced','1']].forEach(([f,cls,out],i)=>{
+    const y = 70 + i*32, col = i<2 ? C.in : C.out;
+    items.push({t:'text',x:360,y,anchor:'middle',label:f,tex:true,fs:15});
+    items.push({t:'text',x:452,y,anchor:'middle',label:cls,fs:14,color:col});
+    items.push({t:'text',x:526,y,anchor:'middle',label:out,fs:16,color:col});
   });
-  items.push({t:'text',x:290,y:180,label:'one query',fs:12});
-  items.push({t:'text',x:380,y:218,label:'The reading is 0 for a constant function and 1 for a balanced one, every time, from a single query. It never says which',fs:12.5});
-  items.push({t:'text',x:380,y:242,label:'of the two constants or which of the two balanced functions it was, and it was never asked to.',fs:12.5,color:C.err});
-  return P.blocks({w:760,h:256,items});
+  return growBlocks({w:560,h:186,items});
 }
 
 /* Deutsch-Jozsa: the amplitude of the all-zero string is the mean of the
    signs, so the two promised cases land on 1 and on 0 and on nothing else. */
 function figDJ(){
-  const items = [];
-  const draw = (y0, signs, label, col, val) => {
-    items.push({t:'text',x:60,y:y0,anchor:'start',label,fs:12.5,color:col});
-    signs.forEach((s,i)=>{
-      items.push({t:'text',x:250+i*44,y:y0,anchor:'middle',label:s,fs:16,color:col});
-    });
-    items.push({t:'text',x:640,y:y0,anchor:'start',label:val,tex:true,fs:15,color:col});
+  const items = [
+    {t:'text',x:289,y:30,anchor:'middle',label:'(-1)^{f(x)}\\text{ for the eight inputs}',tex:true,fs:14},
+    {t:'text',x:500,y:30,anchor:'middle',label:'\\text{mean}',tex:true,fs:14},
+    {t:'line',d:'M12,44 H548',color:C.rule}
+  ];
+  const draw = (y, signs, label, col, val) => {
+    items.push({t:'text',x:12,y,anchor:'start',label,fs:14,color:col});
+    signs.forEach((s,i)=>items.push({t:'text',x:170+i*34,y,anchor:'middle',label:s,fs:17,color:col}));
+    items.push({t:'text',x:500,y,anchor:'middle',label:val,tex:true,fs:16,color:col});
   };
-  items.push({t:'text',x:250,y:32,anchor:'start',label:'(-1)^{f(x)}\\text{ for the eight inputs}',tex:true,fs:12.5});
-  items.push({t:'text',x:640,y:32,anchor:'start',label:'\\text{mean}',tex:true,fs:12.5});
-  items.push({t:'line',d:'M50,44 H730',color:C.rule});
-  draw(76,['+','+','+','+','+','+','+','+'],'constant, value 0',C.in,'+1');
-  draw(114,['-','-','-','-','-','-','-','-'],'constant, value 1',C.in,'-1');
-  draw(158,['+','-','-','+','-','+','+','-'],'balanced, parity',C.out,'0');
-  draw(196,['+','+','+','+','-','-','-','-'],'balanced, top bit',C.out,'0');
-  items.push({t:'line',d:'M50,222 H730',color:C.rule});
-  items.push({t:'text',x:380,y:254,anchor:'middle',label:'\\langle 0^{n}|\\,H^{\\otimes n}\\Big(2^{-n/2}\\textstyle\\sum_{x}(-1)^{f(x)}|x\\rangle\\Big) = \\frac{1}{2^{n}}\\sum_{x}(-1)^{f(x)}',tex:true,fs:16,color:C.mid});
-  items.push({t:'text',x:380,y:292,label:'Every balanced function has as many plus signs as minus signs, so they all cancel exactly. The all-zero string is read',fs:12.5});
-  items.push({t:'text',x:380,y:316,label:'with probability one for a constant function and with probability zero for a balanced one.',fs:12.5});
-  return P.blocks({w:760,h:328,items});
+  draw(76, ['+','+','+','+','+','+','+','+'],'constant 0',C.in,'+1');
+  draw(110,['-','-','-','-','-','-','-','-'],'constant 1',C.in,'-1');
+  draw(152,['+','-','-','+','-','+','+','-'],'parity',C.out,'0');
+  draw(186,['+','+','+','+','-','-','-','-'],'top bit',C.out,'0');
+  return growBlocks({w:560,h:204,items});
 }
 
 /* What the separation is: exact against exact. Both classical curves are
    drawn, because quoting only the deterministic one overstates the result. */
 function figDJcost(){
-  const a = P.Axes({w:600,h:300,xr:[1,20],yr:[0,8.6],
+  const a = P.Axes({w:560,h:280,xr:[1,20],yr:[0,8.6],
     xlabel:'n\\,(\\text{input bits})', ylabel:'\\text{queries}',
     pad:{l:76,r:26,t:30,b:48}, xtarget:6,
     yticksOverride:P.decades(0,6), ytickfmt:P.decade});
@@ -288,19 +297,21 @@ function figDJcost(){
   /* The three names stack in a band above the highest curve, which reaches
      5.72 at twenty bits, and each is drawn in the colour of the curve it
      names rather than in the colour of anything it mentions. */
-  a.note(1.4,7.9,'\\text{classical, exact: }2^{n-1}+1',{fs:12.5,color:C.err,anchor:'start',tex:true});
-  a.note(1.4,7.0,'\\text{classical, wrong once in a million: }21',{fs:12,color:C.h,anchor:'start',tex:true});
-  a.note(1.4,6.1,'\\text{quantum, exact: }1',{fs:12.5,color:C.out,anchor:'start',tex:true});
+  a.note(1.4,7.9,'\\text{classical, exact: }2^{n-1}+1',{fs:13,color:C.err,anchor:'start',tex:true});
+  a.note(1.4,7.0,'\\text{classical, wrong once in a million: }21',{fs:13,color:C.h,anchor:'start',tex:true});
+  a.note(1.4,6.1,'\\text{quantum, exact: }1',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
 /* The transform on one basis state: every magnitude the same, and the phase
-   winding at a rate the input index sets. Isotropic: 300 px over an x span of
-   2.90 and 300 px over a y span of 2.90, so 103.4 px to the unit either way
-   and the eight phases sit on a genuine circle. */
+   winding at a rate the input index sets. Isotropic: the plot area is 330 px
+   over an x span of 3.9875 and 240 px over a y span of 2.90, so 82.8 px to the
+   unit either way and the eight phases sit on a genuine circle. The x range
+   runs past the circle to hold the two notes; the formula and the sentence
+   about the rate are in the caption and the cards. */
 function figQFT(){
-  const a = P.Axes({w:620,h:300,xr:[-1.45,2.5375],yr:[-1.45,1.45],
-    pad:{l:24,r:266,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+  const a = P.Axes({w:560,h:300,xr:[-1.45,2.5375],yr:[-1.45,1.45],
+    pad:{l:24,r:206,t:30,b:30}, xticksOverride:[], yticksOverride:[],
     grid:false, zeroAxes:false, arrows:false});
   const ring=[]; for(let i=0;i<=220;i++){ const s=TAU*i/220; ring.push([Math.cos(s),Math.sin(s)]); }
   a.poly(ring,{color:C.grid,width:1.4,dash:'3 4'});
@@ -312,44 +323,38 @@ function figQFT(){
     const th = TAU*3*k/8;
     a.poly([[0,0],[Math.cos(th),Math.sin(th)]],{color:k===0?C.out:C.in,width:k===0?2.6:1.8});
     a.point(Math.cos(th),Math.sin(th),{color:k===0?C.out:C.in,r:k===0?6:4.6});
-    a.note(1.16*Math.cos(th),1.16*Math.sin(th),String(k),{fs:12,color:C.muted,anchor:'middle'});
+    a.note(1.16*Math.cos(th),1.16*Math.sin(th),String(k),{fs:13,color:C.muted,anchor:'middle'});
   }
-  a.note(1.32,0.98,'F_{8}|3\\rangle = \\tfrac{1}{\\sqrt8}\\sum_{k} e^{2\\pi i\\,3k/8}|k\\rangle',{fs:13,color:C.mid,anchor:'start',tex:true});
-  a.note(1.32,0.46,'\\text{every magnitude is }1/\\sqrt8 = 0.354',{fs:12.5,color:C.in,anchor:'start',tex:true});
-  a.note(1.32,0.02,'\\text{each step turns by }135^{\\circ}',{fs:12.5,color:C.in,anchor:'start',tex:true});
-  a.note(1.32,-0.44,'\\text{the input index sets the rate}',{fs:12.5,color:C.muted,anchor:'start',tex:true});
-  a.note(1.32,-0.82,'\\text{of the winding, and nothing else}',{fs:12.5,color:C.muted,anchor:'start',tex:true});
+  a.note(1.42,0.30,'|a_{k}| = 1/\\sqrt8 = 0.354',{fs:14,color:C.in,anchor:'start',tex:true});
+  a.note(1.42,-0.34,'135^{\\circ}\\text{ a step}',{fs:14,color:C.in,anchor:'start',tex:true});
   return a.svg();
 }
 
-/* The circuit on three qubits: a Hadamard and then the controlled rotations
-   that write the lower bits into the phase, and the swaps that put the output
-   back in order. */
+/* The circuit on three qubits, q0 on the top wire. The most significant bit
+   q2 takes a Hadamard and then a controlled rotation from each lower bit, the
+   rotation halving as the control gets further away; q1 and q0 follow; and
+   the swap of q0 and q2 puts the output back in order. Every control line
+   stops at the edge of the box it controls. */
 function figQFTcirc(){
-  const Y=[54,124,194];
+  const Y = [44,100,156];
   const items = [
-    wire(Y[0],130,660), wire(Y[1],130,660), wire(Y[2],130,660),
-    {t:'text',x:120,y:Y[0]+5,anchor:'end',label:'q_{2}',tex:true,fs:13.5},
-    {t:'text',x:120,y:Y[1]+5,anchor:'end',label:'q_{1}',tex:true,fs:13.5},
-    {t:'text',x:120,y:Y[2]+5,anchor:'end',label:'q_{0}',tex:true,fs:13.5},
-    gate(168,Y[0],'H',true),
-    {t:'line',d:`M230,${Y[0]+17} V${Y[1]}`,color:C.h}, ctrl(230,Y[1]),
-    gate(230,Y[0],'R_{2}',true,44),
-    {t:'line',d:`M310,${Y[0]+17} V${Y[2]}`,color:C.h}, ctrl(310,Y[2]),
-    gate(310,Y[0],'R_{3}',true,44),
-    gate(390,Y[1],'H',true),
-    {t:'line',d:`M450,${Y[1]+17} V${Y[2]}`,color:C.h}, ctrl(450,Y[2]),
-    gate(450,Y[1],'R_{2}',true,44),
-    gate(530,Y[2],'H',true),
-    /* the output swap, drawn as the crossing it is */
-    {t:'line',d:`M596,${Y[0]} L636,${Y[2]}`,color:C.mid},
-    {t:'line',d:`M596,${Y[2]} L636,${Y[0]}`,color:C.mid},
-    {t:'text',x:616,y:236,label:'swap',fs:11.5,color:C.mid},
-    {t:'text',x:240,y:228,label:'the rotations get smaller as the control gets further away',fs:12},
-    {t:'text',x:380,y:296,anchor:'middle',label:'R_{k} = \\begin{bmatrix}1&0\\\\0&e^{2\\pi i/2^{k}}\\end{bmatrix}, \\qquad \\tfrac12 n(n+1) \\text{ gates on } n \\text{ qubits}',tex:true,fs:15,color:C.mid},
-    {t:'text',x:380,y:342,label:'Six gates here, fifty-five on ten qubits, and dropping the smallest rotations trades a bounded error for less depth.',fs:12.5}
-  ];
-  return P.blocks({w:760,h:354,items});
+    wire(Y[0],60,530), wire(Y[1],60,530), wire(Y[2],60,530),
+    {t:'text',x:52,y:Y[0]+5,anchor:'end',label:'q_{0}',tex:true,fs:15},
+    {t:'text',x:52,y:Y[1]+5,anchor:'end',label:'q_{1}',tex:true,fs:15},
+    {t:'text',x:52,y:Y[2]+5,anchor:'end',label:'q_{2}',tex:true,fs:15},
+    gate(96,Y[2],'H',true),
+    {t:'line',d:`M158,${Y[1]} V${Y[2]-17}`,color:C.h}, ctrl(158,Y[1]),
+    gate(158,Y[2],'R_{2}',true,44),
+    {t:'line',d:`M226,${Y[0]} V${Y[2]-17}`,color:C.h}, ctrl(226,Y[0]),
+    gate(226,Y[2],'R_{3}',true,44),
+    gate(292,Y[1],'H',true),
+    {t:'line',d:`M354,${Y[0]} V${Y[1]-17}`,color:C.h}, ctrl(354,Y[0]),
+    gate(354,Y[1],'R_{2}',true,44),
+    gate(418,Y[0],'H',true)
+  ].concat(swapMark(484,Y[0],Y[2])).concat([
+    {t:'text',x:484,y:186,label:'swap',fs:14,color:C.mid}
+  ]);
+  return growBlocks({w:560,h:198,items});
 }
 
 /* What comes out: a distribution over indices, and one draw from it. The bars
@@ -365,42 +370,40 @@ function figQFTnot(){
     return (re*re+im*im)/Q;
   };
   const pts=[]; for(let k=0;k<Q;k++) pts.push([k,amp(k)]);
-  const a = P.Axes({w:620,h:274,xr:[-0.6,7.6],yr:[0,0.62],
+  const a = P.Axes({w:560,h:280,xr:[-0.6,7.6],yr:[0,0.62],
     xlabel:'k', ylabel:'|\\tilde a_{k}|^{2}',
     pad:{l:74,r:26,t:28,b:46}, xtarget:8, yticksOverride:[0,0.125,0.25,0.375,0.5]});
   a.stem(pts,{color:C.in,r:5,width:2.4});
   a.point(2,amp(2),{color:C.out,r:8});
-  a.note(2.2,0.56,'\\text{one run returns } k=2 \\text{, and nothing else}',{fs:12.5,color:C.out,anchor:'start',tex:true});
-  a.note(-0.4,0.56,'\\text{eight numbers exist}',{fs:12.5,color:C.in,anchor:'start',tex:true});
+  a.note(2.2,0.56,'\\text{one run returns } k=2',{fs:13,color:C.out,anchor:'start',tex:true});
+  a.note(3.2,0.44,'\\text{eight numbers exist}',{fs:13,color:C.in,anchor:'start',tex:true});
   return a.svg();
 }
 
-/* The phase-estimation circuit: the counting register, the controlled powers,
-   the inverse transform, and the reading. */
+/* The phase-estimation circuit with q0 on the top wire: counting qubit j
+   controls U raised to 2^j, so the top wire applies U once and the third
+   applies it four times. Then the inverse transform and the readings. */
 function figQPE(){
-  const Y=[46,100,154,214];
+  const Y = [40,88,136,196];
   const items = [
-    wire(Y[0],150,700), wire(Y[1],150,700), wire(Y[2],150,700), wire(Y[3],150,660),
-    {t:'text',x:140,y:Y[0]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:13},
-    {t:'text',x:140,y:Y[1]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:13},
-    {t:'text',x:140,y:Y[2]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:13},
-    {t:'text',x:140,y:Y[3]+5,anchor:'end',label:'|u\\rangle',tex:true,fs:13},
-    gate(190,Y[0],'H',true), gate(190,Y[1],'H',true), gate(190,Y[2],'H',true),
-    {t:'line',d:`M260,${Y[2]} V${Y[3]-17}`,color:C.h}, ctrl(260,Y[2]),
-    gate(260,Y[3],'U',true,44),
-    {t:'line',d:`M340,${Y[1]} V${Y[3]-17}`,color:C.h}, ctrl(340,Y[1]),
-    gate(340,Y[3],'U^{2}',true,54),
-    {t:'line',d:`M430,${Y[0]} V${Y[3]-17}`,color:C.h}, ctrl(430,Y[0]),
-    gate(430,Y[3],'U^{4}',true,54),
-    {t:'box',x:500,y:26,w:76,h:150,label:'F^{\\dagger}',tex:true,fs:17,color:C.mid},
-    meter(620,Y[0]), meter(620,Y[1]), meter(620,Y[2]),
-    {t:'text',x:345,y:252,label:'each control writes its own power of the phase',fs:12},
-    {t:'text',x:664,y:252,anchor:'middle',label:'y,\\ \\varphi \\approx y/2^{t}',tex:true,fs:13},
-    {t:'line',d:'M40,278 H720',color:C.rule},
-    {t:'text',x:380,y:312,anchor:'middle',label:'U|u\\rangle = e^{2\\pi i\\varphi}|u\\rangle \\;\\Longrightarrow\\; \\tfrac{1}{\\sqrt{2^{t}}}\\sum_{k=0}^{2^{t}-1} e^{2\\pi i k\\varphi}|k\\rangle \\;\\xrightarrow{\\;F^{\\dagger}\\;}\\; \\text{a spike near } 2^{t}\\varphi',tex:true,fs:15,color:C.mid},
-    {t:'text',x:380,y:348,label:'The counting register has been made to hold the phase as a binary number. The inverse transform is what reads it.',fs:12.5}
+    wire(Y[0],60,448), wire(Y[1],60,448), wire(Y[2],60,448), wire(Y[3],60,392),
+    {t:'text',x:52,y:Y[0]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
+    {t:'text',x:52,y:Y[1]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
+    {t:'text',x:52,y:Y[2]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
+    {t:'text',x:52,y:Y[3]+5,anchor:'end',label:'|u\\rangle',tex:true,fs:15},
+    gate(92,Y[0],'H',true), gate(92,Y[1],'H',true), gate(92,Y[2],'H',true),
+    {t:'line',d:`M148,${Y[0]} V${Y[3]-17}`,color:C.h}, ctrl(148,Y[0]),
+    gate(148,Y[3],'U',true,40),
+    {t:'line',d:`M206,${Y[1]} V${Y[3]-17}`,color:C.h}, ctrl(206,Y[1]),
+    gate(206,Y[3],'U^{2}',true,48),
+    {t:'line',d:`M266,${Y[2]} V${Y[3]-17}`,color:C.h}, ctrl(266,Y[2]),
+    gate(266,Y[3],'U^{4}',true,48),
+    {t:'box',x:308,y:20,w:62,h:136,label:'F^{\\dagger}',tex:true,fs:19,color:C.mid},
+    meter(420,Y[0]), meter(420,Y[1]), meter(420,Y[2]),
+    {t:'text',x:500,y:Y[1]+5,anchor:'middle',label:'y',tex:true,fs:17,color:C.out},
+    {t:'text',x:470,y:Y[3]+5,anchor:'middle',label:'\\varphi \\approx y/2^{t}',tex:true,fs:15,color:C.out}
   ];
-  return P.blocks({w:760,h:360,items});
+  return growBlocks({w:560,h:222,items});
 }
 
 /* The exact case: a phase that is a whole number of steps, and every wrong
@@ -408,13 +411,13 @@ function figQPE(){
 function figQPEexact(){
   const t = 3, Q = 8, phi = 3/8;
   const pts=[]; for(let y=0;y<Q;y++) pts.push([y, qpeProb(phi,t,y)]);
-  const a = P.Axes({w:600,h:300,xr:[-0.6,7.6],yr:[0,1.34],
+  const a = P.Axes({w:560,h:280,xr:[-0.6,7.6],yr:[0,1.34],
     xlabel:'y', ylabel:'P(y)',
     pad:{l:70,r:26,t:30,b:48}, xtarget:8, yticksOverride:[0,0.25,0.5,0.75,1]});
   a.stem(pts,{color:C.in,r:5,width:2.4,showZero:true});
   a.point(3,1,{color:C.out,r:7.5});
-  a.note(3.3,1.14,'y=3,\\; \\varphi = 3/8 = 0.375',{fs:12.5,color:C.out,anchor:'start',tex:true});
-  a.note(-0.4,1.14,'\\text{seven outcomes cancel exactly}',{fs:12.5,color:C.in,anchor:'start',tex:true});
+  a.note(3.3,1.16,'y=3,\\; \\varphi = 3/8',{fs:13,color:C.out,anchor:'start',tex:true});
+  a.note(4.2,0.36,'\\text{seven are exactly }0',{fs:13,color:C.in,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -425,7 +428,7 @@ function figQPEprec(){
   /* The frame reaches to 1.40 because the six-qubit peak is 0.875 and a stem
      is drawn outside the clip: a range that stopped at 0.78 would let the one
      peak this figure exists to show run off the top of the frame. */
-  const a = P.Axes({w:600,h:300,xr:[-0.02,1.02],yr:[0,1.40],
+  const a = P.Axes({w:560,h:280,xr:[-0.02,1.02],yr:[0,1.40],
     xlabel:'y/2^{t}', ylabel:'P',
     pad:{l:70,r:26,t:30,b:48}, xtarget:5, yticksOverride:[0,0.25,0.5,0.75,1]});
   const draw = (t,col,r) => { const Q=1<<t, pts=[];
@@ -434,9 +437,9 @@ function figQPEprec(){
   draw(3,C.in,4.6);
   draw(6,C.out,3.0);
   a.vline(phi,{color:C.err,width:1.6,dash:'4 4'});
-  a.note(0.32,1.06,'\\varphi = 0.3',{fs:12.5,color:C.err,anchor:'start',tex:true});
-  a.note(0.50,1.32,'t=3\\text{: coarse, and never exact}',{fs:12,color:C.in,anchor:'start',tex:true});
-  a.note(0.50,1.18,'t=6\\text{: tighter, and still a distribution}',{fs:12,color:C.out,anchor:'start',tex:true});
+  a.note(0.32,1.06,'\\varphi = 0.3',{fs:13,color:C.err,anchor:'start',tex:true});
+  a.note(0.50,1.30,'t=3\\text{: coarse}',{fs:13,color:C.in,anchor:'start',tex:true});
+  a.note(0.50,1.14,'t=6\\text{: tighter, still spread}',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -444,38 +447,34 @@ function figQPEprec(){
    them. Both axes are counts, and the vertical one is logarithmic because the
    two differ by three decades before the register is large. */
 function figQPEcost(){
-  const a = P.Axes({w:600,h:300,xr:[2,14],yr:[0,4.4],
+  const a = P.Axes({w:560,h:280,xr:[2,14],yr:[0,4.4],
     xlabel:'t\\,(\\text{counting qubits})', ylabel:'\\text{operations}',
     pad:{l:78,r:26,t:30,b:48}, xtarget:6,
     yticksOverride:P.decades(0,4), ytickfmt:P.decade});
   a.curve(t => Math.log10(Math.pow(2,t)-1), {color:C.err,width:2.6});
   a.curve(t => Math.log10(t*(t+1)/2), {color:C.out,width:2.6});
-  a.note(6.4,3.9,'\\text{applications of } U:\\; 2^{t}-1',{fs:12.5,color:C.err,anchor:'start',tex:true});
-  a.note(6.4,0.66,'\\text{gates in } F^{\\dagger}:\\; \\tfrac12 t(t+1)',{fs:12.5,color:C.out,anchor:'start',tex:true});
+  a.note(5.6,3.9,'\\text{uses of } U:\\; 2^{t}-1',{fs:13,color:C.err,anchor:'start',tex:true});
+  a.note(6.4,0.66,'\\text{gates in } F^{\\dagger}:\\; \\tfrac12 t(t+1)',{fs:13,color:C.out,anchor:'start',tex:true});
   a.point(10,Math.log10(1023),{color:C.err,r:6});
   a.point(10,Math.log10(55),{color:C.out,r:6});
-  a.note(10.2,2.72,'1023',{fs:12.5,color:C.err,anchor:'start'});
-  a.note(10.2,1.94,'55',{fs:12.5,color:C.out,anchor:'start'});
+  a.note(10.3,2.72,'1023',{fs:13,color:C.err,anchor:'start'});
+  a.note(10.3,1.94,'55',{fs:13,color:C.out,anchor:'start'});
   return a.svg();
 }
 
 /* Quantum counting: the same estimator pointed at the Grover iteration, so
    that the number of marked candidates comes out before the search is run. */
 function figCount(){
-  const items = [
-    {t:'box',x:40,y:44,w:180,h:58,label:'the Grover step',fs:13,color:C.h},
-    {t:'arrow',x1:220,y1:73,x2:266,y2:73},
-    {t:'box',x:266,y:44,w:200,h:58,label:'phase estimation',fs:13,color:C.mid},
-    {t:'arrow',x1:466,y1:73,x2:512,y2:73},
-    {t:'box',x:512,y:44,w:210,h:58,label:'an estimate of M',fs:13,color:C.out},
-    {t:'text',x:130,y:126,label:'\\text{its two eigenvalues are } e^{\\pm 2i\\theta}',tex:true,fs:12},
-    {t:'text',x:366,y:126,label:'\\text{reads } \\theta \\text{ off the phase}',tex:true,fs:12},
-    {t:'text',x:617,y:126,label:'\\text{through } M = N\\sin^{2}\\theta',tex:true,fs:12},
-    {t:'text',x:380,y:174,anchor:'middle',label:'\\sin^{2}\\theta = M/N \\quad\\Longrightarrow\\quad M = N\\sin^{2}\\theta',tex:true,fs:17,color:C.mid},
-    {t:'text',x:380,y:216,label:'Chapter 5 left a hole: the best number of Grover iterations needs M, and M is what was not known. This closes it, and the',fs:12.5},
-    {t:'text',x:380,y:240,label:'closing costs about as many queries again, so counting first and searching after is still a square-root method overall.',fs:12.5}
-  ];
-  return P.blocks({w:760,h:254,items});
+  return growBlocks({w:560,h:150,items:[
+    {t:'box',x:12,y:30,w:150,h:54,label:'the Grover step',fs:14,color:C.h},
+    {t:'arrow',x1:162,y1:57,x2:205,y2:57},
+    {t:'box',x:205,y:30,w:150,h:54,label:'phase estimation',fs:14,color:C.mid},
+    {t:'arrow',x1:355,y1:57,x2:398,y2:57},
+    {t:'box',x:398,y:30,w:150,h:54,label:'\\text{an estimate of }M',tex:true,fs:14,color:C.out},
+    {t:'text',x:87,y:116,label:'e^{\\pm 2i\\theta}',tex:true,fs:16},
+    {t:'text',x:280,y:116,label:'\\text{reads }\\theta',tex:true,fs:15},
+    {t:'text',x:473,y:116,label:'M = N\\sin^{2}\\theta',tex:true,fs:15}
+  ]});
 }
 
 /* The order of a modulo N, as the thing that repeats. */
@@ -483,13 +482,13 @@ function figOrder(){
   const N = 15, a0 = 2, r = orderOf(a0,N);
   const pts=[]; let x=1;
   for(let k=0;k<=12;k++){ pts.push([k,x]); x=(x*a0)%N; }
-  const a = P.Axes({w:600,h:300,xr:[0,12],yr:[0,15.8],
+  const a = P.Axes({w:560,h:280,xr:[0,12],yr:[0,15.8],
     xlabel:'k', ylabel:'2^{k} \\bmod 15',
     pad:{l:70,r:26,t:30,b:48}, xtarget:6, yticksOverride:[0,4,8,12]});
   a.stem(pts,{color:C.in,r:5,width:2.0});
   [0,4,8,12].forEach(k=>a.point(k,1,{color:C.out,r:7}));
-  a.span(0,4,13.6,'r = '+r,{color:C.out,fs:13,tex:true});
-  a.note(5.2,13.0,'\\text{the sequence repeats, and the period is the order}',{fs:12.5,color:C.muted,anchor:'start',tex:true});
+  a.span(0,4,13.6,'r = '+r,{color:C.out,fs:14,tex:true});
+  a.note(5.2,13.0,'\\text{the period is the order}',{fs:13,color:C.muted,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -498,65 +497,55 @@ function figOrder(){
    even mixture. */
 function figOrderEig(){
   const r = 4;
-  const a = P.Axes({w:600,h:280,xr:[-0.06,1.06],yr:[0,1.30],
+  const a = P.Axes({w:560,h:280,xr:[-0.06,1.06],yr:[0,1.30],
     xlabel:'\\varphi', ylabel:'\\text{weight}',
     pad:{l:70,r:26,t:30,b:48}, xtarget:5, yticksOverride:[0,0.25,0.5,0.75,1]});
   const pts=[]; for(let s=0;s<r;s++) pts.push([s/r, 1/r]);
   a.stem(pts,{color:C.in,r:6,width:2.4});
-  ['0','1/4','2/4','3/4'].forEach((L,s)=>
-    a.note(s/r,0.34,'\\varphi=\\tfrac{'+(s)+'}{4}',{fs:12,color:C.in,anchor:'middle',tex:true}));
-  a.note(0.02,1.20,'U_{a}|u_{s}\\rangle = e^{2\\pi i s/r}|u_{s}\\rangle, \\qquad \\tfrac{1}{\\sqrt r}\\sum_{s}|u_{s}\\rangle = |1\\rangle',{fs:13,color:C.mid,anchor:'start',tex:true});
-  a.note(0.02,0.62,'\\text{each eigenphase is drawn with probability } 1/r',{fs:12.5,color:C.muted,anchor:'start',tex:true});
+  /* The first name starts at its stem rather than centring on it, so that it
+     clears the axis and the tick labels to its left. */
+  ['0','\\tfrac14','\\tfrac12','\\tfrac34'].forEach((L,s)=>
+    a.note(s/r+(s?0:0.015),0.40,'\\varphi='+L,{fs:13,color:C.in,anchor:s?'middle':'start',tex:true}));
+  a.note(0.02,1.18,'\\text{each drawn with probability } 1/r',{fs:13,color:C.muted,anchor:'start',tex:true});
   return a.svg();
 }
 
 /* The cost of the whole order-finding circuit, and where it sits: the
    modular exponentiation, and not the transform that reads it. */
 function figModexp(){
-  const a = P.Axes({w:600,h:300,xr:[0,2600],yr:[2,13.4],
+  const a = P.Axes({w:560,h:280,xr:[0,2600],yr:[2,13.4],
     xlabel:'L\\,(\\text{bits of }N)', ylabel:'\\text{gates}',
     pad:{l:78,r:26,t:30,b:48}, xtarget:5,
     yticksOverride:P.decades(2,11).filter(v=>v%2===0), ytickfmt:P.decade});
   a.curve(L => L>0 ? 3*Math.log10(L) + Math.log10(4) : null, {color:C.err,width:2.6});
   a.curve(L => L>0 ? 2*Math.log10(2*L) : null, {color:C.out,width:2.6});
-  /* Both names sit in the band above the higher curve, which no value can
-     enter: the arithmetic tops out at 10.8 and the frame reaches 12.4. */
-  a.note(120,12.0,'\\text{modular exponentiation: order } L^{3}',{fs:12.5,color:C.err,anchor:'start',tex:true});
-  a.note(1180,7.9,'\\text{the transform: order } L^{2}',{fs:12.5,color:C.out,anchor:'start',tex:true});
+  /* Both names sit clear of the curves: the arithmetic tops out at 10.8 and
+     the frame reaches 13.4, and the transform's name sits under its curve. */
+  a.note(120,12.2,'\\text{modular exponentiation: } L^{3}',{fs:13,color:C.err,anchor:'start',tex:true});
+  a.note(1180,5.2,'\\text{the transform: } L^{2}',{fs:13,color:C.out,anchor:'start',tex:true});
   a.vline(2048,{color:C.rule,width:1.3,dash:'3 4'});
-  a.note(2048,2.9,'L=2048',{fs:12,color:C.muted,anchor:'middle',tex:true});
-  a.note(120,2.4,'\\text{the expensive part is the arithmetic}',{fs:12,color:C.muted,anchor:'start',tex:true});
+  a.note(2048,2.9,'L=2048',{fs:13,color:C.muted,anchor:'middle',tex:true});
   return a.svg();
 }
 
 /* Continued fractions: the measured fraction, and the ladder that turns it
    into the small denominator hiding inside it. */
 function figCF(){
-  const rows = [
-    ['0','0','0/1'],
-    ['6','1/6','1/6'],
-    ['42','42/253','253'],
-    ['2','\\ldots','']
-  ];
   const items = [
-    {t:'text',x:380,y:34,anchor:'middle',label:'\\frac{y}{Q} = \\frac{85}{512} = 0.166016\\ldots',tex:true,fs:18,color:C.in},
-    {t:'text',x:130,y:80,anchor:'middle',label:'step',fs:12.5},
-    {t:'text',x:330,y:80,anchor:'middle',label:'quotient',fs:12.5},
-    {t:'text',x:540,y:80,anchor:'middle',label:'convergent',fs:12.5},
-    {t:'line',d:'M60,92 H700',color:C.rule}
+    {t:'text',x:280,y:30,anchor:'middle',label:'\\frac{y}{Q} = \\frac{85}{512} = 0.166016\\ldots',tex:true,fs:18,color:C.in},
+    {t:'text',x:90,y:78,anchor:'middle',label:'step',fs:14},
+    {t:'text',x:230,y:78,anchor:'middle',label:'quotient',fs:14},
+    {t:'text',x:380,y:78,anchor:'middle',label:'convergent',fs:14},
+    {t:'line',d:'M20,90 H540',color:C.rule}
   ];
   [['1','0','0/1'],['2','6','1/6'],['3','42','42/253']].forEach(([k,q,c],i)=>{
-    const y = 124 + i*38;
-    const hit = i===1;
-    items.push({t:'text',x:130,y,anchor:'middle',label:k,fs:14});
-    items.push({t:'text',x:330,y,anchor:'middle',label:q,fs:14});
-    items.push({t:'text',x:540,y,anchor:'middle',label:c,tex:true,fs:15,color:hit?C.out:C.muted});
+    const y = 120 + i*34, hit = i===1;
+    items.push({t:'text',x:90,y,anchor:'middle',label:k,fs:15});
+    items.push({t:'text',x:230,y,anchor:'middle',label:q,fs:15});
+    items.push({t:'text',x:380,y,anchor:'middle',label:c,tex:true,fs:16,color:hit?C.out:C.muted});
   });
-  items.push({t:'text',x:660,y:162,anchor:'start',label:'\\leftarrow r=6',tex:true,fs:15,color:C.out});
-  items.push({t:'line',d:'M60,250 H700',color:C.rule});
-  items.push({t:'text',x:380,y:284,label:'The convergent wanted is the last one whose denominator is smaller than the number being factored. Confirming it costs',fs:12.5});
-  items.push({t:'text',x:380,y:308,label:'one modular exponentiation to accept or reject, and that check is classical and cheap.',fs:12.5});
-  return P.blocks({w:760,h:320,items});
+  items.push({t:'text',x:448,y:154,anchor:'start',label:'\\leftarrow r=6',tex:true,fs:16,color:C.out});
+  return growBlocks({w:560,h:204,items});
 }
 
 /* The failure modes, and what each of them costs: a run that fails is
@@ -567,52 +556,45 @@ function figRepeat(){
      for one that costs a whole base, green for the one that finishes. Two
      rows share a repair and therefore share a colour. */
   const rows = [
-    ['\\text{the outcome is } s=0','no information at all','measure again',C.h,true],
-    ['s \\text{ and } r \\text{ share a factor}','a proper divisor of the order','measure again',C.h,true],
-    ['\\text{the order } r \\text{ is odd}','no square root to take','choose another base',C.err,true],
-    ['a^{r/2} \\equiv -1','the two divisors are trivial','choose another base',C.err,true],
-    ['otherwise','two factors of N','done',C.out,false]
+    ['s=0','\\text{nothing about }r','run again',C.h],
+    ['\\gcd(s,r)>1','\\text{a divisor of }r','run again',C.h],
+    ['r\\text{ odd}','\\text{no square root}','new base',C.err],
+    ['a^{r/2} \\equiv -1','\\text{trivial divisors}','new base',C.err],
+    ['\\text{otherwise}','\\text{two factors}','done',C.out]
   ];
   const items = [
-    {t:'text',x:180,y:32,anchor:'middle',label:'what went wrong',fs:12.5},
-    {t:'text',x:430,y:32,anchor:'middle',label:'what comes out',fs:12.5},
-    {t:'text',x:650,y:32,anchor:'middle',label:'what to do',fs:12.5},
-    {t:'line',d:'M34,44 H726',color:C.rule}
+    {t:'text',x:100,y:28,anchor:'middle',label:'what went wrong',fs:14},
+    {t:'text',x:300,y:28,anchor:'middle',label:'what comes out',fs:14},
+    {t:'text',x:470,y:28,anchor:'middle',label:'what to do',fs:14},
+    {t:'line',d:'M12,40 H548',color:C.rule}
   ];
-  rows.forEach(([a,b,c,col,tx],i)=>{
-    const y = 78 + i*38;
-    items.push({t:'text',x:180,y,anchor:'middle',label:a,tex:tx,fs:13,color:col});
-    items.push({t:'text',x:430,y,anchor:'middle',label:b,fs:13});
-    items.push({t:'text',x:650,y,anchor:'middle',label:c,fs:13,color:col});
+  rows.forEach(([a,b,c,col],i)=>{
+    const y = 70 + i*34;
+    items.push({t:'text',x:100,y,anchor:'middle',label:a,tex:true,fs:15,color:col});
+    items.push({t:'text',x:300,y,anchor:'middle',label:b,tex:true,fs:15});
+    items.push({t:'text',x:470,y,anchor:'middle',label:c,fs:14,color:col});
   });
-  items.push({t:'line',d:'M34,286 H726',color:C.rule});
-  items.push({t:'text',x:380,y:318,label:'Every branch above is decided by classical arithmetic on numbers that have already been measured. The quantum part is',fs:12.5});
-  items.push({t:'text',x:380,y:342,label:'run again from the beginning, and a constant expected number of runs is enough.',fs:12.5,color:C.out});
-  return P.blocks({w:760,h:354,items});
+  return growBlocks({w:560,h:222,items});
 }
 
 /* The workflow, with the one quantum box marked and everything else in the
    tone of the classical work it is. */
 function figShor(){
   const steps = [
-    ['choose a base, and take one greatest common divisor','classical'],
-    ['find the order of that base','quantum'],
-    ['read the order off by continued fractions','classical'],
-    ['confirm the candidate order','classical'],
-    ['take two more greatest common divisors','classical']
+    ['choose a base, take one gcd','classical'],
+    ['find the order of the base','quantum'],
+    ['continued fractions','classical'],
+    ['confirm the order','classical'],
+    ['two more gcds','classical']
   ];
   const items = [];
   steps.forEach(([txt,kind],i)=>{
-    const y = 26 + i*44;
-    const q = kind==='quantum';
-    items.push({t:'box',x:60,y,w:400,h:34,label:txt,fs:12.5,color:q?C.h:C.rule});
-    items.push({t:'text',x:500,y:y+22,anchor:'start',label:kind,fs:12.5,color:q?C.h:C.muted});
-    if(i<4) items.push({t:'line',d:`M260,${y+34} V${y+44}`,color:C.rule});
+    const y = 14 + i*40, q = kind==='quantum';
+    items.push({t:'box',x:40,y,w:300,h:30,label:txt,fs:14,color:q?C.h:C.rule});
+    items.push({t:'text',x:364,y:y+20,anchor:'start',label:kind,fs:14,color:q?C.h:C.muted});
+    if(i<4) items.push({t:'line',d:`M190,${y+30} V${y+40}`,color:C.rule});
   });
-  items.push({t:'text',x:380,y:262,anchor:'middle',label:'\\gcd\\big(a^{r/2}-1,\\,N\\big) \\quad\\text{and}\\quad \\gcd\\big(a^{r/2}+1,\\,N\\big)',tex:true,fs:16,color:C.out});
-  items.push({t:'text',x:380,y:300,label:'One box in five, and it is the only one that needs a quantum computer. The other four are arithmetic on integers that a',fs:12.5});
-  items.push({t:'text',x:380,y:324,label:'laptop does in microseconds, which is exactly why the cost of the whole thing is decided inside that one box.',fs:12.5,color:C.err});
-  return P.blocks({w:760,h:336,items});
+  return growBlocks({w:560,h:212,items});
 }
 
 /* The whole of N = 15 with a = 2, worked, so that the classical steps can be
@@ -620,79 +602,72 @@ function figShor(){
 function figShor15(){
   const N = 15, a0 = 2, r = orderOf(a0,N);
   const half = Math.pow(a0,r/2);
-  const items = [
-    {t:'text',x:380,y:38,anchor:'middle',label:'N = 15, \\qquad a = 2, \\qquad \\gcd(2,15) = 1',tex:true,fs:17,color:C.in},
-    {t:'text',x:380,y:86,anchor:'middle',label:'2^{0},2^{1},2^{2},2^{3},2^{4} \\equiv 1,\\,2,\\,4,\\,8,\\,1 \\pmod{15}',tex:true,fs:17},
-    {t:'text',x:380,y:124,anchor:'middle',label:'r = '+r+'\\text{, which is even}',tex:true,fs:16,color:C.h},
-    {t:'text',x:380,y:168,anchor:'middle',label:'2^{r/2} = '+half+' \\not\\equiv -1 \\pmod{15}',tex:true,fs:16,color:C.h},
-    {t:'text',x:230,y:216,anchor:'middle',label:'\\gcd('+(half-1)+',15) = '+gcd(half-1,N),tex:true,fs:17,color:C.out},
-    {t:'text',x:530,y:216,anchor:'middle',label:'\\gcd('+(half+1)+',15) = '+gcd(half+1,N),tex:true,fs:17,color:C.out},
-    {t:'text',x:380,y:252,anchor:'middle',label:'15 = 3 \\times 5',tex:true,fs:18,color:C.out},
-    {t:'text',x:380,y:292,label:'A favourable choice. Starting from fourteen instead, the order is two and its square root is minus one, so both greatest',fs:12.5},
-    {t:'text',x:380,y:316,label:'common divisors come out trivial and the whole run is thrown away. That is why the procedure repeats.',fs:12.5,color:C.err}
-  ];
-  return P.blocks({w:760,h:328,items});
+  return growBlocks({w:560,h:236,items:[
+    {t:'text',x:280,y:30,anchor:'middle',label:'N = 15, \\quad a = 2, \\quad \\gcd(2,15) = 1',tex:true,fs:16,color:C.in},
+    {t:'text',x:280,y:70,anchor:'middle',label:'2^{0},\\ldots,2^{4} \\equiv 1,\\,2,\\,4,\\,8,\\,1 \\pmod{15}',tex:true,fs:16},
+    {t:'text',x:280,y:106,anchor:'middle',label:'r = '+r+'\\text{, even}',tex:true,fs:16,color:C.h},
+    {t:'text',x:280,y:142,anchor:'middle',label:'2^{r/2} = '+half+' \\not\\equiv -1 \\pmod{15}',tex:true,fs:16,color:C.h},
+    {t:'text',x:160,y:182,anchor:'middle',label:'\\gcd('+(half-1)+',15) = '+gcd(half-1,N),tex:true,fs:16,color:C.out},
+    {t:'text',x:400,y:182,anchor:'middle',label:'\\gcd('+(half+1)+',15) = '+gcd(half+1,N),tex:true,fs:16,color:C.out},
+    {t:'text',x:280,y:220,anchor:'middle',label:'15 = 3 \\times 5',tex:true,fs:17,color:C.out}
+  ]});
 }
 
 /* What the result threatens and what it does not. */
 function figRSA(){
-  return P.blocks({w:760,h:280,items:[
-    {t:'box',x:34,y:40,w:330,h:44,label:'RSA, Diffie-Hellman, elliptic curves',fs:13,color:C.err},
-    {t:'text',x:199,y:106,label:'broken by a large fault-tolerant machine',fs:12,color:C.err},
-    {t:'box',x:34,y:132,w:330,h:44,label:'AES and hash functions',fs:13,color:C.out},
-    {t:'text',x:199,y:198,label:'weakened by a square root, and a longer key fixes that',fs:12,color:C.out},
-    {t:'box',x:410,y:40,w:316,h:136,label:'',color:C.rule},
-    {t:'text',x:568,y:74,label:'the reason to move now',fs:13,color:C.h},
-    {t:'text',x:568,y:104,label:'traffic can be recorded today',fs:12},
-    {t:'text',x:568,y:130,label:'and decrypted whenever the',fs:12},
-    {t:'text',x:568,y:156,label:'machine finally exists',fs:12},
-    {t:'text',x:380,y:224,label:'Public-key cryptography rests on the absence of a known efficient attack, never on a proof that one cannot exist. The',fs:12.5},
-    {t:'text',x:380,y:248,label:'replacements are classical algorithms chosen because no efficient quantum attack on them is known either.',fs:12.5},
-    {t:'text',x:380,y:272,label:'Nothing here is a demonstration that any deployed key is at risk today.',fs:12.5,color:C.out}
+  return growBlocks({w:560,h:196,items:[
+    {t:'box',x:12,y:22,w:270,h:42,label:'RSA, Diffie-Hellman, ECC',fs:14,color:C.err},
+    {t:'text',x:147,y:86,label:'broken, once the machine exists',fs:13,color:C.err},
+    {t:'box',x:12,y:112,w:270,h:42,label:'AES and hash functions',fs:14,color:C.out},
+    {t:'text',x:147,y:176,label:'a square root: longer keys',fs:13,color:C.out},
+    {t:'box',x:306,y:22,w:242,h:132,label:'',color:C.rule},
+    {t:'text',x:427,y:56,label:'why move now',fs:15,color:C.h},
+    {t:'text',x:427,y:90,label:'recorded today',fs:14},
+    {t:'text',x:427,y:116,label:'decrypted later',fs:14}
   ]});
 }
 
 /* Shor's claim, laid against the five things a claim has to name. */
 function figShorClaim(){
   const rows = [
-    ['task','\\text{factor an } L\\text{-bit integer } N = pq',C.h,true],
-    ['input model','the number itself, with no oracle and nothing to load',C.h],
-    ['accuracy','a constant success probability per attempt, checked classically',C.h],
-    ['hardware model','fault tolerant, millions of physical qubits, hours of running',C.err],
-    ['baseline','\\text{the number field sieve: } e^{c\\,L^{1/3}(\\log L)^{2/3}}\\text{, not } 2^{L}',C.err,true]
+    ['task','\\text{factor an }L\\text{-bit } N = pq',C.h,true],
+    ['input model','the number itself, nothing to load',C.h],
+    ['accuracy','constant, checked classically',C.h],
+    ['hardware model','fault tolerant, millions of qubits',C.err],
+    ['baseline','\\text{number field sieve: } e^{c\\,L^{1/3}(\\log L)^{2/3}}',C.err,true]
   ];
   const items = [];
   rows.forEach(([k,v,col,tex],i)=>{
-    const y = 20 + i*38;
-    items.push({t:'box',x:30,y,w:150,h:30,label:k,fs:12.5,color:col});
-    items.push({t:'text',x:196,y:y+20,anchor:'start',label:v,tex:!!tex,fs:12.5});
+    const y = 14 + i*40;
+    items.push({t:'box',x:12,y,w:146,h:32,label:k,fs:14,color:col});
+    items.push({t:'text',x:172,y:y+21,anchor:'start',label:v,tex:!!tex,fs:14});
   });
   /* The two boxes in the error tone are the last two, and the caption beside
      this figure says two. A caption that names a count has to match what the
      figure marks. */
-  items.push({t:'text',x:380,y:236,anchor:'middle',label:'\\text{superpolynomial against the best known method, and not against a proved lower bound}',tex:true,fs:14,color:C.out});
-  items.push({t:'text',x:380,y:266,label:'The gap is real and it is large. It is a gap against an algorithm, and no proof says factoring is hard.',fs:12.5});
-  return P.blocks({w:760,h:278,items});
+  return growBlocks({w:560,h:214,items});
 }
 
-/* The family the one move belongs to. */
+/* The family the one move belongs to. Order finding sits inside period
+   finding with factoring in it; the discrete logarithm is a period-finding
+   problem in two variables and so sits beside order finding, not inside it. */
 function figFamily(){
-  return P.blocks({w:760,h:278,items:[
-    {t:'box',x:24,y:32,w:712,h:180,label:'',color:C.rule},
-    {t:'text',x:380,y:60,label:'the hidden subgroup problem',fs:14,color:C.muted},
-    {t:'box',x:70,y:76,w:620,h:120,label:'',color:C.mid},
-    {t:'text',x:380,y:104,label:'period finding',fs:14,color:C.mid},
-    {t:'box',x:130,y:120,w:500,h:62,label:'',color:C.in},
-    {t:'text',x:380,y:148,label:'order finding',fs:14,color:C.in},
-    {t:'text',x:380,y:172,label:'factoring, discrete logarithms',fs:12.5,color:C.in},
-    {t:'text',x:380,y:238,label:'One mechanism, one transform, and a family of problems whose answers are hidden in a period. Grover is outside it, which is',fs:12.5},
-    {t:'text',x:380,y:262,label:'why its saving is a square root and these are more than that.',fs:12.5}
+  return growBlocks({w:560,h:236,items:[
+    {t:'box',x:12,y:14,w:536,h:190,label:'',color:C.rule},
+    {t:'text',x:280,y:40,label:'the hidden subgroup problem',fs:15,color:C.muted},
+    {t:'box',x:40,y:56,w:480,h:136,label:'',color:C.mid},
+    {t:'text',x:280,y:82,label:'period finding',fs:15,color:C.mid},
+    {t:'box',x:62,y:98,w:236,h:80,label:'',color:C.in},
+    {t:'text',x:180,y:128,label:'order finding',fs:15,color:C.in},
+    {t:'text',x:180,y:156,label:'factoring',fs:14,color:C.in},
+    {t:'text',x:410,y:142,label:'discrete logarithms',fs:14,color:C.mid},
+    {t:'text',x:280,y:226,label:'Grover sits outside every box',fs:14,color:C.err}
   ]});
 }
 
-/* The chapter as one ladder. */
+/* The chapter as one ladder. The sentence that closes it is the caption. */
 function figLadder(){
-  return P.blocks({w:760,h:200,items:[
+  return P.blocks({w:760,h:146,items:[
     {t:'box',x:24,y:44,w:150,h:56,label:'a phase',fs:13,color:C.in},
     {t:'arrow',x1:174,y1:72,x2:214,y2:72},
     {t:'box',x:214,y:44,w:150,h:56,label:'interference',fs:13,color:C.h},
@@ -703,8 +678,7 @@ function figLadder(){
     {t:'text',x:99,y:124,label:'kickback writes it',fs:12},
     {t:'text',x:289,y:124,label:'the wrong answers cancel',fs:12},
     {t:'text',x:479,y:124,label:'one index, not a spectrum',fs:12},
-    {t:'text',x:667,y:124,label:'five things, or nothing',fs:12},
-    {t:'text',x:380,y:170,label:'Every algorithm in this chapter is these four steps with a different question written into the first one.',fs:12.5}
+    {t:'text',x:667,y:124,label:'five things, or nothing',fs:12}
   ]});
 }
 
@@ -740,27 +714,21 @@ const SC = [
   src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'A query count is one number, and it is not the cost of anything'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Most of the results in this chapter are stated in a <b>query model</b>. The algorithm is given a black box that computes an unknown function $f$, and it is charged one <b>query</b> each time it uses that box, whatever is inside.</p>'},
-    {t:'eq', key:true, tex:'U_{f}\\,|x\\rangle|y\\rangle = |x\\rangle\\,|y \\oplus f(x)\\rangle'},
-    {t:'body', html:'<p>The exclusive-or in the second register is what makes the box reversible, and chapter 4 built exactly this embedding. The model is useful because it can be reasoned about: how many questions must be asked before the answer is forced is a question with a proof attached to it.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'It is also a model that hides things on purpose. Building $U_{f}$ as a real circuit costs gates, and those gates are not counted. Loading data into the box, if the function is a lookup rather than a formula, is not counted. Error correction is not counted. A query separation is a theorem about the first column of the figure and says nothing about the third.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQuery(),
-      caption:'The same box, seen three ways. A theorem in the first column is real and provable; a claim about a wall clock lives in the third, and the two are not the same claim.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQuery(),
+      caption:'The same box, counted three ways. A separation in the first column is a real theorem; it becomes a saving in seconds only when the other two are filled in.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'An algorithm needs $25$ queries where a classical method needs $512$. One query costs a circuit of $4000$ gates on the quantum machine; the classical evaluation costs $30$ operations.'],
-        ['Work', 'Quantum gate count: $25 \\times 4000 = 10^{5}$. Classical operation count: $512 \\times 30 = 1.54\\times10^{4}$.'],
-        ['Answer', 'The query count improved by a factor of about twenty and the operation count got about six times worse.'],
-        ['Check', 'Both numbers are right and they point opposite ways, which is the normal situation. The query saving becomes a real saving only when the problem is large enough that the ratio $\\sqrt{N}$ against $N$ beats the fixed ratio of the two query costs.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'"Exponential" needs its qualifiers', html:'Deutsch\u2013Jozsa has an exponential separation in <b>exact</b> query complexity <b>under a promise</b>. Remove any one of those words and the statement is false.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'A query', tex:'U_{f}\\,|x\\rangle|y\\rangle = |x\\rangle\\,|y \\oplus f(x)\\rangle',
+      note:'The algorithm is charged one query each time it uses the box, whatever is inside. The exclusive-or keeps the box reversible; chapter 4 built this embedding. What the box costs to build, to load with data and to protect from errors is not counted.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} \\text{quantum: } 25 \\times 4000 &= 10^{5}\\text{ gates} \\\\ \\text{classical: } 512 \\times 30 &= 1.54\\times10^{4}\\text{ operations} \\end{aligned}',
+        note:'Twenty times fewer queries, and about six times more work. Both numbers are right. The query saving becomes a real one only when the problem is large enough for $\\sqrt{N}$ against $N$ to beat the ratio of the two query costs.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'The word "exponential" is doing a lot of work in most sentences it appears in', html:'Deutsch–Jozsa has an exponential separation in <b>exact</b> query complexity <b>under a promise</b>. Remove any one of those three qualifiers and the statement becomes false. Chapter 5 asked for five things before a resource claim counts as a claim; this chapter asks for them again, and the input model is the one that decides most of these.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'A quantum method needs $1000$ queries at $2000$ gates each. A classical method needs $10^{6}$ queries at $50$ operations each.<div class="nsep"></div>Which run does less work in total?',
+        ask:{key:'m6-query', choices:['quantum: $2\\times10^{6}$ against $5\\times10^{7}$','classical: its query is cheaper','they tie'], answer:0,
+          why:'$1000\\times2000 = 2\\times10^{6}$ and $10^{6}\\times50 = 5\\times10^{7}$. Here the query saving pays for the dearer query, with a factor of $25$ to spare.'}}]}
   ]}
 ]},
 
@@ -771,28 +739,32 @@ const SC = [
   src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · What a query model counts'},
   {t:'title', text:'The classes name what is settled in polynomial time, and P is inside all of them'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A <b>decision problem</b> asks a yes-or-no question about an input, and its size is the number of bits the input is written in. That last point is where the arguments start: the number $N$ has about $\\log_{2}N$ bits, so an algorithm that runs in time $N$ is <b>exponential</b> in the size of its input, not linear.</p>'},
-    {t:'body', html:'<p>Four classes, and each is a promise about polynomial time in that bit length:</p>'},
-    {t:'small', html:'<b>P</b> — settled by an ordinary algorithm. <b>BPP</b> — settled by an algorithm allowed to toss coins and be wrong with probability below one third. <b>BQP</b> — settled by a quantum algorithm with the same allowance. <b>NP</b> — a yes answer comes with a certificate that can be <b>checked</b> quickly, which says nothing about finding it.'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'What is known is $\\mathrm{P}\\subseteq\\mathrm{BPP}\\subseteq\\mathrm{BQP}$ and $\\mathrm{P}\\subseteq\\mathrm{NP}$. Whether $\\mathrm{NP}\\subseteq\\mathrm{BQP}$ is open, and no efficient quantum algorithm is known for any NP-complete problem. Grover gives a square root on the search, and a square root of an exponential is still an exponential.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figClasses(),
-      caption:'The four classes and the containments that are known. Deliberately not a Venn diagram: a nested picture would have to assert something about every pair, and two of those pairs are open questions.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figClasses(),
+      caption:'Four separate classes and the containments that are known. Not a Venn diagram: a nested picture would assert something about every pair, and two of the pairs are open questions.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'Factoring a $2048$-bit modulus.'],
-        ['Work', 'The input is $2048$ bits. Trial division to $\\sqrt{N}$ takes about $2^{1024}$ steps, which is exponential in $2048$. Shor takes a number of operations polynomial in $2048$.'],
-        ['Answer', 'Factoring is in NP and in BQP, and it is not known to be NP-complete.'],
-        ['Check', 'A certificate for a yes answer is a factor, and multiplying two numbers to confirm it is fast — so the NP membership is easy to see. Nothing about the BQP membership follows from that.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'"Quantum computers solve NP-complete problems" is false as far as anyone knows', html:'The known fast quantum algorithms need hidden algebraic structure: a period, an order, a discrete logarithm. Grover gives a square root on search, and the square root of an exponential is still an exponential.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'What is known', tex:'\\mathrm{P} \\subseteq \\mathrm{BPP} \\subseteq \\mathrm{BQP}, \\qquad \\mathrm{P} \\subseteq \\mathrm{NP}, \\qquad \\mathrm{NP} \\subseteq \\mathrm{BQP}\\ ?',
+      note:'Each class promises polynomial time in the <b>bit length</b> of the input. BPP may toss coins and err below one third, BQP is its quantum version, and NP asks only that a yes answer can be <b>checked</b> quickly. Whether NP sits inside BQP is open.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'2048 \\text{ bits: } \\quad \\text{trial division} \\approx 2^{1024} \\text{ steps}, \\qquad \\text{Shor: polynomial in } 2048',
+        note:'Factoring is in NP and in BQP and is not known to be NP-complete. Checking a factor is fast; finding one is the question.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'"Quantum computers solve NP-complete problems" is false as far as anyone knows', html:'The problems a quantum computer is known to settle faster are the ones with hidden algebraic structure — a period, an order, a discrete logarithm. Those are believed <b>not</b> to be NP-complete, and that is precisely why they can have this kind of structure to exploit. A claim that reaches beyond them needs a citation, and there is not one.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'An algorithm takes $N$ steps on the input number $N$, and $N$ is written in $40$ bits.<div class="nsep"></div>In the size of its input, the algorithm is:',
+        ask:{key:'m6-classes', choices:['exponential: up to $2^{40}\\approx1.1\\times10^{12}$ steps','linear: $N$ steps for the input $N$','polynomial, of degree $40$'], answer:0,
+          why:'The input is $40$ bits long and $N$ can be as large as $2^{40}$. Time linear in the value of a number is exponential in its length.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-query', module:'M6', nav:'Code · What a query model counts', title:'What a query model counts in code',
+  objective:'Build an oracle as a permutation, count the queries a tester makes, and price a randomised one.',
+  keywords:'code qiskit numpy program oracle permutation query count exact randomised tester error',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · What a query model counts'},
+  {t:'title', text:'What a query model counts in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-query')}
 ]},
 
 /* ---------------------------------------------------------------- 6.2.1 -- */
@@ -802,28 +774,21 @@ const SC = [
   src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'Point the oracle at the state it cannot change and it writes a phase instead'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The oracle writes $f(x)$ into the second register by flipping it, and a flip is the gate $X$. So choose for the second register the one state that $X$ leaves alone up to a sign:</p>'},
-    {t:'eq', tex:'X\\,|{-}\\rangle = -\\,|{-}\\rangle, \\qquad |{-}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|0\\rangle - |1\\rangle\\big)'},
-    {t:'body', html:'<p>Now run the oracle. When $f(x)=0$ nothing happens. When $f(x)=1$ the flip happens and produces a minus sign. Both cases are one line:</p>'},
-    {t:'eq', key:true, tex:'U_{f}\\,|x\\rangle|{-}\\rangle = (-1)^{f(x)}\\,|x\\rangle|{-}\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The second register never changes at all, so it can be prepared once and ignored. The value of $f$ has become a <b>relative phase</b> among the terms of the first register, and chapter 1 said what that is worth: a relative phase is observable, and it is observable through interference and through nothing else.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figKick(),
-      caption:'The oracle acts, the lower wire comes out exactly as it went in, and the answer is a sign attached to the upper one. Nothing was measured and nothing was copied.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figKick(),
+      caption:'The oracle acts, the lower wire comes out exactly as it went in, and the answer is a sign on the upper one. Nothing was measured and nothing was copied.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'One query qubit in $|{+}\\rangle$, the target in $|{-}\\rangle$, and the balanced oracle $f(x)=x$.'],
-        ['Work', 'The state is $\\tfrac{1}{\\sqrt2}(|0\\rangle+|1\\rangle)|{-}\\rangle$. The oracle multiplies the $|x\\rangle$ term by $(-1)^{x}$, giving $\\tfrac{1}{\\sqrt2}(|0\\rangle-|1\\rangle)|{-}\\rangle$.'],
-        ['Answer', 'The query qubit has gone from $|{+}\\rangle$ to $|{-}\\rangle$, and a Hadamard now turns it into $|1\\rangle$, which is read with certainty.'],
-        ['Check', 'Run the same argument with $f(x)=0$: nothing changes, the qubit is still $|{+}\\rangle$, and the Hadamard returns $|0\\rangle$. Two different promised functions, two different certain answers, one query each.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'The sign lands on the first register', html:'The sign multiplies a term of the whole state. The second factor is the same $|{-}\\rangle$ in every term, so the sign can only make a difference between the terms of the first.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Kickback', tex:'\\begin{aligned} X\\,|{-}\\rangle &= -\\,|{-}\\rangle \\\\ U_{f}\\,|x\\rangle|{-}\\rangle &= (-1)^{f(x)}\\,|x\\rangle|{-}\\rangle \\end{aligned}',
+      note:'The oracle writes $f(x)$ by flipping the target, and $|{-}\\rangle$ is the state a flip leaves alone up to a sign. When $f(x)=0$ nothing happens; when $f(x)=1$ the sign appears. The target never changes, and $f$ is now a relative phase on the first register, observable through interference.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'f(x) = x: \\quad |{+}\\rangle|{-}\\rangle \\;\\xrightarrow{\\;U_{f}\\;}\\; |{-}\\rangle|{-}\\rangle \\;\\xrightarrow{\\;H\\;}\\; |1\\rangle|{-}\\rangle',
+        note:'The query signs the $|1\\rangle$ term, so the query qubit moves from $|{+}\\rangle$ to $|{-}\\rangle$ and a Hadamard reads $1$ with certainty. With $f(x)=0$ nothing moves, and the Hadamard returns $|0\\rangle$ every time.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'The phase is on the first register even though the gate was written on the second', html:'This is the step readers re-derive three times before believing it. The sign $(-1)^{f(x)}$ multiplies a term of the <b>whole</b> state, so it can be read as belonging to either factor — and because the second factor is the same $|{-}\\rangle$ in every term, the only place the sign can make a difference is between the terms of the first. A global sign on the whole state would be unobservable; this one is not, because $f(x)$ differs from term to term.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'Two query qubits in $|{+}\\rangle|{+}\\rangle$, the target in $|{-}\\rangle$, and $f(x_{1},x_{0}) = x_{1}\\text{ AND }x_{0}$.<div class="nsep"></div>Which terms of the query register pick up a minus sign?',
+        ask:{key:'m6-kick', choices:['only $|11\\rangle$','$|01\\rangle$ and $|10\\rangle$','all four, as a global sign'], answer:0,
+          why:'$f$ is $1$ only at $x=11$, so one query gives $\\tfrac12\\big(|00\\rangle+|01\\rangle+|10\\rangle-|11\\rangle\\big)|{-}\\rangle$. One sign in four is a relative phase.'}}]}
   ]}
 ]},
 
@@ -834,28 +799,21 @@ const SC = [
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'The same move with any unitary: an eigenstate sends its phase up to the control'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Nothing above used the fact that the operation was a bit flip. It used only that the target was prepared in an <b>eigenstate</b> of it. So replace $X$ by any unitary $U$ and $|{-}\\rangle$ by an eigenstate $|u\\rangle$:</p>'},
-    {t:'eq', tex:'U\\,|u\\rangle = e^{2\\pi i \\varphi}\\,|u\\rangle, \\qquad 0 \\le \\varphi < 1'},
-    {t:'body', html:'<p>Because $U$ is unitary its eigenvalues have modulus one, so they are pure phases and can always be written this way. Now control $U$ on a qubit prepared in $|{+}\\rangle$:</p>'},
-    {t:'eq', key:true, tex:'\\mathrm{c}U\\,\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+|1\\rangle\\big)|u\\rangle = \\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{2\\pi i \\varphi}|1\\rangle\\big)|u\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The target is untouched again, and the eigenphase is now a relative phase on one qubit. Chapter 5\u2019s three-gate circuit — a Hadamard, a phase, a Hadamard — turns a relative phase into a probability, and the rest of this chapter is that idea done with $t$ qubits at once so that the phase comes out as a binary number instead of as one probability.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figEigen(),
-      caption:'One controlled gate. The lower wire is unchanged and the upper one has picked up the eigenvalue. The wanted number is now a relative phase, which is the only kind of number this course can read.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figEigen(),
+      caption:'One controlled gate. The lower wire is unchanged and the upper one has picked up the eigenvalue as a relative phase, the kind of number this course can read.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$U = T = \\operatorname{diag}(1, e^{i\\pi/4})$ and the target prepared in $|1\\rangle$.'],
-        ['Work', '$T|1\\rangle = e^{i\\pi/4}|1\\rangle$, so $2\\pi\\varphi = \\pi/4$ and $\\varphi = 1/8$.'],
-        ['Answer', 'The control comes out as $\\tfrac{1}{\\sqrt2}\\left(|0\\rangle + e^{i\\pi/4}|1\\rangle\\right)$, a state on the equator of the Bloch sphere at azimuth $45^{\\circ}$.'],
-        ['Check', '$\\varphi = 1/8$ is $0.001$ in binary and needs three bits, so a counting register of three qubits should read it exactly. That is what the next section builds.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'This needs an eigenstate', html:'Given a superposition $\\sum_{k}c_{k}|u_{k}\\rangle$ instead, the procedure returns $\\varphi_{k}$ with probability $|c_{k}|^{2}$. It samples one eigenphase; it does not list the spectrum.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Kickback, general form', tex:'\\begin{aligned} U\\,|u\\rangle &= e^{2\\pi i \\varphi}\\,|u\\rangle, \\qquad 0 \\le \\varphi < 1 \\\\ \\mathrm{c}U\\,\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+|1\\rangle\\big)|u\\rangle &= \\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{2\\pi i \\varphi}|1\\rangle\\big)|u\\rangle \\end{aligned}',
+      note:'The Boolean case used only that the target was an eigenstate of the flip. A unitary has eigenvalues of modulus one, so each is a pure phase. The target is untouched, and the eigenphase is a relative phase on the control, which a Hadamard turns into a probability.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'U = T,\\ |u\\rangle = |1\\rangle: \\quad T|1\\rangle = e^{i\\pi/4}|1\\rangle, \\qquad \\varphi = \\tfrac18',
+        note:'The control comes out as $\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{i\\pi/4}|1\\rangle\\big)$, on the equator at azimuth $45^{\\circ}$. In binary $\\varphi = 0.001$, so three counting qubits should read it exactly; phase estimation does that.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'This needs an eigenstate, and getting one can be the hard part', html:'The whole construction assumes $|u\\rangle$ is available. Sometimes it is not, and then the input is a superposition $\\sum_{k}c_{k}|u_{k}\\rangle$; the procedure still runs and returns the eigenphase $\\varphi_{k}$ with probability $|c_{k}|^{2}$. It samples one eigenphase; it does not list the spectrum. Order finding turns this apparent weakness into the thing that makes it work.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$U = S = \\operatorname{diag}(1, i)$, the control in $|{+}\\rangle$, and the target in $|0\\rangle$.<div class="nsep"></div>What is the control after the controlled-$S$?',
+        ask:{key:'m6-eigen', choices:['$|{+}\\rangle$, unchanged: here $\\varphi = 0$','$\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+i|1\\rangle\\big)$','entangled with the target'], answer:0,
+          why:'$S|0\\rangle = |0\\rangle$, so the eigenvalue is $1$ and $\\varphi = 0$. The phase $i$ belongs to the other eigenstate, $|1\\rangle$.'}}]}
   ]}
 ]},
 
@@ -866,25 +824,32 @@ const SC = [
   src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · One mechanism'},
   {t:'title', text:'A superposition costs one layer and buys nothing until the wrong terms cancel'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>One layer of Hadamards on $n$ qubits produces every input at once, and one query then produces every output at once:</p>'},
-    {t:'eq', tex:'\\frac{1}{2^{n/2}}\\sum_{x} |x\\rangle \\;\\xrightarrow{\\;U_{f}\\;}\\; \\frac{1}{2^{n/2}}\\sum_{x} (-1)^{f(x)}|x\\rangle'},
-    {t:'body', html:'<p>Measure now and a uniformly random $x$ comes out. Every amplitude has the same modulus, so every string is equally likely, and the signs — which are the entire content of what the query returned — are invisible in this basis. The run has cost a query and returned a coin toss.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>What the last layer of Hadamards does is add the $2^{n}$ signed amplitudes together, so that a term with a plus and a term with a minus destroy each other:</p>'},
-      {t:'eq', key:true, tex:'\\langle 0^{n}|\\,H^{\\otimes n}\\Big(\\tfrac{1}{2^{n/2}}\\textstyle\\sum_{x}(-1)^{f(x)}|x\\rangle\\Big) = \\frac{1}{2^{n}}\\sum_{x}(-1)^{f(x)}'},
-      {t:'small', html:'That single number is what the algorithm is for. It is not any one value of $f$; it is a <b>global</b> property of the whole table, and it arrived because the unwanted terms cancelled.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figCancel(),
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figCancel(),
       caption:'Sixteen amplitudes before the last layer of Hadamards and one after it, for a balanced function on four bits. The first picture is worth nothing; the second is the whole answer.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'def', head:'The rule, in one line', html:'A quantum algorithm has to make the amplitudes of every answer it does not want <b>cancel</b>, and it has to do that before anything is measured. The readout returns $n$ bits, never $2^{n}$ numbers, so any design that needs to see many amplitudes has already failed. Every algorithm in this chapter is answerable to this sentence and each one answers it differently.'}
-    ]},
+      {t:'note', kind:'err', head:'"It computes all the values in parallel" is true and useless', html:'The only way to look at the superposition is to measure it, and $2^{n}$ equal amplitudes measure as a random number. The question is which arrangement of phases lets one number survive the sum.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'What the last layer computes', tex:'\\langle 0^{n}|\\,H^{\\otimes n}\\Big(\\tfrac{1}{2^{n/2}}\\textstyle\\sum_{x}(-1)^{f(x)}|x\\rangle\\Big) = \\frac{1}{2^{n}}\\sum_{x}(-1)^{f(x)}',
+      note:'One layer of Hadamards and one query produce every output at once, all with the same modulus. Measured now, the state gives a uniformly random string and the signs are invisible. The last layer adds the signed amplitudes, so a plus and a minus destroy each other and one global property of $f$ survives.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'n = 4,\\ f = \\text{parity}: \\quad 16 \\text{ amplitudes } \\pm\\tfrac14 \\;\\xrightarrow{\\;H^{\\otimes 4}\\;}\\; |1111\\rangle',
+        note:'After the last layer one string carries all the probability and fifteen carry none, and $0000$ is never printed. That cancellation is the answer.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'"It computes all the values in parallel" is true and useless', html:'The superposition really does contain all $2^{n}$ values. It is useless because the only way to look at it is to measure it, and a measurement of a state with $2^{n}$ equal amplitudes is a random number generator. The interesting question is never how many values are held; it is which arrangement of phases lets one number survive the sum.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$n = 3$, and $f(x) = 1$ on the two inputs $000$ and $001$ only.<div class="nsep"></div>What is the probability of reading $000$?',
+        ask:{key:'m6-cancel', choices:['$\\tfrac14$','$0$','$\\tfrac34$'], answer:0,
+          why:'Six signs are $+$ and two are $-$, so the mean is $\\tfrac{6-2}{8} = \\tfrac12$ and the probability is its square. This $f$ is neither constant nor balanced, and the reading proves nothing.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-kick', module:'M6', nav:'Code · One mechanism', title:'Phase kickback in code',
+  objective:'Watch an oracle write a sign, a controlled gate write an eigenphase, and interference turn signs into one string.',
+  keywords:'code qiskit numpy program phase kickback oracle sign eigenstate controlled phase interference',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · One mechanism'},
+  {t:'title', text:'Phase kickback in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-kick')}
 ]},
 
 /* ---------------------------------------------------------------- 6.3.1 -- */
@@ -894,28 +859,21 @@ const SC = [
   src:'L10 · Deutsch\u2019s promise problem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'One query decides a property that two are needed for classically'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A black box holds one of the four functions $f:\\{0,1\\}\\to\\{0,1\\}$. Two of them are <b>constant</b> — they return the same value on both inputs — and two are <b>balanced</b>, returning $0$ once and $1$ once. The task is to say which class it is in. It is not to find the function.</p>'},
-    {t:'body', html:'<p>Classically this needs both values: knowing $f(0)$ alone rules nothing out. So two queries, and no clever ordering avoids it.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>The quantum circuit uses one. Prepare the query qubit in $|{+}\\rangle$ and the target in $|{-}\\rangle$, query once, and Hadamard the query qubit:</p>'},
-      {t:'eq', key:true, tex:'\\tfrac{1}{\\sqrt2}\\Big((-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\Big) \\;\\xrightarrow{\\;H\\;}\\; \\pm\\,|\\,f(0)\\oplus f(1)\\,\\rangle'},
-      {t:'small', html:'The reading is $f(0)\\oplus f(1)$, which is $0$ for both constant functions and $1$ for both balanced ones. It is exactly the one bit that was asked for, and the two bits that were not asked for never appear.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figDeutsch(),
-      caption:'The circuit and the four promised functions. Each pair of functions gives the same reading, because the reading is the property and not the function.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figDeutsch(),
+      caption:'The circuit and the four promised functions. Each pair gives the same reading, because the reading is the property and not the function.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'The balanced oracle $f(x)=x$, implemented as a CNOT from the query qubit to the target.'],
-        ['Work', 'Kickback gives $(-1)^{x}$ on the query term, so the query qubit becomes $\\tfrac{1}{\\sqrt2}(|0\\rangle-|1\\rangle) = |{-}\\rangle$.'],
-        ['Answer', 'The final Hadamard sends $|{-}\\rangle$ to $|1\\rangle$, so every ideal shot reads $1$: balanced.'],
-        ['Check', 'The target is still $|{-}\\rangle$ up to a global phase, and it is not entangled with the query qubit. Measuring it would give a fair coin and would say nothing, which is the sign that the answer really is on the other wire.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'What this result is', html:'One query saved on a problem with four instances is not a useful computation. It is the smallest complete example of the mechanism: a promise, a query answered into a phase, and interference that turns the phase into a certain bit.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Deutsch', tex:'\\tfrac{1}{\\sqrt2}\\Big((-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\Big) \\;\\xrightarrow{\\;H\\;}\\; \\pm\\,|\\,f(0)\\oplus f(1)\\,\\rangle',
+      note:'Two of the four functions $f:\\{0,1\\}\\to\\{0,1\\}$ are constant and two are balanced; the task is to say which class, not which function. Classically that needs both values. Prepare $|{+}\\rangle|{-}\\rangle$, query once, apply a Hadamard: the reading is $f(0)\\oplus f(1)$, the one bit asked for.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'f(x) = x: \\quad |{+}\\rangle \\;\\xrightarrow{\\;U_{f}\\;}\\; |{-}\\rangle \\;\\xrightarrow{\\;H\\;}\\; |1\\rangle',
+        note:'The oracle is a CNOT from the query qubit to the target. Every ideal shot reads $1$: balanced. The target stays $|{-}\\rangle$, unentangled, and measuring it would give a fair coin.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'What this result is, honestly', html:'A saving of one query on a problem with four possible instances is not a useful computation, and this circuit is not a benchmark for a machine. Its importance is that it is the smallest complete example of the mechanism: a promise, a query answered into a phase, and interference converting that phase into a certain bit. Everything later in this chapter is this circuit made bigger.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The balanced oracle $f(x) = x$ again, but the target is prepared in $|1\\rangle$, with no Hadamard on it.<div class="nsep"></div>What does the query qubit read?',
+        ask:{key:'m6-deutsch', choices:['a fair coin','$1$, every shot','$0$, every shot'], answer:0,
+          why:'The CNOT turns $|{+}\\rangle|1\\rangle$ into $\\tfrac{1}{\\sqrt2}\\big(|0\\rangle|1\\rangle+|1\\rangle|0\\rangle\\big)$, which is entangled. $|1\\rangle$ is not an eigenstate of the flip, nothing is kicked back, and the reading is $0$ or $1$ with probability $\\tfrac12$ each.'}}]}
   ]}
 ]},
 
@@ -926,27 +884,21 @@ const SC = [
   src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The same circuit on n bits, and every balanced function cancels exactly'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Now $f:\\{0,1\\}^{n}\\to\\{0,1\\}$, promised to be constant or to be balanced — meaning it returns $1$ on exactly half of its $2^{n}$ inputs. The circuit is unchanged: Hadamards on all $n$ query qubits, one query, Hadamards again, and measure all $n$.</p>'},
-    {t:'body', html:'<p>The only quantity that has to be computed is the amplitude of the string $0^{n}$, and the Hadamard layer makes that a plain average:</p>'},
-    {t:'eq', key:true, tex:'a_{0^{n}} = \\frac{1}{2^{n}}\\sum_{x\\in\\{0,1\\}^{n}} (-1)^{f(x)}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'A constant function makes every sign the same, so the average is $+1$ or $-1$ and the probability of reading $0^{n}$ is one. A balanced function has exactly $2^{n-1}$ plus signs and $2^{n-1}$ minus signs, so the average is <b>exactly</b> zero and the probability of reading $0^{n}$ is zero. Nothing is approximate: read $0^{n}$ and the function is constant, read anything else and it is balanced.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figDJ(),
-      caption:'Four promised functions on three bits and the average of their signs. The two balanced rows cancel term by term; that cancellation is the algorithm, and the promise is what guarantees it.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figDJ(),
+      caption:'Four promised functions on three bits and the mean of their signs. The balanced rows cancel term by term; the promise is what guarantees it.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$n=2$ and the balanced oracle $f(x_{1},x_{0}) = x_{0} \\oplus x_{1}$, built from two CNOTs into the target.'],
-        ['Work', 'The signs on the four terms are $+,-,-,+$, so the state before the last Hadamards is $|{-}\\rangle|{-}\\rangle$.'],
-        ['Answer', 'The Hadamards send it to $|11\\rangle$, so every ideal shot prints $11$ — never $00$.'],
-        ['Check', 'The amplitude of $|00\\rangle$ is $\\tfrac14(1-1-1+1)=0$, and the four probabilities are $0,0,0,1$, which add to one. Compare a constant oracle, which is the empty circuit, and prints $00$ every time.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'The promise is not decoration', html:'For a function that is neither constant nor balanced the amplitude of $0^{n}$ lies between $-1$ and $1$, and no reading proves anything. Stating the promise is part of stating the result.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The all-zero amplitude', tex:'a_{0^{n}} = \\frac{1}{2^{n}}\\sum_{x\\in\\{0,1\\}^{n}} (-1)^{f(x)}',
+      note:'The promise: $f$ is constant, or it is $1$ on exactly half its $2^{n}$ inputs. The circuit is Deutsch\u2019s on $n$ query qubits. A constant $f$ makes the mean $\\pm1$, so $0^{n}$ is read with certainty; a balanced $f$ makes it exactly zero, so $0^{n}$ is never read.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'n = 2,\\ f = x_{0}\\oplus x_{1}: \\quad a_{00} = \\tfrac14(1-1-1+1) = 0, \\qquad \\text{reading } 11',
+        note:'The signs $+,-,-,+$ make the state before the last Hadamards $|{-}\\rangle|{-}\\rangle$, and the Hadamards send it to $|11\\rangle$. A constant oracle, the empty circuit, prints $00$ every time.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'The promise is not decoration', html:'Drop it and the algorithm is worthless. For a function that is neither constant nor balanced the amplitude of $0^{n}$ is some number between $-1$ and $1$, so a reading of $0^{n}$ no longer proves anything and a reading of something else no longer proves anything either. Every "exponential separation" in this family is a separation for a promised input, and stating the promise is part of stating the result.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$n = 3$ and the balanced oracle $f(x) = x_{0}\\oplus x_{2}$.<div class="nsep"></div>Which string does every ideal shot print?',
+        ask:{key:'m6-dj', choices:['$101$','$000$','$010$'], answer:0,
+          why:'The parity of the bits picked out by $s = 101$ puts the sign $(-1)^{x\\cdot s}$ on each term, and the Hadamards send that pattern to $|s\\rangle$. Any reading but $000$ says balanced.'}}]}
   ]}
 ]},
 
@@ -957,32 +909,33 @@ const SC = [
   src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
   {t:'title', text:'The exponential gap is against an exact classical algorithm, and only that one'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A classical algorithm that must never be wrong has to keep asking until the answer is forced. In the worst case it sees $2^{n-1}$ equal values and still cannot tell a constant function from a balanced one, so it needs</p>'},
-    {t:'eq', key:true, tex:'2^{n-1}+1 \\ \\text{ queries, against } 1 \\ \\text{ for the quantum circuit}'},
-    {t:'body', html:'<p>That is an exponential separation and it is a genuine theorem. It is also a theorem about exact algorithms, and almost nothing in computing is required to be exact.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Allow the classical algorithm to be wrong with small probability and the gap collapses. Query $k$ distinct inputs at random: a constant function always agrees, and a balanced one gives all-equal answers with probability below $2^{-(k-1)}$. So</p>'},
-      {t:'eq', tex:'k = 21 \\ \\text{ queries give an error probability below } 10^{-6}, \\ \\text{ for every } n'},
-      {t:'small', html:'Twenty-one questions, whatever $n$ is. Against that constant, the quantum saving is a factor of twenty-one and not an exponential.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figDJcost(),
-      caption:'Three counts on a logarithmic axis. The exponential gap is the distance to the top curve; the honest gap for anyone willing to be wrong once in a million is the distance to the flat one at twenty-one.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figDJcost(),
+      caption:'Three counts on a logarithmic axis. The exponential gap is the distance to the top curve; for anyone willing to be wrong once in a million it is the distance to the flat line at twenty-one.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$n=10$, so $1024$ inputs.'],
-        ['Work', 'Exact classical worst case: $2^{9}+1 = 513$. Quantum: $1$. Randomised for error below $10^{-6}$: $21$.'],
-        ['Answer', 'The exact ratio is $513$; the ratio anyone would actually use is $21$.'],
-        ['Check', 'Push $n$ to $30$. The exact count becomes $5.4\\times10^{8}$ and the randomised count is still $21$: the first grows and the second does not, which is exactly what "the separation is against exactness" means.']
-      ]}
-    ]},
+      {t:'note', kind:'ok', head:'Why the result still matters', html:'It was the first proof that a quantum computer can settle a question with fewer queries than any classical machine. It must not be quoted as an exponential speedup for a practical task.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Exact against exact', tex:'2^{n-1}+1 \\ \\text{ classical queries, against } 1',
+      note:'A classical algorithm that must never be wrong can see $2^{n-1}$ equal values and still not know. That gap is a theorem about exact algorithms. Allow an error: $k$ random queries err below $2^{-(k-1)}$, for every $n$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} n = 10: \\quad \\text{exact } &2^{9}+1 = 513 \\\\ \\text{error below } 10^{-6}: \\quad &21 \\end{aligned}',
+        note:'The ratio anyone would use is $21$, not $513$. At $n = 30$ the randomised count is still $21$, and the exact count has grown to $5.4\\times10^{8}$ queries.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'Why the result still matters', html:'It was the first proof that a quantum computer can settle a question with fewer questions than any classical machine, and it introduced the mechanism the rest of the chapter runs on. A first proof of possibility does not have to be useful. What it must not do is get quoted as an exponential speedup for a practical task, because it is not one.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'A randomised classical tester may be wrong once in a billion, $\\varepsilon = 10^{-9}$, and $n = 20$.<div class="nsep"></div>How many queries does it need?',
+        ask:{key:'m6-djcost', choices:['$31$','$524\\,289$','$30$'], answer:0,
+          why:'$2^{-(k-1)} \\le 10^{-9}$ needs $k-1 \\ge 29.9$, so $k = 31$, whatever $n$ is. $524\\,289 = 2^{19}+1$ is the exact count.'}}]}
   ]}
-]}
-,
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-dj', module:'M6', nav:'Code · Deutsch and Deutsch\u2013Jozsa', title:'Deutsch\u2013Jozsa in code',
+  objective:'Run Deutsch\u2013Jozsa on several oracles, check the mean of the signs, and see what happens without the promise.',
+  keywords:'code qiskit numpy program deutsch jozsa oracles balanced constant mean of signs promise',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · Deutsch and Deutsch\u2013Jozsa'},
+  {t:'title', text:'Deutsch\u2013Jozsa in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-dj')}
+]},
 
 /* ---------------------------------------------------------------- 6.4.1 -- */
 { id:'m6-qft', module:'M6', nav:'The Fourier transform', title:'The transform sends a basis state to a phase that winds at a rate the state sets',
@@ -991,27 +944,21 @@ const SC = [
   src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform sends a basis state to a phase that winds at a rate the state sets'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>On $n$ qubits there are $Q=2^{n}$ basis states, and the transform is defined on each of them:</p>'},
-    {t:'eq', key:true, tex:'F_{Q}\\,|x\\rangle = \\frac{1}{\\sqrt{Q}}\\sum_{k=0}^{Q-1} e^{2\\pi i\\,xk/Q}\\,|k\\rangle'},
-    {t:'body', html:'<p>Every output amplitude has the same modulus $1/\\sqrt{Q}$. What carries the input is the <b>rate</b> at which the phase turns as $k$ advances: input $x$ turns it by $2\\pi x/Q$ per step, so $x=0$ does not wind at all.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'It is unitary, so it is a change of basis and nothing more: no information is created and none is destroyed. The inverse takes the opposite sign in the exponent. On a general input $\\sum_{x}a_{x}|x\\rangle$ it acts by linearity, and the result is the discrete Fourier transform of the amplitude list — held as amplitudes, not printed.'}
-    ]}
-  ], right:[
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
     {t:'fig', frame:true, svg:()=>figQFT(),
-      caption:'The eight amplitudes of $F_{8}|3\\rangle$, drawn as arrows in the complex plane. All eight have the same length, and each step turns by $3\\times 45^{\\circ} = 135^{\\circ}$.'},
+      caption:'The eight amplitudes of $F_{8}|3\\rangle$ as arrows in the complex plane, drawn with equal scales. All have one length; the input index sets how fast the phase winds, and nothing else.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$Q=8$ and the input $|3\\rangle$.'],
-        ['Work', 'Amplitude $k$ is $\\tfrac{1}{\\sqrt8}e^{2\\pi i\\,3k/8}$. Its modulus is $1/\\sqrt8 = 0.354$ for every $k$, and its phase advances by $135^{\\circ}$ each step.'],
-        ['Answer', 'Measuring straight away gives a uniformly random $k$: eight outcomes, each with probability $1/8$.'],
-        ['Check', 'The eight probabilities add to one, and they are the same for every input $x$ — so a single application of the transform followed by a measurement can never reveal $x$. The transform is only useful when the phase pattern it produces is made to interfere with something.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'The one input worth memorising', html:'$F_{Q}|0\\rangle$ is the uniform superposition, and on one qubit $F_{2}$ is the Hadamard. The layer of Hadamards that opens every algorithm here does the same to $|0^{n}\\rangle$.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The transform', tex:'F_{Q}\\,|x\\rangle = \\frac{1}{\\sqrt{Q}}\\sum_{k=0}^{Q-1} e^{2\\pi i\\,xk/Q}\\,|k\\rangle',
+      note:'On $n$ qubits $Q = 2^{n}$. Every output amplitude has modulus $1/\\sqrt{Q}$; the input sets the <b>rate</b> at which the phase turns, $2\\pi x/Q$ a step. It is unitary, a change of basis. On a general input it gives the discrete Fourier transform of the amplitudes, held as amplitudes and not printed.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'F_{8}|3\\rangle: \\quad |a_{k}| = \\tfrac{1}{\\sqrt8} = 0.354, \\qquad \\text{each step turns } 3\\times45^{\\circ} = 135^{\\circ}',
+        note:'Measured straight away it gives each $k$ with probability $1/8$, for every input $x$. The transform is useful only when its phase pattern is made to interfere with something.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'The one input worth memorising', html:'$F_{Q}|0\\rangle$ is the uniform superposition, since every phase is $1$. So the layer of Hadamards that starts every algorithm in this chapter <b>is</b> the Fourier transform of the all-zero state, and on one qubit the Hadamard is exactly $F_{2}$. The chapter has been using this transform since its first scene.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$Q = 8$ and the input $|4\\rangle$.<div class="nsep"></div>What is the amplitude of $|k\\rangle$ in $F_{8}|4\\rangle$?',
+        ask:{key:'m6-qft', choices:['$(-1)^{k}/\\sqrt8$','$1/\\sqrt8$ for every $k$','$e^{i\\pi k/4}/\\sqrt8$'], answer:0,
+          why:'Each step turns by $2\\pi\\cdot4/8 = \\pi$, half a turn, so the phase alternates between $+1$ and $-1$. The third choice is the ramp of $|1\\rangle$.'}}]}
   ]}
 ]},
 
@@ -1022,29 +969,21 @@ const SC = [
   src:'L10 · QFT circuit in Qiskit', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'A Hadamard and a triangle of small rotations, and the whole thing is quadratic'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The transform looks like a $Q\\times Q$ matrix and would take $Q^{2}$ multiplications to apply as one. It factors instead into a short circuit, because the phase $e^{2\\pi i xk/Q}$ separates into one factor per bit of $x$.</p>'},
-    {t:'body', html:'<p>Each qubit gets one Hadamard and then one controlled rotation from every qubit below it, with the rotation getting smaller as the control gets further away:</p>'},
-    {t:'eq', tex:'R_{k} = \\begin{bmatrix} 1 & 0 \\\\ 0 & e^{2\\pi i/2^{k}} \\end{bmatrix}'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Counting them: $n$ Hadamards and $n(n-1)/2$ rotations, plus $\\lfloor n/2 \\rfloor$ swaps to put the output bits back in order.</p>'},
-      {t:'eq', key:true, tex:'\\tfrac12\\,n(n+1) \\ \\text{ gates}, \\qquad \\text{depth } O(n)'},
-      {t:'small', html:'Ten qubits means fifty-five gates, and a thousand qubits would mean about half a million. Quadratic in the number of qubits, which is polynomial in the input length and therefore cheap.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQFTcirc(),
-      caption:'Three qubits: three Hadamards, three controlled rotations and one swap. The rotation angles halve with each step down, which is what makes truncating them a sensible thing to do.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQFTcirc(),
+      caption:'Three qubits: three Hadamards, three controlled rotations and one swap. The rotation angle halves as the control gets further away, which is why dropping the smallest ones is sensible.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'A ten-qubit register, so $Q=1024$.'],
-        ['Work', 'Gates: $\\tfrac12\\times10\\times11 = 55$, plus $5$ swaps. The smallest rotation is $R_{10}$, an angle of $2\\pi/1024 = 0.35^{\\circ}$.'],
-        ['Answer', 'Sixty gates for a transform whose matrix has $1024^{2} \\approx 10^{6}$ entries.'],
-        ['Check', 'A classical fast Fourier transform on $1024$ explicitly stored numbers costs about $Q\\log_{2}Q = 10240$ arithmetic operations. The counts are different because the tasks are different: one has the vector in memory and prints the answer, the other has it as amplitudes and prints one index.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'The approximate transform', html:'Rotations below a threshold are dropped. That turns a gate of a third of a degree into a bounded error and cuts the count from $O(n^{2})$ to $O(n\\log n)$.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The circuit', tex:'\\begin{aligned} R_{k} &= \\begin{bmatrix} 1 & 0 \\\\ 0 & e^{2\\pi i/2^{k}} \\end{bmatrix} \\\\ n + \\tfrac12 n(n-1) &= \\tfrac12 n(n+1) \\text{ gates} \\end{aligned}',
+      note:'The phase $e^{2\\pi i xk/Q}$ splits into one factor per bit of $x$, so the $Q\\times Q$ matrix factors into a short circuit. Each qubit gets a Hadamard and a controlled rotation from every less significant qubit. Add $\\lfloor n/2\\rfloor$ swaps to restore the bit order; the depth is $O(n)$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'n = 10: \\quad \\tfrac12\\cdot10\\cdot11 = 55 \\text{ gates} + 5 \\text{ swaps}, \\qquad R_{10}: 0.35^{\\circ}',
+        note:'Sixty gates for a matrix with $1024^{2}\\approx10^{6}$ entries. A classical FFT on $1024$ stored numbers costs about $Q\\log_{2}Q = 10240$ operations, for a different task: it prints all $Q$ numbers.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'The approximate transform, and why it is used', html:'Rotations by less than some threshold are dropped. This turns a hardware problem — a gate that has to implement an angle of a third of a degree accurately — into a bounded algorithmic error, and it reduces the gate count from $O(n^{2})$ to $O(n\\log n)$. It is the standard choice in every resource estimate for factoring.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The transform on $n = 6$ qubits, swaps not counted.<div class="nsep"></div>How many Hadamards and controlled rotations does it take?',
+        ask:{key:'m6-qftcirc', choices:['$21$','$36$','$15$'], answer:0,
+          why:'$6$ Hadamards and $\\tfrac12\\cdot6\\cdot5 = 15$ rotations, $21$ in all. $36 = n^{2}$ counts every ordered pair of qubits.'}}]}
   ]}
 ]},
 
@@ -1055,28 +994,32 @@ const SC = [
   src:'L10 · what the QFT does and does not return', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
   {t:'title', text:'The transform produces amplitudes, and a measurement still returns one index'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>This is the scene the rest of the chapter depends on. Hand the transform a state $\\sum_{x}a_{x}|x\\rangle$ and it produces $\\sum_{k}\\tilde{a}_{k}|k\\rangle$. It does <b>not</b> print the $Q$ numbers $\\tilde{a}_{k}$. It cannot: the readout returns $n$ bits.</p>'},
-    {t:'eq', key:true, tex:'\\text{one run returns one } k, \\ \\text{ drawn with probability } |\\tilde{a}_{k}|^{2}'},
-    {t:'body', html:'<p>So it is useful only where the thing wanted can be <b>inferred from samples</b> of that distribution — a period, an order, an eigenphase. If the whole spectrum is wanted, a classical fast Fourier transform is the right machine.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The two are also not comparable as costs. The classical transform takes a stored vector of $Q$ numbers and returns $Q$ numbers in about $Q\\log_{2}Q$ operations; the quantum one takes a prepared state and returns one index. Quoting $n^{2}$ against $Q\\log Q$ as a speedup compares two different tasks.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQFTnot(),
-      caption:'Eight numbers exist inside the machine and one index comes out. Recovering the shape of the distribution would take many runs, and by then the counting has cost more than the transform saved.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQFTnot(),
+      caption:'Eight numbers exist inside the machine and one index comes out. Recovering the shape would take many runs, and the counting would cost more than the transform saved.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'The transform in the figure: probability $0.25$ on each of $k=0,2,4,6$ and exactly zero on the odd indices.'],
-        ['Work', 'One run returns one of those four, each with probability one quarter. Nothing else is learnt from that run.'],
-        ['Answer', 'The useful inference is about the <b>set</b> of likely indices, not about the amplitudes: every outcome is even, which is already a statement about a period.'],
-        ['Check', 'Estimating one of those probabilities to within $0.01$ takes about $1900$ shots, and reading the phase of $\\tilde{a}_{2}$ would take a different experiment entirely.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'"Fourier transforms, exponentially faster" is the commonest wrong sentence here', html:'The circuit is exponentially smaller than its matrix, and its output is not what a signal processor wants. Reading $Q$ numbers takes $Q$ readings.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'What one run returns', tex:'\\text{one } k, \\ \\text{ drawn with probability } |\\tilde{a}_{k}|^{2}',
+      note:'Given $\\sum_{x}a_{x}|x\\rangle$, the transform produces $\\sum_{k}\\tilde{a}_{k}|k\\rangle$ and does not print the $Q$ numbers; the readout returns $n$ bits. It helps only where the wanted thing can be inferred from samples: a period, an order, an eigenphase. For the whole spectrum a classical FFT is the right machine.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\tfrac{1}{\\sqrt2}\\big(|1\\rangle+|5\\rangle\\big) \\;\\xrightarrow{\\;F_{8}\\;}\\; P(k) = 0.25 \\text{ on } k = 0,2,4,6',
+        note:'One run returns one even index. Every outcome is even, which is already a statement about a period. Estimating one of the probabilities to $\\pm0.01$ takes about $1900$ shots.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'"Fourier transforms, exponentially faster" is the commonest wrong sentence about this subject', html:'The circuit really is exponentially smaller than the matrix it implements, and what it produces is not the answer a signal processor wants. Reading $Q$ numbers takes $Q$ readings, so there is no way round it. Every real use of this transform reads a single index out of it.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The input $\\tfrac12\\big(|0\\rangle+|2\\rangle+|4\\rangle+|6\\rangle\\big)$ on $Q = 8$.<div class="nsep"></div>What can one run of the transform return?',
+        ask:{key:'m6-qftnot', choices:['$0$ or $4$, each with probability $\\tfrac12$','any even index, each with $\\tfrac14$','the four amplitudes'], answer:0,
+          why:'The input repeats every $2$ steps, so the transform has weight only on multiples of $8/2 = 4$. A shorter period in $x$ means a wider spacing in $k$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-qft', module:'M6', nav:'Code · The quantum Fourier transform', title:'The Fourier transform in code',
+  objective:'Compare the transform matrix with its circuit, draw a phase ramp, and transform a periodic input.',
+  keywords:'code qiskit numpy program quantum fourier transform matrix circuit phase ramp periodic input',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
+  {t:'title', text:'The Fourier transform in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-qft')}
 ]},
 
 /* ---------------------------------------------------------------- 6.5.1 -- */
@@ -1086,23 +1029,21 @@ const SC = [
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Write the phase into t qubits at once, then undo the transform to read it'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>One controlled $U$ put $e^{2\\pi i\\varphi}$ onto one control qubit. Use $t$ control qubits, and let control $j$ apply $U$ raised to the power $2^{j}$, so that the phase it collects is doubled each time:</p>'},
-    {t:'eq', tex:'\\text{control } j \\ \\text{ collects } e^{2\\pi i\\,2^{j}\\varphi}'},
-    {t:'body', html:'<p>The counting register is then exactly the state the Fourier transform produces from the number $2^{t}\\varphi$:</p>'},
-    {t:'eq', key:true, tex:'\\frac{1}{\\sqrt{2^{t}}}\\sum_{k=0}^{2^{t}-1} e^{2\\pi i k\\varphi}\\,|k\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'So apply the <b>inverse</b> transform and the phase ramp collapses onto the number that produced it. Measuring the $t$ qubits gives an integer $y$, and $y/2^{t}$ is the estimate of $\\varphi$. Three parts: Hadamards, controlled powers, inverse transform — and the middle part is where the physics and the cost both are.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQPE(),
-      caption:'Three counting qubits, three controlled powers and the inverse transform. The eigenstate on the bottom wire is unchanged from beginning to end, exactly as in the two-qubit version.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQPE(),
+      caption:'Three counting qubits, three controlled powers and the inverse transform. The eigenstate on the bottom wire is unchanged from beginning to end.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'def', head:'Why the powers are powers of two', html:'A $t$-bit binary fraction is $\\varphi \\approx 0.b_{1}b_{2}\\ldots b_{t}$, and multiplying by $2^{j}$ shifts the binary point $j$ places. The control that applies $U^{2^{j}}$ is therefore reading bit $t-j$ of the answer. The circuit is a binary expansion, written in phases, and the inverse transform is the machine that reads a binary expansion out of phases.'}
-    ]},
+      {t:'note', kind:'warn', head:'A superposition of eigenstates gives a sample', html:'With $\\sum_{k}c_{k}|u_{k}\\rangle$ on the bottom wire, the circuit returns $\\varphi_{k}$ with probability $|c_{k}|^{2}$. Order finding relies on exactly that.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The counting register', tex:'\\text{control } j \\text{ applies } U^{2^{j}}: \\qquad \\frac{1}{\\sqrt{2^{t}}}\\sum_{k=0}^{2^{t}-1} e^{2\\pi i k\\varphi}\\,|k\\rangle',
+      note:'Control $j$ collects $e^{2\\pi i\\,2^{j}\\varphi}$, so the phase doubles from wire to wire. The register is then the state the Fourier transform makes from the number $2^{t}\\varphi$, and the inverse transform collapses the ramp onto that number. Measuring gives $y$, and $y/2^{t}$ estimates $\\varphi$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\varphi = \\tfrac58 = 0.101_{2},\\ t = 3: \\quad \\text{the controls collect } \\tfrac58,\\ \\tfrac14,\\ \\tfrac12 \\text{ of a turn}',
+        note:'Doubling shifts the binary point: $2\\varphi = 1.01_{2}$ and $4\\varphi = 10.1_{2}$, and whole turns drop out. The inverse transform reads $y = 5$, the bits $101$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'A superposition of eigenstates gives a sample, not a list', html:'If the third register holds $\\sum_{k}c_{k}|u_{k}\\rangle$ rather than a single eigenstate, the circuit returns an estimate of $\\varphi_{k}$ with probability $|c_{k}|^{2}$. It samples one eigenphase per run. That is a limitation everywhere else and it is the whole mechanism of order finding, where no single eigenstate can be prepared and the even mixture of all of them can.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$t = 4$ counting qubits and $\\varphi = 3/16$.<div class="nsep"></div>Which control collects a phase of exactly half a turn?',
+        ask:{key:'m6-qpe', choices:['$j = 3$, the one applying $U^{8}$','$j = 0$, the one applying $U$','none of them'], answer:0,
+          why:'Control $j$ collects $2^{j}\\cdot\\tfrac{3}{16}$ of a turn: $\\tfrac{3}{16}$, $\\tfrac38$, $\\tfrac34$, then $\\tfrac32$, which is half a turn once the whole turn drops out.'}}]}
   ]}
 ]},
 
@@ -1113,28 +1054,21 @@ const SC = [
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that fits in t bits comes out certain, and every wrong outcome cancels'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Take the case where the phase happens to be a $t$-bit binary fraction, $\\varphi = m/2^{t}$ for a whole number $m$. Then the counting register holds exactly $F|m\\rangle$, and the inverse transform sends it exactly to $|m\\rangle$.</p>'},
-    {t:'eq', key:true, tex:'\\varphi = \\frac{m}{2^{t}} \\quad\\Longrightarrow\\quad P(y=m) = 1'},
-    {t:'body', html:'<p>It is worth seeing why the other $2^{t}-1$ outcomes are gone. The amplitude of outcome $y$ is a geometric sum, and away from $y=m$ its terms are the roots of unity spread evenly round the circle:</p>'},
-    {t:'eq', tex:'a_{y} = \\frac{1}{2^{t}}\\sum_{k=0}^{2^{t}-1} e^{2\\pi i k\\left(\\varphi - y/2^{t}\\right)}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'When $\\varphi - y/2^{t}$ is a non-zero multiple of $2^{-t}$, those $2^{t}$ unit vectors are the vertices of a regular polygon and they add to zero. That is the cancellation the whole chapter is about, and here it is complete rather than approximate.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQPEexact(),
-      caption:'Three counting qubits and $\\varphi=3/8$. One outcome carries all the probability and the other seven carry exactly none — not a small amount, none.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQPEexact(),
+      caption:'Three counting qubits and $\\varphi = 3/8$. One outcome carries all the probability and the other seven carry none at all.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$U=T$, the target in $|1\\rangle$, so $\\varphi = 1/8$, with $t=3$ counting qubits.'],
-        ['Work', '$2^{t}\\varphi = 8\\times\\tfrac18 = 1$, a whole number, so the exact case applies.'],
-        ['Answer', 'Every shot reads $y=1$, that is the bits $001$, and $\\varphi = 1/8 = 0.125$ exactly.'],
-        ['Check', '$0.125$ in binary is $0.001$, which is three bits — the register was just big enough. With $t=2$ the phase would not fit and the reading would be spread across all four outcomes.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'Exactness is a property of the number, not of the machine', html:'Almost no real phase is a $t$-bit fraction. A circuit designed from the exact case is expected to print the answer and prints a distribution instead.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The exact case', tex:'\\begin{aligned} \\varphi = \\frac{m}{2^{t}} &\\;\\Longrightarrow\\; P(y = m) = 1 \\\\ a_{y} &= \\frac{1}{2^{t}}\\sum_{k=0}^{2^{t}-1} e^{2\\pi i k\\left(\\varphi - y/2^{t}\\right)} \\end{aligned}',
+      note:'When the phase is a $t$-bit fraction the register holds exactly $F|m\\rangle$, and the inverse transform returns $|m\\rangle$. For every other $y$ the $2^{t}$ terms are the vertices of a regular polygon and add to zero. The cancellation is complete.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'U = T,\\ \\varphi = \\tfrac18,\\ t = 3: \\quad 2^{t}\\varphi = 1, \\qquad y = 001 \\text{ every shot}',
+        note:'$0.125$ is $0.001$ in binary, three bits, so the register was just big enough. With two counting qubits the phase would not fit, and the reading would spread over all four outcomes.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'Exactness here is a property of the number, not of the machine', html:'A phase is a real number and almost every real number is not a $t$-bit fraction. The exact case is the special case, and reasoning about phase estimation from it produces a circuit that is expected to print the answer and prints a distribution instead. The next scene is what actually happens.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The phase $\\varphi = 5/16$.<div class="nsep"></div>Which register sizes read it with certainty?',
+        ask:{key:'m6-qpeexact', choices:['$t \\ge 4$','$t \\ge 3$','none: $5/16$ is not exact'], answer:0,
+          why:'$5/16 = 0.0101$ in binary needs four bits. At $t = 3$, $2^{t}\\varphi = 2.5$ sits halfway between two readings, and the better one has probability $0.41$.'}}]}
   ]}
 ]},
 
@@ -1145,29 +1079,21 @@ const SC = [
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'A phase that does not fit gives a distribution, and more qubits narrow it'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>For a general $\\varphi$ the geometric sum no longer vanishes anywhere, and the outcome distribution is a peak centred on $2^{t}\\varphi$ with tails on both sides:</p>'},
-    {t:'eq', tex:'P(y) = \\frac{1}{2^{2t}}\\left|\\frac{\\sin\\!\\big(\\pi\\,2^{t}\\delta\\big)}{\\sin(\\pi\\delta)}\\right|^{2}, \\qquad \\delta = \\varphi - \\frac{y}{2^{t}}'},
-    {t:'body', html:'<p>Two guarantees follow. The single nearest outcome carries at least $4/\\pi^{2}\\approx 0.405$, and the two nearest together at least $8/\\pi^{2}\\approx 0.811$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>To get $n$ correct bits with failure probability at most $\\varepsilon$, use</p>'},
-      {t:'eq', key:true, tex:'t = n + \\left\\lceil \\log_{2}\\!\\left(2 + \\frac{1}{2\\varepsilon}\\right) \\right\\rceil \\ \\text{ counting qubits}'},
-      {t:'small', html:'The extra qubits are cheap: halving the failure probability adds about one. Accuracy is what is expensive, because each extra bit of $n$ doubles the applications of $U$.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQPEprec(),
-      caption:'The same phase $\\varphi = 0.3$ read with three counting qubits and with six. The peak sharpens onto a finer grid and the tails shrink, and at no register size does one outcome carry all the probability.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQPEprec(),
+      caption:'The phase $\\varphi = 0.3$ read with three counting qubits and with six. The peak sharpens onto a finer grid, and at no register size does one outcome take all the probability.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$\\varphi = 0.3$ and $t=3$, so $2^{t}\\varphi = 2.4$.'],
-        ['Work', 'The two nearest outcomes are $y=2$ and $y=3$. Putting $\\delta = 0.05$ and $\\delta = -0.075$ into the formula gives $P(2)=0.577$ and $P(3)=0.259$.'],
-        ['Answer', 'The estimate is $2/8 = 0.25$ with probability $0.577$, and one of the two nearest with probability $0.836$.'],
-        ['Check', '$0.836$ is above the guaranteed $8/\\pi^{2} = 0.811$, as it must be. The remaining $0.164$ is spread over the other six outcomes, and a run that lands there returns a badly wrong phase with no warning attached.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'One run is not an answer', html:'Where the phase feeds something checkable, such as an order, a failed run is repeated. Where there is no check, quote the confidence the register bought.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Distribution and register size', tex:'\\begin{aligned} P(y) &= \\frac{1}{2^{2t}}\\left|\\frac{\\sin\\!\\big(\\pi\\,2^{t}\\delta\\big)}{\\sin(\\pi\\delta)}\\right|^{2}, \\qquad \\delta = \\varphi - \\frac{y}{2^{t}} \\\\ t &= n + \\left\\lceil \\log_{2}\\!\\left(2 + \\frac{1}{2\\varepsilon}\\right) \\right\\rceil \\end{aligned}',
+      note:'A general phase gives a peak at $2^{t}\\varphi$ with tails. The nearest outcome carries at least $4/\\pi^{2}\\approx0.405$, the two nearest at least $8/\\pi^{2}\\approx0.811$. For $n$ correct bits with failure at most $\\varepsilon$, take the $t$ of the second line; halving $\\varepsilon$ costs about one qubit.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\varphi = 0.3,\\ t = 3: \\quad P(2) = 0.577,\\ \\ P(3) = 0.259, \\qquad \\text{together } 0.836',
+        note:'$0.836$ is above the guaranteed $0.811$. The other $0.164$ is spread over six outcomes, and a run that lands there returns a wrong phase with no warning.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'One run is not an answer', html:'A single reading is a sample from that distribution. Where the phase is used for something checkable — an order, for instance — a failed run is simply repeated. Where there is no check, the result must be quoted with the confidence the register size bought.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'Three correct bits are wanted, with failure probability at most $1\\%$.<div class="nsep"></div>How many counting qubits?',
+        ask:{key:'m6-qpeprec', choices:['$9$','$4$','$10$'], answer:0,
+          why:'$2 + 1/(2\\times0.01) = 52$ and $\\lceil\\log_{2}52\\rceil = 6$, so $t = 3 + 6 = 9$. Four is the three bits with a single qubit of margin.'}}]}
   ]}
 ]},
 
@@ -1178,27 +1104,21 @@ const SC = [
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'The controlled powers cost exponentially more than the transform that reads them'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Add up what the circuit asks for. The inverse transform is $\\tfrac12 t(t+1)$ gates. The controlled powers are $U$ applied</p>'},
-    {t:'eq', key:true, tex:'1 + 2 + 4 + \\cdots + 2^{t-1} = 2^{t}-1 \\ \\text{ times}'},
-    {t:'body', html:'<p>That is exponential in the register size, and it has to be exponential: reading $t$ bits of a phase means evolving for a time proportional to $2^{t}$, however the circuit is arranged. Precision $\\delta$ needs about $\\log_{2}(1/\\delta)$ qubits and about $1/\\delta$ applications of $U$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'This is why phase estimation is efficient only when $U^{2^{j}}$ can be built directly, in a circuit of size polynomial in $j$, rather than by repeating $U$ that many times. Order finding can do it, because squaring a modular multiplier is another modular multiplier. For an arbitrary $U$ it cannot be done, and calling the inverse transform efficient does not make the algorithm efficient.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figQPEcost(),
-      caption:'The two counts against the register size. At ten counting qubits the transform is fifty-five gates and the controlled powers are one thousand and twenty-three applications of $U$, and the gap only widens.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figQPEcost(),
+      caption:'The two counts against the register size. At ten counting qubits the transform is fifty-five gates and the controlled powers are $1023$ uses of $U$, and the gap only widens.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'Ten counting qubits, and a $U$ whose circuit is $500$ gates.'],
-        ['Work', 'Applications of $U$: $2^{10}-1 = 1023$. Gates in those: $1023\\times500 \\approx 5.1\\times10^{5}$. Gates in the inverse transform: $55$.'],
-        ['Answer', 'The transform is about $0.01\\%$ of the circuit. Everything else is the controlled evolution.'],
-        ['Check', 'Add one counting qubit. The transform grows from $55$ to $66$ gates and the controlled part doubles. A rewrite that halved the cost of the transform would change the total by nothing at all.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'Semiclassical variants', html:'One qubit, measured and reused $t$ times with feedforward, can replace the counting register. That saves $t-1$ qubits and nothing in the controlled evolution.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The two costs', tex:'\\begin{aligned} \\text{controlled powers: } & 1 + 2 + \\cdots + 2^{t-1} = 2^{t}-1 \\text{ uses of } U \\\\ \\text{inverse transform: } & \\tfrac12 t(t+1) \\text{ gates} \\end{aligned}',
+      note:'Reading $t$ bits of a phase means evolving for a time proportional to $2^{t}$, however the circuit is arranged. So the method is efficient only when $U^{2^{j}}$ can be built directly, in size polynomial in $j$. Order finding can do that; an arbitrary $U$ cannot.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'t = 10,\\ U \\text{ of } 500 \\text{ gates}: \\quad 1023 \\times 500 \\approx 5.1\\times10^{5}, \\ \\text{ against } 55',
+        note:'The transform is about $0.01\\%$ of the circuit. One more counting qubit takes it from $55$ to $66$ gates and doubles the rest.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'What the semiclassical variants change, and what they do not', html:'The counting register can be replaced by one qubit measured and reused $t$ times, with the earlier results fed forward into later rotations — the dynamic circuits of chapter 5. That saves $t-1$ qubits and it saves nothing at all in the controlled evolution, which is the part that costs. Trading qubits for depth is a real engineering choice; it is not a speedup.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$t = 12$ counting qubits and a $U$ whose circuit is $200$ gates.<div class="nsep"></div>About how many gates are in the controlled powers?',
+        ask:{key:'m6-qpecost', choices:['$8.2\\times10^{5}$','$2400$','$78$'], answer:0,
+          why:'$(2^{12}-1)\\times200 = 4095\\times200 = 819\\,000$. $2400 = 12\\times200$ counts each control once, and $78$ is the inverse transform.'}}]}
   ]}
 ]},
 
@@ -1209,27 +1129,21 @@ const SC = [
   src:'L10 · Grover search and amplitude amplification', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Phase estimation'},
   {t:'title', text:'Point the estimator at the Grover step and it returns how many answers there are'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Chapter 5 finished with a hole in it. The best number of Grover iterations is $\\tfrac{\\pi}{4\\theta}-\\tfrac12$ with $\\sin\\theta = \\sqrt{M/N}$, and $M$ — how many candidates are marked — is usually exactly what is not known.</p>'},
-    {t:'body', html:'<p>The Grover step is a rotation of a plane by $2\\theta$, and a rotation of a plane has eigenvalues $e^{\\pm 2i\\theta}$. So it is a unitary with the wanted number sitting in its eigenphase, which is precisely what the last four scenes were built to read.</p>'},
-    {t:'eq', key:true, tex:'\\text{estimate } \\theta \\ \\Longrightarrow \\ M = N\\sin^{2}\\theta'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The register does not even need an eigenstate. The uniform superposition is a combination of the two eigenvectors of the rotation, so the circuit samples one of the two eigenphases, and $\\pm\\theta$ give the same $\\sin^{2}\\theta$. This is the case from two scenes ago where sampling an eigenphase is the intended behaviour rather than a limitation.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figCount(),
-      caption:'The estimator pointed at the search step. The answer to "how many" arrives before the search is run, and the search then uses the right number of iterations rather than a guess.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figCount(),
+      caption:'The estimator pointed at the search step. The answer to how many arrives before the search is run, and the search then uses the right number of iterations.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$N=1024$ candidates with an unknown $M$, and $t=8$ counting qubits.'],
-        ['Work', 'Suppose the estimate comes out at $\\theta = 3.6^{\\circ}$. Then $M = 1024\\sin^{2}(3.6^{\\circ}) = 1024\\times 0.003943 = 4.04$.'],
-        ['Answer', '$M=4$, and the search should then run $\\tfrac{\\pi}{4}\\sqrt{1024/4} - \\tfrac12 = 12.07$, so twelve iterations.'],
-        ['Check', 'Put $M=4$ back: $\\sin\\theta = \\sqrt{4/1024} = 0.0625$, so $\\theta = 3.583^{\\circ}$, which the estimate rounds to. The counting cost is itself about $\\sqrt{N}$ applications, so counting and then searching is still a square-root method overall.']
-      ]}
-    ]},
+      {t:'note', kind:'ok', head:'Is there an answer at all?', html:'If the estimate of $M$ is zero within its error bar, nothing is marked. A classical machine settles that only by checking all $N$ candidates.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Counting', tex:'\\text{eigenvalues } e^{\\pm 2i\\theta} \\;\\Longrightarrow\\; \\text{estimate } \\theta, \\qquad M = N\\sin^{2}\\theta',
+      note:'The best Grover count needs $M$, the number of marked candidates, and $M$ is usually what is unknown. The Grover step turns a plane by $2\\theta$, so its eigenphases carry $\\theta$. The uniform start is a mixture of the two eigenvectors, and $\\pm\\theta$ give the same $M$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 1024,\\ \\theta = 3.6^{\\circ}: \\quad M = 1024\\sin^{2}3.6^{\\circ} = 4.04 \\;\\to\\; 4',
+        note:'The search then runs $\\tfrac{\\pi}{4}\\sqrt{1024/4}-\\tfrac12 = 12.07$, so twelve iterations. Counting costs about $\\sqrt{N}$ applications, so counting and then searching is still a square-root method.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'Deciding whether there is an answer at all', html:'The same circuit answers the existence question: if the estimate of $M$ is zero to within its own error bar, nothing is marked. A classical machine can only establish that by checking every candidate, which is $N$ queries, so this is a square-root saving on a question that has no search in it at all.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 4096$, and the estimate comes out at $\\theta = 5.1^{\\circ}$.<div class="nsep"></div>How many candidates are marked?',
+        ask:{key:'m6-count', choices:['$32$','$365$','$64$'], answer:0,
+          why:'$\\sin^{2}5.1^{\\circ} = 0.00790$, and $4096\\times0.00790 = 32.4$. The $365$ multiplies $N$ by $\\theta$ in radians and forgets the sine squared.'}}]}
   ]}
 ]},
 
@@ -1244,6 +1158,16 @@ const SC = [
   {t:'lab', id:'K'}
 ]},
 
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-qpe', module:'M6', nav:'Code · Phase estimation', title:'Phase estimation in code',
+  objective:'Read an exact phase, a halfway phase against the two bounds, and the register a target error needs.',
+  keywords:'code qiskit numpy program phase estimation exact halfway bounds counting qubits success',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · Phase estimation'},
+  {t:'title', text:'Phase estimation in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-qpe')}
+]},
+
 /* ---------------------------------------------------------------- 6.6.1 -- */
 { id:'m6-order', module:'M6', nav:'The order of a number', title:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order',
   objective:'Define the order of a modulo N and the unitary whose eigenphases carry it.',
@@ -1251,28 +1175,21 @@ const SC = [
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Multiplying by a fixed number modulo N goes round in a cycle, and its length is the order'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Fix a composite $N$ and a number $a$ with no factor in common with it. The <b>order</b> of $a$ modulo $N$ is the smallest positive $r$ that brings the powers of $a$ back to one:</p>'},
-    {t:'eq', key:true, tex:'a^{r} \\equiv 1 \\pmod N, \\qquad r \\ \\text{ smallest such}'},
-    {t:'body', html:'<p>Because $a$ and $N$ share no factor, multiplying by $a$ is a <b>permutation</b> of the numbers $0,1,\\ldots,N-1$: nothing is lost and nothing collides. A permutation is a unitary, so it is a legal gate:</p>'},
-    {t:'eq', tex:'U_{a}\\,|y\\rangle = |\\,a\\,y \\bmod N\\,\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The work register holds $m$ qubits with $2^{m} \\ge N$, and the basis states from $N$ up to $2^{m}-1$ are outside the interesting range. $U_{a}$ is completed on them as any permutation — usually the identity — which keeps it unitary and changes nothing about the cycle that matters.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figOrder(),
-      caption:'Powers of two modulo fifteen. The sequence returns to one after four steps and then repeats forever, so the order is four. Finding this length is the only quantum step in factoring.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figOrder(),
+      caption:'Powers of two modulo fifteen. The sequence returns to one after four steps and then repeats, so the order is four. Finding this length is the only quantum step in factoring.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$N=21$ and $a=2$.'],
-        ['Work', 'The powers are $1,2,4,8,16,11,1,\\ldots$ where $32 \\bmod 21 = 11$ and $22 \\bmod 21 = 1$.'],
-        ['Answer', 'The order is $r=6$.'],
-        ['Check', '$2^{6}=64$ and $64 = 3\\times21+1$, so $2^{6}\\equiv1$. And no smaller power hit one, which is what "smallest" requires — checking that is what makes a candidate order a confirmed one.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'Why this is hard classically', html:'Walking the cycle takes $r$ steps, and $r$ can be close to $N$, which is exponential in its bit length. The examples look easy because their numbers are small; the numbers in use have six hundred digits.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The order', tex:'\\begin{aligned} a^{r} &\\equiv 1 \\pmod N, \\qquad r \\text{ the smallest such} \\\\ U_{a}\\,|y\\rangle &= |\\,a\\,y \\bmod N\\,\\rangle \\end{aligned}',
+      note:'When $a$ and $N$ share no factor, multiplying by $a$ permutes $0,1,\\ldots,N-1$: nothing is lost and nothing collides. A permutation is a unitary, so it is a legal gate. On the unused basis states from $N$ to $2^{m}-1$ it is completed as the identity.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 21,\\ a = 2: \\quad 1,\\,2,\\,4,\\,8,\\,16,\\,11,\\,1 \\;\\Longrightarrow\\; r = 6',
+        note:'$2^{6} = 64 = 3\\times21+1$, and no smaller power reached one. Checking that is what confirms a candidate order.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'Why this is hard classically, and why it does not look hard', html:'Computing the order by walking the cycle takes $r$ steps, and $r$ can be as large as $N$, which is exponential in the number of bits of $N$. Nothing about the cycle is visible from $a$ and $N$ without walking it. The problem looks small because the numbers are small in the examples; the numbers in use have six hundred digits.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 35$ and $a = 2$.<div class="nsep"></div>What is the order?',
+        ask:{key:'m6-order', choices:['$12$','$6$','$34$'], answer:0,
+          why:'The powers run $2,4,8,16,32,29,23,11,22,9,18,1$, so the cycle closes at $k = 12$. At $k = 6$ the value is $29$, not $1$.'}}]}
   ]}
 ]},
 
@@ -1283,30 +1200,21 @@ const SC = [
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The eigenphases of the multiplier are the fractions s over r, and the state one can prepare is their even mixture'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The unitary $U_{a}$ walks a cycle of length $r$. Its eigenvectors are the Fourier combinations of that cycle, one for each $s$ from $0$ to $r-1$:</p>'},
-    {t:'eq', tex:'|u_{s}\\rangle = \\frac{1}{\\sqrt r}\\sum_{k=0}^{r-1} e^{-2\\pi i sk/r}\\,|a^{k} \\bmod N\\rangle'},
-    {t:'eq', key:true, tex:'U_{a}\\,|u_{s}\\rangle = e^{2\\pi i s/r}\\,|u_{s}\\rangle, \\qquad \\varphi = \\frac{s}{r}'},
-    {t:'body', html:'<p>So the order is sitting in the denominators of the eigenphases, and phase estimation reads eigenphases. That is the whole reduction.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>There is one obstacle: preparing $|u_{s}\\rangle$ needs $r$, which is what is being looked for. The way round it is that the $r$ eigenvectors add up to something trivial:</p>'},
-      {t:'eq', tex:'\\frac{1}{\\sqrt r}\\sum_{s=0}^{r-1} |u_{s}\\rangle = |1\\rangle'},
-      {t:'small', html:'Start the work register in $|1\\rangle$ — one gate — and the circuit samples one eigenphase $s/r$ with $s$ uniform on $0,\\ldots,r-1$. The limitation from two scenes ago has become the preparation.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figOrderEig(),
-      caption:'The four eigenphases when the order is four, each reached with probability one quarter. Starting the work register in the state one is exactly the even mixture drawn here.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figOrderEig(),
+      caption:'The four eigenphases when the order is four, each reached with probability one quarter. Starting the work register in the state one is exactly this even mixture.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$N=15$, $a=2$, so $r=4$.'],
-        ['Work', 'The eigenphases are $0, \\tfrac14, \\tfrac12, \\tfrac34$, each drawn with probability $\\tfrac14$.'],
-        ['Answer', 'A run returns an estimate of one of those four numbers, chosen at random.'],
-        ['Check', 'The value $s=0$ returns a phase of zero and says nothing about $r$; the value $s=2$ returns $\\tfrac12$, whose reduced form is $1/2$ and gives the candidate $r=2$, which fails the test $2^{2}\\equiv1$. Only $s=1$ and $s=3$ give $r=4$ directly, so half the runs here succeed and the rest are detected and repeated.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'The step worth understanding twice', html:'The circuit never holds an eigenstate and never learns $s$. It measures a phase whose denominator is $r$, and classical arithmetic recovers that denominator.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The eigenphases', tex:'\\begin{aligned} |u_{s}\\rangle &= \\frac{1}{\\sqrt r}\\sum_{k=0}^{r-1} e^{-2\\pi i sk/r}\\,|a^{k} \\bmod N\\rangle \\\\ U_{a}\\,|u_{s}\\rangle &= e^{2\\pi i s/r}\\,|u_{s}\\rangle, \\qquad \\frac{1}{\\sqrt r}\\sum_{s=0}^{r-1}|u_{s}\\rangle = |1\\rangle \\end{aligned}',
+      note:'The eigenvectors are the Fourier combinations of the cycle, and their eigenphases are $s/r$: the order sits in the denominators. Preparing one $|u_{s}\\rangle$ would need $r$. Their even mixture is $|1\\rangle$, one gate, so the circuit samples $s/r$ with $s$ uniform.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 15,\\ a = 2,\\ r = 4: \\quad \\varphi \\in \\{0, \\tfrac14, \\tfrac12, \\tfrac34\\}, \\text{ each with } \\tfrac14',
+        note:'$s = 0$ says nothing about $r$; $s = 2$ reduces to $\\tfrac12$, and the candidate $2$ fails $2^{2}\\equiv1$. Only $s = 1$ and $s = 3$ give $r = 4$, so half the runs succeed.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'This is the step worth understanding twice', html:'The circuit never holds an eigenstate, never learns $s$ in advance, and never needs to. It measures a phase drawn from a set whose denominators all equal $r$, and a classical procedure then recovers that denominator. The quantum part supplies one noisy fraction per run, and nothing else.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 15$ and $a = 4$, whose order is $r = 2$.<div class="nsep"></div>Which eigenphases does a run sample?',
+        ask:{key:'m6-ordereig', choices:['$0$ and $\\tfrac12$, each with probability $\\tfrac12$','$0$, $\\tfrac14$, $\\tfrac12$ and $\\tfrac34$','only $\\tfrac12$'], answer:0,
+          why:'With $r = 2$ the eigenphases are $s/2$ for $s = 0, 1$, each drawn with probability $\\tfrac12$. The four quarters belong to $a = 2$, whose order is four.'}}]}
   ]}
 ]},
 
@@ -1317,27 +1225,21 @@ const SC = [
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'The controlled powers are modular exponentiation, and they are the whole cost'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Phase estimation needs $U_{a}^{2^{j}}$ for every counting qubit $j$, and applying $U_{a}$ that many times would be exponential. It is not done that way. Squaring the number instead of repeating the gate:</p>'},
-    {t:'eq', key:true, tex:'U_{a}^{2^{j}} = U_{a^{2^{j}} \\bmod N}'},
-    {t:'body', html:'<p>and $a^{2^{j}} \\bmod N$ is computed classically before the circuit is built, by squaring $j$ times. So each counting qubit controls <b>one</b> modular multiplication by a precomputed constant, and the whole middle of the circuit is a reversible modular exponentiation.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'A reversible multiplier on $L$-bit numbers costs about $L^{2}$ gates, and there are about $2L$ of them, so the arithmetic is order $L^{3}$. The inverse Fourier transform is order $L^{2}$. For a two-thousand-bit number those differ by three decades, and every published resource estimate for factoring is an estimate of the arithmetic.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figModexp(),
-      caption:'The two parts of the circuit against the size of $N$. The Fourier transform is the cheap one by three orders of magnitude at the sizes that matter, which is the opposite of how the algorithm is usually described.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figModexp(),
+      caption:'The two parts of the circuit against the size of $N$. At the sizes that matter the Fourier transform is the cheap part by three orders of magnitude.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$L=2048$ bits, a counting register of $t=2L=4096$ qubits.'],
-        ['Work', 'Modular multiplications: about $4096$. Gates in each, at about $L^{2}$: $4.2\\times10^{6}$. Total arithmetic: about $1.7\\times10^{10}$ gates. The inverse transform: $\\tfrac12 t(t+1) \\approx 8.4\\times10^{6}$.'],
-        ['Answer', 'The arithmetic is about two thousand times the transform.'],
-        ['Check', 'The ratio should be about $L^{3}/L^{2}=L$ up to constants, and $1.7\\times10^{10}/8.4\\times10^{6} = 2050$, which is of the order of $L=2048$. The scaling argument and the arithmetic agree.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'"Shor\u2019s algorithm is the quantum Fourier transform" is the wrong summary', html:'The transform is the smallest part. The modular exponentiation has to run coherently and reversibly, and chapter 4\u2019s ancillas and uncomputing are where its cost comes from.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Squaring, not repeating', tex:'U_{a}^{2^{j}} = U_{a^{2^{j}} \\bmod N}',
+      note:'Applying $U_{a}$ $2^{j}$ times would be exponential. The constant $a^{2^{j}}\\bmod N$ is computed classically by squaring $j$ times, so each counting qubit controls one modular multiplication. A reversible multiplier costs about $L^{2}$ gates and there are about $2L$ of them: order $L^{3}$, against $L^{2}$ for the transform.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} L = 2048: \\quad 4096 \\times 4.2\\times10^{6} &\\approx 1.7\\times10^{10} \\text{ gates} \\\\ \\tfrac12\\, t(t+1) &\\approx 8.4\\times10^{6} \\end{aligned}',
+        note:'The arithmetic is about $2050$ times the transform, of the order of $L$, as the scaling says. Every published resource estimate for factoring is an estimate of the arithmetic.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'"Shor\u2019s algorithm is the quantum Fourier transform" is the wrong summary', html:'The transform is the smallest part of the circuit. What makes the algorithm work is that modular exponentiation can be done <b>coherently and reversibly</b>, so that the phase information survives it, and what makes the algorithm expensive is that the same modular exponentiation has to be done coherently and reversibly. Chapter 4\u2019s ancillas and uncomputing are where that cost comes from.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 15$ and $a = 7$. Counting qubit $j = 2$ multiplies by the constant $7^{4} \\bmod 15$.<div class="nsep"></div>What is that constant?',
+        ask:{key:'m6-modexp', choices:['$1$: that control does nothing','$4$','$13$'], answer:0,
+          why:'Squaring twice: $7^{2} = 49 \\equiv 4$ and $4^{2} = 16 \\equiv 1$. The order of $7$ is four, so every control from $j = 2$ on multiplies by one.'}}]}
   ]}
 ]},
 
@@ -1348,27 +1250,21 @@ const SC = [
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Continued fractions turn a measured fraction into the small denominator hiding in it'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The measurement returns an integer $y$, and $y/Q$ is close to some $s/r$ — but $Q$ is a power of two and $r$ is not, so $y/Q$ never <b>equals</b> $s/r$. What is needed is a way to find a fraction with a small denominator near a given number, and that is an old classical algorithm.</p>'},
-    {t:'eq', key:true, tex:'\\left| \\frac{y}{Q} - \\frac{s}{r} \\right| \\le \\frac{1}{2Q}, \\qquad Q > N^{2} \\ \\Longrightarrow \\ \\frac{s}{r} \\ \\text{ is the unique such fraction}'},
-    {t:'body', html:'<p>Repeatedly take the whole part and invert the remainder. The fractions this builds — the <b>convergents</b> — are the best approximations with small denominators, and the wanted one is the last whose denominator is below $N$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'Then check it. Compute $a^{r} \\bmod N$ by repeated squaring, which is fast, and accept $r$ only if the answer is one. If the convergent gave a proper divisor of the order, the check fails and the run is thrown away. Nothing in this paragraph is quantum, and none of it costs anything worth counting.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figCF(),
-      caption:'One measured reading turned into an order. The convergent wanted is the one whose denominator is below $N$; the next one has a denominator of $253$, which is far too large to be an order modulo twenty-one.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figCF(),
+      caption:'One reading turned into an order. The convergent wanted is the last one whose denominator is below $N$; the next has denominator $253$, far too large to be an order modulo twenty-one.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$N=21$, $a=2$, $t=9$ so $Q=512$, and a reading of $y=85$.'],
-        ['Work', '$85/512 = 0.166016$. The expansion is $[0;6,42,2]$, with convergents $0/1$, $1/6$ and $42/253$. The last denominator below $21$ is $6$.'],
-        ['Answer', 'The candidate order is $r=6$.'],
-        ['Check', '$2^{6} = 64 = 3\\times21+1$, so $2^{6}\\equiv1 \\pmod{21}$ and the candidate is confirmed. Compare it with the true fraction: $s/r = 1/6 = 0.16667$, and $85/512 = 0.16602$ — the reading was never exact and did not need to be.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'The register is twice as long as the number', html:'$Q > N^{2}$ means about $2L$ counting qubits for an $L$-bit $N$, and so twice as many controlled multiplications.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Continued fractions', tex:'\\left| \\frac{y}{Q} - \\frac{s}{r} \\right| \\le \\frac{1}{2Q}, \\quad Q > N^{2} \\;\\Longrightarrow\\; \\frac{s}{r} \\text{ is a convergent of } \\frac{y}{Q}',
+      note:'The reading $y/Q$ is close to $s/r$ but never equal, because $Q$ is a power of two. Take the whole part, invert the remainder, repeat: the convergents are the best approximations with small denominators. Keep the last denominator below $N$, and accept it only if $a^{r}\\equiv1$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 21,\\ Q = 512,\\ y = 85: \\quad [0;6,42,2] \\;\\to\\; \\tfrac01,\\ \\tfrac16,\\ \\tfrac{42}{253} \\;\\to\\; r = 6',
+        note:'$2^{6} = 64 \\equiv 1 \\pmod{21}$ confirms it. The reading $0.16602$ was never exactly $1/6 = 0.16667$ and did not need to be.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'The register has to be twice as long as the number', html:'The uniqueness above needs $Q > N^{2}$, so the counting register carries about $2L$ qubits for an $L$-bit $N$. That is not a detail: it doubles the counting register, doubles the number of controlled modular multiplications, and is the reason the qubit counts in resource estimates are what they are.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 21$, $a = 2$, $Q = 512$, and the reading $y = 171$.<div class="nsep"></div>What does the classical step accept?',
+        ask:{key:'m6-cf', choices:['nothing: the candidate $3$ fails the check','$r = 6$','$r = 3$'], answer:0,
+          why:'$171/512$ has the convergents $0$, $\\tfrac12$, $\\tfrac13$ and then $\\tfrac{171}{512}$. The last denominator below $21$ is $3$, and $2^{3} = 8 \\not\\equiv 1$. The run drew $s/r = 2/6$, which reduced, and it is repeated.'}}]}
   ]}
 ]},
 
@@ -1379,29 +1275,32 @@ const SC = [
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Order finding'},
   {t:'title', text:'Several things can go wrong, all of them are detected, and none of the repairs is quantum'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A run of the quantum circuit produces one number, and that number is not always useful. Four ways it fails, and each one is caught by arithmetic that costs nothing:</p>'},
-    {t:'small', html:'The measurement can land on $s=0$, which carries no information about $r$. The values $s$ and $r$ can share a factor, so the convergent is a proper divisor of $r$ and the check $a^{r}\\equiv1$ fails. The order can turn out odd, so $a^{r/2}$ is not a whole number. And $a^{r/2}$ can be $-1$ modulo $N$, in which case both greatest common divisors come out trivial.'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>The first two are repaired by running the circuit again with the same $a$. The last two are repaired by choosing a different $a$, and the theorem that makes the whole thing work says how often that is needed:</p>'},
-      {t:'eq', key:true, tex:'P\\big(r \\text{ even and } a^{r/2} \\not\\equiv -1\\big) \\ \\ge \\ \\tfrac12 \\ \\text{ for } N = pq'},
-      {t:'small', html:'A constant probability of success per attempt means a constant expected number of attempts, so the repetition costs a factor and not an exponent. That factor is what turns a probabilistic procedure into a polynomial-time algorithm.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figRepeat(),
-      caption:'The four failures, what each produces, and the repair. The colour is the repair: amber where the circuit is simply run again, red where a whole base has to be discarded. Every row is decided by integer arithmetic on numbers already measured.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figRepeat(),
+      caption:'The four failures, what each produces, and the repair. The colour is the repair: amber where the circuit is run again, red where the base is discarded. Every row is decided by integer arithmetic.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$N=15$ with $a=2$, so $r=4$, and a counting register long enough to read $s/4$ exactly.'],
-        ['Work', 'The four values of $s$ are equally likely. $s=0$ gives nothing; $s=2$ reduces to $1/2$ and the candidate $r=2$ fails $2^{2}=4\\not\\equiv1$; $s=1$ and $s=3$ both give $r=4$.'],
-        ['Answer', 'Two of the four values succeed, so the success probability of one run is $1/2$.'],
-        ['Check', 'The expected number of runs is then two. Add the check itself: confirming $r=4$ costs one modular exponentiation, and rejecting $r=2$ costs another — both classical, both instant.']
-      ]}
-    ]},
+      {t:'note', kind:'ok', head:'A failure that announces itself', html:'Success is checkable: multiply the factors and compare with $N$. In Deutsch\u2013Jozsa or Grover a wrong answer looks exactly like a right one.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'How often a base works', tex:'P\\big(r \\text{ even and } a^{r/2} \\not\\equiv -1\\big) \\ge \\tfrac12 \\quad \\text{for } N = pq',
+      note:'A run fails in four ways. $s = 0$ carries nothing, and an $s$ sharing a factor with $r$ gives a divisor that fails $a^{r}\\equiv1$: run again. An odd $r$, or $a^{r/2}\\equiv-1$, leaves only trivial divisors: choose another base. A constant success probability means a constant expected number of attempts.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 15,\\ a = 2: \\quad s \\in \\{0,1,2,3\\}, \\quad s = 1, 3 \\text{ succeed}, \\quad P = \\tfrac12',
+        note:'$s = 2$ gives the candidate $2$, which fails $2^{2} = 4 \\not\\equiv 1$. The expected number of runs is two, and each check is one classical modular exponentiation.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'A failure that announces itself is not a real problem', html:'The reason this algorithm tolerates a success probability of a half is that success is <b>checkable</b>. Multiply the candidate factors and see whether they give $N$. Compare that with Deutsch\u2013Jozsa or with Grover, where a wrong answer looks exactly like a right one and the confidence has to come from the analysis instead.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 21$ and the base $a = 20$.<div class="nsep"></div>What should the procedure do?',
+        ask:{key:'m6-repeat', choices:['choose another base','run the circuit again','stop: the factors are $3$ and $7$'], answer:0,
+          why:'$20^{2} = 400 = 19\\times21+1$, so $r = 2$, and $a^{r/2} = 20 \\equiv -1 \\pmod{21}$. Then $\\gcd(19,21) = 1$ and $\\gcd(21,21) = 21$, both trivial, whatever the circuit returns.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-order', module:'M6', nav:'Code · Order finding', title:'Order finding in code',
+  objective:'Find an order by brute force, simulate the order-finding readings, and turn a reading into an order.',
+  keywords:'code qiskit numpy program order finding modular exponentiation continued fractions readings',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · Order finding'},
+  {t:'title', text:'Order finding in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-order')}
 ]},
 
 /* ---------------------------------------------------------------- 6.7.1 -- */
@@ -1411,23 +1310,21 @@ const SC = [
   src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'One box in five needs a quantum computer, and the other four are integer arithmetic'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The reduction from factoring to order finding is a page of school algebra. Suppose the order $r$ of $a$ is even. Then</p>'},
-    {t:'eq', tex:'a^{r} - 1 \\equiv 0 \\pmod N \\quad\\Longrightarrow\\quad \\big(a^{r/2}-1\\big)\\big(a^{r/2}+1\\big) \\equiv 0 \\pmod N'},
-    {t:'body', html:'<p>So $N$ divides that product but — provided $a^{r/2}\\not\\equiv\\pm1$ — divides neither factor on its own. Its prime factors must therefore be split between the two, and</p>'},
-    {t:'eq', key:true, tex:'\\gcd\\big(a^{r/2}-1,\\,N\\big) \\ \\text{ and } \\ \\gcd\\big(a^{r/2}+1,\\,N\\big) \\ \\text{ are proper factors}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'Every step of that is classical, and so is picking $a$, taking the first greatest common divisor to check $a$ is coprime to $N$, running the continued fractions, and verifying the candidate order. Order finding is the one line that is not.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figShor(),
-      caption:'The five steps, with the quantum one marked. Four of them run on a laptop in microseconds; the whole cost of the algorithm is inside the one box that does not.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figShor(),
+      caption:'The five steps, with the quantum one marked. Four of them run on a laptop in microseconds; the whole cost of the algorithm is inside the one that does not.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'def', head:'Why the greatest common divisor is the tool', html:'Euclid\u2019s algorithm finds it in about $\\log N$ steps and it is the cheapest thing in the whole procedure. The algebra above turns "the number $N$ is a product" into "these two specific numbers share a factor with $N$", and the second question is easy. The quantum step exists only to supply the exponent that makes the algebra apply.'}
-    ]},
+      {t:'note', kind:'err', head:'Why "quantum computers factor numbers" misleads', html:'What is true is narrower: a quantum computer finds the period of a modular exponential in polynomial time, and factoring reduces to that. A problem with no hidden period gets nothing from this.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The reduction', tex:'\\begin{aligned} \\big(a^{r/2}-1\\big)\\big(a^{r/2}+1\\big) &\\equiv 0 \\pmod N \\\\ \\gcd\\big(a^{r/2}\\pm1,\\,N\\big) &\\ \\text{ are proper factors} \\end{aligned}',
+      note:'If $r$ is even, $a^{r}-1\\equiv0$ factors as a difference of squares. Provided $a^{r/2}\\not\\equiv\\pm1$, $N$ divides the product but neither factor, so its primes are split between the two. Picking $a$, the first gcd, the continued fractions and the check are classical too.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'N = 21,\\ a = 2,\\ r = 6: \\quad 2^{3} = 8, \\qquad \\gcd(7,21) = 7,\\ \\ \\gcd(9,21) = 3',
+        note:'$8 \\not\\equiv \\pm1 \\pmod{21}$, so both divisors are proper, and $3\\times7 = 21$. Euclid\u2019s algorithm takes about $\\log N$ steps, the cheapest thing in the procedure.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'This is why "quantum computers factor numbers" is a misleading summary', html:'The claim that is true is narrower and more interesting: a quantum computer can find the period of a modular exponential in polynomial time, and factoring happens to reduce to that. A problem that does not reduce to a period gets nothing from any of this — which is why breaking a hash function or solving an NP-complete problem is not on the same list.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 33$ and $a = 5$, whose order is $r = 10$.<div class="nsep"></div>What does the procedure return?',
+        ask:{key:'m6-shor', choices:['$3$ and $11$','nothing: choose another base','$23$ and $33$'], answer:0,
+          why:'$5^{5} = 3125 = 94\\times33+23$, and $23 \\not\\equiv \\pm1$. Then $\\gcd(22,33) = 11$ and $\\gcd(24,33) = 3$.'}}]}
   ]}
 ]},
 
@@ -1438,28 +1335,21 @@ const SC = [
   src:'L10 · worked order-finding example: N = 15', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'The smallest example, worked to the end, including the choice that fails'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Take $N=15$ and $a=2$. First check they are coprime: $\\gcd(2,15)=1$, so no factor has fallen out yet and the procedure continues.</p>'},
-    {t:'body', html:'<p>The quantum step returns the order. Here it is small enough to see: the powers of two modulo fifteen are $1,2,4,8,1,\\ldots$, so $r=4$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Now the two conditions. The order is even, and $2^{2}=4$, which is not $-1$ modulo fifteen — that would be $14$. Both hold, so take the two greatest common divisors:</p>'},
-      {t:'eq', key:true, tex:'\\gcd(3,15) = 3, \\qquad \\gcd(5,15) = 5'},
-      {t:'small', html:'And $3\\times5=15$. The multiplication at the end is the whole verification: this algorithm produces an answer that can be checked in one line, which is what lets it tolerate failing half the time.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figShor15(),
-      caption:'Every number in the run, in order. The only step a laptop cannot do at this size is the second one, and at this size a laptop can do that too.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figShor15(),
+      caption:'Every number in the run, in order. The only step a laptop cannot do at scale is the order, and at this size a laptop can do that too.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'The same $N=15$, but with $a=14$.'],
-        ['Work', '$14^{2} = 196 = 13\\times15+1$, so the order is $r=2$, which is even. But $14^{r/2}=14\\equiv-1 \\pmod{15}$.'],
-        ['Answer', 'The second condition fails: $\\gcd(13,15)=1$ and $\\gcd(15,15)=15$, both useless.'],
-        ['Check', 'This is not a rare accident. Of the eight numbers below fifteen that are coprime to it, two are useless: $1$, whose order is the odd number $1$, and $14$ for the reason above. So the procedure has to be prepared to discard a base and pick another, which is a classical retry and costs one more run.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'What a small demonstration shows', html:'Hardware runs on fifteen almost always simplify the circuit using the known answer. They show that the pieces fit, not what a large number would cost.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Fifteen, base two', tex:'\\begin{aligned} 2^{k} \\bmod 15 &: \\ 1,\\,2,\\,4,\\,8,\\,1 \\;\\Longrightarrow\\; r = 4 \\\\ \\gcd(3,15) &= 3, \\qquad \\gcd(5,15) = 5 \\end{aligned}',
+      note:'$\\gcd(2,15) = 1$, so no factor falls out early. The order is even and $2^{2} = 4$ is not $-1\\equiv14$, so both divisors are proper, and $3\\times5 = 15$ checks the answer in one line.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'a = 14: \\quad 14^{2} \\equiv 1,\\ r = 2, \\quad 14 \\equiv -1 \\;\\Longrightarrow\\; \\gcd(13,15) = 1,\\ \\gcd(15,15) = 15',
+        note:'Both divisors are useless. Of the eight bases coprime to fifteen, two fail: $1$, whose order is the odd number $1$, and $14$. A failed base costs one more run.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'What a small demonstration does and does not show', html:'Fifteen has been factored on hardware many times, and the circuits used are almost always simplified using knowledge of the answer — a multiplier built for a known order is not the general circuit. A demonstration at this size shows that the pieces fit together. It is not evidence about what a large number would cost, and the difference between the two is about ten orders of magnitude.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$N = 15$ and the base $a = 11$.<div class="nsep"></div>What happens?',
+        ask:{key:'m6-shor15', choices:['$r = 2$, and the factors $5$ and $3$','$r = 2$, and both divisors are trivial','$r = 4$, and the factors $3$ and $5$'], answer:0,
+          why:'$11^{2} = 121 = 8\\times15+1$, so $r = 2$, and $11 \\not\\equiv -1$. Then $\\gcd(10,15) = 5$ and $\\gcd(12,15) = 3$.'}}]}
   ]}
 ]},
 
@@ -1470,26 +1360,21 @@ const SC = [
   src:'L10 · RSA and the scope of the quantum threat', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Public-key cryptography breaks, symmetric cryptography does not, and the timing is the problem'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>RSA publishes a modulus $N=pq$ and keeps the factorisation secret; the private key is derived from it. Anyone who can factor $N$ has the private key. Diffie\u2013Hellman and elliptic-curve schemes rest on the discrete logarithm, which the same phase-estimation machinery solves.</p>'},
-    {t:'body', html:'<p>So a large enough fault-tolerant quantum computer breaks all of them. Symmetric ciphers and hash functions are in a different position: the best known quantum attack is Grover, a square root, and doubling the key length restores the margin.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'Their security was never a proof in either case. It is the absence of a known efficient attack at the sizes in use, and that is exactly what changed when Shor\u2019s algorithm was published — the attack became known, and only the machine is missing.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figRSA(),
-      caption:'What each family of schemes faces, and the reason the schedule is not set by when the machine arrives. Traffic recorded today can be opened later by whoever kept it.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figRSA(),
+      caption:'What each family of schemes faces. The schedule is not set by when the machine arrives, because traffic recorded today can be opened later by whoever kept it.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'Data that must stay secret for twenty years, encrypted today under a key exchange based on elliptic curves.'],
-        ['Work', 'The traffic can be recorded now at negligible cost. If a capable machine exists at any point in those twenty years, the recording can be decrypted then.'],
-        ['Answer', 'The migration deadline is set by the secrecy lifetime of the data, not by the arrival date of the machine.'],
-        ['Check', 'Reverse the reasoning: data that stops mattering next week is not at risk from this, whatever happens. The correct question is always how long a particular secret has to hold.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'What "post-quantum" means', html:'A <b>classical</b> algorithm resting on a problem with no known efficient quantum attack; lattice schemes are the main family. It is not quantum cryptography, which distributes keys over physical channels.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'When it matters', tex:'\\text{secret lifetime} + \\text{migration time} \\; > \\; \\text{time to a large machine}',
+      note:'RSA rests on factoring; Diffie\u2013Hellman and elliptic curves rest on the discrete logarithm, which the same machinery solves. Symmetric ciphers and hashes face only Grover\u2019s square root, and a doubled key restores the margin. None of this was ever a proof of security, and recorded traffic is at risk whenever the inequality holds.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'20 \\text{ years of secrecy, recorded today} \\;\\Longrightarrow\\; \\text{the data sets the deadline}',
+        note:'Recording costs almost nothing, and the recording can be opened whenever a machine exists within those twenty years. Data that stops mattering next week is not at risk.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'What "post-quantum" means, and what it does not', html:'A post-quantum scheme is a <b>classical</b> algorithm — it runs on ordinary computers — chosen because it rests on a problem for which no efficient quantum attack is known. Lattice problems are the main family, and standards for them exist. It is not quantum cryptography, which is a different subject about distributing keys over physical channels.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'A secret must hold for $10$ years, replacing the key exchange takes $5$ years, and a large machine is assumed $12$ years away.<div class="nsep"></div>Is traffic sent before the migration ends at risk?',
+        ask:{key:'m6-rsa', choices:['yes: $10 + 5 = 15 > 12$','no: $10 < 12$','no: migration ends before the machine'], answer:0,
+          why:'Traffic sent in year $5$ must stay secret until year $15$, three years after the machine. Comparing the secret lifetime alone with the arrival date forgets the migration.'}}]}
   ]}
 ]},
 
@@ -1500,26 +1385,21 @@ const SC = [
   src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'A superpolynomial gap against the best known method, and no lower bound behind it'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Chapter 5 said a resource claim names five things. Write this one out and two of the five turn out to be carrying almost all the weight.</p>'},
-    {t:'body', html:'<p>The <b>hardware model</b> assumes fault tolerance. The logical circuit is about $L^{3}$ gates, but every logical gate is a code block of many physical qubits with rounds of error correction, and published estimates for a two-thousand-bit modulus run to millions of physical qubits and hours of running time.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The <b>baseline</b> is the general number field sieve, which takes about $e^{c\\,L^{1/3}(\\log L)^{2/3}}$ operations — subexponential, not exponential. So the gap is superpolynomial rather than exponential, and it is a gap against the best <b>known</b> classical algorithm. No theorem says factoring is hard; if a fast classical factoring algorithm were found tomorrow, the separation would vanish and none of the quantum mechanics would be wrong.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figShorClaim(),
-      caption:'The claim against the five. The two in the error tone are the ones usually left unstated, and they are the ones that decide whether any of this happens on a real machine.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figShorClaim(),
+      caption:'The claim against the five. The two in the error tone are usually left unstated, and they decide whether any of this happens on a real machine.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'A $2048$-bit modulus, and a machine running logical gates at one microsecond each.'],
-        ['Work', 'Logical gates: about $1.7\\times10^{10}$. At one microsecond each and no parallelism, that is $1.7\\times10^{4}$ seconds, about five hours.'],
-        ['Answer', 'Hours of quantum running time, on a machine with millions of physical qubits behind those logical ones.'],
-        ['Check', 'Compare the classical baseline: the number field sieve on the same modulus is beyond any assembled computing effort, which is why the key size is what it is. Both numbers are large; only one of them is finite in practice, and which one that is depends entirely on whether the machine exists.']
-      ]}
-    ]},
+      {t:'note', kind:'ok', head:'What the result does say', html:'On an ideal fault-tolerant machine factoring takes polynomially many operations, where every known classical method takes subexponentially many. It is a statement about two algorithms, not about the problem.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'The claim', tex:'\\text{polynomial in } L, \\ \\text{ against } \\ e^{c\\,L^{1/3}(\\log L)^{2/3}} \\text{ for the best known method}',
+      note:'Two of the five components carry the weight. The <b>hardware model</b> is fault tolerant: about $L^{3}$ logical gates, each a code block, and millions of physical qubits for a $2048$-bit modulus. The <b>baseline</b> is the number field sieve, subexponential, and no theorem says factoring is hard.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'1.7\\times10^{10} \\text{ gates} \\times 1\\,\\mu\\text{s} = 1.7\\times10^{4}\\,\\text{s} \\approx 4.8 \\text{ hours}',
+        note:'Hours of running, with no parallelism, on millions of physical qubits. The sieve on the same modulus is beyond any assembled effort; which number is finite in practice depends on whether the machine exists.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'What the result does say, stated fairly', html:'On an ideal fault-tolerant quantum computer, factoring takes a number of operations polynomial in the bit length, where every known classical method takes subexponentially many. That is a genuine and important separation, and it is the strongest known statement of its kind. It is a statement about two algorithms, not about the difficulty of the problem.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The same $1.7\\times10^{10}$ logical gates, run at $10\\,\\mu\\text{s}$ each with no parallelism.<div class="nsep"></div>About how long does one run take?',
+        ask:{key:'m6-shorclaim', choices:['about two days','about five hours','about half an hour'], answer:0,
+          why:'$1.7\\times10^{10}\\times10^{-5}\\,\\text{s} = 1.7\\times10^{5}\\,\\text{s}$, about $47$ hours. The logical clock rate enters the running time directly.'}}]}
   ]}
 ]},
 
@@ -1527,23 +1407,35 @@ const SC = [
 { id:'m6-family', module:'M6', nav:'The family', title:'Order finding is one case of period finding, and period finding is one case of something larger',
   objective:'Place order finding inside the family of problems the same mechanism solves, and say what is outside it.',
   keywords:'period finding hidden subgroup problem discrete logarithm family abelian structure grover outside quadratic limits of the method',
-  src:'L10 · quantum Fourier transform', steps:2, slide:true, blocks:[
+  src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
   {t:'title', text:'Order finding is one case of period finding, and period finding is one case of something larger'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Nothing in the order-finding circuit used the fact that the operation was multiplication. It used that some function repeats:</p>'},
-    {t:'eq', key:true, tex:'f(x+r) = f(x) \\ \\text{ for all } x, \\ \\text{ and } f \\text{ takes distinct values within one period}'},
-    {t:'body', html:'<p>Given a circuit for such an $f$, the same construction — superpose, evaluate, transform, measure, read the denominator — returns $r$. Order finding is the case $f(x)=a^{x}\\bmod N$. The discrete logarithm is another case, with a function of two variables.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'All of them are instances of one statement about hidden structure in a commutative group, and that statement is where the known superpolynomial quantum speedups live — nearly all of them. Grover is the conspicuous exception, and it is the exception because unstructured search has no such structure to find, which is exactly why its saving is only a square root.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figFamily(),
-      caption:'Where factoring sits. The outermost box is the general statement; the inner ones are the cases with algorithms. Grover is outside the picture, and so is every problem with no hidden period.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figFamily(),
+      caption:'Where factoring sits. The outer box is the general statement about hidden structure in a commutative group; the inner ones are cases with algorithms.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'warn', head:'This is the honest boundary of the subject', html:'Two mechanisms have produced every algorithm in this course: interference against a hidden period, which is superpolynomial and needs structure, and amplitude amplification, which is quadratic and needs nothing. A claim of a large speedup on a problem with neither is a claim that something new has been found, and it should be read that way.'}
-    ]}
+      {t:'note', kind:'warn', head:'The honest boundary', html:'Interference against a hidden period is superpolynomial and needs structure; amplitude amplification is quadratic and needs none. A large speedup on a problem with neither is a claim of something new.'}]}
+  ], right:[
+    {t:'eq', key:true, label:'Period finding', tex:'f(x + r) = f(x) \\ \\text{ for all } x, \\quad f \\text{ distinct within one period}',
+      note:'Order finding used only that a function repeats, not that it multiplies. Superpose, evaluate, transform, measure, read the denominator: the same construction returns $r$ whenever $f$ repeats. Order finding is $f(x) = a^{x}\\bmod N$; the discrete logarithm is a case in two variables. Grover is outside, which is why its saving is only a square root.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'Q = 16,\\ r = 4: \\quad y \\in \\{0, 4, 8, 12\\}, \\ \\text{ each with } \\tfrac14',
+        note:'When $r$ divides $Q$ the readings are exactly the multiples of $Q/r$, and a reading gives $y/Q = s/r$. For $f(x) = 2^{x}\\bmod 15$ this is the order four again.'}]},
+    {t:'reveal', at:3, items:[
+      {t:'note', kind:'def', head:'Given', html:'A function with period $r = 8$, read on a counting register with $Q = 64$.<div class="nsep"></div>What can one run return?',
+        ask:{key:'m6-family', choices:['a multiple of $8$, each of the eight with $\\tfrac18$','only $y = 8$','any $y$, each with $\\tfrac1{64}$'], answer:0,
+          why:'$Q/r = 64/8 = 8$, so the readings are $0, 8, \\ldots, 56$, with $s$ uniform on $0,\\ldots,7$. Each gives $y/64 = s/8$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m6-code-shor', module:'M6', nav:'Code · Factoring, and the reach of one mechanism', title:'Factoring in code',
+  objective:'Factor fifteen end to end, meet the failure cases, and count the bases that work.',
+  keywords:'code qiskit numpy program shor factoring gcd order failure cases bases',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 6 · Factoring, and the reach of one mechanism'},
+  {t:'title', text:'Factoring in code'},
+  {t:'raw', html:()=>CODEBANK.page('m6-code-shor')}
 ]},
 
 /* ---------------------------------------------------------------- 6.8.1 -- */
@@ -1557,13 +1449,13 @@ const SC = [
     caption:'The chapter as one ladder. Every algorithm in it is these four steps with a different question written into the first one.'},
   {t:'grid', cols:4, gap:'20px', items:[
     [{t:'card', head:'The mechanism', items:[
-      {t:'small', html:'$U_{f}|x\\rangle|{-}\\rangle = (-1)^{f(x)}|x\\rangle|{-}\\rangle$, and $\\mathrm{c}U|{+}\\rangle|u\\rangle$ puts $e^{2\\pi i\\varphi}$ on the control. The superposition is free; the interference is the algorithm.'}]}],
+      {t:'small', html:'$U_{f}|x\\rangle|{-}\\rangle = (-1)^{f(x)}|x\\rangle|{-}\\rangle$. The superposition is free; the interference is the algorithm.'}]}],
     [{t:'card', head:'Deutsch\u2013Jozsa', items:[
-      {t:'small', html:'The amplitude of $0^{n}$ is $2^{-n}\\sum_{x}(-1)^{f(x)}$: $\\pm1$ constant, exactly $0$ balanced. One query against $2^{n-1}+1$ exact classical ones, and $21$ randomised ones.'}]}],
+      {t:'small', html:'The amplitude of $0^{n}$ is $2^{-n}\\sum_{x}(-1)^{f(x)}$: $\\pm1$ constant, exactly $0$ balanced. One query against $2^{n-1}+1$ exact, or $21$ randomised.'}]}],
     [{t:'card', head:'Transform and estimate', items:[
-      {t:'small', html:'$F_{Q}|x\\rangle = Q^{-1/2}\\sum_{k}e^{2\\pi ixk/Q}|k\\rangle$, in $\\tfrac12 n(n+1)$ gates, returning one index and not a spectrum. Estimation costs $2^{t}-1$ applications of $U$.'}]}],
+      {t:'small', html:'$F_{Q}|x\\rangle = Q^{-1/2}\\sum_{k}e^{2\\pi ixk/Q}|k\\rangle$, in $\\tfrac12 n(n+1)$ gates, returning one index. Estimation costs $2^{t}-1$ uses of $U$.'}]}],
     [{t:'card', head:'Order finding', items:[
-      {t:'small', html:'$U_{a}|y\\rangle=|ay \\bmod N\\rangle$ has eigenphases $s/r$, and $|1\\rangle$ is their even mixture. Continued fractions give $r$, and $\\gcd(a^{r/2}\\pm1,N)$ gives the factors.'}]}]
+      {t:'small', html:'$U_{a}|y\\rangle=|ay \\bmod N\\rangle$ has eigenphases $s/r$. Continued fractions give $r$; $\\gcd(a^{r/2}\\pm1,N)$ gives the factors.'}]}]
   ]},
   {t:'reveal', at:1, items:[
     {t:'grid', cols:2, gap:'24px', items:[
