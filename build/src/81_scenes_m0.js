@@ -204,12 +204,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.1 ---- */
-{ id:'m0-open', module:'M0', nav:'What the course asks', title:'One question, asked in six ways',
+{ id:'m0-open', module:'M0', nav:'What the course asks', title:'The Frame of the Course',
   objective:'State the question the whole course answers before any machinery is introduced.',
   keywords:'opening quantum advantage coprocessor amplitude phase interference measurement',
   src:'L0 · why quantum engineering', steps:2, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'One question, asked in six ways'},
+  {t:'title', text:'The Frame of the Course'},
   {t:'lede', text:'A quantum processor is handed a circuit. It prepares a state, transforms it without ever reading it, and returns one string of bits. Everything in this course is one of three things: a way of describing that state, a way of transforming it, or a way of arranging the transformation so that the string which comes back is the one that was wanted.'},
   {t:'fig', frame:true, svg:()=>figCoprocessor(),
     caption:'Where the machine sits. A classical computer writes the circuit and collects the statistics; the quantum processor runs it and returns one bit string per shot. Nothing in this course is a picture of a quantum computer replacing the box on the left.'},

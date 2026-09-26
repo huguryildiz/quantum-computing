@@ -504,12 +504,12 @@ function figGenerator(){
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
-{ id:'m1-open', module:'M1', nav:'One language', title:'One language for states, operations and questions',
+{ id:'m1-open', module:'M1', nav:'One language', title:'The Mathematics of Quantum States',
   objective:'Say what the chapter is for: the notation every later chapter is written in.',
   keywords:'linear algebra language complex vector space basis matrix inner product overview module 1',
   src:'L2 · why linear algebra is the language', steps:2, blocks:[
   {t:'eyebrow', text:'Module 1 · The mathematics of quantum states'},
-  {t:'title', text:'One language for states, operations and questions'},
+  {t:'title', text:'The Mathematics of Quantum States'},
   {t:'lede', text:'Nothing in this chapter is quantum mechanics. It is the language that the quantum mechanics of the next five chapters is written in, and it is worth learning on its own terms first, because a reader who is decoding the notation cannot also be following the physics.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Fix a basis — a list of the outcomes the system can be found in. Three things become concrete at once. A <b>state</b> becomes a column of complex numbers, one for each outcome. An <b>operation</b> becomes a matrix acting on that column. A <b>question</b> becomes a single number, formed from two columns by an inner product.</p>'},

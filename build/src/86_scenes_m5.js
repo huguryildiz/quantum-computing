@@ -632,12 +632,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
-{ id:'m5-open', module:'M5', nav:'The machine, as it is run', title:'From a drawing of gates to a machine that returns bit strings',
+{ id:'m5-open', module:'M5', nav:'The machine, as it is run', title:'Circuits and Protocols',
   objective:'Say what this chapter adds to the gates of chapter 4, and name the three objects it keeps apart.',
   keywords:'circuit model overview module 5 program run shots protocol teleportation grover resource claim introduction',
   src:'L8 · a circuit is an abstract program', steps:2, blocks:[
   {t:'eyebrow', text:'Module 5 · Circuits and protocols'},
-  {t:'title', text:'From a drawing of gates to a machine that returns bit strings'},
+  {t:'title', text:'Circuits and Protocols'},
   {t:'lede', text:'Chapter 4 finished the gates. Nothing new about quantum mechanics is needed after that. What is still missing is everything about running the gates: what a circuit is as an object, what a machine gives back when it runs one, what a compiler does to it first, and how to say honestly what any of it cost.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Three objects get confused with each other, and keeping them apart is most of this chapter. A <b>circuit</b> is a program: wires, gates, and the order they run in. A <b>run</b> is a physical experiment repeated many times. The <b>result</b> is a table of bit strings and how often each came up.</p>'},

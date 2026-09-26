@@ -12709,12 +12709,12 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.1 ---- */
-{ id:'m0-open', module:'M0', nav:'What the course asks', title:'One question, asked in six ways',
+{ id:'m0-open', module:'M0', nav:'What the course asks', title:'The Frame of the Course',
   objective:'State the question the whole course answers before any machinery is introduced.',
   keywords:'opening quantum advantage coprocessor amplitude phase interference measurement',
   src:'L0 · why quantum engineering', steps:2, blocks:[
   {t:'eyebrow', text:'Module 0 · The frame of the course'},
-  {t:'title', text:'One question, asked in six ways'},
+  {t:'title', text:'The Frame of the Course'},
   {t:'lede', text:'A quantum processor is handed a circuit. It prepares a state, transforms it without ever reading it, and returns one string of bits. Everything in this course is one of three things: a way of describing that state, a way of transforming it, or a way of arranging the transformation so that the string which comes back is the one that was wanted.'},
   {t:'fig', frame:true, svg:()=>figCoprocessor(),
     caption:'Where the machine sits. A classical computer writes the circuit and collects the statistics; the quantum processor runs it and returns one bit string per shot. Nothing in this course is a picture of a quantum computer replacing the box on the left.'},
@@ -13457,12 +13457,12 @@ function figGenerator(){
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
-{ id:'m1-open', module:'M1', nav:'One language', title:'One language for states, operations and questions',
+{ id:'m1-open', module:'M1', nav:'One language', title:'The Mathematics of Quantum States',
   objective:'Say what the chapter is for: the notation every later chapter is written in.',
   keywords:'linear algebra language complex vector space basis matrix inner product overview module 1',
   src:'L2 · why linear algebra is the language', steps:2, blocks:[
   {t:'eyebrow', text:'Module 1 · The mathematics of quantum states'},
-  {t:'title', text:'One language for states, operations and questions'},
+  {t:'title', text:'The Mathematics of Quantum States'},
   {t:'lede', text:'Nothing in this chapter is quantum mechanics. It is the language that the quantum mechanics of the next five chapters is written in, and it is worth learning on its own terms first, because a reader who is decoding the notation cannot also be following the physics.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Fix a basis — a list of the outcomes the system can be found in. Three things become concrete at once. A <b>state</b> becomes a column of complex numbers, one for each outcome. An <b>operation</b> becomes a matrix acting on that column. A <b>question</b> becomes a single number, formed from two columns by an inner product.</p>'},
@@ -14645,12 +14645,12 @@ function figPhaseCircle(){
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
-{ id:'m2-open', module:'M2', nav:'What a postulate says', title:'Four postulates, and the two this chapter is about',
+{ id:'m2-open', module:'M2', nav:'What a postulate says', title:'States, Measurement and Dynamics',
   objective:'Name the four postulates and say which parts of the course each one licenses.',
   keywords:'postulates state evolution measurement composition overview module 2 quantum mechanics',
   src:'L4 · quantum-mechanical state and measurement principles', steps:2, blocks:[
   {t:'eyebrow', text:'Module 2 · States, measurement and dynamics'},
-  {t:'title', text:'Four postulates, and the two this chapter is about'},
+  {t:'title', text:'States, Measurement and Dynamics'},
   {t:'lede', text:'Chapter 1 was mathematics and nothing else could have been argued with. This chapter adds the four statements that connect that mathematics to a laboratory. They are postulates: they are not derived from anything, they are what experiment has found to hold, and everything else in the course follows from them.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>The first says what a state is: a normalised vector in a complex space, with two vectors differing by a global phase describing the same physical state. That was chapter 1, and this chapter uses it without restating it.</p>'},
@@ -15768,12 +15768,12 @@ function figSep(){
 const SC = [
 
 /* ---------------------------------------------------------------- 3.0.1 -- */
-{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Two situations no state vector describes',
+{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Mixed States and Entanglement',
   objective:'Name the two situations in which a pure state vector cannot be written, and say what replaces it.',
   keywords:'mixed state density operator open system subsystem ignorance entanglement module 3 overview',
   src:'L6 · density operators: pure states, mixtures, and reduced states', steps:2, blocks:[
   {t:'eyebrow', text:'Module 3 · Mixed states and entanglement'},
-  {t:'title', text:'Two situations no state vector describes'},
+  {t:'title', text:'Mixed States and Entanglement'},
   {t:'lede', text:'Every state so far has been one normalised vector. That is enough only while the system is alone and the preparation is known exactly. Two ordinary situations break it, and both are the normal case rather than the exception.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p><b>The preparation is not known.</b> A device emits $|0\\rangle$ half the time and $|1\\rangle$ the other half, and nobody records which. That is not the superposition $\\left(|0\\rangle+|1\\rangle\\right)/\\sqrt2$: the superposition gives a certain answer in the $X$ basis and this device gives a coin there. The two are different physics and no single vector tells them apart.</p>'},
@@ -17050,12 +17050,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
-{ id:'m4-open', module:'M4', nav:'One qubit, drawn', title:'Everything one qubit can be, on one sphere',
+{ id:'m4-open', module:'M4', nav:'One qubit, drawn', title:'The Bloch Sphere and Quantum Gates',
   objective:'Say what the chapter turns into a picture, and what that picture is exact about.',
   keywords:'bloch sphere overview module 4 rotation gate picture geometry one qubit introduction',
   src:'L7 · pure qubit states and the Bloch sphere', steps:2, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere and quantum gates'},
-  {t:'title', text:'Everything one qubit can be, on one sphere'},
+  {t:'title', text:'The Bloch Sphere and Quantum Gates'},
   {t:'lede', text:'Three chapters of algebra have said what a qubit state is and what may be done to it. This chapter says the same things again as a drawing, and the drawing loses nothing: every pure state of one qubit is a point of a sphere, every mixed state a point inside it, and every gate a rotation.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Two amplitudes with two complex numbers in them look like four real parameters. Normalisation removes one, and the fact that a global phase is not physical removes another. Two are left, and two angles are exactly what it takes to name a point on a sphere.</p>'},
@@ -18354,12 +18354,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
-{ id:'m5-open', module:'M5', nav:'The machine, as it is run', title:'From a drawing of gates to a machine that returns bit strings',
+{ id:'m5-open', module:'M5', nav:'The machine, as it is run', title:'Circuits and Protocols',
   objective:'Say what this chapter adds to the gates of chapter 4, and name the three objects it keeps apart.',
   keywords:'circuit model overview module 5 program run shots protocol teleportation grover resource claim introduction',
   src:'L8 · a circuit is an abstract program', steps:2, blocks:[
   {t:'eyebrow', text:'Module 5 · Circuits and protocols'},
-  {t:'title', text:'From a drawing of gates to a machine that returns bit strings'},
+  {t:'title', text:'Circuits and Protocols'},
   {t:'lede', text:'Chapter 4 finished the gates. Nothing new about quantum mechanics is needed after that. What is still missing is everything about running the gates: what a circuit is as an object, what a machine gives back when it runs one, what a compiler does to it first, and how to say honestly what any of it cost.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Three objects get confused with each other, and keeping them apart is most of this chapter. A <b>circuit</b> is a program: wires, gates, and the order they run in. A <b>run</b> is a physical experiment repeated many times. The <b>result</b> is a table of bit strings and how often each came up.</p>'},
@@ -19826,12 +19826,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 6.0.1 -- */
-{ id:'m6-open', module:'M6', nav:'One mechanism, four uses', title:'Every algorithm in this chapter is the same move, made four times',
+{ id:'m6-open', module:'M6', nav:'One mechanism, four uses', title:'Quantum Algorithms',
   objective:'State the one mechanism this chapter is built on and the sentence every algorithm in it has to answer.',
   keywords:'quantum algorithms overview module 6 phase kickback interference cancellation deutsch jozsa fourier phase estimation shor introduction',
   src:'L10 · computational models: what is being counted?', steps:2, blocks:[
   {t:'eyebrow', text:'Module 6 · Quantum algorithms'},
-  {t:'title', text:'Every algorithm in this chapter is the same move, made four times'},
+  {t:'title', text:'Quantum Algorithms'},
   {t:'lede', text:'A quantum computer does not try every answer at once. It holds many amplitudes, and a measurement returns one string of bits. An algorithm earns something only if it can arrange for the amplitudes of the answers it does not want to cancel before that measurement happens. This chapter is four ways of arranging exactly that, and they are all the same arrangement.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>The mechanism is called <b>phase kickback</b>. An operation is written to change one register; it is pointed instead at a register already prepared in a state that operation cannot move; and so the only thing it can do is write a phase onto the register that controlled it.</p>'},

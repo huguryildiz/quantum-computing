@@ -411,12 +411,12 @@ function figPhaseCircle(){
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
-{ id:'m2-open', module:'M2', nav:'What a postulate says', title:'Four postulates, and the two this chapter is about',
+{ id:'m2-open', module:'M2', nav:'What a postulate says', title:'States, Measurement and Dynamics',
   objective:'Name the four postulates and say which parts of the course each one licenses.',
   keywords:'postulates state evolution measurement composition overview module 2 quantum mechanics',
   src:'L4 · quantum-mechanical state and measurement principles', steps:2, blocks:[
   {t:'eyebrow', text:'Module 2 · States, measurement and dynamics'},
-  {t:'title', text:'Four postulates, and the two this chapter is about'},
+  {t:'title', text:'States, Measurement and Dynamics'},
   {t:'lede', text:'Chapter 1 was mathematics and nothing else could have been argued with. This chapter adds the four statements that connect that mathematics to a laboratory. They are postulates: they are not derived from anything, they are what experiment has found to hold, and everything else in the course follows from them.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>The first says what a state is: a normalised vector in a complex space, with two vectors differing by a global phase describing the same physical state. That was chapter 1, and this chapter uses it without restating it.</p>'},

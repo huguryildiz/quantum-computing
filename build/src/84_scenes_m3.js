@@ -475,12 +475,12 @@ function figSep(){
 const SC = [
 
 /* ---------------------------------------------------------------- 3.0.1 -- */
-{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Two situations no state vector describes',
+{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Mixed States and Entanglement',
   objective:'Name the two situations in which a pure state vector cannot be written, and say what replaces it.',
   keywords:'mixed state density operator open system subsystem ignorance entanglement module 3 overview',
   src:'L6 · density operators: pure states, mixtures, and reduced states', steps:2, blocks:[
   {t:'eyebrow', text:'Module 3 · Mixed states and entanglement'},
-  {t:'title', text:'Two situations no state vector describes'},
+  {t:'title', text:'Mixed States and Entanglement'},
   {t:'lede', text:'Every state so far has been one normalised vector. That is enough only while the system is alone and the preparation is known exactly. Two ordinary situations break it, and both are the normal case rather than the exception.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p><b>The preparation is not known.</b> A device emits $|0\\rangle$ half the time and $|1\\rangle$ the other half, and nobody records which. That is not the superposition $\\left(|0\\rangle+|1\\rangle\\right)/\\sqrt2$: the superposition gives a certain answer in the $X$ basis and this device gives a coin there. The two are different physics and no single vector tells them apart.</p>'},

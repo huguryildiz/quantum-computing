@@ -685,12 +685,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 6.0.1 -- */
-{ id:'m6-open', module:'M6', nav:'One mechanism, four uses', title:'Every algorithm in this chapter is the same move, made four times',
+{ id:'m6-open', module:'M6', nav:'One mechanism, four uses', title:'Quantum Algorithms',
   objective:'State the one mechanism this chapter is built on and the sentence every algorithm in it has to answer.',
   keywords:'quantum algorithms overview module 6 phase kickback interference cancellation deutsch jozsa fourier phase estimation shor introduction',
   src:'L10 · computational models: what is being counted?', steps:2, blocks:[
   {t:'eyebrow', text:'Module 6 · Quantum algorithms'},
-  {t:'title', text:'Every algorithm in this chapter is the same move, made four times'},
+  {t:'title', text:'Quantum Algorithms'},
   {t:'lede', text:'A quantum computer does not try every answer at once. It holds many amplitudes, and a measurement returns one string of bits. An algorithm earns something only if it can arrange for the amplitudes of the answers it does not want to cancel before that measurement happens. This chapter is four ways of arranging exactly that, and they are all the same arrangement.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>The mechanism is called <b>phase kickback</b>. An operation is written to change one register; it is pointed instead at a register already prepared in a state that operation cannot move; and so the only thing it can do is write a phase onto the register that controlled it.</p>'},

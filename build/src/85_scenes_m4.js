@@ -575,12 +575,12 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
-{ id:'m4-open', module:'M4', nav:'One qubit, drawn', title:'Everything one qubit can be, on one sphere',
+{ id:'m4-open', module:'M4', nav:'One qubit, drawn', title:'The Bloch Sphere and Quantum Gates',
   objective:'Say what the chapter turns into a picture, and what that picture is exact about.',
   keywords:'bloch sphere overview module 4 rotation gate picture geometry one qubit introduction',
   src:'L7 · pure qubit states and the Bloch sphere', steps:2, blocks:[
   {t:'eyebrow', text:'Module 4 · The Bloch sphere and quantum gates'},
-  {t:'title', text:'Everything one qubit can be, on one sphere'},
+  {t:'title', text:'The Bloch Sphere and Quantum Gates'},
   {t:'lede', text:'Three chapters of algebra have said what a qubit state is and what may be done to it. This chapter says the same things again as a drawing, and the drawing loses nothing: every pure state of one qubit is a point of a sphere, every mixed state a point inside it, and every gate a rotation.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
     {t:'body', html:'<p>Two amplitudes with two complex numbers in them look like four real parameters. Normalisation removes one, and the fact that a global phase is not physical removes another. Two are left, and two angles are exactly what it takes to name a point on a sphere.</p>'},
