@@ -786,6 +786,18 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 1.L-B1 -- */
+{ id:'m1-lab-b1', module:'M1', nav:'Laboratory B1 — A Projector, Split and Put Back Together', title:'Laboratory B1 — A Projector, Split and Put Back Together',
+  objective:'Let the reader split a real qubit state along a chosen direction and watch the kept length change.',
+  keywords:'laboratory projector split idempotent resolution of identity length lost interactive',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
+  {t:'title', text:'Laboratory B1 — A Projector, Split and Put Back Together'},
+  {t:'body', html:'<p>The state $|v\\rangle=\\cos(\\beta/2)|0\\rangle+\\sin(\\beta/2)|1\\rangle$ and the direction $|u\\rangle=\\cos(\\alpha/2)|0\\rangle+\\sin(\\alpha/2)|1\\rangle$ are both real states of one qubit. The projector $P=|u\\rangle\\langle u|$ keeps the part of $|v\\rangle$ along $|u\\rangle$; $I-P$ keeps the rest. The left figure draws both pieces; the right one bars their lengths against the length of $|v\\rangle$ itself.</p>'},
+  {t:'small', html:'Set $\\alpha=\\beta$ and the kept piece is everything. Pull them apart and watch how much length $P|v\\rangle$ loses — that missing length is a probability, not a rounding error.'},
+  {t:'lab', id:'B1'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m1-code-proj', module:'M1', nav:'Outer Products and Projectors in Code', title:'Outer Products and Projectors in Code',
   objective:'Build an outer product, split a state with a projector, and insert the resolution of the identity.',
@@ -1027,6 +1039,18 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 1.L-B2 -- */
+{ id:'m1-lab-b2', module:'M1', nav:'Laboratory B2 — One Generator, Two Routes to Its Rotation', title:'Laboratory B2 — One Generator, Two Routes to Its Rotation',
+  objective:'Let the reader compare the closed form of a Pauli rotation against a truncated power series of its own generator.',
+  keywords:'laboratory generator rotation pauli power series closed form unitary full turn interactive',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
+  {t:'title', text:'Laboratory B2 — One Generator, Two Routes to Its Rotation'},
+  {t:'body', html:'<p>Pick a generator $G\\in\\{X,Y,Z\\}$ and an angle $\\theta$. The left figure marks $\\cos(\\theta/2)$ and $\\sin(\\theta/2)$, the coefficients of the closed form $U(\\theta)=\\cos(\\theta/2)I-i\\sin(\\theta/2)G$. The right one builds $U(\\theta)$ a second way, from the power series $\\sum_k(-i\\theta G/2)^k/k!$ of the matrix $-i\\theta G/2$ itself, and counts how many correct digits survive as more terms are kept.</p>'},
+  {t:'small', html:'Push $\\theta$ past $360^{\\circ}$ and read the sign the closed form gives, not the one you expect. Then check that $U^{\\dagger}U=I$ holds anyway.'},
+  {t:'lab', id:'B2'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m1-code-herm', module:'M1', nav:'Hermitian and Unitary Operators in Code', title:'Hermitian and Unitary Operators in Code',
   objective:'Test for Hermiticity and unitarity, and build a rotation from its Hermitian generator.',
@@ -1111,6 +1135,18 @@ const SC = [
         ask:{key:'m1-fofa', choices:['$2P_{+}+3P_{-}$','$\\sqrt{13}\\,I$','$4P_{+}+9P_{-}$'], answer:0,
           why:'The square root acts on the eigenvalues $4$ and $9$ and keeps the projectors.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 1.L-B3 -- */
+{ id:'m1-lab-b3', module:'M1', nav:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt', title:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt',
+  objective:'Let the reader build a Hermitian matrix, find its own spectral decomposition, and drive it to a repeated eigenvalue.',
+  keywords:'laboratory hermitian eigenvalue eigenvector spectral decomposition function of an operator degenerate interactive',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
+  {t:'title', text:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt'},
+  {t:'body', html:'<p>Four sliders build the Hermitian matrix $A=\\begin{bmatrix}a&b-ic\\\\b+ic&d\\end{bmatrix}$. The laboratory finds its eigenvalues and eigenvectors from the characteristic equation, rebuilds $A=\\lambda_1P_1+\\lambda_2P_2$, and evaluates $e^{-iAt}$ two ways: from the projectors, and from a power series of $A$ itself. The left figure marks the two eigenvalues on the real axis; the right one marks $e^{-i\\lambda_1t}$ and $e^{-i\\lambda_2t}$ on the unit circle.</p>'},
+  {t:'small', html:'Set $a=d$ and $b=c=0$: the two eigenvalues meet, and the eigenvectors the laboratory reports stop meaning anything beyond "some orthonormal pair". Move any one slider off that point and a definite pair returns.'},
+  {t:'lab', id:'B3'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1296,6 +1332,78 @@ const SC = [
   ]}
 ]}
 ,
+
+/* Four optional projects for students who want to run the chapter's own
+   constructions on their own computer. They carry no grade and no code: each
+   card gives an aim, what it practises, a few steps and what to look for. The
+   briefs state no numerical answer, so they need no line in verify/. Small
+   local glyphs, modelled on the reference course's summary-card sketches,
+   since the summary page is always navy and needs the dark-page signal
+   tints rather than the light-page figure colours. */
+{ id:'m1-projects', module:'M1', nav:'Projects to Try', title:'Projects to Try',
+  dark:true, objective:'Offer four optional projects that run the chapter’s own constructions in NumPy.',
+  keywords:'projects numpy qiskit python inner product gram schmidt qr tensor product spectral decomposition matrix function',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 1 · Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>{
+    const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+    const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const AX='rgba(239,231,216,.30)', CY='#4FBECE', GR='#82C27B', RD='#E8785F', VI='#AC99DC', AM='#E5B255';
+    const G = {
+      inner: sv(ln('M46 6 L46 38',AX,1)+ln('M6 22 L86 22',AX,1)
+        +ln('M46 22 L74 9',CY)+`<circle cx="74" cy="9" r="3" fill="${CY}"/>`
+        +ln('M46 22 L66 36',VI)+`<circle cx="66" cy="36" r="3" fill="${VI}"/>`),
+      gs: sv(ln('M8 38 L60 8',CY,1.6)+`<circle cx="60" cy="8" r="3" fill="${CY}"/>`
+        +ln('M8 38 L58 38',AM,1.6)+`<circle cx="58" cy="38" r="3" fill="${AM}"/>`
+        +ln('M58 38 L60 8',AX,1.2)+ln('M8 38 L36 15',GR,2)+`<circle cx="36" cy="15" r="3" fill="${GR}"/>`),
+      tensor: sv(ln('M2 38 H90',AX,1)+[1,2,4,8].map((n,k)=>{ const x=8+k*22, y=Math.max(4,38-n*4);
+        return ln(`M${x} 38 V${y}`,AX,1)+`<circle cx="${x}" cy="${y}" r="3" fill="${k<2?CY:GR}"/>`; }).join('')),
+      spectral: sv(ln('M10 22 H36',CY,2)+`<circle cx="10" cy="22" r="3" fill="${CY}"/><circle cx="36" cy="22" r="3" fill="${CY}"/>`
+        +ln('M46 22 H56',AX,1.4)+ln('M52 18 L56 22 L52 26',AX,1.4)
+        +ln('M66 10 H90',AM,2)+`<circle cx="66" cy="10" r="3" fill="${AM}"/><circle cx="90" cy="10" r="3" fill="${AM}"/>`
+        +ln('M66 34 H90',RD,2)+`<circle cx="66" cy="34" r="3" fill="${RD}"/><circle cx="90" cy="34" r="3" fill="${RD}"/>`)
+    };
+    return PROJECTS.deck('m1', [
+      {title:'Normalise a state and watch the probabilities move', glyph:G.inner,
+       aim:'Use the inner product to normalise an unnormalised column and check Cauchy-Schwarz on a pair of states.',
+       learn:['Normalising a column by dividing by its own length.',
+              'Computing an inner product with the conjugate on the first argument, never the second.',
+              'The Cauchy-Schwarz bound as a numerical check rather than a theorem to quote.'],
+       steps:['Build the column $(1+2i,\\,3-i)$ in NumPy. Normalise it with `np.vdot` for the squared length, and print both probabilities.',
+              'Build two more normalised states and print $\\langle a|b\\rangle$ with `np.vdot(a,b)` and with `np.dot(a,b)`. Compare the two.',
+              'Print $|\\langle a|b\\rangle|$ against $\\lVert a\\rVert\\lVert b\\rVert$ for ten random normalised states of dimension four.'],
+       look:'`np.dot` silently drops the conjugate and agrees with `np.vdot` only when every entry is real. The Cauchy-Schwarz ratio never exceeds one, and it reaches one only when the two states agree up to a phase.'},
+      {title:'Break Gram-Schmidt on purpose', glyph:G.gs,
+       aim:'Reproduce Laboratory B in plain NumPy and watch the classical recursion lose orthogonality where the modified one does not.',
+       learn:['Writing the classical and the modified Gram-Schmidt recursions from their own definitions.',
+              'Measuring a defect from orthonormality rather than trusting a plot.',
+              'Comparing a hand-written recursion against `np.linalg.qr`.'],
+       steps:['Write both recursions for three vectors in $\\mathbb{C}^3$, following the definitions of this chapter.',
+              'Generate two vectors separated by an angle $\\theta=10^{-k}$ radians for $k=1,\\dots,8$, plus a third vector off their plane, and run both recursions.',
+              'At each $k$ print $\\max_{i,j}\\lvert\\langle e_i|e_j\\rangle-\\delta_{ij}\\rvert$ for both recursions, and compare the classical one against `np.linalg.qr`.'],
+       look:'The classical recursion’s defect grows by roughly a factor of ten each time $k$ does; the modified one stays many digits smaller for much longer. `np.linalg.qr` tracks the modified recursion, not the classical one.'},
+      {title:'Count the amplitudes a register actually has', glyph:G.tensor,
+       aim:'Build tensor products of growing registers and read off the exponential growth directly from array shapes.',
+       learn:['Forming a multi-qubit state with `np.kron`, in this course’s bit order.',
+              'Reading dimension growth from `.shape` rather than from a formula alone.',
+              'Telling the size of a state apart from the cost of preparing or reading it.'],
+       steps:['Build $|0\\rangle$ and $|1\\rangle$ as columns. Form $|1\\rangle\\otimes|0\\rangle$ with `np.kron(b,a)` for qubit $1$ then qubit $0$, and check which entry is $1$.',
+              'Write a loop that tensors $n$ copies of $\\tfrac{1}{\\sqrt2}(|0\\rangle+|1\\rangle)$ for $n=1,\\dots,20$ and prints the array length at each step.',
+              'At $n=20$, print how long the array takes to build, and how many entries would be needed at $n=50$ without building it.'],
+       look:'The array length doubles every step, exactly $2^n$, and by $n=20$ it already holds over a million entries while every one of them equals $2^{-n/2}$. The array is easy to build only because it needs no structure beyond one repeated tensor factor; Chapter 3 finds states this trick cannot reach.'},
+      {title:'Take a matrix apart and put it back together', glyph:G.spectral,
+       aim:'Diagonalise a Hermitian matrix, rebuild it from its own projectors, and evaluate a function of it two ways.',
+       learn:['Using `np.linalg.eigh` on a Hermitian matrix rather than `np.linalg.eig`.',
+              'Rebuilding a matrix from $\\sum_k\\lambda_kP_k$ and checking the rebuild against the original.',
+              'Evaluating $e^{-iAt}$ from the spectral decomposition and from `scipy.linalg.expm`, and comparing them.'],
+       steps:['Build a random $4\\times4$ Hermitian matrix $A$ (a random matrix plus its own adjoint).',
+              'Diagonalise it with `np.linalg.eigh`, form each projector $P_k=|v_k\\rangle\\langle v_k|$, and print $\\max\\lvert\\sum_k\\lambda_kP_k-A\\rvert$.',
+              'For ten values of $t$, compute $e^{-iAt}$ from $\\sum_k e^{-i\\lambda_kt}P_k$ and from `scipy.linalg.expm(-1j*A*t)`, and print the largest entrywise gap.'],
+       look:'Both defects stay at the size of floating-point rounding, about $10^{-14}$, for a generic matrix. Repeat with two of the four eigenvalues set equal by hand, and the individual projectors printed by `eigh` change under a tiny perturbation of the matrix while their sum for the repeated eigenvalue does not.'}
+    ]);
+  }}
+]},
 
 /* ---------------------------------------------------------------- 1.10.2 ---
    The promise made in the course map — that each chapter names the shapes of

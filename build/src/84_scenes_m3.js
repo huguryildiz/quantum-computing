@@ -472,6 +472,30 @@ function figSep(){
   return growBlocks({w:560,h:276,items});
 }
 
+/* Small sketches for the projects deck, in the dark-page signal tints, styled
+   like the summary glyphs of the reference course's m1-projects. */
+const G = (()=>{
+  const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+  const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const AX='rgba(239,231,216,.30)', CY='#4FBECE', GR='#82C27B', RD='#E8785F', VI='#AC99DC';
+  return {
+    matrix: sv(ln('M8 6 V38 M84 6 V38',AX,1.4)
+               +ln('M18 14 H36 M18 22 H36 M18 30 H36',CY,1.6)
+               +ln('M56 14 H74 M56 22 H74 M56 30 H74',VI,1.6)),
+    ball:   sv(`<circle cx="46" cy="22" r="17" fill="none" stroke="${AX}" stroke-width="1.4"/>`
+               +ln('M46 22 L60 12',CY)+`<circle cx="60" cy="12" r="3" fill="${CY}"/>`
+               +ln('M46 22 L38 30',VI)+`<circle cx="38" cy="30" r="3" fill="${VI}"/>`
+               +`<circle cx="46" cy="22" r="2.4" fill="${GR}"/>`),
+    bars:   sv(ln('M4 38 H90',AX,1)
+               +`<rect x="14" y="10" width="12" height="28" fill="${CY}"/>`
+               +`<rect x="40" y="22" width="12" height="16" fill="${VI}"/>`
+               +`<rect x="66" y="4" width="12" height="34" fill="${GR}"/>`),
+    dial:   sv(`<circle cx="46" cy="24" r="18" fill="none" stroke="${AX}" stroke-width="1.4"/>`
+               +ln('M46 24 L60 15',RD)+`<circle cx="46" cy="24" r="2.4" fill="${CY}"/>`
+               +ln('M20 8 A18 18 0 0 1 30 4',GR,1.6))
+  };
+})();
+
 const SC = [
 
 /* ---------------------------------------------------------------- 3.0.1 -- */
@@ -655,6 +679,17 @@ const SC = [
         ask:{key:'m3-ball', choices:['$0.8$ and $0.2$','$0.6$ and $0.4$','$0.68$ and $0.32$'], answer:0,
           why:'$\\tfrac12(1\\pm 0.6)$ gives $0.8$ and $0.2$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 3.L1a -- */
+{ id:'m3-lab-f1', module:'M3', nav:'Laboratory F1 — A Point in the Bloch Ball', title:'Laboratory F1 — A Point in the Bloch Ball',
+  objective:'Let the reader set a direction and a radius and read the eigenvalues and purity of the state that gives.',
+  keywords:'laboratory bloch ball point radius direction eigenvalues purity pauli vector rank one pure mixed',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 3 · Purity and the ball of states'},
+  {t:'title', text:'Laboratory F1 — A Point in the Bloch Ball'},
+  {t:'small', html:'The left panel is the flat cross-section at the chosen azimuth, with the point the three sliders place. The right panel follows the purity as only the radius moves, with the direction held fixed. Move the polar angle and the azimuth without touching the radius, and watch the purity readout not move at all: purity is a property of the length alone.'},
+  {t:'lab', id:'F1'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -873,6 +908,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 3.L1b -- */
+{ id:'m3-lab-f2', module:'M3', nav:'Laboratory F2 — The Partial Trace, Live', title:'Laboratory F2 — The Partial Trace, Live',
+  objective:'Let the reader steer a two-qubit state and watch both reduced states computed by the block rule.',
+  keywords:'laboratory partial trace reduced state schmidt family relative phase no signalling block rule live',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 3 · Composite systems and the partial trace'},
+  {t:'title', text:'Laboratory F2 — The Partial Trace, Live'},
+  {t:'small', html:'The state is $\\cos\\theta\\,|00\\rangle+\\sin\\theta\\,e^{i\\varphi}|11\\rangle$. The left panel follows the purity of the left qubit as $\\theta$ moves; the right panel is both reduced states, read off the block rule at the current setting. Hold $\\theta$ fixed and sweep $\\varphi$ alone: the joint state changes and both bars stay exactly still.'},
+  {t:'lab', id:'F2'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-ptrace', module:'M3', nav:'Two Systems in Code', title:'Two Systems in Code',
   objective:'Build a two-qubit state in the fixed ordering, take both partial traces, and compare the purity of a pair with its halves.',
@@ -958,6 +1004,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 3.L1c -- */
+{ id:'m3-lab-f3', module:'M3', nav:'Laboratory F3 — The Product Test on a General State', title:'Laboratory F3 — The Product Test on a General State',
+  objective:'Let the reader steer all four amplitudes of a two-qubit state and watch the determinant and the Schmidt coefficients together.',
+  keywords:'laboratory product test determinant schmidt coefficients svd two qubit general state rank live',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 3 · Separability and the Schmidt decomposition'},
+  {t:'title', text:'Laboratory F3 — The Product Test on a General State'},
+  {t:'small', html:'Three sliders set the size of $c_{1}$, $c_{2}$ and $c_{3}$ relative to $c_{0}$, and one sets the phase of $c_{3}$; the state is renormalised after every move. The left panel draws the four amplitudes as an array, each point sized by its own size. The right panel is the two Schmidt coefficients from an explicit $2\\times2$ eigenproblem. Find a setting where the determinant is exactly zero and watch one bar go with it.'},
+  {t:'lab', id:'F3'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-schmidt', module:'M3', nav:'The Schmidt Decomposition in Code', title:'The Schmidt Decomposition in Code',
   objective:'Apply the product test, compute Schmidt coefficients with an SVD, and count a rank with a stated tolerance.',
@@ -991,6 +1048,17 @@ const SC = [
         ask:{key:'m3-entropy', choices:['$2$ bits','$1$ bit','$4$ bits'], answer:0,
           why:'$\\rho_{A}=\\tfrac{I}{2}\\otimes\\tfrac{I}{2}=\\tfrac{I}{4}$, so $S=\\log_{2}4=2$. Entropy adds over independent pairs.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 3.L1d -- */
+{ id:'m3-lab-f4', module:'M3', nav:'Laboratory F4 — Entanglement Entropy Along a Family', title:'Laboratory F4 — Entanglement Entropy Along a Family',
+  objective:'Let the reader sweep the Schmidt angle and follow the entropy, the two Schmidt weights and the purity together.',
+  keywords:'laboratory entanglement entropy schmidt coefficients purity ebit family sweep von neumann live',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 3 · Entropy'},
+  {t:'title', text:'Laboratory F4 — Entanglement Entropy Along a Family'},
+  {t:'small', html:'One slider drives $\\theta$ in $\\cos\\theta\\,|00\\rangle+\\sin\\theta\\,|11\\rangle$. The left panel is the entropy against $\\theta$, with a marker; the right panel is both Schmidt weights and the purity of one half, on the same axis. Find the one setting where the entropy is largest and read off what the purity is doing there.'},
+  {t:'lab', id:'F4'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1200,6 +1268,60 @@ const SC = [
   {t:'reveal', at:2, items:[
     {t:'note', kind:'def', head:'What comes next', html:'Chapter 4 draws the ball this chapter has been computing in, gives the two angles of a pure state their names, and turns every single-qubit gate into a rotation of it. It also builds the two-qubit gate that makes a Bell state out of a product one, so the pairs used here stop being assumed and start being constructed.'}
   ]}
+]},
+
+/* Four optional projects for students who want to try the module on their own
+   computer. They carry no grade and no code: each card gives an aim, what it
+   practises, a few steps and what to look for. The briefs state no numerical
+   answer, so they need no line in verify/. */
+{ id:'m3-projects', module:'M3', nav:'Projects to Try', title:'Projects to Try',
+  dark:true, objective:'Offer four optional projects that use the module’s tools on states built or measured by the reader.',
+  keywords:'projects numpy qiskit density matrix purity channel bloch ball partial trace entanglement chsh',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 3 · Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>PROJECTS.deck('m3', [
+    {title:'Watch a channel erase a photograph of a qubit', glyph:G.ball,
+     aim:'Build the three elementary channels from their Kraus operators and follow purity as the strength grows.',
+     learn:['Writing Kraus operators as NumPy matrices and checking $\\sum_{k}K_{k}^{\\dagger}K_{k}=I$.',
+            'Applying a channel as $\\rho\\mapsto\\sum_{k}K_{k}\\rho K_{k}^{\\dagger}$, not as a shortcut formula.',
+            'Reading purity and the Bloch vector off the result at each strength.'],
+     steps:['Write the Kraus operators for depolarising, amplitude damping and dephasing, each with a strength parameter.',
+            'Start from ten states spread evenly around a great circle of the Bloch ball. Apply one channel to all ten at strengths $0, 0.2, \\dots, 1$.',
+            'Plot the ten points at each strength and watch the circle deform. Plot purity against strength for one of the ten.',
+            'Repeat for the other two channels and compare where each one leaves a state untouched.'],
+     look:'One channel shrinks the circle towards its centre, one drags it toward a pole, and one squashes it onto an axis. The laboratory of this section shows one input at a time; this project shows the whole circle moving, which is the more complete picture and cannot be read from any single vector.'},
+    {title:'Recover a hidden qubit from a two-qubit state', glyph:G.matrix,
+     aim:'Given a two-qubit density matrix with the ordering unstated, work out which convention it uses by testing both partial traces.',
+     learn:['The block rule for the partial trace, written directly from $4\\times4$ blocks.',
+            'That the two orderings give different-looking matrices from the same sixteen numbers.',
+            'Using a known marginal to decide between two conventions.'],
+     steps:['Build $|\\Phi^{+}\\rangle$ in this course’s ordering and compute its $4\\times4$ density matrix.',
+            'Write a partial-trace function from the block rule, taking the qubit ordering as an argument.',
+            'Trace out qubit 0 under one ordering and qubit 1 under the other. Compare the two results against the known answer, $I/2$.',
+            'Repeat with a product state, $|0\\rangle\\otimes|{+}\\rangle$, where the two reduced states differ and a wrong ordering is easy to spot.'],
+     look:'On the Bell pair both orderings quietly give $I/2$, because the state is symmetric under swapping its two halves — the mistake is invisible there. On the product state the two orderings swap which qubit gets which answer, and only there does picking the wrong one cost something a reader would notice.'},
+    {title:'Measure how much entanglement survives a channel', glyph:G.bars,
+     aim:'Send one half of a Bell pair through amplitude damping and follow the entanglement entropy of the surviving state.',
+     learn:['Building a two-qubit density matrix from a Kraus map applied to one qubit only.',
+            'Computing eigenvalues of a mixed reduced state, not only of a pure one.',
+            'That entropy of $\\rho_{A}$ is no longer a clean measure of entanglement once the pair is mixed.'],
+     steps:['Build $\\rho_{AB}=|\\Phi^{+}\\rangle\\langle\\Phi^{+}|$ as a $4\\times4$ NumPy array.',
+            'Apply amplitude damping to qubit $B$ only: $\\rho_{AB}\\mapsto\\sum_{k}(I\\otimes K_{k})\\rho_{AB}(I\\otimes K_{k})^{\\dagger}$.',
+            'At each damping strength, compute $\\rho_{A}=\\operatorname{Tr}_{B}\\rho_{AB}$ and its eigenvalues, and also $\\operatorname{Tr}\\rho_{AB}^{2}$.',
+            'Plot both against the damping strength on the same axes.'],
+     look:'At zero damping $\\rho_{A}=I/2$ and the pair is pure. As damping grows, $\\rho_{AB}$ itself stops being pure, so a bare eigenvalue count on $\\rho_{A}$ no longer isolates entanglement from the noise the channel added — the two curves separate, and that separation is the fact the section’s warning about mixed pairs is asking to be checked.'},
+    {title:'Find your own CHSH-violating angles', glyph:G.dial,
+     aim:'Search over the two free measurement angles for the setting that gets closest to $2\\sqrt2$, without assuming the textbook angles.',
+     learn:['Assembling the CHSH combination from four Pauli correlations computed directly from the Bell state.',
+            'A small numerical search over two angles rather than one.',
+            'Distinguishing the found maximum from the one constant, $2\\sqrt2$, that no search can beat.'],
+     steps:['Fix $A_{0}=0^{\\circ}$ and $A_{1}=90^{\\circ}$ from $z$. Write a function $S(B_{0},B_{1})$ from $\\langle(\\mathbf{n}\\cdot\\boldsymbol\\sigma)\\otimes(\\mathbf{m}\\cdot\\boldsymbol\\sigma)\\rangle=\\cos(\\alpha-\\beta)$.',
+            'Evaluate $S$ on a grid of $B_{0}, B_{1}$ each from $-180^{\\circ}$ to $180^{\\circ}$ in steps of $1^{\\circ}$, and find the grid point with the largest $|S|$.',
+            'Refine near that point with a finer grid, or a one-line optimiser, and report how close the result comes to $2\\sqrt2\\approx 2.8284$.',
+            'Repeat with $A_{0}$ and $A_{1}$ also free, over all four angles.'],
+     look:'The two-angle search lands within a fraction of a degree of $45^{\\circ}$ from each of $A_{0}$ and $A_{1}$, the angles the worked example uses. No search over any four angles gets past $2\\sqrt2$: the laboratory of this section only sweeps $B_{0}$ with the rest fixed, so this project is the first place the whole four-dimensional bound is checked at once rather than assumed.'}
+  ])}
 ]},
 
 /* ---------------------------------------------------------------- 3.9.2 -- */

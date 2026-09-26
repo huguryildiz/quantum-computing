@@ -572,6 +572,34 @@ function figLadder(){
   ]});
 }
 
+/* Small sketches for the projects cards. The projects page is always navy
+   (dark:true), so they are drawn in the dark-page signal tints, the same
+   fixed hex values the reference course's summary glyphs use rather than the
+   light-theme CSS custom properties, which this inline SVG cannot read. */
+const PG = (() => {
+  const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+  const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const AX='rgba(239,231,216,.30)', CY='#4FBECE', GR='#82C27B', RD='#E8785F', VI='#AC99DC', AM='#E5B255';
+  return {
+    /* a dashed path curling on a small circle rim: the Bloch path */
+    path: sv(`<circle cx="46" cy="22" r="18" fill="none" stroke="${AX}" stroke-width="1.4"/>`
+             +ln('M46 22 L34 10',CY,1.6)+`<circle cx="34" cy="10" r="2.6" fill="${CY}"/>`
+             +ln('M34 10 Q26 22 40 34',AM,1.6)+`<circle cx="40" cy="34" r="2.6" fill="${AM}"/>`
+             +ln('M40 34 L58 30',GR,1.6)+`<circle cx="58" cy="30" r="2.8" fill="${GR}"/>`),
+    /* two dots joined by an arc, rising and falling: entanglement against tilt */
+    ent: sv(ln('M2 34 H90',AX,1)+ln('M2 32 Q24 6 46 6 T90 32',GR,1.8)
+           +`<circle cx="46" cy="6" r="3" fill="${AM}"/>`+ln('M46 6 V34',AM,1.2)),
+    /* two boxes, one gate applied to each, landing on different results */
+    order: sv(ln('M4 10 H28 V22 H4 Z',CY,1.6)+ln('M4 26 H28 V38 H4 Z',CY,1.6)
+             +ln('M32 16 H46',AX,1.4)+ln('M32 32 H46',AX,1.4)
+             +ln('M50 10 H74 V22 H50 Z',GR,1.6)+ln('M50 26 H74 V38 H50 Z',RD,1.6)),
+    /* a short and a long word, with the long one closer to a target ring */
+    univ: sv(`<circle cx="70" cy="22" r="6" fill="none" stroke="${AM}" stroke-width="1.6"/>`
+             +ln('M4 34 L20 34',VI,2)+`<circle cx="20" cy="34" r="2.4" fill="${VI}"/>`
+             +ln('M4 12 Q30 6 50 14 T70 22',CY,1.8)+`<circle cx="70" cy="22" r="2.6" fill="${CY}"/>`)
+  };
+})();
+
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
@@ -722,6 +750,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 4.L1 --- */
+{ id:'m4-lab-h1', module:'M4', nav:'Laboratory H1 — The Point and the Angles', title:'Laboratory H1 — The Point and the Angles',
+  objective:'Let the reader set both sphere angles directly and read the overlap with a chosen state off the two column vectors.',
+  keywords:'laboratory bloch angles theta phi overlap half angle right angle antipodal orthogonal coin',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 4 · The Bloch sphere'},
+  {t:'title', text:'Laboratory H1 — The Point and the Angles'},
+  {t:'small', html:'Move $\\theta$ and $\\varphi$ and watch $|\\psi(\\theta,\\varphi)\\rangle$ move on the sphere. The right panel plots $|\\langle\\chi|\\psi\\rangle|^2$ against the angle between the two points, computed from the two amplitude columns rather than from the formula this chapter states. Find the setting where the two points are opposite, and check that the overlap there is exactly zero, not merely small.'},
+  {t:'lab', id:'H1'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m4-code-sphere', module:'M4', nav:'The Bloch Sphere in Code', title:'The Bloch Sphere in Code',
   objective:'Turn a state into its Bloch vector and back, compute an overlap from two vectors, and compare a global with a relative phase.',
@@ -830,6 +869,17 @@ const SC = [
         ask:{key:'m4-phase', choices:['$|{-}i\\rangle$','$|{+}i\\rangle$','$|{-}\\rangle$'], answer:0,
           why:'Three quarter turns are $270^{\\circ}$, which carries $+\\hat{x}$ to $-\\hat{y}$. By matrices, $S^{3}=\\operatorname{diag}(1,-i)$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 4.L2 --- */
+{ id:'m4-lab-h2', module:'M4', nav:'Laboratory H2 — One Gate, One Turn', title:'Laboratory H2 — One Gate, One Turn',
+  objective:'Let the reader apply one gate to a state they set and read the axis and angle of that gate off its own matrix.',
+  keywords:'laboratory single gate rotation axis angle pauli hadamard phase gate half turn length preserved',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 4 · Single-qubit gates as rotations'},
+  {t:'title', text:'Laboratory H2 — One Gate, One Turn'},
+  {t:'small', html:'Set the input state by its own $\\theta$ and $\\varphi$, pick one gate, and watch the vector move. The readout names the axis and the turn of that gate alone, read off its matrix at interaction time. Check that every Pauli reports a turn of exactly $180^{\\circ}$, whatever the $i$ in its matrix suggests, and that no gate ever changes the length of the vector.'},
+  {t:'lab', id:'H2'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1098,6 +1148,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 4.L3 --- */
+{ id:'m4-lab-h3', module:'M4', nav:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit', title:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit',
+  objective:'Let the reader run CNOT, CZ and SWAP on a chosen input and see which entry moved, for a chosen control and target.',
+  keywords:'laboratory cnot cz swap control target qubit order chosen input which entry moved sign',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 4 · Two-qubit gates'},
+  {t:'title', text:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit'},
+  {t:'small', html:'Pick a gate, an input bit for each qubit, and — for CNOT — which qubit is the control. Both panels are the four amplitudes, input on the left and output on the right, built from the gate’s own four-by-four matrix. Run $\\mathrm{CNOT}_{0\\to1}$ and $\\mathrm{CNOT}_{1\\to0}$ on the same input and compare which entry moved; that is the whole ordering trap of this section.'},
+  {t:'lab', id:'H3'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m4-code-twoqubit', module:'M4', nav:'Two-Qubit Gates in Code', title:'Two-Qubit Gates in Code',
   objective:'Place a one-qubit gate on a named qubit, print the two CNOT matrices, and build CZ and SWAP from CNOTs.',
@@ -1177,6 +1238,17 @@ const SC = [
         ask:{key:'m4-univ', choices:['No: every circuit is a Clifford circuit','Yes, exactly','Yes, to any accuracy'], answer:0,
           why:'Every product of these gates sends Paulis to Paulis, so no circuit can come close to $T$. Adding $T$ is what makes the set universal.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 4.L4 --- */
+{ id:'m4-lab-h4', module:'M4', nav:'Laboratory H4 — Reaching a Target with H and T', title:'Laboratory H4 — Reaching a Target with H and T',
+  objective:'Let the reader grow a word in H and T and watch its distance from a chosen target rotation, and see the floor a Clifford-only word cannot pass.',
+  keywords:'laboratory universality solovay kitaev clifford H T word length distance target approximation floor',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 4 · Universality'},
+  {t:'title', text:'Laboratory H4 — Reaching a Target with H and T'},
+  {t:'small', html:'Build a word of up to eight letters and watch its net gate’s distance from a chosen target, computed fresh from the matrix product at every length. Switch the alphabet to H and S only, with the off-Clifford target selected: the distance stops falling however long the word grows, because no product of Cliffords can leave the Clifford group. Put T back and the same target is reached exactly, in one letter.'},
+  {t:'lab', id:'H4'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1265,6 +1337,60 @@ const SC = [
   {t:'reveal', at:2, items:[
     {t:'note', kind:'def', head:'What comes next', html:'Chapter 5 runs these gates: how a circuit is executed, what a shot count buys against an exact statevector, and what a compiler does before the machine sees it. Then two protocols end to end, teleportation and Grover, using nothing beyond the gates written down here.'}
   ]}
+]},
+
+/* Four optional projects for students who want to try the module on their own
+   computer. They carry no grade: each card gives an aim, what it practises, a
+   few steps and what to look for. The briefs state no numerical answer, so
+   they need no line in verify/. */
+{ id:'m4-projects', module:'M4', nav:'Projects to Try', title:'Projects to Try',
+  dark:true, objective:'Offer four optional projects that use this chapter\u2019s gates and Bloch-sphere picture in NumPy.',
+  keywords:'projects numpy qiskit bloch sphere rotation composition entanglement universality clifford',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 4 · Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>PROJECTS.deck('m4', [
+    {title:'Draw the path a sequence really takes', glyph:PG.path,
+     aim:'Build a Bloch-vector plotter from the gate matrices and trace a sequence step by step.',
+     learn:['A one-qubit gate as a $2\\times2$ complex matrix, applied by hand.',
+            'The Bloch vector of a state, from $r_a=\\langle\\psi|\\sigma_a|\\psi\\rangle$.',
+            'That a product of one-qubit gates is one rotation, whatever the sequence.'],
+     steps:['Write X, Y, Z, H, S and T as NumPy arrays and a function that multiplies a chosen sequence in the right order.',
+            'Write a second function that takes a state vector and returns $(r_x,r_y,r_z)$ from the Pauli matrices.',
+            'Run a sequence of six or more gates on $|0\\rangle$, print the Bloch vector after every step, and plot the path in 3D with Matplotlib.',
+            'Diagonalise the net matrix and recover its rotation axis and angle from the eigenvector of eigenvalue $e^{i\\alpha/2}$.'],
+     look:'The vector never leaves the unit sphere at any step, to machine precision. Two sequences that are permutations of each other usually land at different points — order matters exactly where laboratory G says it does.'},
+    {title:'Measure how much one gate entangles', glyph:PG.ent,
+     aim:'Reproduce the entanglement-against-tilt curve of this chapter from a two-qubit state vector, with no shortcut formula.',
+     learn:['Building a two-qubit gate as a $4\\times4$ matrix from smaller pieces.',
+            'The partial trace of a two-qubit density matrix.',
+            'The von Neumann entropy of a $2\\times2$ reduced state.'],
+     steps:['Build $R_y(\\theta)\\otimes I$ and $\\mathrm{CNOT}_{0\\to1}$ as $4\\times4$ NumPy arrays with `np.kron`.',
+            'Apply both to $|00\\rangle$ for fifty values of $\\theta$ from $0$ to $\\pi$, and for each output form $\\rho=|\\psi\\rangle\\langle\\psi|$.',
+            'Trace out one qubit by summing the two $2\\times2$ blocks the course defines, and get its eigenvalues.',
+            'Plot $S=-\\sum_k\\lambda_k\\log_2\\lambda_k$ against $\\theta$ and compare the curve with Entangling Gates.'],
+     look:'The curve is zero at $\\theta=0$ and $\\theta=\\pi$ and peaks at exactly one bit at $\\theta=\\pi/2$. Multiply the state by a random global phase before computing $\\rho$: the curve does not move, because a global phase cancels in $|\\psi\\rangle\\langle\\psi|$.'},
+    {title:'Break the qubit order on purpose', glyph:PG.order,
+     aim:'Apply a gate to the wrong qubit of a pair and see that the result is a different, equally valid state rather than an error.',
+     learn:['`np.kron` order and this course\u2019s convention that the higher-numbered qubit sits on the left.',
+            'That $I\\otimes X$ and $X\\otimes I$ are both unitary, so nothing catches a swap by construction.',
+            'A test that tells the two apart: prepare $|10\\rangle$, apply the gate, print all four amplitudes.'],
+     steps:['Build `IX = np.kron(I, X)` and `XI = np.kron(X, I)` and confirm both are unitary.',
+            'Apply each to the four computational basis states and print which single entry moved every time.',
+            'Take a Bell-state preparation circuit written for one qubit order and run it in the other order. Compare the two output states with `np.vdot`.',
+            'Time yourself finding the swapped qubit in a ten-line circuit with no comments, using only the amplitude test.'],
+     look:'Both gates are valid, normalised, reversible — nothing about the numbers alone says which one is wrong for a given circuit. Only comparing against the intended state catches it, which is why the scene\u2019s advice is to test with $|10\\rangle$ rather than to read the code.'},
+    {title:'Find the length no short circuit can beat', glyph:PG.univ,
+     aim:'Search for the shortest word in H and T that comes within a stated distance of a fixed target rotation, and watch the cost of accuracy grow.',
+     learn:['A search over short words in a fixed gate alphabet.',
+            'A distance between two one-qubit unitaries that ignores global phase.',
+            'Why the search gets slower long before it gets impossible.'],
+     steps:['Write `dist(U, V) = 1 - abs(np.trace(U.conj().T @ V)) / 2` for two-by-two unitaries.',
+            'Fix a target such as $R_z(\\pi/5)$, which no short word of H and T reaches exactly.',
+            'Enumerate every word of H and T up to length $L$ for $L=1,\\dots,10$, keep the best distance found at each $L$, and plot best distance against $L$.',
+            'Repeat with an alphabet of H and S only, against the same target.'],
+     look:'With H and T the best distance keeps falling, roughly by a constant factor for every few extra letters — a numerical look at the Solovay\u2013Kitaev bound. With H and S only, the curve goes flat: the target is off the Clifford group and no word of Cliffords can approach it.'}
+  ])}
 ]},
 
 /* ---------------------------------------------------------------- 4.8.2 -- */

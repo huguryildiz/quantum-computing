@@ -396,3 +396,413 @@ Object.assign(LABS, (function(){
 
   return { A, B };
 })());
+
+/* ==========================================================================
+   B1 · B2 · B3 — three further laboratories for Module 1.
+
+   B1 · A projector, split and put back together — real states of one qubit,
+       the direction a projector keeps, and the length that is lost.
+   B2 · One generator, two routes to its rotation — a Pauli generator and an
+       angle, the closed form against a truncated matrix exponential.
+   B3 · A Hermitian matrix, taken apart and rebuilt — its own eigenvalues and
+       projectors, a function of it two ways, and the case where an
+       eigenvector is not unique.
+
+   Every number here is computed from the definitions at interaction time.
+   ========================================================================== */
+Object.assign(LABS, (function(){
+  const T = LABS.KIT.T, M = LABS.KIT.M, fmt = LABS.KIT.F, el = LABS.KIT.el;
+  const P = PLOT;
+  const D2R = Math.PI/180;
+
+  const sci = (v, d=2) => {
+    if(!isFinite(v)) return '\\infty';
+    if(v === 0) return '0';
+    const e = Math.floor(Math.log10(Math.abs(v)));
+    const m = v / Math.pow(10, e);
+    return Math.abs(e) < 4 ? fmt(v, Math.max(0, 4-e))
+                           : m.toFixed(d) + '\\times 10^{' + e + '}';
+  };
+
+  /* Complex-number helpers, as (re,im) pairs, written from the definitions:
+     nothing here calls a library routine that already knows the answer. */
+  const cAdd=(u,v)=>[u[0]+v[0],u[1]+v[1]];
+  const cSub=(u,v)=>[u[0]-v[0],u[1]-v[1]];
+  const cMul=(u,v)=>[u[0]*v[0]-u[1]*v[1], u[0]*v[1]+u[1]*v[0]];
+  const cConj=u=>[u[0],-u[1]];
+  const cScaleR=(u,r)=>[u[0]*r,u[1]*r];
+
+  /* =======================================================================
+     B1 · A PROJECTOR, SPLIT AND PUT BACK TOGETHER
+
+     Two real states of one qubit, both angles measured from |0>:
+
+        |v> = cos(beta/2)|0> + sin(beta/2)|1>      the state being split
+        |u> = cos(alpha/2)|0> + sin(alpha/2)|1>    the direction kept
+
+     P = |u><u| keeps the part of |v> along |u>; I-P keeps the rest. The
+     laboratory draws both pieces and reports how much of |v>'s own length
+     survives being kept, which is the thing a student assumes is unchanged.
+     ======================================================================= */
+  const B1 = (() => {
+    let st = { beta:70, alpha:20 };
+
+    function vecs(){
+      const b = st.beta*D2R, a = st.alpha*D2R;
+      const v = [Math.cos(b/2), Math.sin(b/2)];
+      const u = [Math.cos(a/2), Math.sin(a/2)];
+      return { v, u };
+    }
+
+    function draw(root){
+      const { v, u } = vecs();
+      const c = v[0]*u[0] + v[1]*u[1];              /* <u|v>, both real */
+      const Pv = [u[0]*c, u[1]*c];                   /* P|v> = <u|v> |u> */
+      const Qv = [v[0]-Pv[0], v[1]-Pv[1]];           /* (I-P)|v> */
+      const lenPv = Math.hypot(Pv[0],Pv[1]);
+      const lenQv = Math.hypot(Qv[0],Qv[1]);
+      const rebuilt = [Pv[0]+Qv[0], Pv[1]+Qv[1]];
+      const rebuildErr = Math.hypot(rebuilt[0]-v[0], rebuilt[1]-v[1]);
+      /* P^2 - P, measured entrywise on the 2x2 real matrix |u><u|. */
+      const Pxx=u[0]*u[0], Pxy=u[0]*u[1], Pyx=u[1]*u[0], Pyy=u[1]*u[1];
+      const P2xx=Pxx*Pxx+Pxy*Pyx, P2xy=Pxx*Pxy+Pxy*Pyy, P2yx=Pyx*Pxx+Pyy*Pyx, P2yy=Pyx*Pxy+Pyy*Pyy;
+      const idemDefect = Math.max(Math.abs(P2xx-Pxx),Math.abs(P2xy-Pxy),Math.abs(P2yx-Pyx),Math.abs(P2yy-Pyy));
+
+      const ax = P.Axes({w:430,h:360,xr:[-0.35,1.45],yr:[-0.35,1.30],
+        pad:{l:34,r:24,t:26,b:34}, xticksOverride:[], yticksOverride:[],
+        grid:false, zeroAxes:true, arrows:true});
+      ax.note(1,0,'|0\\rangle',{fs:14,color:P.COL.muted,anchor:'middle',dy:24,tex:true});
+      ax.note(0,1,'|1\\rangle',{fs:14,color:P.COL.muted,dx:12,dy:-6,tex:true});
+      ax.poly([[0,0],u],{color:P.COL.h,width:2.2,dash:'5 5'});
+      ax.point(u[0],u[1],{color:P.COL.h,r:5});
+      ax.note(u[0],u[1],'|u\\rangle',{fs:13,color:P.COL.h,dx:10,dy:-8,tex:true});
+      ax.poly([[0,0],v],{color:P.COL.in,width:2.6});
+      ax.point(v[0],v[1],{color:P.COL.in,r:6});
+      ax.note(v[0],v[1],'|v\\rangle',{fs:14,color:P.COL.in,dx:10,dy:20,tex:true});
+      ax.poly([[0,0],Pv],{color:P.COL.out,width:3.2});
+      ax.point(Pv[0],Pv[1],{color:P.COL.out,r:6});
+      ax.note(Pv[0],Pv[1],'P|v\\rangle',{fs:13,color:P.COL.out,anchor:'end',dx:-10,dy:-10,tex:true});
+      ax.poly([[Pv[0],Pv[1]],v],{color:P.COL.mid,width:2.2,dash:'4 4'});
+      ax.note((Pv[0]+v[0])/2,(Pv[1]+v[1])/2,'(I-P)|v\\rangle',{fs:12,color:P.COL.mid,dx:10,tex:true});
+
+      const bx = P.Axes({w:430,h:360,xr:[-0.7,2.7],yr:[0,1.12],
+        ylabel:'\\text{length}', pad:{l:56,r:24,t:28,b:56}, xticksOverride:[], ytarget:4});
+      const bar=(n,val,fill,line)=>{ bx.rect(n-0.28,0,n+0.28,val,{fill}); bx.poly([[n-0.28,val],[n+0.28,val]],{color:line,width:2.4}); };
+      bar(0,1,P.COL.dec.in,P.COL.in);
+      bar(1,lenPv,P.COL.dec.out,P.COL.out);
+      bar(2,lenQv,P.COL.dec.mid,P.COL.mid);
+      bx.note(0,-0.10,'\\lVert v\\rVert',{fs:13,color:P.COL.in,anchor:'middle',tex:true});
+      bx.note(1,-0.10,'\\lVert P v\\rVert',{fs:13,color:P.COL.out,anchor:'middle',tex:true});
+      bx.note(2,-0.10,'\\lVert(I-P)v\\rVert',{fs:12,color:P.COL.mid,anchor:'middle',tex:true});
+
+      root.querySelector('.plots').innerHTML = `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>⟨u|v⟩</dt><dd>${fmt(c,4)}</dd></div>
+        <div><dt>‖Pv‖</dt><dd>${fmt(lenPv,4)}</dd></div>
+        <div><dt>‖(I-P)v‖</dt><dd>${fmt(lenQv,4)}</dd></div>
+        <div><dt>‖Pv‖²+‖(I-P)v‖²</dt><dd class="okv">${fmt(lenPv*lenPv+lenQv*lenQv,6)}</dd></div>
+        <div><dt>Rebuild error ‖Pv+(I-P)v-v‖</dt><dd>${T(sci(rebuildErr),false)}</dd></div>
+        <div><dt>Idempotence defect ‖P²-P‖<sub>∞</sub></dt><dd>${T(sci(idemDefect),false)}</dd></div>`;
+
+      const aligned = lenPv > 0.999;
+      const verdict = aligned
+        ? `<div class="note ok"><span class="note-h">Kept in full only when it was already there</span>
+             At ${T('\\alpha=\\beta',false)} the state lies exactly along ${T('|u\\rangle',false)}, so
+             ${T('P|v\\rangle',false)} has length one and ${T('(I-P)|v\\rangle',false)} vanishes. Move either
+             slider and the kept piece shrinks at once.</div>`
+        : `<div class="note warn"><span class="note-h">A projector shortens a state</span>
+             ${T('\\lVert Pv\\rVert='+fmt(lenPv,3),false)} is not one, and a student who reads
+             ${T('P|v\\rangle',false)} as a new normalised state has thrown away the missing length —
+             which is exactly the probability ${T('1-\\lVert Pv\\rVert^{2}='+fmt(1-lenPv*lenPv,3),false)}
+             of the other outcome. The two pieces still add back to ${T('|v\\rangle',false)} exactly, and
+             ${T('P^{2}=P',false)} to the last digit a double holds.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>State angle β, degrees <span class="val" data-out="beta">70</span></label>
+                <input type="range" data-v="beta" min="0" max="180" step="5" value="70"></div>
+              <div class="ctrl"><label>Kept direction α, degrees <span class="val" data-out="alpha">20</span></label>
+                <input type="range" data-v="alpha" min="0" max="180" step="5" value="20"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     B2 · ONE GENERATOR, TWO ROUTES TO ITS ROTATION
+
+     U(theta) = exp(-i theta G / 2) for G in {X, Y, Z}, computed two ways:
+     the closed form cos(theta/2) I - i sin(theta/2) G, and a truncated power
+     series sum_{k=0}^{K} (-i theta G/2)^k / k! carried to enough terms that
+     the two agree to machine precision except right at the edge of the
+     series' own reach. Both are checked against U^dagger U = I.
+     ======================================================================= */
+  const B2 = (() => {
+    let st = { gen:'X', theta:180, terms:8 };
+    const GEN = {
+      X: [[[0,0],[1,0]], [[1,0],[0,0]]],
+      Y: [[[0,0],[0,-1]],[[0,1],[0,0]]],
+      Z: [[[1,0],[0,0]], [[0,0],[-1,0]]]
+    };
+    const mMul = (A,B) => { const C=[[[0,0],[0,0]],[[0,0],[0,0]]];
+      for(let i=0;i<2;i++) for(let j=0;j<2;j++){ let re=0, im=0;
+        for(let k=0;k<2;k++){ const t=cMul(A[i][k],B[k][j]); re+=t[0]; im+=t[1]; }
+        C[i][j]=[re,im]; } return C; };
+    const mAdd = (A,B) => [[cAdd(A[0][0],B[0][0]),cAdd(A[0][1],B[0][1])],[cAdd(A[1][0],B[1][0]),cAdd(A[1][1],B[1][1])]];
+    const mScale = (A,s) => [[cMul(A[0][0],s),cMul(A[0][1],s)],[cMul(A[1][0],s),cMul(A[1][1],s)]];
+    const I2 = [[[1,0],[0,0]],[[0,0],[1,0]]];
+    const dagger = A => [[cConj(A[0][0]),cConj(A[1][0])],[cConj(A[0][1]),cConj(A[1][1])]];
+    const mSub = (A,B) => [[cSub(A[0][0],B[0][0]),cSub(A[0][1],B[0][1])],[cSub(A[1][0],B[1][0]),cSub(A[1][1],B[1][1])]];
+    const mMaxAbs = A => { let m=0; for(let i=0;i<2;i++) for(let j=0;j<2;j++) m=Math.max(m,Math.hypot(A[i][j][0],A[i][j][1])); return m; };
+
+    /* The closed form, from the Pauli algebra derived in the scene above. */
+    function closedForm(theta, G){
+      const c = Math.cos(theta/2), s = Math.sin(theta/2);
+      const negI = [0,-1];
+      return mAdd(mScale(I2,[c,0]), mScale(G, cMul(negI,[s,0])));
+    }
+    /* The power series for exp(-i theta G/2), computed from its own definition
+       and not from the closed form the scene derives it from. */
+    function seriesForm(theta, G, K){
+      const A = mScale(G, cMul([0,-1],[theta/2,0]));   /* -i theta G/2 */
+      let term = I2, sum = I2;
+      for(let k=1;k<=K;k++){
+        term = mScale(mMul(term, A), [1/k, 0]);
+        sum = mAdd(sum, term);
+      }
+      return sum;
+    }
+
+    function draw(root){
+      const G = GEN[st.gen], th = st.theta*D2R;
+      const Uc = closedForm(th, G);
+      const Us = seriesForm(th, G, st.terms);
+      const diff = mMaxAbs(mSub(Uc, Us));
+      const UdU = mMul(dagger(Uc), Uc);
+      const unitDefect = mMaxAbs(mSub(UdU, I2));
+
+      /* ---- the two coefficients of the closed form, with the current angle marked ---- */
+      const ax = P.Axes({w:430,h:340,xr:[0,4*Math.PI],yr:[-1.5,1.42],
+        xlabel:'\\theta', ylabel:'\\text{coefficient}', pad:{l:56,r:24,t:26,b:44}, xtarget:5, ytarget:5});
+      ax.curve(t => Math.cos(t/2), {color:P.COL.in, width:2.4});
+      ax.curve(t => Math.sin(t/2), {color:P.COL.mid, width:2.0, dash:'5 4'});
+      ax.vline(th, {color:P.COL.h, width:1.6, dash:'3 4'});
+      /* The vline sweeps the whole width of the frame as theta moves, so both
+         names sit in the margin above the curves rather than beside them: a
+         label placed at any x inside the data area is on the moving line at
+         some setting of the angle slider. */
+      ax.note(0.35,-1.16,'\\cos(\\theta/2)',{fs:12.5,color:P.COL.in,anchor:'start',tex:true});
+      ax.note(0.35,-1.38,'\\sin(\\theta/2)',{fs:12.5,color:P.COL.mid,anchor:'start',tex:true});
+
+      /* ---- the entrywise gap between the two routes, over the terms kept ---- */
+      const bx = P.Axes({w:430,h:340,xr:[0.5,12.5],yr:[0,17.5],
+        xlabel:'\\text{terms kept}', ylabel:'\\text{correct digits}', pad:{l:56,r:24,t:26,b:44}, xtarget:6, ytarget:5});
+      const pts = []; for(let k=1;k<=12;k++){ const d = mMaxAbs(mSub(Uc, seriesForm(th,G,k))); pts.push([k, -Math.log10(Math.max(d,1e-17))]); }
+      bx.poly(pts, {color:P.COL.out, width:2.2});
+      pts.forEach(([x,y])=>bx.point(x,y,{color:P.COL.out,r:3.4}));
+      bx.vline(st.terms, {color:P.COL.muted, width:1.2, dash:'3 4'});
+
+      root.querySelector('.plots').innerHTML = `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>Closed form, entry (0,0)</dt><dd>${fmt(Uc[0][0][0],4)} ${Uc[0][0][1]<0?'−':'+'} ${fmt(Math.abs(Uc[0][0][1]),4)}i</dd></div>
+        <div><dt>Series (${st.terms} terms), entry (0,0)</dt><dd>${fmt(Us[0][0][0],4)} ${Us[0][0][1]<0?'−':'+'} ${fmt(Math.abs(Us[0][0][1]),4)}i</dd></div>
+        <div><dt>Max entrywise gap, closed vs. series</dt><dd>${T(sci(diff),false)}</dd></div>
+        <div><dt>Unitarity defect ‖U†U-I‖<sub>∞</sub></dt><dd class="${unitDefect>1e-8?'warnv':'okv'}">${T(sci(unitDefect),false)}</dd></div>`;
+
+      /* Near an odd multiple of 360 degrees, U is close to -I: a full turn of
+         the generator, not a return to the identity. */
+      const nearestOddTurn = Math.round((st.theta - 360) / 720) * 2 + 1;
+      const nearFull = Math.abs(st.theta - 360*nearestOddTurn) < 2;
+      const verdict = nearFull
+        ? `<div class="note warn"><span class="note-h">A full turn is minus the identity, not the identity</span>
+             At ${T('\\theta\\approx 2\\pi',false)} the closed form gives ${T('\\cos(\\pi)=-1',false)} and
+             ${T('\\sin(\\pi)=0',false)}, so ${T('U='+ '-I',false)}. On the whole state that minus sign is a
+             global phase and changes nothing; on one branch of a superposition it is a relative phase and
+             changes everything, which is the double cover the Bloch sphere makes formal in Chapter 4.
+             The series needs only ${T(String(st.terms),false)} terms to match it to
+             ${T(sci(diff),false)}.</div>`
+        : `<div class="note ok"><span class="note-h">Two routes to the same matrix</span>
+             The closed form ${T('\\cos(\\theta/2)I-i\\sin(\\theta/2)G',false)} and the power series it is a
+             resummation of agree to ${T(sci(diff),false)} after ${T(String(st.terms),false)} terms, and both
+             satisfy ${T('U^{\\dagger}U=I',false)} to ${T(sci(unitDefect),false)}. Neither route reads the
+             other's answer off a table.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+      root.querySelectorAll('[data-seg=gen]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.val===st.gen)));
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Generator <span class="seg">
+                <button data-seg="gen" data-val="X">X</button>
+                <button data-seg="gen" data-val="Y">Y</button>
+                <button data-seg="gen" data-val="Z">Z</button></span></label></div>
+              <div class="ctrl"><label>Angle θ, degrees <span class="val" data-out="theta">180</span></label>
+                <input type="range" data-v="theta" min="0" max="1440" step="5" value="180"></div>
+              <div class="ctrl"><label>Series terms kept <span class="val" data-out="terms">8</span></label>
+                <input type="range" data-v="terms" min="1" max="12" step="1" value="8"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      root.addEventListener('click', e=>{ const b=e.target.closest('[data-seg=gen]'); if(!b) return;
+        st.gen = b.dataset.val; draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     B3 · A HERMITIAN MATRIX, TAKEN APART AND REBUILT
+
+     A = [[a, b-ic],[b+ic, d]], Hermitian for any real a,b,c,d. The lab finds
+     its own eigenvalues and eigenvectors from the definition, rebuilds A as
+     sum lambda_k P_k, and evaluates f(A) = exp(-iAt) two ways: through the
+     spectral decomposition, and through a direct truncated power series of
+     the matrix itself. At b=c=0, a=d the matrix is proportional to I, every
+     vector is an eigenvector, and the two projectors the lab reports are one
+     arbitrary orthonormal pair rather than an invariant.
+     ======================================================================= */
+  const B3 = (() => {
+    const T_FIXED = 0.7;
+    let st = { a:2, d:2, b:1, c:0 };
+
+    const mMul = (A,B) => { const C=[[[0,0],[0,0]],[[0,0],[0,0]]];
+      for(let i=0;i<2;i++) for(let j=0;j<2;j++){ let re=0, im=0;
+        for(let k=0;k<2;k++){ const t=cMul(A[i][k],B[k][j]); re+=t[0]; im+=t[1]; }
+        C[i][j]=[re,im]; } return C; };
+    const mAdd = (A,B) => [[cAdd(A[0][0],B[0][0]),cAdd(A[0][1],B[0][1])],[cAdd(A[1][0],B[1][0]),cAdd(A[1][1],B[1][1])]];
+    const mScale = (A,s) => [[cMul(A[0][0],s),cMul(A[0][1],s)],[cMul(A[1][0],s),cMul(A[1][1],s)]];
+    const mSub = (A,B) => [[cSub(A[0][0],B[0][0]),cSub(A[0][1],B[0][1])],[cSub(A[1][0],B[1][0]),cSub(A[1][1],B[1][1])]];
+    const I2 = [[[1,0],[0,0]],[[0,0],[1,0]]];
+    const mMaxAbs = A => { let m=0; for(let i=0;i<2;i++) for(let j=0;j<2;j++) m=Math.max(m,Math.hypot(A[i][j][0],A[i][j][1])); return m; };
+    const outer = (u) => { /* |u><u| for a complex 2-vector u */
+      return [[cMul(u[0],cConj(u[0])), cMul(u[0],cConj(u[1]))],
+              [cMul(u[1],cConj(u[0])), cMul(u[1],cConj(u[1]))]];
+    };
+
+    /* A closed-form 2x2 Hermitian eigensolver, from the characteristic
+       equation lambda^2 - (a+d) lambda + (ad - |z|^2) = 0 with z = b+ic. */
+    function eigH(){
+      const { a, d, b, c } = st;
+      const tr = a+d, z2 = b*b+c*c, det = a*d - z2;
+      const disc = Math.max(0, tr*tr - 4*det);
+      const gap = Math.sqrt(disc);
+      const l1 = (tr+gap)/2, l2 = (tr-gap)/2;
+      /* Degenerate: a=d and z=0. Any orthonormal pair works; report the
+         computational basis rather than a division by zero. */
+      if(gap < 1e-12 && Math.hypot(b,c) < 1e-12){
+        return { l1:a, l2:d, e1:[[1,0],[0,0]], e2:[[0,0],[1,0]], degenerate:true };
+      }
+      /* Eigenvector for l1 from (A - l1 I): row 0 gives (a-l1) x + (b-ic) y = 0,
+         so (x,y) is proportional to (b-ic, l1-a) whenever the off-diagonal is
+         non-zero; otherwise the matrix is already diagonal in this basis. */
+      let v1;
+      if(Math.hypot(b,c) > 1e-9) v1 = [[b,-c], [l1-a,0]];
+      else v1 = (l1===a) ? [[1,0],[0,0]] : [[0,0],[1,0]];
+      const norm1 = Math.sqrt(v1[0][0]**2+v1[0][1]**2+v1[1][0]**2+v1[1][1]**2);
+      const e1 = [cScaleR(v1[0],1/norm1), cScaleR(v1[1],1/norm1)];
+      /* e2 orthogonal to e1: (-e1_1^*, e1_0^*) up to phase, which is a valid
+         second eigenvector because the matrix is Hermitian and 2x2. */
+      const e2 = [cScaleR(cConj(e1[1]),1), cScaleR(cConj(e1[0]),-1)];
+      return { l1, l2, e1, e2, degenerate:false };
+    }
+
+    function draw(root){
+      const { a, d, b, c } = st;
+      const t = T_FIXED;
+      const A = [[[a,0],[b,-c]],[[b,c],[d,0]]];
+      const { l1, l2, e1, e2, degenerate } = eigH();
+      const P1 = outer(e1), P2 = outer(e2);
+      const rebuilt = mAdd(mScale(P1,[l1,0]), mScale(P2,[l2,0]));
+      const rebuildDefect = mMaxAbs(mSub(rebuilt, A));
+
+      /* f(A) = exp(-iAt): spectral route. */
+      const fSpec = mAdd(mScale(P1,[Math.cos(l1*t),-Math.sin(l1*t)]), mScale(P2,[Math.cos(l2*t),-Math.sin(l2*t)]));
+      /* Direct route: a truncated power series of exp(-iAt) built from A itself. */
+      const iAt = mScale(A, cMul([0,-1],[t,0]));
+      let term = I2, series = I2;
+      for(let k=1;k<=14;k++){ term = mScale(mMul(term, iAt), [1/k,0]); series = mAdd(series, term); }
+      const fnDiff = mMaxAbs(mSub(fSpec, series));
+
+      /* ---- the eigenvalues on the real axis, and A's diagonal for scale ---- */
+      const ax = P.Axes({w:430,h:300,xr:[Math.min(-1,l1-1,l2-1),Math.max(1,l1+1,l2+1)],yr:[-1.4,1.4],
+        xlabel:'\\operatorname{Re}\\lambda', ylabel:'\\operatorname{Im}\\lambda', pad:{l:56,r:24,t:28,b:44}, xtarget:5, ytarget:4});
+      ax.point(l1,0,{color:P.COL.h,r:7});
+      ax.note(l1,0.18,'\\lambda_{1}',{fs:13,color:P.COL.h,anchor:'middle',tex:true});
+      ax.point(l2,0,{color:P.COL.out,r:7});
+      ax.note(l2,0.18,'\\lambda_{2}',{fs:13,color:P.COL.out,anchor:'middle',tex:true});
+      if(degenerate) ax.note((l1+l2)/2,-0.9,'\\lambda_{1}=\\lambda_{2}: \\text{ every direction is an eigenvector}',{fs:11.5,color:P.COL.muted,anchor:'middle',tex:true});
+
+      /* ---- f(A) evaluated on the unit circle, spectral route ---- */
+      const bx = P.Axes({w:430,h:300,xr:[-1.5,1.5],yr:[-1.35,1.35],
+        xlabel:'\\operatorname{Re}', ylabel:'\\operatorname{Im}', pad:{l:56,r:24,t:28,b:44}, xtarget:4, ytarget:4});
+      const ring=[]; for(let i=0;i<=180;i++){ const th=2*Math.PI*i/180; ring.push([Math.cos(th),Math.sin(th)]); }
+      bx.poly(ring,{color:P.COL.grid,width:1.2});
+      const f1 = [Math.cos(l1*t), -Math.sin(l1*t)], f2=[Math.cos(l2*t), -Math.sin(l2*t)];
+      bx.point(f1[0],f1[1],{color:P.COL.h,r:6});
+      bx.point(f2[0],f2[1],{color:P.COL.out,r:6});
+      bx.note(f1[0],f1[1],'e^{-i\\lambda_{1}t}',{fs:12,color:P.COL.h,dx:10,dy:-8,tex:true});
+      bx.note(f2[0],f2[1],'e^{-i\\lambda_{2}t}',{fs:12,color:P.COL.out,dx:10,dy:16,tex:true});
+
+      root.querySelector('.plots').innerHTML = `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>λ₁, λ₂</dt><dd>${fmt(l1,4)}, ${fmt(l2,4)}</dd></div>
+        <div><dt>Rebuild defect ‖ΣλₖPₖ − A‖<sub>∞</sub></dt><dd class="${rebuildDefect>1e-8?'warnv':'okv'}">${T(sci(rebuildDefect),false)}</dd></div>
+        <div><dt>f(A) gap, spectral vs. series</dt><dd class="${fnDiff>1e-6?'warnv':'okv'}">${T(sci(fnDiff),false)}</dd></div>`;
+
+      const verdict = degenerate
+        ? `<div class="note warn"><span class="note-h">A repeated eigenvalue has no invariant eigenvector</span>
+             ${T('A=aI',false)} here, so every state is an eigenvector of ${T(fmt(a,3),false)}. The pair
+             ${T('e_1,e_2',false)} shown is one arbitrary orthonormal choice, not a property of ${T('A',false)}.</div>`
+        : `<div class="note ok"><span class="note-h">Taken apart and put back together exactly</span>
+             ${T('A=\\lambda_{1}P_{1}+\\lambda_{2}P_{2}',false)} rebuilds ${T('A',false)} to
+             ${T(sci(rebuildDefect),false)}, and the two routes to ${T('e^{-iAt}',false)} agree to
+             ${T(sci(fnDiff),false)}.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Diagonal a <span class="val" data-out="a">2</span></label>
+                <input type="range" data-v="a" min="-3" max="3" step="0.5" value="2"></div>
+              <div class="ctrl"><label>Diagonal d <span class="val" data-out="d">2</span></label>
+                <input type="range" data-v="d" min="-3" max="3" step="0.5" value="2"></div>
+              <div class="ctrl"><label>Off-diagonal, real part b <span class="val" data-out="b">1</span></label>
+                <input type="range" data-v="b" min="-3" max="3" step="0.5" value="1"></div>
+              <div class="ctrl"><label>Off-diagonal, imaginary part c <span class="val" data-out="c">0</span></label>
+                <input type="range" data-v="c" min="-3" max="3" step="0.5" value="0"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseFloat(e.target.value); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  return { B1, B2, B3 };
+})());

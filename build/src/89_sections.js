@@ -69,16 +69,16 @@ CONTENT.SECTIONS = {
     { n:'1.2', title:'Amplitude, phase and interference', ids:[
         'm1-amp','m1-phase','m1-lab-a','m1-code-phase'] },
     { n:'1.3', title:'Outer products and projectors',     ids:[
-        'm1-outer','m1-proj','m1-resid','m1-code-proj'] },
+        'm1-outer','m1-proj','m1-resid','m1-lab-b1','m1-code-proj'] },
     { n:'1.4', title:'Building an orthonormal basis',     ids:['m1-gs','m1-lab-b','m1-code-gs'] },
     { n:'1.5', title:'The tensor product',                ids:['m1-tensor','m1-expo','m1-code-tensor'] },
     { n:'1.6', title:'Hermitian and unitary operators',   ids:[
-        'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle','m1-code-herm'] },
+        'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle','m1-lab-b2','m1-code-herm'] },
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
-        'm1-eig','m1-spectral','m1-fofa','m1-code-spectral'] },
+        'm1-eig','m1-spectral','m1-fofa','m1-lab-b3','m1-code-spectral'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac','m1-code-dirac'] },
     { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness','m1-code-functions'] },
-    { n:'1.10', title:'Summary and practice',             ids:['m1-quick','m1-synth','m1-shapes'] }
+    { n:'1.10', title:'Summary and practice',             ids:['m1-quick','m1-synth','m1-projects','m1-shapes'] }
   ],
 
   /* Chapter 2 carries the other two postulates. The measurement sections come
@@ -91,16 +91,18 @@ CONTENT.SECTIONS = {
     { n:'2.1', title:'The Born rule',                     ids:[
         'm2-born','m2-bases','m2-distinguish','m2-lab-c','m2-code-born'] },
     { n:'2.2', title:'Projective measurement',            ids:[
-        'm2-proj','m2-collapse','m2-povm','m2-code-measure'] },
+        'm2-proj','m2-collapse','m2-povm','m2-lab-d1','m2-code-measure'] },
     { n:'2.3', title:'Observables',                       ids:['m2-obs','m2-var','m2-code-obs'] },
-    { n:'2.4', title:'Compatibility and uncertainty',     ids:['m2-comm','m2-uncert','m2-code-comm'] },
+    { n:'2.4', title:'Compatibility and uncertainty',     ids:[
+        'm2-comm','m2-uncert','m2-lab-d2','m2-code-comm'] },
     { n:'2.5', title:'The Pauli algebra',                 ids:[
-        'm2-pauli','m2-paulialg','m2-ndotsigma','m2-code-pauli'] },
+        'm2-pauli','m2-paulialg','m2-ndotsigma','m2-lab-d3','m2-code-pauli'] },
     { n:'2.6', title:'Dynamics',                          ids:[
         'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d',
         'm2-code-dynamics'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots','m2-code-shots'] },
-    { n:'2.8', title:'Summary and practice',              ids:['m2-quick','m2-synth','m2-shapes'] }
+    { n:'2.8', title:'Summary and practice',              ids:[
+        'm2-quick','m2-synth','m2-projects','m2-shapes'] }
   ],
 
   /* Chapter 3 drops the two assumptions chapters 1 and 2 rested on, one at a
@@ -114,19 +116,19 @@ CONTENT.SECTIONS = {
     { n:'3.0', title:'Opening',                           ids:['m3-open'] },
     { n:'3.1', title:'The density operator',              ids:[
         'm3-rho','m3-physical','m3-expect','m3-ensemble','m3-code-rho'] },
-    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball','m3-code-purity'] },
+    { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball','m3-lab-f1','m3-code-purity'] },
     { n:'3.3', title:'Quantum channels',                  ids:[
         'm3-kraus','m3-damp','m3-dephase','m3-lab-e','m3-code-channels'] },
     { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2','m3-code-t1t2'] },
     { n:'3.5', title:'Composite systems and the partial trace', ids:[
-        'm3-order','m3-ptrace','m3-local','m3-code-ptrace'] },
+        'm3-order','m3-ptrace','m3-local','m3-lab-f2','m3-code-ptrace'] },
     { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
-        'm3-sep','m3-schmidt','m3-svd','m3-code-schmidt'] },
-    { n:'3.7', title:'Entropy',                           ids:['m3-entropy','m3-code-entropy'] },
+        'm3-sep','m3-schmidt','m3-svd','m3-lab-f3','m3-code-schmidt'] },
+    { n:'3.7', title:'Entropy',                           ids:['m3-entropy','m3-lab-f4','m3-code-entropy'] },
     { n:'3.8', title:'Bell correlations',                 ids:[
         'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig',
         'm3-code-bell'] },
-    { n:'3.9', title:'Summary and practice',              ids:['m3-quick','m3-synth','m3-shapes'] }
+    { n:'3.9', title:'Summary and practice',              ids:['m3-quick','m3-synth','m3-projects','m3-shapes'] }
   ],
 
   /* Chapter 4 is one qubit drawn, and then everything that can be done to it
@@ -139,17 +141,17 @@ CONTENT.SECTIONS = {
   M4: [
     { n:'4.0', title:'Opening',                           ids:['m4-open'] },
     { n:'4.1', title:'The Bloch sphere',                  ids:[
-        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover','m4-code-sphere'] },
+        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover','m4-lab-h1','m4-code-sphere'] },
     { n:'4.2', title:'Single-qubit gates as rotations',   ids:[
-        'm4-rot','m4-pauli','m4-had','m4-phase','m4-code-rotations'] },
+        'm4-rot','m4-pauli','m4-had','m4-phase','m4-lab-h2','m4-code-rotations'] },
     { n:'4.3', title:'Composing gates',                   ids:[
         'm4-time','m4-euler','m4-ugate','m4-lab-g','m4-code-compose'] },
     { n:'4.4', title:'Reversible embeddings',             ids:['m4-rev','m4-toffoli','m4-code-reversible'] },
     { n:'4.5', title:'Two-qubit gates',                   ids:[
-        'm4-order','m4-cnot','m4-cz','m4-swap','m4-code-twoqubit'] },
+        'm4-order','m4-cnot','m4-cz','m4-swap','m4-lab-h3','m4-code-twoqubit'] },
     { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h','m4-code-entangle'] },
-    { n:'4.7', title:'Universality',                      ids:['m4-univ','m4-code-univ'] },
-    { n:'4.8', title:'Summary and practice',              ids:['m4-quick','m4-synth','m4-shapes'] }
+    { n:'4.7', title:'Universality',                      ids:['m4-univ','m4-lab-h4','m4-code-univ'] },
+    { n:'4.8', title:'Summary and practice',              ids:['m4-quick','m4-synth','m4-projects','m4-shapes'] }
   ],
 
   /* Chapter 5 has two halves and the section order is the join between them.
@@ -168,11 +170,11 @@ CONTENT.SECTIONS = {
   M5: [
     { n:'5.0', title:'Opening',                           ids:['m5-open'] },
     { n:'5.1', title:'The circuit model',                 ids:[
-        'm5-circuit','m5-model','m5-read','m5-depth','m5-code-circuit'] },
+        'm5-circuit','m5-model','m5-read','m5-depth','m5-lab-j1','m5-code-circuit'] },
     { n:'5.2', title:'Running a circuit',                 ids:[
-        'm5-state','m5-shots','m5-measure','m5-feed','m5-code-run'] },
+        'm5-state','m5-shots','m5-measure','m5-feed','m5-lab-j2','m5-code-run'] },
     { n:'5.3', title:'Compiling for a machine',           ids:[
-        'm5-iset','m5-transpile','m5-cost','m5-fault','m5-code-compile'] },
+        'm5-iset','m5-transpile','m5-cost','m5-fault','m5-lab-j3','m5-code-compile'] },
     { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey','m5-code-ramsey'] },
     { n:'5.5', title:'Teleportation',                     ids:[
         'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',
@@ -180,7 +182,7 @@ CONTENT.SECTIONS = {
     { n:'5.6', title:'Grover search',                     ids:[
         'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
         'm5-lab-j','m5-code-grover'] },
-    { n:'5.7', title:'Summary and practice',              ids:['m5-quick','m5-synth','m5-shapes'] }
+    { n:'5.7', title:'Summary and practice',              ids:['m5-quick','m5-synth','m5-projects','m5-shapes'] }
   ],
 
   /* Chapter 6 is one mechanism and four uses of it, and the section order is
@@ -206,19 +208,19 @@ CONTENT.SECTIONS = {
     { n:'6.2', title:'Phase kickback',                     ids:[
         'm6-kick','m6-eigen','m6-cancel','m6-code-kick'] },
     { n:'6.3', title:'Deutsch and Deutsch\u2013Jozsa',      ids:[
-        'm6-deutsch','m6-dj','m6-djcost','m6-code-dj'] },
+        'm6-deutsch','m6-dj','m6-djcost','m6-lab-k1','m6-code-dj'] },
     { n:'6.4', title:'The quantum Fourier transform',     ids:[
-        'm6-qft','m6-qftcirc','m6-qftnot','m6-code-qft'] },
+        'm6-qft','m6-qftcirc','m6-qftnot','m6-lab-k2','m6-code-qft'] },
     { n:'6.5', title:'Phase estimation',                  ids:[
         'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-lab-k',
         'm6-code-qpe'] },
     { n:'6.6', title:'Order finding',                     ids:[
-        'm6-order','m6-ordereig','m6-modexp','m6-cf','m6-repeat',
+        'm6-order','m6-ordereig','m6-modexp','m6-lab-k3','m6-cf','m6-repeat',
         'm6-code-order'] },
     { n:'6.7', title:'Factoring and period finding', ids:[
         'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family',
         'm6-code-shor'] },
-    { n:'6.8', title:'Summary and practice',              ids:['m6-quick','m6-synth','m6-shapes'] }
+    { n:'6.8', title:'Summary and practice',              ids:['m6-quick','m6-synth','m6-projects','m6-shapes'] }
   ]
 
 };

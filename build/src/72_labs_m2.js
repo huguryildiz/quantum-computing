@@ -9,8 +9,20 @@
        time against the population. A pulse that flips the qubit on resonance
        stops flipping it a little way off, and the second panel says by how
        much.
+   D1 · Two measurements in a row — a state, a first basis and a second one.
+        The first reading collapses the state; the second reading is computed
+        from what is left, not from the original state, and the two bases
+        agree only when they share an eigenbasis.
+   D2 · How tight is the uncertainty bound? — a state and two measurement
+        directions on the equatorial plane. The product of the two spreads
+        and the Robertson bound are both computed from the state, and the
+        gap between them closes only at one angle for a given state.
+   D3 · Measuring along a tilted axis — a state's Bloch vector and an
+        instrument direction, both set by two angles apiece. The probability
+        of the plus outcome is read from the angle between the two vectors,
+        never quoted, and it falls to one half exactly at a right angle.
 
-   Both compute from the definitions at interaction time. The sampling in C is
+   All compute from the definitions at interaction time. The sampling in C is
    from a seeded generator, so the figure is the same figure on every machine
    and in every render: a gate that reads the page a fixed time after
    navigating cannot be handed a different answer each run.
@@ -272,5 +284,350 @@ Object.assign(LABS, (function(){
     }};
   })();
 
-  return { C, D };
+  /* =======================================================================
+     D1 · TWO MEASUREMENTS IN A ROW
+
+     The state is cos(theta/2)|0> + e^{i phi} sin(theta/2)|1>, with Bloch
+     vector r = (sin theta cos phi, sin theta sin phi, cos theta). A first
+     measurement along axis a gives + with probability (1+r.a)/2 and leaves
+     the state's vector at +a or -a, whichever the reading was — computed
+     here by re-reading the Pauli mean of the collapsed state, not asserted.
+     A second measurement along axis b then reads (1+r'.b)/2 from that new
+     vector. Both readings come from n.sigma probabilities; nothing is a
+     lookup table of the nine basis pairs.
+     ======================================================================= */
+  const D1 = (() => {
+    let st = { theta:60, phi:30, first:'Z', second:'X', outcome:1 };
+    const AX = { Z:[0,0,1], X:[1,0,0], Y:[0,1,0] };
+
+    function bloch(){
+      const th = st.theta*D2R, ph = st.phi*D2R;
+      return [Math.sin(th)*Math.cos(ph), Math.sin(th)*Math.sin(ph), Math.cos(th)];
+    }
+    const dot = (u,v) => u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+
+    function draw(root){
+      const r = bloch(), a = AX[st.first], b = AX[st.second];
+      const ra = dot(r,a);
+      const pFirst = (1 + ra)/2;
+      /* The reading the reader has chosen. A projective measurement along a
+         puts the vector exactly at +a or -a; nothing between them survives. */
+      const sign = st.outcome;
+      const rPrime = sign > 0 ? a : a.map(v=>-v);
+      const pSecond = (1 + sign*dot(rPrime,b))/2;
+      const commute = Math.abs(dot(a,b)) > 1 - 1e-9;
+
+      /* ---- the Bloch vector before and after, on the equatorial-ish disc
+         used elsewhere in this module: a 2-D projection along (x,y) with z
+         shown as a filled fraction, since the full sphere is chapter 4's. ---- */
+      const ax = P.Axes({w:430,h:320,xr:[-1.3,1.3],yr:[-1.3,1.3],
+        pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+        grid:false, zeroAxes:true, arrows:false});
+      const ring=[]; for(let i=0;i<=160;i++){ const t=2*Math.PI*i/160; ring.push([Math.cos(t),Math.sin(t)]); }
+      ax.poly(ring,{color:P.COL.grid,width:1.2});
+      const proj = v => [v[0]+0.32*v[1], v[2]+0.20*v[1]];
+      [[a,'a',P.COL.mid],[b,'b',P.COL.out]].forEach(([v,l,col])=>{
+        const p = proj(v);
+        ax.poly([[0,0],p],{color:col,width:2,dash:'4 4'});
+        ax.note(p[0],p[1],l,{fs:13,color:col,dx:p[0]>=0?8:-16,dy:p[1]>0?-6:16,tex:true});
+      });
+      const p0 = proj(r), p1 = proj(rPrime);
+      ax.poly([[0,0],p0],{color:P.COL.in,width:2.6});
+      ax.point(p0[0],p0[1],{color:P.COL.in,r:6});
+      ax.note(p0[0],p0[1],'\\mathbf{r}',{fs:14,color:P.COL.in,dx:10,dy:-10,tex:true});
+      ax.poly([[0,0],p1],{color:P.COL.err,width:2.6});
+      ax.point(p1[0],p1[1],{color:P.COL.err,r:6});
+      ax.note(p1[0],p1[1],"\\mathbf{r}'",{fs:14,color:P.COL.err,dx:10,dy:14,tex:true});
+
+      /* ---- the two probabilities that were actually asked for ---- */
+      const bx = P.Axes({w:430,h:320,xr:[-0.7,1.7],yr:[0,1.12],
+        ylabel:'\\text{probability}', pad:{l:60,r:24,t:28,b:56},
+        xticksOverride:[], ytarget:4});
+      bx.rect(-0.30,0,0.30,pFirst,{fill:P.COL.dec.mid});
+      bx.poly([[-0.30,pFirst],[0.30,pFirst]],{color:P.COL.mid,width:2.6});
+      bx.rect(0.70,0,1.30,pSecond,{fill:P.COL.dec.out});
+      bx.poly([[0.70,pSecond],[1.30,pSecond]],{color:P.COL.out,width:2.6});
+      bx.note(0,0,'1st, '+st.first,{fs:12,color:P.COL.muted,anchor:'middle',dy:26});
+      bx.note(1,0,'2nd, '+st.second,{fs:12,color:P.COL.muted,anchor:'middle',dy:26});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>r before</dt><dd>(${fmt(r[0],3)}, ${fmt(r[1],3)}, ${fmt(r[2],3)})</dd></div>
+        <div><dt>p(+) on the 1st measurement</dt><dd class="okv">${fmt(pFirst,5)}</dd></div>
+        <div><dt>Reading kept</dt><dd>${sign>0?'+1':'-1'}</dd></div>
+        <div><dt>r after</dt><dd>(${fmt(rPrime[0],3)}, ${fmt(rPrime[1],3)}, ${fmt(rPrime[2],3)})</dd></div>
+        <div><dt>p(+) on the 2nd measurement</dt><dd class="${commute?'okv':'warnv'}">${fmt(pSecond,5)}</dd></div>`;
+
+      const verdict = commute
+        ? `<div class="note ok"><span class="note-h">The two bases share an eigenbasis</span>
+             ${T(st.first+'\\text{ and }'+st.second,false)} point along the same line, so the first
+             reading already puts the state at an eigenvector of the second observable. The second
+             probability is exactly ${T(fmt(pSecond,3),false)}: certain, one way or the other.</div>`
+        : `<div class="note warn"><span class="note-h">The first reading destroyed the second question</span>
+             Whatever ${T('\\mathbf{r}',false)} was before, the first measurement threw it away and
+             replaced it with ${T('\\pm\\mathbf{a}',false)}. The second probability
+             ${T(fmt(pSecond,4),false)} depends only on the angle between
+             ${T('\\mathbf{a}',false)} and ${T('\\mathbf{b}',false)} — the original state has left no
+             trace on it at all.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+      root.querySelectorAll('[data-seg]').forEach(b=>
+        b.setAttribute('aria-pressed', String(b.dataset.val===String(st[b.dataset.seg]))));
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Polar angle θ, degrees <span class="val" data-out="theta">60</span></label>
+                <input type="range" data-v="theta" min="0" max="180" step="5" value="60"></div>
+              <div class="ctrl"><label>Relative phase φ, degrees <span class="val" data-out="phi">30</span></label>
+                <input type="range" data-v="phi" min="0" max="360" step="5" value="30"></div>
+              <div class="ctrl"><label>1st measurement <span class="seg">
+                <button data-seg="first" data-val="Z">Z</button>
+                <button data-seg="first" data-val="X">X</button>
+                <button data-seg="first" data-val="Y">Y</button></span></label></div>
+              <div class="ctrl"><label>Reading kept <span class="seg">
+                <button data-seg="outcome" data-val="1">+1</button>
+                <button data-seg="outcome" data-val="-1">-1</button></span></label></div>
+              <div class="ctrl"><label>2nd measurement <span class="seg">
+                <button data-seg="second" data-val="Z">Z</button>
+                <button data-seg="second" data-val="X">X</button>
+                <button data-seg="second" data-val="Y">Y</button></span></label></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      root.addEventListener('click', e=>{ const b=e.target.closest('[data-seg]'); if(!b) return;
+        const key = b.dataset.seg;
+        st[key] = key==='outcome' ? parseInt(b.dataset.val,10) : b.dataset.val;
+        draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     D2 · HOW TIGHT IS THE UNCERTAINTY BOUND?
+
+     The state has Bloch vector r(theta,phi). The two observables measured
+     are n.sigma and m.sigma, both unit vectors in the equatorial plane at
+     angles alpha and alpha+beta from x. For a Pauli observable
+     Var(n.sigma) = 1 - (n.r)^2, so both spreads and the commutator bound
+     come from r, n and m alone — nothing here is looked up from the closed
+     forms the teaching scene gives for X and Z in particular.
+     ======================================================================= */
+  const D2 = (() => {
+    let st = { theta:70, phi:20, alpha:0, beta:90 };
+
+    function bloch(){
+      const th = st.theta*D2R, ph = st.phi*D2R;
+      return [Math.sin(th)*Math.cos(ph), Math.sin(th)*Math.sin(ph), Math.cos(th)];
+    }
+    const dirv = deg => [Math.cos(deg*D2R), Math.sin(deg*D2R), 0];
+    const cross = (u,v) => [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]];
+    const dot = (u,v) => u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+
+    function draw(root){
+      const r = bloch(), n = dirv(st.alpha), m = dirv(st.alpha+st.beta);
+      const rn = dot(r,n), rm = dot(r,m);
+      const dN = Math.sqrt(Math.max(0,1-rn*rn)), dM = Math.sqrt(Math.max(0,1-rm*rm));
+      const product = dN*dM;
+      /* [n.sigma, m.sigma] = 2i (n x m).sigma, so the bound is |(n x m).r|. */
+      const nxm = cross(n,m);
+      const bound = Math.abs(dot(nxm,r));
+      const gap = product - bound;
+
+      const ax = P.Axes({w:430,h:320,xr:[-1.25,1.25],yr:[-1.25,1.25],
+        pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+        grid:false, zeroAxes:true, arrows:false});
+      const ring=[]; for(let i=0;i<=160;i++){ const t=2*Math.PI*i/160; ring.push([Math.cos(t),Math.sin(t)]); }
+      ax.poly(ring,{color:P.COL.grid,width:1.2});
+      const proj = v => [v[0]+0.32*v[1], v[2]+0.20*v[1]];
+      [[n,'n',P.COL.mid],[m,'m',P.COL.out]].forEach(([v,l,col])=>{
+        const p = proj(v);
+        ax.poly([[0,0],p],{color:col,width:2.4});
+        ax.point(p[0],p[1],{color:col,r:5});
+        ax.note(p[0],p[1],l,{fs:13,color:col,dx:p[0]>=0?10:-18,dy:p[1]>0?-8:18,tex:true});
+      });
+      const pr = proj(r);
+      ax.poly([[0,0],pr],{color:P.COL.in,width:2.6});
+      ax.point(pr[0],pr[1],{color:P.COL.in,r:6});
+      ax.note(pr[0],pr[1],'\\mathbf{r}',{fs:14,color:P.COL.in,dx:10,dy:-10,tex:true});
+
+      const bx = P.Axes({w:430,h:320,xr:[0,181],yr:[0,1.12],
+        xlabel:'\\beta,\\text{ the angle between }\\mathbf{n}\\text{ and }\\mathbf{m}',
+        ylabel:'\\text{value}', pad:{l:60,r:24,t:28,b:52}, xtarget:5, ytarget:4});
+      bx.curve(b => { const mm = dirv(st.alpha+b);
+        const rmm = dot(r,mm); return Math.sqrt(Math.max(0,1-rn*rn))*Math.sqrt(Math.max(0,1-rmm*rmm)); },
+        {color:P.COL.in,width:2.4});
+      bx.curve(b => { const mm = dirv(st.alpha+b);
+        return Math.abs(dot(cross(n,mm),r)); }, {color:P.COL.err,width:2.2,dash:'5 4'});
+      bx.vline(st.beta,{color:P.COL.h,width:1.6,dash:'3 4'});
+      bx.point(st.beta,product,{color:P.COL.in,r:6});
+      bx.point(st.beta,bound,{color:P.COL.err,r:6});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>ΔN</dt><dd>${fmt(dN,4)}</dd></div>
+        <div><dt>ΔM</dt><dd>${fmt(dM,4)}</dd></div>
+        <div><dt>ΔN · ΔM</dt><dd class="okv">${fmt(product,5)}</dd></div>
+        <div><dt>Robertson bound</dt><dd>${fmt(bound,5)}</dd></div>
+        <div><dt>Gap</dt><dd class="${gap<1e-3?'okv':''}">${fmt(gap,5)}</dd></div>`;
+
+      const verdict = st.beta < 1 || st.beta > 179
+        ? `<div class="note warn"><span class="note-h">The same observable twice</span>
+             At ${T('\\beta='+st.beta+'^{\\circ}',false)} the two directions coincide, so
+             ${T('[\\,\\mathbf{n}\\cdot\\boldsymbol\\sigma,\\mathbf{m}\\cdot\\boldsymbol\\sigma\\,]=0',false)}
+             and the bound is exactly zero. Both spreads can still be large; the relation says nothing
+             about a single observable measured against itself.</div>`
+        : gap < 1e-3
+        ? `<div class="note ok"><span class="note-h">The bound is saturated here</span>
+             ${T('\\Delta N\\,\\Delta M',false)} touches the Robertson bound at this state and this
+             angle. Move ${T('\\theta',false)} or ${T('\\varphi',false)} and the two curves separate
+             again: saturation is a property of one state, not of the pair of observables.</div>`
+        : `<div class="note def"><span class="note-h">A bound, not a prediction</span>
+             The product ${T(fmt(product,4),false)} sits above the bound ${T(fmt(bound,4),false)} by
+             ${T(fmt(gap,4),false)}. The relation guarantees the product cannot fall below the bound;
+             it never promises the product will reach it.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Polar angle θ, degrees <span class="val" data-out="theta">70</span></label>
+                <input type="range" data-v="theta" min="0" max="180" step="5" value="70"></div>
+              <div class="ctrl"><label>Relative phase φ, degrees <span class="val" data-out="phi">20</span></label>
+                <input type="range" data-v="phi" min="0" max="360" step="5" value="20"></div>
+              <div class="ctrl"><label>Direction n, degrees <span class="val" data-out="alpha">0</span></label>
+                <input type="range" data-v="alpha" min="0" max="180" step="5" value="0"></div>
+              <div class="ctrl"><label>Angle to m, degrees <span class="val" data-out="beta">90</span></label>
+                <input type="range" data-v="beta" min="0" max="180" step="5" value="90"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     D3 · MEASURING ALONG A TILTED AXIS
+
+     Both the state's Bloch vector r(theta,phi) and the instrument direction
+     n(alpha,beta) are set independently, each by its own polar and azimuthal
+     angle. p(+) = (1+n.r)/2 is read from their dot product; the angle
+     between them is recovered from the same dot product via arccos, not
+     assumed to equal any control on the panel.
+     ======================================================================= */
+  const D3 = (() => {
+    let st = { theta:40, phi:0, alpha:90, beta:0 };
+
+    const vec = (th,ph) => { const t=th*D2R, p=ph*D2R;
+      return [Math.sin(t)*Math.cos(p), Math.sin(t)*Math.sin(p), Math.cos(t)]; };
+    const dot = (u,v) => u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+
+    function draw(root){
+      const r = vec(st.theta,st.phi), n = vec(st.alpha,st.beta);
+      const c = Math.max(-1,Math.min(1,dot(r,n)));
+      const pPlus = (1+c)/2;
+      const angle = Math.acos(c);
+
+      const ax = P.Axes({w:430,h:320,xr:[-1.3,1.3],yr:[-1.3,1.3],
+        pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+        grid:false, zeroAxes:true, arrows:false});
+      const ring=[]; for(let i=0;i<=160;i++){ const t=2*Math.PI*i/160; ring.push([Math.cos(t),Math.sin(t)]); }
+      ax.poly(ring,{color:P.COL.grid,width:1.2});
+      const proj = v => [v[0]+0.32*v[1], v[2]+0.20*v[1]];
+      const pn = proj(n);
+      ax.poly([[0,0],pn],{color:P.COL.mid,width:2.6});
+      ax.point(pn[0],pn[1],{color:P.COL.mid,r:6});
+      ax.note(pn[0],pn[1],'\\mathbf{n}',{fs:14,color:P.COL.mid,dx:10,dy:-10,tex:true});
+      const pr = proj(r);
+      ax.poly([[0,0],pr],{color:P.COL.in,width:2.6});
+      ax.point(pr[0],pr[1],{color:P.COL.in,r:6});
+      ax.note(pr[0],pr[1],'\\mathbf{r}',{fs:14,color:P.COL.in,dx:10,dy:14,tex:true});
+
+      const bx = P.Axes({w:430,h:320,xr:[0,Math.PI],yr:[0,1.12],
+        xlabel:'\\alpha,\\text{ the angle }\\mathbf{n}\\text{ to }\\mathbf{r}', ylabel:'p(+)',
+        pad:{l:60,r:24,t:28,b:52}, xtarget:4, ytarget:4});
+      bx.curve(a => (1+Math.cos(a))/2, {color:P.COL.in,width:2.4});
+      bx.vline(angle,{color:P.COL.h,width:1.6,dash:'3 4'});
+      bx.point(angle,pPlus,{color:P.COL.h,r:6});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${ax.svg()}${bx.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>r</dt><dd>(${fmt(r[0],3)}, ${fmt(r[1],3)}, ${fmt(r[2],3)})</dd></div>
+        <div><dt>n</dt><dd>(${fmt(n[0],3)}, ${fmt(n[1],3)}, ${fmt(n[2],3)})</dd></div>
+        <div><dt>n · r</dt><dd>${fmt(c,4)}</dd></div>
+        <div><dt>Angle between them</dt><dd>${fmt(angle/D2R,2)}°</dd></div>
+        <div><dt>p(+)</dt><dd class="okv">${fmt(pPlus,5)}</dd></div>`;
+
+      const aligned = angle < 1e-6, opposed = Math.abs(angle-Math.PI) < 1e-6, right = Math.abs(angle-Math.PI/2)<1e-2;
+      const verdict = aligned
+        ? `<div class="note ok"><span class="note-h">The instrument reads the state's own axis</span>
+             ${T('\\mathbf{n}=\\mathbf{r}',false)}, so the state is an eigenstate of
+             ${T('\\mathbf{n}\\cdot\\boldsymbol\\sigma',false)} and ${T('p(+)=1',false)} exactly. This is
+             what "aligned with the measurement direction" means for a Bloch vector.</div>`
+        : opposed
+        ? `<div class="note err"><span class="note-h">Pointed the wrong way</span>
+             ${T('\\mathbf{n}=-\\mathbf{r}',false)}: the instrument is aimed at the state's antipode, and
+             every shot returns ${T('-1',false)}. Nothing is broken; the axis was chosen backwards.</div>`
+        : right
+        ? `<div class="note warn"><span class="note-h">A right angle is a coin</span>
+             At ${T('\\alpha=90^{\\circ}',false)}, ${T('\\mathbf{n}\\cdot\\mathbf{r}=0',false)} and
+             ${T('p(+)=\\tfrac12',false)} whatever the two vectors' individual directions were. This is
+             the same right angle Section 2.1.3 measures in state space, doubled onto the Bloch sphere.</div>`
+        : `<div class="note def"><span class="note-h">Read straight off the dot product</span>
+             ${T('p(+)=\\tfrac12(1+\\mathbf{n}\\cdot\\mathbf{r})',false)} needs no other formula once
+             both vectors are written down. Turning either slider moves one vector and recomputes the
+             same dot product.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>State polar angle θ, degrees <span class="val" data-out="theta">40</span></label>
+                <input type="range" data-v="theta" min="0" max="180" step="5" value="40"></div>
+              <div class="ctrl"><label>State azimuth φ, degrees <span class="val" data-out="phi">0</span></label>
+                <input type="range" data-v="phi" min="0" max="360" step="5" value="0"></div>
+              <div class="ctrl"><label>Instrument polar angle, degrees <span class="val" data-out="alpha">90</span></label>
+                <input type="range" data-v="alpha" min="0" max="180" step="5" value="90"></div>
+              <div class="ctrl"><label>Instrument azimuth, degrees <span class="val" data-out="beta">0</span></label>
+                <input type="range" data-v="beta" min="0" max="360" step="5" value="0"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  return { C, D, D1, D2, D3 };
 })());

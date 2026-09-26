@@ -584,3 +584,554 @@ Object.assign(LABS, (function(){
 
   return { I, J };
 })());
+
+/* ==========================================================================
+   Module 5 laboratories, second file half.
+
+   J1 · Depth against gate count — the reader builds a GHZ state on a chosen
+       number of qubits as a chain or as a tree, and the laboratory applies
+       the actual gates, layer by layer, to find the depth. The point is that
+       the two circuits share a gate count and a two-qubit count and differ
+       only in how many of those gates a coherence time has to survive.
+   J2 · Deferred measurement — the reader chooses the input state and which
+       of two equivalent circuits runs: measure q0 then apply a classically
+       controlled X on q1, or apply the CNOT first and measure q0 last. Both
+       are simulated as eight, sorry, four amplitudes and their outcome
+       statistics are compared. Turning on a Hadamard placed on q0 after its
+       own measurement breaks the equivalence, and the laboratory shows
+       exactly how much it breaks it by.
+   J3 · Routing on a line — the reader places two qubits on a chip whose
+       qubits sit in a line and asks for a CNOT between them. The laboratory
+       builds the actual SWAP sequence, applies it and the CNOT to a real
+       three-or-more-qubit state, and reports whether the amplitudes that
+       come out are the ones the untouched algorithm would have produced.
+
+   All three compute from the definitions at interaction time: a state is a
+   flat array of complex amplitudes, and every gate is the same handful of
+   index-pairing rules laboratory I already uses, applied again here as
+   layers or as a compiled sequence rather than quoted as a formula.
+   ========================================================================== */
+Object.assign(LABS, (function(){
+  const T = LABS.KIT.T, fmt = LABS.KIT.F, KIT = LABS.KIT;
+  const P = PLOT;
+
+  /* ---- the same small complex arithmetic and gates as laboratory I -------
+     Repeated rather than shared, because a module's laboratories live in one
+     file and two laboratories reaching into a third's closures is worse than
+     forty lines written twice. */
+  const cx  = (a,b) => [a[0]*b[0]-a[1]*b[1], a[0]*b[1]+a[1]*b[0]];
+  const cad = (a,b) => [a[0]+b[0], a[1]+b[1]];
+  const csb = (a,b) => [a[0]-b[0], a[1]-b[1]];
+  const ab2 = a      => a[0]*a[0] + a[1]*a[1];
+  const sc  = (r,a)  => [r*a[0], r*a[1]];
+
+  /* A state of `n` qubits, as 2^n amplitudes, index x = sum 2^k q_k. */
+  const zeros = n => { const v=[]; for(let i=0;i<(1<<n);i++) v.push([0,0]); return v; };
+  function hOn(v,n,q){
+    const R2 = Math.SQRT1_2, w = v.slice(), N = 1<<n;
+    for(let x=0;x<N;x++){
+      if((x>>q)&1) continue;
+      const y = x | (1<<q);
+      w[x] = sc(R2, cad(v[x],v[y]));
+      w[y] = sc(R2, csb(v[x],v[y]));
+    }
+    return w;
+  }
+  function cnotOn(v,n,c,t){
+    const w = v.slice(), N = 1<<n;
+    for(let x=0;x<N;x++){
+      if(!((x>>c)&1)) continue;
+      if((x>>t)&1) continue;
+      const y = x | (1<<t);
+      w[x] = v[y]; w[y] = v[x];
+    }
+    return w;
+  }
+  function xOn(v,n,q){
+    const w = v.slice(), N = 1<<n;
+    for(let x=0;x<N;x++){
+      if((x>>q)&1) continue;
+      const y = x | (1<<q);
+      w[x] = v[y]; w[y] = v[x];
+    }
+    return w;
+  }
+  function swapOn(v,n,a,b){ return cnotOn(cnotOn(cnotOn(v,n,a,b),n,b,a),n,a,b); }
+
+  /* =======================================================================
+     J1 · DEPTH AGAINST GATE COUNT
+
+     A GHZ state on n qubits, built two ways from n-1 CNOTs and one Hadamard:
+     a chain, where CNOT k needs the qubit CNOT k-1 has just touched, and a
+     tree, which starts the Hadamard at the middle qubit and lets CNOTs that
+     touch four different qubits run in the same layer. Both are simulated by
+     applying the gates in the layers the schedule below assigns them, so the
+     final state — and the fact that it is the GHZ state either way — is a
+     result of running the circuit and not an assumption in the laboratory.
+     ======================================================================= */
+  const J1 = (() => {
+    let st = { n:8, shape:'tree', tau:100 };
+
+    /* The chain schedule: H on qubit 0, then CNOT(k, k+1) for k=0..n-2, one
+       gate a layer. The tree schedule: H on the middle qubit m, then CNOTs
+       that spread outward from it; every CNOT that touches four qubits none
+       of which any other CNOT in the same round touches joins that round. */
+    function schedule(n, shape){
+      const layers = [];
+      if(shape === 'chain'){
+        layers.push([{g:'h', q:0}]);
+        for(let k=0;k<n-1;k++) layers.push([{g:'cx', c:k, t:k+1}]);
+        return layers;
+      }
+      const m = Math.floor((n-1)/2);
+      layers.push([{g:'h', q:m}]);
+      /* Round r doubles the entangled block by pairing every qubit already
+         reached with one not yet reached, 2^(r-1) qubits below and the same
+         number above, so up to two CNOTs a round touch four separate qubits
+         and share a layer. */
+      let loLo = m, loHi = m, reached = 1;
+      while(reached < n){
+        const round = [];
+        const span = reached;
+        if(loLo - 1 >= 0){ round.push({g:'cx', c:loLo, t:loLo-1}); loLo -= 1; }
+        if(loHi + 1 < n){
+          const src = Math.min(loHi, loLo + span - 1 >= 0 ? loHi : loHi);
+          round.push({g:'cx', c:loHi, t:loHi+1}); loHi += 1;
+        }
+        layers.push(round);
+        reached = loHi - loLo + 1;
+      }
+      return layers;
+    }
+
+    function run(n, shape){
+      let v = zeros(n);
+      v[0] = [1,0];
+      const layers = schedule(n, shape);
+      let gates = 0, cx2 = 0;
+      layers.forEach(round => round.forEach(op => {
+        if(op.g === 'h'){ v = hOn(v,n,op.q); gates++; }
+        else { v = cnotOn(v,n,op.c,op.t); gates++; cx2++; }
+      }));
+      return { v, depth: layers.length, gates, cx2 };
+    }
+
+    /* Whether the state actually is the GHZ state: amplitude 1/sqrt2 on
+       |0...0> and |1...1> and nothing else. Read off the run, not assumed. */
+    function isGHZ(v,n){
+      const R2 = Math.SQRT1_2;
+      for(let x=0;x<(1<<n);x++){
+        const want = (x===0 || x===(1<<n)-1) ? R2 : 0;
+        if(Math.abs(Math.hypot(v[x][0],v[x][1]) - want) > 1e-9) return false;
+      }
+      return true;
+    }
+
+    function draw(root){
+      const n = st.n;
+      const chain = run(n,'chain'), tree = run(n,'tree');
+      const cur = st.shape==='chain' ? chain : tree;
+      const okChain = isGHZ(chain.v,n), okTree = isGHZ(tree.v,n);
+
+      /* ---- depth against n, both shapes, for the chosen tau ---- */
+      const a = P.Axes({w:430,h:310,xr:[2,16],yr:[0,16],
+        xlabel:'n\\,(\\text{qubits})', ylabel:'\\text{depth}',
+        pad:{l:56,r:24,t:30,b:46}, xtarget:5, ytarget:5});
+      const chainPts = [], treePts = [];
+      for(let k=2;k<=16;k++){ chainPts.push([k, run(k,'chain').depth]); treePts.push([k, run(k,'tree').depth]); }
+      a.poly(chainPts,{color:P.COL.err,width:2.2});
+      a.poly(treePts,{color:P.COL.out,width:2.2});
+      a.point(n, chain.depth, {color:P.COL.err, r: st.shape==='chain'?6.5:4});
+      a.point(n, tree.depth, {color:P.COL.out, r: st.shape==='tree'?6.5:4});
+      a.note(3,14.5,'\\text{chain: depth}=n',{fs:12,color:P.COL.err,anchor:'start',tex:true});
+      a.note(3,13.0,'\\text{tree: depth}\\approx1+\\log_{2}n',{fs:12,color:P.COL.out,anchor:'start',tex:true});
+
+      /* ---- circuit time against n, at the chosen gate duration ---- */
+      const b = P.Axes({w:430,h:310,xr:[2,16],yr:[0,16*st.tau/1000],
+        xlabel:'n\\,(\\text{qubits})', ylabel:'T_{\\text{circuit}}\\,(\\mu s)',
+        pad:{l:62,r:24,t:30,b:46}, xtarget:5, ytarget:5});
+      b.poly(chainPts.map(([k,d])=>[k, d*st.tau/1000]),{color:P.COL.err,width:2.2});
+      b.poly(treePts.map(([k,d])=>[k, d*st.tau/1000]),{color:P.COL.out,width:2.2});
+      b.vline(n,{color:P.COL.rule,width:1.3,dash:'3 4'});
+      b.point(n, cur.depth*st.tau/1000, {color:P.COL.h, r:6.5});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${a.svg()}${b.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>Qubits</dt><dd>${T('n='+n,false)}</dd></div>
+        <div><dt>Shape run</dt><dd>${st.shape==='chain'?'chain':'tree'}</dd></div>
+        <div><dt>Gate count</dt><dd>${cur.gates}</dd></div>
+        <div><dt>Two-qubit gates</dt><dd>${cur.cx2}</dd></div>
+        <div><dt>Depth</dt><dd class="okv">${cur.depth}</dd></div>
+        <div><dt>Circuit time at ${T('\\tau='+st.tau+'\\text{ns}',false)}</dt><dd>${fmt(cur.depth*st.tau/1000,3)} μs</dd></div>
+        <div><dt>Chain gave the GHZ state</dt><dd class="${okChain?'okv':'warnv'}">${okChain?'yes':'no'}</dd></div>
+        <div><dt>Tree gave the GHZ state</dt><dd class="${okTree?'okv':'warnv'}">${okTree?'yes':'no'}</dd></div>`;
+
+      const verdict = st.shape==='chain'
+        ? `<div class="note warn"><span class="note-h">Same gates, one after another</span>
+             The chain needs ${T('n-1',false)} CNOTs and every one of them waits for the qubit the
+             one before it just touched, so the depth is ${T(String(cur.depth),false)}, equal to
+             the gate count. At ${T('\\tau='+st.tau+'\\text{ns}',false)} and ${T('n='+n,false)} the circuit takes
+             ${T(fmt(cur.depth*st.tau/1000,3),false)} μs. Switch to the tree with nothing
+             else changed and watch the depth curve fall away from the gate-count line while the
+             two-qubit count stays exactly the same.</div>`
+        : `<div class="note ok"><span class="note-h">The same gates, several at once</span>
+             The tree starts the Hadamard in the middle and lets every round double the entangled
+             block, so two CNOTs that touch four separate qubits share a layer. The depth is
+             ${T(String(cur.depth),false)}, close to ${T('1+\\log_{2}n',false)}, against
+             ${T(String(chain.depth),false)} for the chain on the same ${T('n='+n,false)}. Both
+             circuits used ${T(String(cur.cx2),false)} CNOTs and made the identical state; only the
+             time a coherence budget is charged for changed.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+      root.querySelectorAll('[data-prop]').forEach(x=>
+        x.setAttribute('aria-pressed', String(x.dataset.prop===st.shape)));
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Qubits n <span class="val" data-out="n">8</span></label>
+                <input type="range" data-v="n" min="2" max="16" step="1" value="8"></div>
+              <div class="ctrl"><label>Circuit shape <span class="seg">
+                <button data-prop="chain">chain</button>
+                <button data-prop="tree">tree</button></span></label></div>
+              <div class="ctrl"><label>Gate duration τ, ns <span class="val" data-out="tau">100</span></label>
+                <input type="range" data-v="tau" min="50" max="500" step="10" value="100"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      root.addEventListener('click', e=>{ const b=e.target.closest('[data-prop]'); if(!b) return;
+        st.shape = b.dataset.prop; draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     J2 · DEFERRED MEASUREMENT
+
+     Two qubits, |q1 q0>, with an unknown state on q0 and |0> on q1. Either
+     circuit reads out a joint distribution over q1 q0:
+
+        A. CNOT(0->1), then measure both.
+        B. measure q0 first, giving m0; apply X on q1 only where m0=1;
+           measure q1.
+
+     Both are simulated as four amplitudes and the reader compares the two
+     distributions directly. A third switch adds a Hadamard on q0 after its
+     own measurement in circuit B — a gate on a wire that has already been
+     read — and the two distributions stop agreeing, because the measurement
+     threw away the phase that gate needed.
+     ======================================================================= */
+  const J2 = (() => {
+    let st = { theta:120, phi:60, hAfter:0 };
+    const D2R = Math.PI/180;
+
+    /* The two-qubit input state, alpha|0> on q0 tensor |0> on q1. */
+    function input(theta, phi){
+      const t = theta*D2R, f = phi*D2R;
+      const a0 = [Math.cos(t/2), 0], a1 = cx([Math.cos(f), Math.sin(f)], [Math.sin(t/2), 0]);
+      const v = zeros(2);
+      v[0] = a0; v[1] = a1;      /* q1=0: entries 0 (q0=0) and 1 (q0=1) */
+      return v;
+    }
+
+    /* Circuit A: CNOT(0->1), then read q1 q0. Exact joint distribution. */
+    function distA(theta, phi){
+      const v = cnotOn(input(theta,phi), 2, 0, 1);
+      const p = [0,0,0,0];
+      for(let x=0;x<4;x++) p[x] = ab2(v[x]);
+      return p;
+    }
+
+    /* Circuit B: measure q0 (giving m0 with its Born probability), then
+       apply X on q1 where m0=1, optionally with a Hadamard on q0 slipped in
+       between the two measurements, then read q1 q0. Each branch of the
+       first reading is projected and renormalised, exactly as laboratory I
+       renormalises a teleportation branch. */
+    function distB(theta, phi, hAfter){
+      const v0 = input(theta, phi);
+      const p = [0,0,0,0];
+      for(let m0=0; m0<2; m0++){
+        /* project q0 onto m0 */
+        let branch = zeros(2), amp2 = 0;
+        for(let x=0;x<4;x++){ if((x&1)===m0){ branch[x] = v0[x]; amp2 += ab2(v0[x]); } }
+        if(amp2 < 1e-12) continue;
+        const nrm = 1/Math.sqrt(amp2);
+        branch = branch.map(a => sc(nrm, a));
+        if(hAfter) branch = hOn(branch, 2, 0);
+        if(m0) branch = xOn(branch, 2, 1);
+        for(let x=0;x<4;x++) p[x] += amp2 * ab2(branch[x]);
+      }
+      return p;
+    }
+
+    function draw(root){
+      const pa = distA(st.theta, st.phi);
+      const pb = distB(st.theta, st.phi, st.hAfter);
+      const labels = ['00','01','10','11'];
+      let maxDiff = 0; for(let x=0;x<4;x++) maxDiff = Math.max(maxDiff, Math.abs(pa[x]-pb[x]));
+
+      /* ---- the two distributions, side by side at each outcome ---- */
+      const a = P.Axes({w:430,h:310,xr:[-0.6,3.6],yr:[0,1.34],
+        ylabel:'P', xticksOverride:[], pad:{l:58,r:24,t:30,b:52}, ytarget:4,
+        yticksOverride:[0,0.25,0.5,0.75,1]});
+      for(let x=0;x<4;x++){
+        a.rect(x-0.32,0,x-0.02,pa[x],{fill:P.COL.dec.in});
+        a.poly([[x-0.32,pa[x]],[x-0.02,pa[x]]],{color:P.COL.in,width:2.4});
+        a.rect(x+0.02,0,x+0.32,pb[x],{fill:P.COL.dec.h});
+        a.poly([[x+0.02,pb[x]],[x+0.32,pb[x]]],{color:P.COL.h,width:2.4,dash:'5 4'});
+        a.note(x,0,labels[x],{fs:13,color:P.COL.muted,anchor:'middle',dy:26});
+      }
+      a.note(0,1.24,'\\text{A: measure last}',{fs:12,color:P.COL.in,anchor:'start',tex:true});
+      a.note(2.0,1.24,'\\text{B: measure first}',{fs:12,color:P.COL.h,anchor:'start',tex:true});
+
+      /* ---- the largest disagreement, against the phase, at this theta ---- */
+      const b = P.Axes({w:430,h:310,xr:[0,360],yr:[0,0.54],
+        xlabel:'\\varphi\\,(\\text{degrees})', ylabel:'\\max_{x}|P_{A}(x)-P_{B}(x)|',
+        pad:{l:62,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+      b.curve(f => { let m=0; const pA=distA(st.theta,f), pB=distB(st.theta,f,st.hAfter);
+        for(let x=0;x<4;x++) m=Math.max(m,Math.abs(pA[x]-pB[x])); return m; },
+        {color: st.hAfter? P.COL.err : P.COL.out, width:2.4, n:180});
+      b.vline(st.phi,{color:P.COL.rule,width:1.3,dash:'3 4'});
+      b.point(st.phi, maxDiff, {color: st.hAfter? P.COL.err : P.COL.out, r:6.5});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${a.svg()}${b.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>Input</dt><dd>${T('\\theta='+st.theta+'^{\\circ},\\ \\varphi='+st.phi+'^{\\circ}',false)}</dd></div>
+        <div><dt>Extra ${T('H',false)} on ${T('q_{0}',false)} after its reading</dt><dd>${st.hAfter?'on':'off'}</dd></div>
+        <div><dt>P(00)</dt><dd>A ${fmt(pa[0],4)} &nbsp; B ${fmt(pb[0],4)}</dd></div>
+        <div><dt>P(01)</dt><dd>A ${fmt(pa[1],4)} &nbsp; B ${fmt(pb[1],4)}</dd></div>
+        <div><dt>P(10)</dt><dd>A ${fmt(pa[2],4)} &nbsp; B ${fmt(pb[2],4)}</dd></div>
+        <div><dt>P(11)</dt><dd>A ${fmt(pa[3],4)} &nbsp; B ${fmt(pb[3],4)}</dd></div>
+        <div><dt>Largest disagreement</dt><dd class="${maxDiff<1e-9?'okv':'warnv'}">${fmt(maxDiff,5)}</dd></div>`;
+
+      const verdict = st.hAfter
+        ? `<div class="note err"><span class="note-h">A gate crossed the reading, and the equivalence broke</span>
+             The Hadamard now runs on ${T('q_{0}',false)} after it has already been measured, so it
+             acts on a basis state rather than on ${T('|\\psi\\rangle',false)}, and the phase between
+             ${T('\\alpha',false)} and ${T('\\beta',false)} that it needed is gone. The two
+             distributions disagree by ${T(fmt(maxDiff,4),false)}, which the right-hand curve shows
+             growing and shrinking with ${T('\\varphi',false)} rather than sitting at zero. Nothing
+             here contradicts deferred measurement: the rule only ever covered a qubit used to
+             control later gates, never one still operated on afterwards.</div>`
+        : maxDiff < 1e-9
+        ? `<div class="note ok"><span class="note-h">The two circuits agree, exactly</span>
+             Measuring ${T('q_{0}',false)} first and switching ${T('X',false)} on ${T('q_{1}',false)}
+             by its bit gives the same joint distribution as running the CNOT first and measuring
+             last: every bar in the left panel is covered by its dashed partner, and the right panel
+             sits at zero for every phase. ${T('q_{0}',false)} is only ever used here to control
+             ${T('q_{1}',false)}, which is exactly the case deferred measurement allows.</div>`
+        : `<div class="note warn"><span class="note-h">Should be zero</span>
+             The two circuits disagree by ${T(fmt(maxDiff,4),false)}, which should not happen with
+             the extra Hadamard off. Turn ${T('\\varphi',false)} and ${T('\\theta',false)} and check
+             that the gap returns to zero.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+      root.querySelectorAll('[data-prop]').forEach(x=>
+        x.setAttribute('aria-pressed', String(String(st.hAfter)===x.dataset.prop)));
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Tilt θ of q0, degrees <span class="val" data-out="theta">120</span></label>
+                <input type="range" data-v="theta" min="0" max="180" step="5" value="120"></div>
+              <div class="ctrl"><label>Phase φ of q0, degrees <span class="val" data-out="phi">60</span></label>
+                <input type="range" data-v="phi" min="0" max="360" step="15" value="60"></div>
+              <div class="ctrl"><label>Extra H on q0 after its own reading <span class="seg">
+                <button data-prop="0">off</button>
+                <button data-prop="1">on</button></span></label></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      root.addEventListener('click', e=>{ const b=e.target.closest('[data-prop]'); if(!b) return;
+        st.hAfter = parseInt(b.dataset.prop,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  /* =======================================================================
+     J3 · ROUTING ON A LINE
+
+     A chip whose qubits sit in a line, Q_0 to Q_{L-1}. The circuit wants a
+     CNOT between two qubits the reader chooses; when they are not adjacent
+     the laboratory brings them together with SWAPs, exactly as the scene
+     beside it describes, applies the CNOT, and swaps back. Both the routed
+     circuit and a direct CNOT on an already-adjacent pair are run on the
+     same three-qubit input state, and the check is that they produce the
+     same final amplitudes: routing changes the cost, never the answer.
+     ======================================================================= */
+  const J3 = (() => {
+    let st = { len:5, a:0, b:4 };
+
+    /* A fixed, generic input state on `len` qubits: a product of single-qubit
+       states at unequal angles, so no amplitude cancels by an accident of
+       the coordinate axes the way an all-zero or all-equal input would. */
+    function inputState(len){
+      let v = [[1,0]];
+      for(let k=0;k<len;k++){
+        const t = (30 + 23*k) * Math.PI/180;
+        const q0 = [Math.cos(t/2), 0], q1 = [Math.sin(t/2)*Math.cos(0.4*k), Math.sin(t/2)*Math.sin(0.4*k)];
+        const w = [];
+        for(let x=0;x<v.length;x++){ w.push(cx(v[x], q0)); }
+        for(let x=0;x<v.length;x++){ w.push(cx(v[x], q1)); }
+        v = w;
+      }
+      return v;
+    }
+
+    /* Bring qubit `a` next to qubit `b` with SWAPs along the line, run the
+       CNOT, and report the SWAP count and the two-qubit gate count. The
+       qubit carrying a's amplitude walks one step per SWAP towards b; when it
+       is adjacent the CNOT runs, control-to-target as asked. No SWAP undoes
+       the walk afterwards — that is the cheaper of the two choices the scene
+       beside this laboratory names, and it leaves the physical wire that
+       started as `a` holding, from here on, what the algorithm called qubit
+       `pos`. `perm` is exactly that relabelling, nothing more: it is what a
+       classical bookkeeper writes down, not a gate. */
+    function routed(len, a, b){
+      let v = inputState(len);
+      let pos = a, cxCount = 0;
+      const dir = b > a ? 1 : -1;
+      const swapped = [];
+      while(Math.abs(pos - b) > 1){
+        v = swapOn(v, len, pos, pos+dir);
+        swapped.push(pos, pos+dir);
+        cxCount += 3;
+        pos += dir;
+      }
+      v = cnotOn(v, len, pos, b);
+      cxCount += 1;
+      /* Replay the same sequence of SWAPs on the wire labels, so that
+         `perm(x)`'s bit k is the value the algorithm's qubit k actually
+         carries on the physical wire the state `v` is indexed by. */
+      const label = []; for(let k=0;k<len;k++) label.push(k);
+      for(let i=0;i<swapped.length;i+=2){
+        const p=swapped[i], q=swapped[i+1];
+        const t=label[p]; label[p]=label[q]; label[q]=t;
+      }
+      const perm = x => { let y=0; for(let k=0;k<len;k++) if((x>>k)&1) y |= 1<<label[k]; return y; };
+      return { v, swaps: (Math.abs(b-a) - 1), cx: cxCount, perm };
+    }
+
+    /* The answer the algorithm actually wants: the CNOT applied directly,
+       with no notion of a chip at all. Comparing the two final states, after
+       undoing the routed circuit's relabelling, is the check that routing is
+       bookkeeping and not a second algorithm. */
+    function direct(len, a, b){
+      return cnotOn(inputState(len), len, a, b);
+    }
+
+    function draw(root){
+      const len = st.len, a = Math.min(st.a, len-1), b = Math.min(st.b, len-1);
+      const same = a === b;
+      const r = same ? { v: inputState(len), swaps:0, cx:0, perm:x=>x } : routed(len, a, b);
+      const want = same ? inputState(len) : direct(len, a, b);
+      let maxDiff = 0;
+      if(!same) for(let x=0;x<(1<<len);x++){
+        maxDiff = Math.max(maxDiff, Math.hypot(r.v[x][0]-want[r.perm(x)][0], r.v[x][1]-want[r.perm(x)][1]));
+      }
+
+      /* ---- the line of qubits, with the two endpoints and the swap path ---- */
+      const chipItems = [];
+      for(let k=0;k<len;k++){
+        chipItems.push({t:'text', x:40+k*70, y:26, anchor:'middle', label:'Q_{'+k+'}', tex:true, fs:14,
+          color: (k===a||k===b) ? P.COL.err : P.COL.muted});
+        chipItems.push({t:'point', x:40+k*70, y:56, r: (k===a||k===b)?7:5,
+          color: (k===a||k===b) ? P.COL.err : P.COL.mid});
+        if(k<len-1) chipItems.push({t:'line', x1:40+k*70, y1:56, x2:40+(k+1)*70, y2:56, color:P.COL.rule});
+      }
+      const c = P.Axes({w:430,h:150,xr:[0,40+len*70],yr:[0,80],
+        xticksOverride:[], yticksOverride:[], grid:false, zeroAxes:false, arrows:false,
+        pad:{l:0,r:0,t:0,b:0}});
+      chipItems.forEach(it=>{
+        if(it.t==='text') c.note(it.x,it.y,it.label,{fs:it.fs,color:it.color,tex:true,anchor:'middle'});
+        else if(it.t==='point') c.point(it.x,it.y,{color:it.color,r:it.r});
+        else c.poly([[it.x1,it.y1],[it.x2,it.y2]],{color:it.color,width:1.6});
+      });
+
+      /* ---- the two-qubit cost against the distance apart ---- */
+      const bx = P.Axes({w:430,h:280,xr:[0,len-1],yr:[0,3*(len-1)+2],
+        xlabel:'|a-b|\\,(\\text{steps apart})', ylabel:'\\text{two-qubit gates}',
+        pad:{l:58,r:24,t:30,b:46}, xtarget:5, ytarget:5});
+      const pts = []; for(let d=1; d<len; d++) pts.push([d, 3*(d-1)+1]);
+      bx.poly(pts,{color:P.COL.h,width:2.2});
+      pts.forEach(p=>bx.point(p[0],p[1],{color:P.COL.h,r:3.6}));
+      if(!same) bx.point(Math.abs(b-a), r.cx, {color:P.COL.out, r:7});
+
+      root.querySelector('.plots').innerHTML =
+        `<div class="labgrid">${c.svg()}${bx.svg()}</div>`;
+
+      root.querySelector('.ro').innerHTML = `
+        <div><dt>Chip</dt><dd>${T('\\text{line of }'+len,false)}</dd></div>
+        <div><dt>Requested gate</dt><dd>${T('\\mathrm{CNOT}_{'+a+'\\to '+b+'}',false)}</dd></div>
+        <div><dt>Steps apart</dt><dd>${Math.abs(b-a)}</dd></div>
+        <div><dt>SWAPs used</dt><dd>${r.swaps}</dd></div>
+        <div><dt>Two-qubit gates</dt><dd class="okv">${r.cx}</dd></div>
+        <div><dt>Largest amplitude difference from the unrouted answer</dt>
+          <dd class="${maxDiff<1e-9?'okv':'warnv'}">${fmt(maxDiff,6)}</dd></div>`;
+
+      const verdict = same
+        ? `<div class="note warn"><span class="note-h">Choose two different qubits</span>
+             A CNOT needs a control and a target that are not the same qubit. Move either dial.</div>`
+        : Math.abs(b-a) === 1
+        ? `<div class="note ok"><span class="note-h">Already neighbours: nothing to route</span>
+             ${T('Q_{'+a+'}',false)} and ${T('Q_{'+b+'}',false)} sit next to each other on the line,
+             so the CNOT runs with no SWAP at all and the amplitude difference from the unrouted
+             answer is ${T(fmt(maxDiff,6),false)}. Move one dial to separate them and watch the cost
+             appear.</div>`
+        : `<div class="note ${maxDiff<1e-9?'ok':'err'}"><span class="note-h">${maxDiff<1e-9?'Routed, and still the same answer':'The routed state does not match'}</span>
+             ${T(String(r.swaps),false)} SWAPs, ${T('3\\times'+r.swaps,false)} CNOTs, carry the state
+             on ${T('Q_{'+a+'}',false)} next to ${T('Q_{'+b+'}',false)}; one more CNOT completes the
+             gate, for
+             ${T(String(r.cx),false)} two-qubit gates in place of the one the algorithm wrote. The
+             amplitudes this produced differ from applying the CNOT directly, with no chip at all,
+             by ${T(fmt(maxDiff,6),false)} — routing changed the cost and left the computation
+             alone.</div>`;
+      root.querySelector('.verdict').innerHTML = verdict;
+
+      root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
+    }
+
+    return { mount(root){
+      root.innerHTML = `
+        <div class="cols c-7-5" style="gap:40px">
+          <div class="col stack"><div class="plots"></div></div>
+          <div class="col stack">
+            <div class="ctrls one">
+              <div class="ctrl"><label>Chip length <span class="val" data-out="len">5</span></label>
+                <input type="range" data-v="len" min="3" max="7" step="1" value="5"></div>
+              <div class="ctrl"><label>Control qubit a <span class="val" data-out="a">0</span></label>
+                <input type="range" data-v="a" min="0" max="6" step="1" value="0"></div>
+              <div class="ctrl"><label>Target qubit b <span class="val" data-out="b">4</span></label>
+                <input type="range" data-v="b" min="0" max="6" step="1" value="4"></div>
+            </div>
+            <dl class="readout ro"></dl>
+            <div class="verdict"></div>
+          </div></div>`;
+      root.addEventListener('input', e=>{ const k=e.target.dataset.v; if(!k) return;
+        st[k] = parseInt(e.target.value,10); draw(root); });
+      draw(root);
+    }};
+  })();
+
+  return { J1, J2, J3 };
+})());

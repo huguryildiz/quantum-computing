@@ -629,6 +629,29 @@ function figLadder(){
   ]});
 }
 
+/* Small sketches for the projects deck. The projects page is always navy, so
+   they are drawn in the dark-page signal tints, following the reference
+   course's own summary-card glyphs. */
+const G = (()=>{
+  const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+  const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const CY='#4FBECE', GR='#82C27B', RD='#E8785F', VI='#AC99DC', AM='#E5B255';
+  return {
+    depth: sv(ln('M4 36 H30',CY,2)+ln('M4 24 H44',CY,2)+ln('M4 12 H58',CY,2)
+              +ln('M4 36 V6',GR,1.4)+`<circle cx="4" cy="36" r="2.4" fill="${GR}"/>`
+              +`<circle cx="4" cy="24" r="2.4" fill="${GR}"/><circle cx="4" cy="12" r="2.4" fill="${GR}"/>`),
+    shots:  sv(ln('M4 38 H90',VI,1)+[0,1,2,3,4,5].map(k=>{ const x=10+k*14, h=6+((k*37)%20);
+              return ln(`M${x} 38 V${38-h}`,CY,2); }).join('')
+              +ln('M4 22 Q46 10 88 22',AM,1.4,'4 3')),
+    swap:   sv(ln('M4 14 H88',CY,1.6)+ln('M4 30 H88',GR,1.6)
+              +ln('M30 8 L30 20 L50 20 L50 32 L50 20 L30 20',RD,1.6)
+              +`<circle cx="30" cy="14" r="3" fill="${RD}"/><circle cx="50" cy="26" r="3" fill="${RD}"/>`),
+    defer:  sv(ln('M4 14 H40',CY,1.6)+ln('M40 14 V26',CY,1.4)+ln('M40 26 H88',AM,1.6)
+              +`<circle cx="40" cy="14" r="3.4" fill="${GR}"/>`
+              +ln('M60 26 V38 H30 V26',VI,1.4)+`<circle cx="30" cy="26" r="3" fill="${VI}"/>`)
+  };
+})();
+
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
@@ -754,6 +777,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 5.L3 --- */
+{ id:'m5-lab-j1', module:'M5', nav:'Laboratory J1 — Depth Against Gate Count', title:'Laboratory J1 — Depth Against Gate Count',
+  objective:'Let the reader build a GHZ state as a chain or a tree and read the depth the schedule needs.',
+  keywords:'laboratory depth gate count ghz chain tree schedule layers coherence time two qubit gates',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 5 · The circuit model'},
+  {t:'title', text:'Laboratory J1 — Depth Against Gate Count'},
+  {t:'small', html:'Choose the number of qubits and the gate duration, then switch between the chain and the tree. Both circuits are run, gate by gate, to find the state and the depth; neither is looked up. Two things to find: the two shapes use the same gate count and the same number of two-qubit gates and still take very different times, and the gap between the two depth curves grows with $n$ while the tree curve grows only as $\\log_{2}n$.'},
+  {t:'lab', id:'J1'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m5-code-circuit', module:'M5', nav:'The Circuit Model in Code', title:'The Circuit Model in Code',
   objective:'Build a circuit from its gate list, read the order of its wires, and count its layers.',
@@ -864,6 +898,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 5.L4 --- */
+{ id:'m5-lab-j2', module:'M5', nav:'Laboratory J2 — Deferred Measurement', title:'Laboratory J2 — Deferred Measurement',
+  objective:'Let the reader compare measuring first against measuring last and find the one gate that breaks the equivalence.',
+  keywords:'laboratory deferred measurement principle mid circuit measurement equivalence hadamard breaks it joint distribution',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 5 · Running a circuit'},
+  {t:'title', text:'Laboratory J2 — Deferred Measurement'},
+  {t:'small', html:'Choose the state on $q_{0}$, then compare two circuits: the CNOT run first and both qubits read at the end, against $q_{0}$ read first with $X$ on $q_{1}$ switched by its bit. Both are simulated from the actual amplitudes. Two things to find: with the extra switch off the two joint distributions agree exactly, for every input; turn on the Hadamard placed on $q_{0}$ after its own reading, and they stop agreeing, because the measurement has already thrown away the phase that gate needed.'},
+  {t:'lab', id:'J2'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m5-code-run', module:'M5', nav:'Running a Circuit in Code', title:'Running a Circuit in Code',
   objective:'Compare an exact state with finite shots, and follow a measurement and a classically controlled gate branch by branch.',
@@ -972,6 +1017,17 @@ const SC = [
         ask:{key:'m5-fault', choices:['$0.028$','$0.1$','$0.003$'], answer:0,
           why:'$3(0.1)^{2}-2(0.1)^{3}=0.03-0.002=0.028$. Three times the qubits cut the error by a factor of more than three.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 5.L5 --- */
+{ id:'m5-lab-j3', module:'M5', nav:'Laboratory J3 — Routing on a Line', title:'Laboratory J3 — Routing on a Line',
+  objective:'Let the reader route a CNOT between two distant qubits on a line and check that the routed circuit reproduces the unrouted answer.',
+  keywords:'laboratory layout routing coupling map line swap chain two qubit gates cost amplitudes unchanged',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 5 · Compiling for a machine'},
+  {t:'title', text:'Laboratory J3 — Routing on a Line'},
+  {t:'small', html:'Choose the length of a line-shaped chip and the two qubits a $\\mathrm{CNOT}$ is wanted between, then read off the SWAPs the laboratory inserts. The routed circuit is run on a generic multi-qubit state and checked against the same $\\mathrm{CNOT}$ applied directly, with no chip at all. Two things to find: the amplitudes the two routes produce agree to rounding error every time, and the two-qubit gate count grows as three times the distance apart, not as the distance itself.'},
+  {t:'lab', id:'J3'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1437,6 +1493,57 @@ const SC = [
   {t:'reveal', at:2, items:[
     {t:'note', kind:'def', head:'What comes next', html:'Chapter 6 keeps the oracle and the kickback and changes what is done between them: one mechanism, four algorithms, and the resource discipline of this chapter applied to every one of them.'}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 5.7.1b - */
+{ id:'m5-projects', module:'M5', nav:'Projects to Try', title:'Projects to Try',
+  dark:true, objective:'Offer four optional projects that use the module on circuits and protocols built from scratch.',
+  keywords:'projects numpy qiskit depth gate count shots teleportation grover fidelity routing',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 5 · Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>PROJECTS.deck('m5', [
+    {title:'Race a chain against a tree', glyph:G.depth,
+     aim:'Build a GHZ circuit two ways in NumPy and measure the depth each one needs.',
+     learn:['Applying a gate to a flat array of amplitudes by pairing indices, as the scenes of this section do.',
+            'The difference between a gate count and a depth.',
+            'Why a coherence time is spent against layers and not against gates.'],
+     steps:['Write `h(v,q)` and `cnot(v,c,t)` on a state of $n$ qubits, indexed $x=\\sum_k 2^k q_k$.',
+            'Build the $n$-qubit GHZ state as a chain: $H$ on $q_0$, then $\\mathrm{CNOT}_{k\\to k+1}$ for $k=0,\\ldots,n-2$, one gate a layer.',
+            'Build it again as a tree, starting the $H$ at the middle qubit and letting independent CNOTs share a layer.',
+            'For $n=4,8,16,32$, print the depth of each version and check both give the same final amplitudes.'],
+     look:'The gate count is $n$ for both circuits every time. The chain’s depth equals its gate count; the tree’s grows only as $1+\\log_2 n$. At $n=32$ the two depths already differ by a factor of five, and the amplitudes never do.'},
+    {title:'Watch a measurement forget a phase', glyph:G.defer,
+     aim:'Simulate the deferred-measurement circuit both ways and find the one gate that breaks the equivalence.',
+     learn:['Projecting a state onto a measurement outcome and renormalising the branch that survives.',
+            'Why a qubit used only to control later gates can be measured at the very end with no change of statistics.',
+            'What is different about a gate applied to a qubit after it has already been read.'],
+     steps:['Prepare $q_0=\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$ and $q_1=|0\\rangle$.',
+            'Circuit A: apply $\\mathrm{CNOT}_{0\\to1}$, then read both qubits; record $P(q_1q_0)$ over the four outcomes.',
+            'Circuit B: read $q_0$ first, giving $m_0$; project and renormalise; apply $X$ on $q_1$ only where $m_0=1$; read both.',
+            'Check A and B agree for every $\\theta,\\varphi$ you try, then insert a Hadamard on $q_0$ in circuit B, after its own reading, and compare again.'],
+     look:'Without the extra Hadamard the two distributions match to rounding error, whatever $\\theta$ and $\\varphi$ are. With it they disagree, and the gap changes with $\\varphi$ — the reading has already thrown away the phase the Hadamard needed, and no rule says a gate may cross a measurement of its own wire.'},
+    {title:'Send a state where fidelity is the only judge', glyph:G.shots,
+     aim:'Run the teleportation circuit for many random input states and report the fidelity, not one good example.',
+     learn:['Building the three-qubit teleportation circuit as index-pairing gates on eight amplitudes.',
+            'Sampling directions on the Bloch sphere uniformly, so a benchmark is not quietly picked to look good.',
+            'Reporting an average with a spread, rather than a single favourable run.'],
+     steps:['Implement the circuit: $H,\\mathrm{CNOT}_{1\\to2}$ on the pair; $\\mathrm{CNOT}_{0\\to1},H$ on $q_0$; read $q_0,q_1$; apply $X^{m_1}Z^{m_0}$ to $q_2$.',
+            'Draw 500 random inputs, each a uniform point on the Bloch sphere, and run the full circuit on each one.',
+            'Compute the fidelity $F=|\\langle\\psi|\\phi\\rangle|^2$ between the input and what $q_2$ ends up holding, after the correction.',
+            'Now corrupt the shared pair before it is used: apply a random Pauli with probability $1-f$ to $q_2$ right after the pair is made, for a few values of $f$, and repeat the fidelity average.'],
+     look:'With a clean pair every run gives $F=1$ to machine precision, whatever direction was drawn — the average is not doing any work here yet. Once the pair is corrupted the average fidelity follows $(2f+1)/3$, and at $f=0.5$ it settles at $2/3$: no better than measuring the qubit and guessing a fresh one, the benchmark the scenes name.'},
+    {title:'Move a CNOT down a line of qubits', glyph:G.swap,
+     aim:'Route a CNOT between distant qubits on a line-shaped chip and check that the answer does not change.',
+     learn:['Building a SWAP from three CNOTs and using it to carry a qubit’s amplitude along a line.',
+            'Counting the two-qubit gates a routing decision costs, as a function of distance.',
+            'Confirming a compiler pass by comparing final amplitudes, not by trusting the pass.'],
+     steps:['On $n=6$ qubits prepare any fixed product state that is not all $|0\\rangle$, so no amplitude cancels by accident.',
+            'Apply $\\mathrm{CNOT}_{0\\to5}$ directly, with no notion of a chip, and save the resulting state.',
+            'Now treat the six qubits as a line $Q_0,\\ldots,Q_5$: bring $Q_0$ next to $Q_5$ with SWAPs one step at a time, apply the CNOT, and count the two-qubit gates used.',
+            'Compare the two final states, and repeat for every pair $(a,b)$ on the line, plotting the gate count against $|a-b|$.'],
+     look:'The routed state matches the direct one to rounding error every time: routing is bookkeeping, not a second computation. The gate count grows as $3(|a-b|-1)+1$, so the two ends of a line of six cost seven times what two neighbours cost for the identical logical gate.'}
+  ])}
 ]},
 
 /* ---------------------------------------------------------------- 5.7.2 -- */

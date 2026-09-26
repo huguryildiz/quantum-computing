@@ -682,6 +682,28 @@ function figLadder(){
   ]});
 }
 
+/* Small sketches for the projects cards. The projects page is dark, so they
+   are drawn in the dark-page signal tints, the same four used throughout this
+   file's figures. Modelled on the equivalent block in the reference course;
+   defined locally here rather than touching 90_app.js. */
+const G6 = (() => {
+  const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+  const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const AX='rgba(239,231,216,.30)', CY='#4FBECE', GR='#82C27B', AM='#E5B255', VI='#AC99DC';
+  return {
+    signs: sv(ln('M2 38 H90',AX,1)+[0,10,20,30,40,50,60,70,80].map((x,i)=>
+      ln(`M${x+3} 22 v${i%2?10:-10}`,CY,1.8)).join('')),
+    wheel: sv(`<circle cx="46" cy="22" r="17" fill="none" stroke="${AX}" stroke-width="1.4"/>`
+      +[0,1,2,3,4,5].map(k=>{ const a=k*Math.PI/3; return ln(`M46 22 L${(46+17*Math.cos(a)).toFixed(1)} ${(22-17*Math.sin(a)).toFixed(1)}`,GR,1.4); }).join('')
+      +ln('M46 22 L63 22',AM,2)+`<circle cx="63" cy="22" r="3" fill="${AM}"/>`),
+    order: sv(ln('M2 30 H90',AX,1)+[6,16,26,36,46,56].map((x,i)=>{
+        const h=[6,12,20,32,20,6][i]; return ln(`M${x} 30 V${30-h}`,VI,2.2)+`<circle cx="${x}" cy="${30-h}" r="2" fill="${VI}"/>`; }).join('')),
+    factor: sv(ln('M14 8 H78 V36 H14 Z',AX,1.3)+ln('M14 22 H46',AX,1)+ln('M46 8 V36',AX,1)
+      +`<circle cx="30" cy="15" r="3" fill="${CY}"/>`+`<circle cx="30" cy="29" r="3" fill="${CY}"/>`
+      +`<circle cx="62" cy="22" r="4" fill="${AM}"/>`)
+  };
+})();
+
 const SC = [
 
 /* ---------------------------------------------------------------- 6.0.1 -- */
@@ -927,6 +949,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 6.3.L -- */
+{ id:'m6-lab-k1', module:'M6', nav:'Laboratory K1 \u2014 Deutsch\u2013Jozsa', title:'Laboratory K1 \u2014 Deutsch\u2013Jozsa',
+  objective:'Let the reader choose n and a function and watch the signs and their mean answer the promise.',
+  keywords:'laboratory deutsch jozsa signs mean amplitude constant balanced promise cancellation certainty distribution',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 6 \u00b7 Deutsch and Deutsch\u2013Jozsa'},
+  {t:'title', text:'Laboratory K1 \u2014 Deutsch\u2013Jozsa'},
+  {t:'small', html:'Choose the number of query qubits and one of four functions. The left panel is the sign $(-1)^{f(x)}$ at every input; the right panel is the same mean, squared, plotted against every possible count of plus signs so the two promised cases sit on a curve you can see the rest of. Two things to find: a constant function reads $0^{n}$ with certainty, and a balanced one never reads it at all, however $n$ is set.'},
+  {t:'lab', id:'K1'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m6-code-dj', module:'M6', nav:'Deutsch\u2013Jozsa in Code', title:'Deutsch\u2013Jozsa in Code',
   objective:'Run Deutsch\u2013Jozsa on several oracles, check the mean of the signs, and see what happens without the promise.',
@@ -1010,6 +1043,17 @@ const SC = [
         ask:{key:'m6-qftnot', choices:['$0$ or $4$, each with probability $\\tfrac12$','any even index, each with $\\tfrac14$','the four amplitudes'], answer:0,
           why:'The input repeats every $2$ steps, so the transform has weight only on multiples of $8/2 = 4$. A shorter period in $x$ means a wider spacing in $k$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 6.4.L -- */
+{ id:'m6-lab-k2', module:'M6', nav:'Laboratory K2 — The QFT', title:'Laboratory K2 — The QFT',
+  objective:'Let the reader turn the register size and the input index and watch the output amplitudes turn on the circle.',
+  keywords:'laboratory quantum fourier transform amplitudes circle winding rate roots of unity gcd shared factor',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 6 · The quantum Fourier transform'},
+  {t:'title', text:'Laboratory K2 — The QFT'},
+  {t:'small', html:'Choose the register size $Q=2^{n}$ and the input index $x$. The left panel is the $Q$ output amplitudes of $F_{Q}|x\\rangle$, drawn as arrows on the unit circle at equal scales; the right panel is the same amplitudes read off as a fraction of a turn against the output index. Two things to find: every arrow has the same length whatever $x$ is, and when $x$ and $Q$ share a factor the arrow revisits only some of the $Q$ points.'},
+  {t:'lab', id:'K2'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1241,6 +1285,17 @@ const SC = [
         ask:{key:'m6-modexp', choices:['$1$: that control does nothing','$4$','$13$'], answer:0,
           why:'Squaring twice: $7^{2} = 49 \\equiv 4$ and $4^{2} = 16 \\equiv 1$. The order of $7$ is four, so every control from $j = 2$ on multiplies by one.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 6.6.L -- */
+{ id:'m6-lab-k3', module:'M6', nav:'Laboratory K3 — Order Finding', title:'Laboratory K3 — Order Finding',
+  objective:'Let the reader choose N and a and watch the cycle close at the order, with its eigenphases beside it.',
+  keywords:'laboratory order finding cycle gcd coprime eigenphases even mixture continued fractions',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 6 · Order finding'},
+  {t:'title', text:'Laboratory K3 — Order Finding'},
+  {t:'small', html:'Choose the modulus $N$ and the base $a$. The left panel walks $a^{k}\\bmod N$ term by term until it returns to $1$, which is the order $r$; the right panel is the $r$ eigenphases $s/r$, each with weight $1/r$, the even mixture that starting the work register in $|1\\rangle$ actually gives. Two things to find: a base sharing a factor with $N$ never returns to $1$ at all, and that shared factor is already an answer with no quantum step needed.'},
+  {t:'lab', id:'K3'}
 ]},
 
 /* ---------------------------------------------------------------- 6.6.4 -- */
@@ -1514,6 +1569,62 @@ const SC = [
   {t:'reveal', at:2, items:[
     {t:'note', kind:'def', head:'Where this leaves the three sentences of chapter 0', html:'The readout is small, so every algorithm here made everything else cancel first. A relative phase is everything, and kickback is what writes the answer as one. And a resource claim names five things: Deutsch\u2013Jozsa is a promise problem, Grover is quadratic, Shor is a gap against one classical algorithm.'}
   ]}
+]},
+
+/* Four optional projects for students who want to try the module on their own
+   computer. They carry no grade and no code beyond what the reader writes:
+   each card gives an aim, what it practises, a few steps and what to look
+   for. The briefs state no numerical answer, so they need no line in
+   verify/. Every one of them is doable with NumPy alone; Qiskit is optional
+   where a project mentions it. */
+{ id:'m6-projects', module:'M6', nav:'Projects to Try', title:'Projects to Try', dark:true,
+  objective:'Offer four optional projects that build this chapter\u2019s algorithms in NumPy and run them on real questions.',
+  keywords:'projects numpy qiskit deutsch jozsa fourier transform phase estimation order finding rsa factoring',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 6 \u00b7 Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>PROJECTS.deck('m6', [
+    {title:'Build Deutsch\u2013Jozsa and break the promise', glyph:G6.signs,
+     aim:'Implement the Deutsch\u2013Jozsa circuit as a matrix computation and watch what happens when the input function is neither constant nor balanced.',
+     learn:['The oracle as a diagonal sign matrix, built from the truth table of $f$.',
+            'The mean of the signs as the amplitude of $0^{n}$.',
+            'Why the promise, and not the circuit, is what guarantees a clean answer.'],
+     steps:['Write a function that takes a truth table for $f:\\{0,1\\}^{n}\\to\\{0,1\\}$ and returns the diagonal matrix $\\mathrm{diag}((-1)^{f(x)})$.',
+            'Apply $H^{\\otimes n}$, then the diagonal, then $H^{\\otimes n}$ again to the state $|0^{n}\\rangle$, and read off the probability of $0^{n}$.',
+            'Test every constant and every balanced $f$ on $n=3$, then build a few functions that are neither: for example $f(x)=1$ on three of the eight inputs.',
+            'Plot the probability of reading $0^{n}$ against the number of inputs where $f(x)=1$, for $n=3$.'],
+     look:'The constant and balanced cases land exactly on $1$ and $0$. Every other count lands strictly between them: the circuit still runs, but the reading no longer proves anything, because the promise is what the proof depends on and not the circuit.'},
+    {title:'Read a period out of nothing but samples', glyph:G6.wheel,
+     aim:'Build the quantum Fourier transform as a matrix, apply it to a state that repeats, and recover the period from where the amplitude lands.',
+     learn:['The QFT matrix $F_{Q}$, entry by entry, from its definition.',
+            'How a period in the input becomes a spacing in the output.',
+            'The gap between one sample of the output and a full measurement of the state.'],
+     steps:['Build $F_{Q}$ for $Q=16$ directly from $F_{jk}=e^{2\\pi ijk/Q}/\\sqrt{Q}$, and check it is unitary: $F_{Q}^{\\dagger}F_{Q}=I$ to machine precision.',
+            'Make an input state that is an equal mix of $|x\\rangle$ and $|x+p\\rangle$ for a period $p$ that divides $Q$, apply $F_{Q}$, and print $|amplitude|^2$ at every output index.',
+            'Confirm the nonzero outputs sit only on multiples of $Q/p$, for $p=2,4,8$.',
+            'Simulate $200$ single-shot measurements of the transformed state and estimate $p$ from the sampled indices alone.'],
+     look:'The exact calculation gives a clean comb of nonzero probabilities; the simulated measurements only ever return one index at a time and a period has to be inferred from many of them. That gap is what a real run of phase estimation looks like from the inside.'},
+    {title:'Estimate a phase and watch the error shrink', glyph:G6.order,
+     aim:'Simulate phase estimation on a phase you choose, and check the two guaranteed floors against a phase that does not fit the register.',
+     learn:['The phase-estimation amplitude as a geometric sum, computed term by term.',
+            'The two guaranteed floors, $4/\\pi^{2}$ and $8/\\pi^{2}$, checked rather than assumed.',
+            'How many extra counting qubits it takes to halve a failure probability.'],
+     steps:['Write a function that returns the exact probability $P(y)$ for any phase $\\varphi$ and register size $t$, by summing the $2^{t}$ terms of the amplitude directly (no closed form).',
+            'Pick a $\\varphi$ that is not a $t$-bit fraction for any small $t$, for example $\\varphi=1/3$, and plot $P(y)$ for $t=3,\\,4,\\,5,\\,6$.',
+            'At each $t$, record the probability of the single nearest outcome and of the two nearest together, and confirm both stay above $4/\\pi^{2}$ and $8/\\pi^{2}$.',
+            'Find, by trying values of $t$, the smallest register that reads three correct bits of $1/3$ with failure below $1\\%$, and compare it with the formula in the scene.'],
+     look:'The peak sharpens as $t$ grows, but the two floors never move: they hold at every $t$, for every $\\varphi$. Extra qubits buy a finer answer, never a more certain one \u2014 that distinction is the whole content of this chapter\u2019s "not an answer" warning.'},
+    {title:'Factor fifteen with your own arithmetic', glyph:G6.factor,
+     aim:'Run Shor\u2019s classical shell around a simulated order-finding step, end to end, on the one number small enough to check by hand.',
+     learn:['The order of $a$ modulo $N$, found here classically, standing in for the quantum step.',
+            'The two checks that turn an order into a factor: $r$ even, and $a^{r/2}\\not\\equiv-1$.',
+            'Why the repetition around a single quantum step is what actually gets programmed.'],
+     steps:['Write a classical `order(a, N)` function that returns the smallest $r$ with $a^{r}\\equiv1\\pmod N$, by direct search \u2014 this stands in for the phase-estimation step Laboratory K3 draws.',
+            'For $N=15$, loop over every $a$ coprime to $15$, compute $r$, and apply the two checks; record which bases succeed and which do not.',
+            'Extract the factors from a successful base with $\\gcd(a^{r/2}-1,\\,N)$ and $\\gcd(a^{r/2}+1,\\,N)$, and confirm both are nontrivial divisors of $15$.',
+            'Repeat the whole loop for $N=21$ and for $N=35$, and tabulate the fraction of bases that succeed on the first try for each $N$.'],
+     look:'Some bases fail outright (an odd order, or $a^{r/2}\\equiv-1$) and the shell simply tries another; none of that repetition is quantum. Qiskit\u2019s `qiskit.circuit.library` has a `QFT` gate if you want to replace the classical order-finding step with a real phase-estimation circuit on a small $U_a$ and compare.'}
+  ])}
 ]},
 
 /* ---------------------------------------------------------------- 6.8.2 -- */

@@ -408,6 +408,26 @@ function figPhaseCircle(){
   return a.svg();
 }
 
+/* Small glyphs for the project cards, drawn as flat SVG in the dark-page
+   tints this scene uses. Sized and styled the way the reference course's
+   summary-card sketches are, and defined here rather than in 90_app.js. */
+const GM2 = (()=>{
+  const sv = b => `<svg viewBox="0 0 92 44">${b}</svg>`;
+  const ln = (d,c,w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const AX='rgba(239,231,216,.30)', TE='#4FBECE', AM='#E5B255', ER='#E8785F', VI='#AC99DC';
+  return {
+    coin: sv(ln('M2 24 H90',AX,1)+[10,26,42,58,74].map((x,i)=>{ const h=[30,12,26,16,22][i];
+        return ln(`M${x} 24 V${24-h}`,TE,2)+`<circle cx="${x}" cy="${24-h}" r="2.4" fill="${TE}"/>`; }).join('')),
+    seq:  sv(ln('M2 22 H24',AX,1)+`<rect x="24" y="10" width="16" height="24" rx="2" fill="none" stroke="${AM}" stroke-width="1.6"/>`
+          +ln('M40 22 H58',AX,1)+`<rect x="58" y="10" width="16" height="24" rx="2" fill="none" stroke="${ER}" stroke-width="1.6"/>`
+          +ln('M74 22 H90',AX,1)),
+    rabi: sv(ln('M2 38 H90',AX,1)+ln('M2 22 Q12 4 22 22 T42 22 T62 22 T82 22',TE,2.2)
+          +ln('M2 30 H90',AX,1)),
+    beat: sv(ln('M2 22 H90',AX,1)+ln('M2 22 Q10 6 18 22 T34 22 T50 22 T66 22 T82 22',VI,1.6)
+          +ln('M2 22 Q22 30 42 22 T82 22',AM,1.4))
+  };
+})();
+
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
@@ -604,6 +624,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 2.L3 --- */
+{ id:'m2-lab-d1', module:'M2', nav:'Laboratory D1 — Two Measurements in a Row', title:'Laboratory D1 — Two Measurements in a Row',
+  objective:'Let the reader choose a state and two measurement bases, and watch the first reading decide the second one.',
+  keywords:'laboratory sequential measurement collapse post-measurement state eigenbasis compatible bases',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 2 · Projective measurement'},
+  {t:'title', text:'Laboratory D1 — Two Measurements in a Row'},
+  {t:'small', html:'The state is $\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$. A first measurement, along $Z$, $X$ or $Y$, returns the reading you keep and collapses the state onto that axis; a second measurement then reads its own probability from what is left, never from the state you started with. Choose the same axis twice and the second reading is forced; choose a different one and it is not.'},
+  {t:'lab', id:'D1'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m2-code-measure', module:'M2', nav:'Projective Measurement in Code', title:'Projective Measurement in Code',
   objective:'Apply the update rule, follow three measurements in a row, and model a readout error with effects.',
@@ -724,6 +755,17 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 2.L4 --- */
+{ id:'m2-lab-d2', module:'M2', nav:'Laboratory D2 — How Tight Is the Uncertainty Bound?', title:'Laboratory D2 — How Tight Is the Uncertainty Bound?',
+  objective:'Let the reader set a state and two equatorial measurement directions, and compare the spread product with the Robertson bound.',
+  keywords:'laboratory uncertainty relation robertson bound commutator spread product saturation equatorial directions',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 2 · Compatibility and uncertainty'},
+  {t:'title', text:'Laboratory D2 — How Tight Is the Uncertainty Bound?'},
+  {t:'small', html:'The state has Bloch vector $\\mathbf{r}(\\theta,\\varphi)$, and the two observables measured are $\\mathbf{n}\\cdot\\boldsymbol\\sigma$ and $\\mathbf{m}\\cdot\\boldsymbol\\sigma$, both directions set in the equatorial plane. The left panel is the Bloch picture; the right one is $\\Delta N\\,\\Delta M$ beside the Robertson bound as the angle between $\\mathbf{n}$ and $\\mathbf{m}$ sweeps from parallel to opposite. Find a state and an angle where the two curves touch, then move $\\theta$ and watch them separate again.'},
+  {t:'lab', id:'D2'}
+]},
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m2-code-comm', module:'M2', nav:'Compatibility and Uncertainty in Code', title:'Compatibility and Uncertainty in Code',
   objective:'Compute a commutator, check the Robertson bound on one state, and see the order of two measurements matter.',
@@ -807,6 +849,17 @@ const SC = [
         ask:{key:'m2-ndotsigma', choices:['$1$','$\\tfrac12$','$0$'], answer:1,
           why:'$\\mathbf{r}=(0,0,1)$, so $\\mathbf{n}\\cdot\\mathbf{r}=0$ and $p(+)=\\tfrac12$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 2.L5 --- */
+{ id:'m2-lab-d3', module:'M2', nav:'Laboratory D3 — Measuring Along a Tilted Axis', title:'Laboratory D3 — Measuring Along a Tilted Axis',
+  objective:'Let the reader set a state and an instrument direction independently, and read the outcome probability off the angle between them.',
+  keywords:'laboratory n dot sigma tilted axis bloch vector instrument direction angle probability projector',
+  steps:0, slide:true, blocks:[
+  {t:'eyebrow', text:'Module 2 · The Pauli algebra'},
+  {t:'title', text:'Laboratory D3 — Measuring Along a Tilted Axis'},
+  {t:'small', html:'The state\'s Bloch vector $\\mathbf{r}$ and the instrument direction $\\mathbf{n}$ each have their own polar and azimuthal angle. The left panel is the Bloch picture; the right one is $p(+)=\\tfrac12(1+\\mathbf{n}\\cdot\\mathbf{r})$ against the angle between the two vectors, which the lab recovers from the dot product rather than from either slider alone. Line the two vectors up, then send them to a right angle and watch the reading become a coin.'},
+  {t:'lab', id:'D3'}
 ]},
 
 /* ---------------------------------------------------------------- code --- */
@@ -1077,6 +1130,57 @@ const SC = [
   {t:'reveal', at:2, items:[
     {t:'note', kind:'def', head:'What comes next', html:'Everything here assumed the system is alone and its state is a single vector. Chapter 3 drops both: a system that is one half of a larger one has no vector of its own, and describing it needs the density operator. That is also where a measurement whose result was thrown away finally gets a proper description.'}
   ]}
+]},
+
+/* ---------------------------------------------------------------- 2.8.1b - */
+{ id:'m2-projects', module:'M2', nav:'Projects to Try', title:'Projects to Try',
+  dark:true, objective:'Offer four optional projects that use the module’s postulates on a simulated qubit.',
+  keywords:'projects numpy qiskit born rule sequential measurement rabi calibration beats energy levels',
+  steps:0, blocks:[
+  {t:'eyebrow', text:'Module 2 · Projects'},
+  {t:'title', text:'Projects to Try'},
+  {t:'raw', html:()=>PROJECTS.deck('m2', [
+    {title:'How many shots does a digit cost?', glyph:GM2.coin,
+     aim:'Turn the standard-error formula into a shot budget, and see the counted frequency wander around the exact Born probability.',
+     learn:['Sampling a Born probability with a simulated random number generator.',
+            'The standard error $\\sqrt{p(1-p)/N}$ as a function of the shot count.',
+            'Why the same code run twice gives two different answers.'],
+     steps:['Pick a state, for example $|\\psi\\rangle=\\cos(\\theta/2)|0\\rangle+e^{i\\varphi}\\sin(\\theta/2)|1\\rangle$, and compute the exact $p(0)=\\cos^2(\\theta/2)$ by hand from the amplitudes.',
+            'Draw $N$ samples with `np.random.random(N) < p`, for $N=10,\\,100,\\,1000,\\,10\\,000$, and record the counted frequency each time.',
+            'Plot $|\\text{frequency}-p|$ against $N$ on log-log axes and compare its slope with $-\\tfrac12$.',
+            'Repeat the whole run with a fixed seed, then repeat it again without one, and compare the two frequencies at the smallest $N$.'],
+     look:'The error shrinks like $1/\\sqrt{N}$ on average but not on every run: a single small-$N$ trial can land closer to the truth than a larger one, and only the seeded pair reproduces the same number twice. Ask how many shots one more correct decimal place costs.'},
+    {title:'Does the order of two measurements matter?', glyph:GM2.seq,
+     aim:'Simulate two measurements in a row on the same qubit and find out when the second one is affected by the first.',
+     learn:['Collapsing a state vector onto a projector and renormalising it.',
+            'Reading a probability from the collapsed state, not from the original one.',
+            'The link between a nonzero commutator and a disturbed second reading.'],
+     steps:['Write a function that measures a state vector in a chosen Pauli basis, returns a sampled outcome, and returns the post-measurement state.',
+            'Start in $|0\\rangle$, measure in $X$, then measure the result in $Z$. Repeat 2000 times and record the fraction of $Z=0$ outcomes.',
+            'Repeat the whole experiment measuring $Z$ then $Z$ again instead, and compare the fraction of second-reading agreements.',
+            'Compute $[X,Z]$ once, by matrix multiplication, and connect its size to what the simulation showed.'],
+     look:'Measuring $Z$ twice in a row agrees every time; measuring $X$ then $Z$ is a coin flip on the second reading regardless of how the qubit started. The disagreement traces back to $[X,Z]\\neq0$, not to any imperfection added to the simulation.'},
+    {title:'Calibrate a $\\pi$ pulse by search', glyph:GM2.rabi,
+     aim:'Find the pulse length that flips a driven qubit by scanning the closed-form population instead of quoting the formula for it.',
+     learn:['The closed form $P(1)=(\\Omega_x/\\Omega)^2\\sin^2(\\Omega t/2)$ for a driven qubit.',
+            'A one-dimensional search for the time that maximises a function.',
+            'What a wrong Hamiltonian looks like on the same plot.'],
+     steps:['Fix $\\Omega_x=1$ and $\\Delta=0$ and evaluate $P(1)$ on a fine grid of $t$ from $0$ to $10$.',
+            'Find the grid point where $P(1)$ is largest, and compare that time with $\\pi/\\Omega$ computed directly.',
+            'Repeat the search at $\\Delta=0.5$ and $\\Delta=1.5$, keeping $\\Omega_x=1$, and record the largest $P(1)$ reached at each.',
+            'Build the full $2\\times2$ unitary $U(t)=\\cos(\\Omega t/2)I-i\\sin(\\Omega t/2)\\,\\mathbf{n}\\cdot\\boldsymbol\\sigma$ with NumPy and confirm it reproduces the same $P(1)$ by applying it to $|0\\rangle$ directly.'],
+     look:'The searched time matches $\\pi/\\Omega$ to the grid resolution, and the ceiling drops fast as $\\Delta$ grows: at $\\Delta=1.5$ with $\\Omega_x=1$ the qubit can no longer be flipped by any pulse length at all. A calibration done once on resonance is wrong at every other detuning.'},
+    {title:'Watch two energy levels beat', glyph:GM2.beat,
+     aim:'Build a two-level Hamiltonian, evolve a superposition of its eigenstates, and read the beat frequency off the result.',
+     learn:['Diagonalising a $2\\times2$ Hermitian matrix with NumPy.',
+            'Evolving a state with the matrix exponential of $-iHt$.',
+            'The claim that only energy differences are observable.'],
+     steps:['Build a Hermitian $H$ with eigenvalues $E_1=1$ and $E_2=4$ in some basis that is not $Z$, for example $H=2I+1.5X+0.5Z$, and check its eigenvalues with `np.linalg.eigh`.',
+            'Prepare the equal superposition of its two eigenvectors and evolve it with `scipy.linalg.expm(-1j*H*t)` over a range of $t$.',
+            'Measure $\\langle Z\\rangle(t)$ along the way and find the period of its oscillation.',
+            'Shift $H$ by $H+10I$ and rerun the whole evolution; compare $\\langle Z\\rangle(t)$ before and after the shift.'],
+     look:'The oscillation period matches $2\\pi/(E_2-E_1)$ and not $2\\pi/E_2$ or $2\\pi/E_1$ alone. Shifting $H$ by a multiple of the identity changes neither the period nor a single value of $\\langle Z\\rangle(t)$, because a global phase carries no observable consequence.'}
+  ])}
 ]},
 
 /* ---------------------------------------------------------------- 2.8.2 -- */
