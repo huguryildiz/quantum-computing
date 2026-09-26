@@ -600,6 +600,144 @@ const PG = (() => {
   };
 })();
 
+/* ---- "Around Us" galleries, one per photographed section. Adapted from the
+   reference course's realGallery (signals-and-systems/build/src/82_scenes_m1.js):
+   a c-8-4 slide, a grid of framed schematic figures on the left, the photo on
+   the right, then one or two notes revealed step by step. Every figure below
+   computes its curve or bars from the physics definition, never from a drawn
+   mnemonic, and every number it or a note states is checked in
+   verify/around_m4.py. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M4', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two or three real-world figures and one photo.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px 14px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]
+      ]}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* 4.1 · a proton's spin precesses about the field at the Larmor frequency
+   f = (gamma/2 pi) B; gamma/2 pi = 42.577 MHz/T is the accepted proton
+   gyromagnetic ratio. Both figures are the one relation, read two ways: the
+   frequency the field sets, and the period that frequency implies. */
+function figLarmor(){
+  const GAMMA = 42.577; // MHz/T, proton gyromagnetic ratio over 2 pi
+  const a = P.Axes({w:270,h:230,xr:[0,8],yr:[0,350],pad:{l:46,r:14,t:16,b:38},
+    xlabel:'B\\;(\\text{T})',ylabel:'f\\;(\\text{MHz})',xstep:2,ytarget:4});
+  a.curve(B=>GAMMA*B,{color:C.in});
+  [1.5,3.0,7.0].forEach(B=>{ a.point(B,GAMMA*B,{color:C.h}); });
+  a.note(0.3,328,'3\\,\\text{T}\\to 128\\,\\text{MHz}',{tex:true,color:C.h,fs:12,anchor:'start'});
+  return a.svg();
+}
+function figLarmorSignal(){
+  const GAMMA = 42.577, B = 3.0, f = GAMMA*B; // MHz, so the period is in ns
+  const a = P.Axes({w:270,h:230,xr:[0,30],yr:[-1.7,1.25],pad:{l:38,r:14,t:16,b:38},
+    xlabel:'t\\;(\\text{ns})',ylabel:'\\langle X\\rangle(t)',xstep:10,ytarget:3});
+  a.curve(t=>Math.cos(2*Math.PI*f*t/1000),{color:C.in,n:900});
+  a.span(0,1000/f,-1.55,'T=7.83\\,\\text{ns}',{tex:true,fs:12});
+  return a.svg();
+}
+
+/* 4.2 · a two-level ion driven by a resonant laser undergoes Rabi flopping,
+   P(1) = sin^2(Omega t / 2). The pulse length sets the rotation angle: a pi
+   pulse is an X gate, a pi/2 pulse is the 50/50 split Laboratory H2 studies.
+   The second figure is the same drive read as a rotation angle theta = Omega t
+   on the Bloch sphere, which is the fact the section is about. */
+function figRabi(){
+  const OMEGA = 2*Math.PI*0.1; // rad/us, a 100 kHz Rabi frequency
+  const a = P.Axes({w:270,h:230,xr:[0,10],yr:[0,1.08],pad:{l:38,r:14,t:16,b:38},
+    xlabel:'t\\;(\\mu\\text{s})',ylabel:'P(1)',xstep:2,ytarget:4});
+  a.curve(t=>Math.sin(OMEGA*t/2)**2,{color:C.in,n:900});
+  a.vline(2.5,{color:C.mid}); a.vline(5.0,{color:C.h});
+  a.note(2.5,1.0,'\\pi/2',{tex:true,color:C.mid,fs:12});
+  a.note(5.0,1.0,'\\pi',{tex:true,color:C.h,fs:12});
+  return a.svg();
+}
+function figRabiAngle(){
+  const OMEGA = 2*Math.PI*0.1; // rad/us
+  const a = P.Axes({w:270,h:230,xr:[0,10],yr:[0,190],pad:{l:42,r:14,t:16,b:38},
+    xlabel:'t\\;(\\mu\\text{s})',ylabel:'\\theta\\;(^{\\circ})',xstep:2,ytarget:4});
+  a.curve(t=>(OMEGA*t)*180/Math.PI,{color:C.mid});
+  a.hline(90,{color:C.mid,dash:'3 4'}); a.hline(180,{color:C.h,dash:'3 4'});
+  a.note(7.6,100,'90^{\\circ}',{tex:true,color:C.mid,fs:12});
+  a.note(7.6,172,'180^{\\circ}',{tex:true,color:C.h,fs:12});
+  return a.svg();
+}
+
+/* 4.5 · a CNOT applied after a Hadamard turns |00> into a Bell state, and a
+   chip's readout reports the two outcomes it keeps: 00 and 11, each half the
+   shots, and never 01 or 10. The second bar chart is the same qubits with the
+   Hadamard alone, before the entangling gate runs: every outcome is then
+   equally likely, which is what shows the CNOT is what ties the two readouts
+   together. Bars, not a curve, because the claim is about four discrete
+   outcomes. */
+function figChipBell(){
+  const probs = [0.5,0,0,0.5]; // |00>,|01>,|10>,|11>, from H(q0) then CNOT(0->1)
+  const a = P.Axes({w:270,h:230,xr:[-0.5,3.5],yr:[0,0.62],pad:{l:38,r:14,t:16,b:44},
+    xlabel:'\\text{outcome}',ylabel:'\\text{probability}',ystep:0.2,
+    xticksOverride:[0,1,2,3], xtickfmt:v=>['00','01','10','11'][v]||''});
+  a.stem(probs.map((p,i)=>[i,p]),{color:C.out,r:0,width:15});
+  return a.svg();
+}
+function figChipNoGate(){
+  const probs = [0.5,0.5,0,0]; // |00>,|01>,|10>,|11>, from H(q0) alone
+  const a = P.Axes({w:270,h:230,xr:[-0.5,3.5],yr:[0,0.62],pad:{l:38,r:14,t:16,b:44},
+    xlabel:'\\text{outcome}',ylabel:'\\text{probability}',ystep:0.2,
+    xticksOverride:[0,1,2,3], xtickfmt:v=>['00','01','10','11'][v]||''});
+  a.stem(probs.map((p,i)=>[i,p]),{color:C.h,r:0,width:15});
+  return a.svg();
+}
+
+const REAL_NMR = realGallery({ id:'m4-real-nmr', nav:'Spin Precession Around Us',
+  title:'Spin Precession Around Us', eyebrow:'Module 4 · The Bloch sphere',
+  objective:'Connect the Bloch-sphere picture to a spin precessing in a magnet.',
+  keywords:'examples nmr mri magnet larmor precession frequency proton gyromagnetic bloch sphere',
+  photo:['m4_nmr','A tall NMR spectrometer magnet in a chemistry laboratory','A proton inside this magnet precesses about its field, the way a Bloch vector turns about the axis a gate rotates it around.'],
+  figs:[
+    [()=>figLarmor(), '$f=(\\gamma/2\\pi)B$, with $\\gamma/2\\pi=42.577\\,\\text{MHz/T}$. A 3 T scanner drives protons near 128 MHz.'],
+    [()=>figLarmorSignal(), 'At 3 T the precession period is $7.83\\,\\text{ns}$ — the sphere’s rotation, timed on a real spin.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One rotation, one axis', html:'The magnet fixes the axis; the field strength fixes the rate. An NMR or MRI scanner reads the angle a real spin has turned through.'},
+    {t:'note', kind:'warn', head:'The picture is for one spin', html:'A sample holds many spins together; a scanner reads their combined signal. This sphere is one qubit — a large ensemble is chapter 3’s density operator.'}
+  ]});
+
+const REAL_IONTRAP = realGallery({ id:'m4-real-iontrap', nav:'Laser-Driven Rotations Around Us',
+  title:'Laser-Driven Rotations Around Us', eyebrow:'Module 4 · Single-qubit gates as rotations',
+  objective:'Show a laser pulse implementing a rotation gate on a trapped-ion qubit.',
+  keywords:'examples ion trap laser rabi oscillation pulse rotation angle gate x gate hadamard',
+  photo:['m4_iontrap','A vacuum chamber with viewports and laser beams crossing at its centre','A trapped ion sits where the beams cross. A pulse of the right length turns its state exactly as a gate turns a point on the sphere.'],
+  figs:[
+    [()=>figRabi(), 'Rabi flopping: $P(1)=\\sin^{2}(\\Omega t/2)$ at $\\Omega/2\\pi=100\\,\\text{kHz}$. A $5\\,\\mu\\text{s}$ pulse is a full flip, an $X$ gate.'],
+    [()=>figRabiAngle(), 'The same drive as a rotation angle $\\theta=\\Omega t$: a $2.5\\,\\mu\\text{s}$ pulse turns the state $90^{\\circ}$.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A pulse is a rotation', html:'The laser sets the rotation axis; the pulse length sets the angle. Choosing a duration is choosing a point on $R_{\\mathbf n}(\\alpha)$.'},
+    {t:'note', kind:'warn', head:'Halfway twice is not once', html:'A $\\pi/2$ pulse gives $P(1)=0.5$, a coin toss — but two of them in a row make one $\\pi$ pulse, $P(1)=1$, because amplitudes add before anything is read.'}
+  ]});
+
+const REAL_CHIP = realGallery({ id:'m4-real-chip', nav:'Entangling Gates Around Us',
+  title:'Entangling Gates Around Us', eyebrow:'Module 4 · Two-qubit gates',
+  objective:'Show a two-qubit gate on real hardware producing the correlated readout a CNOT predicts.',
+  keywords:'examples superconducting chip qubit cnot bell state entanglement readout wire bonds',
+  photo:['m4_chip','A superconducting chip in a gold sample holder with wire bonds','Each square is a qubit; the wires carry the pulses that drive one-qubit rotations and the two-qubit gate between neighbours.'],
+  figs:[
+    [()=>figChipBell(), 'A Hadamard, then a CNOT: the readout keeps only $00$ and $11$, half the shots each — a chip running the two gates that make a Bell pair.'],
+    [()=>figChipNoGate(), 'The Hadamard alone, before the CNOT: $00$ and $01$ are equally likely, and $q_{1}$ is untouched at $0$. The entangling gate is what ties the two readouts together.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A gate, not a wire', html:'The two qubits carry no signal between them at reading time. The correlation is set once, by the gate, before either is read.'},
+    {t:'note', kind:'err', head:'Correlated is not communicating', html:'Reading $00$ or $11$ every time looks like the qubits are talking. Chapter 3’s no-signalling result says they are not: either qubit’s own readout statistics never change.'}
+  ]});
+
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
@@ -750,6 +888,9 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 4.1.6 -- */
+REAL_NMR,
+
 /* ---------------------------------------------------------------- 4.L1 --- */
 { id:'m4-lab-h1', module:'M4', nav:'Laboratory H1 — The Point and the Angles', title:'Laboratory H1 — The Point and the Angles',
   objective:'Let the reader set both sphere angles directly and read the overlap with a chosen state off the two column vectors.',
@@ -870,6 +1011,9 @@ const SC = [
           why:'Three quarter turns are $270^{\\circ}$, which carries $+\\hat{x}$ to $-\\hat{y}$. By matrices, $S^{3}=\\operatorname{diag}(1,-i)$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 4.2.5 -- */
+REAL_IONTRAP,
 
 /* ---------------------------------------------------------------- 4.L2 --- */
 { id:'m4-lab-h2', module:'M4', nav:'Laboratory H2 — One Gate, One Turn', title:'Laboratory H2 — One Gate, One Turn',
@@ -1147,6 +1291,9 @@ const SC = [
           why:'The two qubits change places: $|0\\rangle\\otimes|{+}\\rangle$, which has $q_{1}=0$ in both terms. The input was $\\tfrac{1}{\\sqrt2}(|00\\rangle+|10\\rangle)$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 4.5.5 -- */
+REAL_CHIP,
 
 /* ---------------------------------------------------------------- 4.L3 --- */
 { id:'m4-lab-h3', module:'M4', nav:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit', title:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit',

@@ -682,6 +682,103 @@ function figLadder(){
   ]});
 }
 
+/* ==== Around Us figures — one gallery slide at the end of three sections.
+   The figures below are schematic but true: each is computed from the same
+   definitions the teaching scenes use (`qpeProb`, `orderOf`, `gcd`), not
+   drawn from a table. ==== */
+
+/* Phase estimation, read as a tuning fork reads a pitch: the register never
+   lands on the true phase unless it happens to be an exact t-bit fraction,
+   but it always piles most of the probability onto the nearest reading. */
+function figForksSpread(){
+  const phi = 0.27, t = 4, Q = 1<<t;
+  const a = P.Axes({w:520,h:260,xr:[-0.02,1.02],yr:[0,0.62],
+    xlabel:'y/2^{t}', ylabel:'P(y)',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,0.2,0.4,0.6]});
+  const pts=[]; for(let y=0;y<Q;y++) pts.push([y/Q, qpeProb(phi,t,y)]);
+  a.stem(pts,{color:C.in,r:4});
+  const near = Math.round(phi*Q);
+  a.point(near/Q, qpeProb(phi,t,near), {color:C.out,r:6});
+  a.vline(phi,{color:C.err,width:1.4,dash:'4 4'});
+  a.note(phi+0.02,0.58,'\\varphi = 0.27',{fs:12,color:C.err,anchor:'start',tex:true});
+  return a.svg();
+}
+/* The floor is the physics, not the luck of one example: for every phase and
+   a fixed register size, the two nearest readings together never fall below
+   8/pi^2, the same bound m6-qpeprec states. Swept here over 400 phases. */
+function figForksFloor(){
+  const t = 4, Q = 1<<t, floor = 8/(Math.PI*Math.PI);
+  const a = P.Axes({w:520,h:260,xr:[0,1],yr:[0.75,1.02],
+    xlabel:'\\varphi', ylabel:'\\text{top two outcomes}',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0.75,0.811,0.9,1.0]});
+  a.curve(phi=>{
+    const probs=[]; for(let y=0;y<Q;y++) probs.push(qpeProb(phi,t,y));
+    probs.sort((x,y)=>y-x); return probs[0]+probs[1];
+  }, {color:C.in, n:400});
+  a.hline(floor, {color:C.err,width:1.4,dash:'4 4'});
+  a.note(0.55,0.775,'8/\\pi^{2} = 0.811',{fs:12,color:C.err,anchor:'start',tex:true});
+  return a.svg();
+}
+
+/* Order finding, read as a gear train: multiplying by a modulo N is one turn
+   of the mechanism, and it returns to the start after r turns whatever N and
+   a are, the same computation figOrder uses with a different pair. */
+function figGearsCycle(){
+  const N = 15, a0 = 7, r = orderOf(a0,N);
+  const pts=[]; let x=1;
+  for(let k=0;k<=10;k++){ pts.push([k,x]); x=(x*a0)%N; }
+  const a = P.Axes({w:520,h:260,xr:[0,10],yr:[0,15.8],
+    xlabel:'k', ylabel:'7^{k} \\bmod 15',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,4,8,12]});
+  a.stem(pts,{color:C.in,r:4.6});
+  for(let k=0;k<=10;k+=r) a.point(k,1,{color:C.out,r:6});
+  a.span(0,r,13.8,'r = '+r,{color:C.out,fs:13,tex:true});
+  return a.svg();
+}
+/* The order is a property of the base as much as of the modulus: sweeping a
+   over every value coprime to 15 gives orders of very different lengths, the
+   gear analogy for six forks each ringing a different, fixed number of beats
+   before the whole train realigns. */
+function figGearsSpread(){
+  const N = 15, bases=[]; for(let x=1;x<N;x++) if(gcd(x,N)===1) bases.push(x);
+  const pts = bases.map((x,i)=>[i,orderOf(x,N)]);
+  const a = P.Axes({w:520,h:260,xr:[-0.5,bases.length-0.5],yr:[0,5],
+    xlabel:'a', ylabel:'\\text{order of }a\\text{ mod }15',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:8, xticksOverride:bases.map((_,i)=>i),
+    xtickfmt:(v)=>String(bases[Math.round(v)]??''), yticksOverride:[0,1,2,4]});
+  a.stem(pts,{color:C.in,r:4.6});
+  return a.svg();
+}
+
+/* Factoring, read against the data centre it protects: the classical route
+   through the modulus (trial division, about sqrt(N) = 2^{L/2} steps) and
+   the arithmetic order finding needs (about L^3 gates, m6-modexp's own
+   scaling) against the size of the modulus in bits. */
+function figDataGrowth(){
+  const a = P.Axes({w:520,h:260,xr:[0,256],yr:[0,42],
+    xlabel:'L\\,(\\text{bits of }N)', ylabel:'\\log_{10}(\\text{steps})',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,10,20,30,40]});
+  a.curve(L=>L>0? (L/2)*Math.log10(2) : null, {color:C.err,width:2.4});
+  a.curve(L=>L>0? 3*Math.log10(L) : null, {color:C.out,width:2.4});
+  a.note(6,34,'\\text{trial division: }2^{L/2}',{fs:12,color:C.err,anchor:'start',tex:true});
+  a.note(6,18,'\\text{order finding: }L^{3}',{fs:12,color:C.out,anchor:'start',tex:true});
+  return a.svg();
+}
+/* The one classical step in Shor's own procedure, shown as what it is: two
+   greatest-common-divisor computations turning one order into two factors.
+   Same N=21, a=2, r=6 the m6-shor worked example already states and checks. */
+function figDataGcd(){
+  const rows = [['a^{r/2}-1=7','\\gcd(7,21)=7',C.in],['a^{r/2}+1=9','\\gcd(9,21)=3',C.h]];
+  const items=[];
+  rows.forEach(([lab,glab,col],i)=>{
+    const y=20+i*100;
+    items.push({t:'text',x:130,y:y+18,anchor:'middle',label:lab,tex:true,fs:15,color:C.muted});
+    items.push({t:'text',x:280,y:y+18,anchor:'middle',label:'\\to',tex:true,fs:15,color:C.muted});
+    items.push({t:'box',x:330,y,w:150,h:44,label:glab,tex:true,fs:14,color:col});
+  });
+  return growBlocks({w:520,h:220,items});
+}
+
 /* Small sketches for the projects cards. The projects page is dark, so they
    are drawn in the dark-page signal tints, the same four used throughout this
    file's figures. Modelled on the equivalent block in the reference course;
@@ -703,6 +800,73 @@ const G6 = (() => {
       +`<circle cx="62" cy="22" r="4" fill="${AM}"/>`)
   };
 })();
+
+/* ==== Around Us — one gallery slide at the end of three sections. Adapted
+   from the reference course's realGallery (signals-and-systems, 82_scenes_m1.js):
+   no `src` field, module fixed to M6. ==== */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M6', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two figures and a photo; each figure is one example.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:(cfg.photos ? [{t:'grid', cols:cfg.photos.length, gap:'12px 14px', items:cfg.photos.map(([k,alt,cap])=>
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[k]}" alt="${alt}">`, caption:cap}])}] : [])
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* ---------------------------------------------------------------- 6.5.6 -- */
+const M6_REAL_FORKS = realGallery({ id:'m6-real-forks', nav:'Phase Estimation Around Us',
+  title:'Phase Estimation Around Us', eyebrow:'Module 6 · Phase estimation',
+  objective:'Connect reading off a fixed pitch or frequency to the way phase estimation reads off a fixed phase.',
+  keywords:'examples tuning fork pitch frequency reading register precision phase estimation everyday',
+  photos:[['m6_forks','A row of six graded steel tuning forks of different sizes standing on wooden blocks',
+    'Each fork is built to ring at one fixed pitch. Phase estimation is the same kind of reading: naming a fixed number as precisely as the instrument allows.']],
+  figs:[
+    [()=>figForksSpread(), 'A phase that is not an exact fraction of the register: the reading spreads over several outcomes, but almost all of it piles onto the one nearest the truth (green).'],
+    [()=>figForksFloor(), 'The two nearest outcomes together, for every possible phase, at a fixed register size. The curve never dips below $8/\\pi^{2}$: the guarantee is a property of the method, not of a lucky phase.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A count, not a spectrum', html:'A fork gives you one number, its pitch. Phase estimation returns one register reading, and $8/\\pi^{2}\\approx0.811$ is how often it is one of the two closest to the truth.'},
+    {t:'note', kind:'warn', head:'More qubits is a finer scale', html:'A longer row of forks only narrows which one you are nearest to; more counting qubits narrow the reading the same way, without making it exact.'}
+  ]});
+
+/* ---------------------------------------------------------------- 6.6.6 -- */
+const M6_REAL_GEARS = realGallery({ id:'m6-real-gears', nav:'Order Finding Around Us',
+  title:'Order Finding Around Us', eyebrow:'Module 6 · Order finding',
+  objective:'Connect a meshing gear train returning to its starting alignment to the order of a modular multiplication.',
+  keywords:'examples clock gears mechanism teeth cycle period order finding everyday interlocking',
+  photos:[['m6_gears','Interlocking brass gears of different tooth counts inside an old clock mechanism',
+    'Gears with different tooth counts realign only after a fixed number of turns, the mechanical version of an order.']],
+  figs:[
+    [()=>figGearsCycle(), 'Repeated multiplication by $7$ modulo $15$: the sequence returns to $1$ after $r=4$ steps (green), then repeats.'],
+    [()=>figGearsSpread(), 'The order of $a$ modulo $15$ for every $a$ coprime to $15$. Some bases cycle back in one step, others in four.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'The period is the point', html:'A twelve-tooth gear meshed with an eight-tooth one realigns every $\\mathrm{lcm}(12,8)=24$ teeth; order finding computes the modular version, $a^{r}\\equiv1\\pmod N$.'},
+    {t:'note', kind:'warn', head:'Size is the difficulty', html:'$N=15$ is short enough to draw; real moduli have hundreds of digits, where walking the cycle classically is the step order finding replaces.'}
+  ]});
+
+/* ---------------------------------------------------------------- 6.7.7 -- */
+const M6_REAL_DATACENTRE = realGallery({ id:'m6-real-datacentre', nav:'Factoring Around Us',
+  title:'Factoring Around Us', eyebrow:'Module 6 · Factoring and period finding',
+  objective:'Connect public-key cryptography in data centres to the classical-versus-quantum cost gap that order finding opens.',
+  keywords:'examples data centre server racks rsa keys encryption factoring cost gcd everyday',
+  photos:[['m6_datacentre','A data-centre aisle lined with tall server racks, cabling running along the ceiling',
+    'Public-key schemes such as RSA secure links to machines like these; RSA rests on a modulus that is hard to factor.']],
+  figs:[
+    [()=>figDataGrowth(), 'Steps against the modulus size: trial division ($2^{L/2}$, red) against the arithmetic order finding needs ($L^{3}$, green). The gap widens with every added bit.'],
+    [()=>figDataGcd(), 'The one classical step that turns an order into two factors: two gcd computations, for the $N=21$, $r=6$ example already checked on the order-finding pages.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One step changes, four do not', html:'Choosing the base, the two gcd computations and the classical check are ordinary arithmetic; order finding is the one piece no known classical method does quickly at RSA sizes.'},
+    {t:'note', kind:'warn', head:'A simpler baseline than the real attack', html:'Trial division is plotted because it states cleanly; the number field sieve that real attacks use is much faster, yet its cost still grows faster than any power of $L$.'}
+  ]});
 
 const SC = [
 
@@ -1643,7 +1807,9 @@ const SC = [
   {t:'reveal', at:1, items:[
     {t:'note', kind:'ok', head:'The check that catches most of it', html:'Probabilities add to one, an amplitude of a balanced function averages to exactly zero, a phase-estimation distribution puts at least $8/\\pi^{2}$ on the two nearest outcomes, a candidate order is confirmed by one modular exponentiation, and a query count is never quoted as a time. Five one-line tests, and between them they catch nearly every slip this chapter can produce.'}
   ]}
-]}
+]},
+
+M6_REAL_FORKS, M6_REAL_GEARS, M6_REAL_DATACENTRE
 
 ];
 

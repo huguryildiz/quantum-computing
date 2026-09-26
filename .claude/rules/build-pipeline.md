@@ -36,6 +36,8 @@ paths:
 | `verify/qcheck.py`, `qops.py` | the shared runner, and the standard operators the gates are built on — including the partial trace, the entropy and the Kraus channels, each written from its own definition rather than from the route the artifact teaches |
 | `verify/verify_scenes.py`, `verify_drills.py` | every number in the scenes and in the worked solutions, re-derived |
 | `verify/notes_cN.py` | every number the lecture notes state that the scenes do not already carry, one file per chapter |
+| `verify/around_mN.py` | every number on the module's Around Us gallery pages |
+| `build/img/` | the course photos (`PROMPT.md` is how they were made); `node build/img/pack.js` packs them into `build/src/77a_images.js` |
 | `verify/*.py` | the numerical gates |
 | `tools/rule_check.py` | banned phrases, figure-label rules, the `NC` mark |
 | `tools/content_guard.py` | the R4 student-facing prose guard — hard AI-slop failures and review-only style warnings, over source and over `dist/` |
@@ -79,7 +81,7 @@ cd build && node pw.js seccheck.js           # PROBLEMS: none
 .venv/bin/python tools/content_guard.py --source --artifacts   # CONTENT GUARD: PASS (N review warning(s))
 .venv/bin/python verify/verify_scenes.py     # N passed, 0 failed
 .venv/bin/python verify/verify_drills.py     # N passed, 0 failed
-for f in verify/notes_c*.py; do .venv/bin/python "$f"; done   # each: N passed, 0 failed
+for f in verify/notes_c*.py verify/around_m*.py; do .venv/bin/python "$f"; done   # each: N passed, 0 failed
 .venv/bin/python -m pytest verify/ -q        # the runner's own tests
 .venv/bin/python verify/code_check.py         # N passed, 0 failed, 0 skipped
 cd build && node pw.js ../notes/mathscan.js  # LITERAL MATH IN NOTES: 0, KATEX ERRORS: 0

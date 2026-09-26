@@ -652,6 +652,104 @@ const G = (()=>{
   };
 })();
 
+/* ---- "Around Us" galleries, one a section, adapted from the reference
+   course's realGallery (signals-and-systems/build/src/82_scenes_m1.js).
+   No src field: these scenes carry no textbook anchor of their own, since the
+   photo and its caption are the content, not a page of the syllabus. */
+const EXG = o => Object.assign({w:520,h:230,pad:{l:56,r:22,t:22,b:38},ytarget:3}, o);
+function realGallery(cfg){
+  return { id:cfg.id, module:'M5', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two everyday examples; each figure is one worked case.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]
+      ]}].concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Shot-noise SE against N at p=0.5, log-log so 1/sqrt(N) is a straight line. */
+function figRealShots(){
+  const a = P.Axes(EXG({xr:[Math.log10(20),Math.log10(20000)],yr:[Math.log10(0.003),Math.log10(0.13)],
+    xlabel:'N\\ (\\text{shots})', ylabel:'\\mathrm{SE}(\\hat p)', xticksOverride:[], yticksOverride:[]}));
+  const lx=n=>Math.log10(n), ly=se=>Math.log10(se);
+  a.curve(t=>{ const N=Math.pow(10,t); return ly(Math.sqrt(0.25/N)); },{color:C.in,n:200});
+  [[100,0.05],[10000,0.005]].forEach(([N,se])=>{
+    a.point(lx(N),ly(se),{color:C.out,r:4.4});
+    a.note(lx(N),ly(se),`N=${N}`,{fs:11.5,color:C.muted,dx:8,dy:-6});
+  });
+  a.note(lx(30),ly(0.11),'\\mathrm{SE}=\\sqrt{0.25/N}',{tex:true,fs:12.5,color:C.in});
+  return a.svg();
+}
+
+/* The estimate p-hat with its +-2 SE band, at two shot counts, same true p. */
+function figRealBand(){
+  const a = P.Axes(EXG({xr:[0,2],yr:[0.25,0.55],ylabel:'\\hat p',xstep:1,
+    xticksOverride:[0.5,1.5], xtickfmt:()=>''}));
+  const p=0.4, cases=[[0.5,200],[1.5,2000]];
+  cases.forEach(([x,N])=>{
+    const se=Math.sqrt(p*(1-p)/N);
+    a.poly([[x,p-2*se],[x,p+2*se]],{color:C.mid,width:2.4});
+    a.poly([[x-0.12,p-2*se],[x+0.12,p-2*se]],{color:C.mid,width:2.4});
+    a.poly([[x-0.12,p+2*se],[x+0.12,p+2*se]],{color:C.mid,width:2.4});
+    a.point(x,p,{color:C.in,r:5});
+    a.note(x,0.25,`N{=}${N}`,{tex:true,fs:12,color:C.muted,anchor:'middle',dy:22});
+  });
+  a.hline(p,{color:C.muted,dash:'3 4'});
+  a.note(1.98,p,'p=0.4',{tex:true,fs:11.5,color:C.muted,anchor:'end',dy:-6});
+  return a.svg();
+}
+
+/* The Ramsey fringe p(0)=cos^2(phi/2) against the phase, two full periods. */
+function figRealFringe(){
+  const a = P.Axes(EXG({xr:[0,720],yr:[-0.08,1.12],xlabel:'\\varphi\\ (^\\circ)',ylabel:'p(0)',xstep:180}));
+  a.curve(phi=>Math.cos(phi*Math.PI/360)**2,{color:C.in,n:900});
+  [0,180,360,540,720].forEach(phi=>a.vline(phi,{color:C.grid,opacity:0.5}));
+  return a.svg();
+}
+
+/* The fringe run out in time, with its oscillation shrinking inside the T2
+   envelope: the same curve the note beside m5-ramsey names but never draws. */
+function figRealDecay(){
+  const T2=1, domega=6*Math.PI;
+  const a = P.Axes(EXG({xr:[0,2.2],yr:[-1.08,1.08],xlabel:'t/T_{2}',ylabel:'p(0)-p(1)'}));
+  a.curve(t=>Math.exp(-t/T2),{color:C.muted,dash:'4 4',n:300});
+  a.curve(t=>-Math.exp(-t/T2),{color:C.muted,dash:'4 4',n:300});
+  a.curve(t=>Math.exp(-t/T2)*Math.cos(domega*t),{color:C.in,n:900});
+  a.note(1.55,0.55,'e^{-t/T_{2}}',{tex:true,fs:12.5,color:C.muted});
+  return a.svg();
+}
+
+/* Grover success probability against iteration count, N=64, M=1: the peak
+   near the optimum and the overshoot past it. */
+function figRealGrover(){
+  const N=64, M=1, th=Math.asin(Math.sqrt(M/N));
+  const a = P.Axes(EXG({xr:[0,13],yr:[0,1.08],xlabel:'r\\ (\\text{iterations})',ylabel:'P(\\text{success})',xstep:3}));
+  const pts=[]; for(let r=0;r<=13;r++) pts.push([r,Math.sin((2*r+1)*th)**2]);
+  a.poly(pts,{color:C.in,width:2.2});
+  pts.forEach(([r,p])=>a.point(r,p,{color:C.in,r:3.4}));
+  a.point(6,Math.sin(13*th)**2,{color:C.out,r:5});
+  a.note(6,Math.sin(13*th)**2,'r_{*}=6',{tex:true,fs:12,color:C.out,dx:8,dy:-8});
+  return a.svg();
+}
+
+/* Query counts, quantum against classical, over four decades of N. */
+function figRealQueries(){
+  const a = P.Axes(EXG({xr:[Math.log10(16),Math.log10(65536)],yr:[Math.log10(3),Math.log10(35000)],
+    xlabel:'N',ylabel:'\\text{queries}',xticksOverride:[],yticksOverride:[]}));
+  const lx=n=>Math.log10(n);
+  a.curve(t=>Math.log10(Math.PI/4*Math.sqrt(Math.pow(10,t))),{color:C.in,n:200});
+  a.curve(t=>Math.log10(Math.pow(10,t)/2),{color:C.mid,n:200});
+  a.note(lx(40),Math.log10(Math.PI/4*Math.sqrt(65536))-0.05,'\\tfrac{\\pi}{4}\\sqrt{N}',{tex:true,fs:12.5,color:C.in,anchor:'start'});
+  a.note(lx(65536),Math.log10(65536/2)+0.36,'N/2',{tex:true,fs:12.5,color:C.mid,anchor:'end'});
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
@@ -898,6 +996,21 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------- 5.2 real --- */
+realGallery({ id:'m5-real-run', nav:'Running a Circuit Around Us',
+  title:'Running a Circuit Around Us', eyebrow:'Module 5 · Running a circuit',
+  objective:'Show a real control rack running a circuit as finite shots, and see the sampling error shrink and the estimate settle.',
+  keywords:'examples control electronics rack cryostat shots sampling error standard error photo real world running a circuit',
+  photo:['m5_rack','A rack of control electronics with coaxial cables, standing beside a dilution-refrigerator cryostat','The pulses that run a circuit are generated and read out here, one shot at a time; the qubits sit in the cryostat behind it.'],
+  figs:[
+    [figRealShots, 'Standard error of an estimated probability, against shots. It falls as $1/\\sqrt{N}$: a hundred times the shots buys ten times the accuracy.'],
+    [figRealBand, 'The estimate for $p=0.4$ with its $\\pm2\\,\\mathrm{SE}$ band, at two shot counts. Ten times the shots narrows it by $\\sqrt{10}$, not by ten.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A shot is a full run', html:'Every point above cost a complete pass through the rack: prepare, run, read out. A reported probability is really a fraction of shots, with the spread chapter 5 derives.'},
+    {t:'note', kind:'warn', head:'A narrow band is not a correct one', html:'More shots shrink the spread around whatever the hardware produces. A miscalibrated pulse or a bad readout shifts that number and stays shifted, however many shots are taken.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 5.L4 --- */
 { id:'m5-lab-j2', module:'M5', nav:'Laboratory J2 — Deferred Measurement', title:'Laboratory J2 — Deferred Measurement',
   objective:'Let the reader compare measuring first against measuring last and find the one gate that breaks the equivalence.',
@@ -1064,6 +1177,21 @@ const SC = [
           why:'$\\cos^{2}30^{\\circ}=0.75$. The half angle is the step to watch: $\\cos^{2}60^{\\circ}$ would give $0.25$.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------- 5.4 real --- */
+realGallery({ id:'m5-real-ramsey', nav:'Interference Around Us',
+  title:'Interference Around Us', eyebrow:'Module 5 · Interference in a circuit',
+  objective:'Connect the Hadamard-sandwich fringe to the atomic-clock interrogation it is modelled on, and to the decay that limits it.',
+  keywords:'examples atomic clock caesium fountain ramsey fringe interference photo real world coherence time decay',
+  photo:['m5_clock','A caesium-fountain atomic-clock laboratory, with the vacuum chamber and optics that launch and interrogate the atoms','A caesium fountain clock counts the ticks of a caesium transition with a Ramsey sequence, the same phase-to-probability step as the circuit here.'],
+  figs:[
+    [figRealFringe, 'The fringe $p(0)=\\cos^{2}(\\varphi/2)$ against the phase between the two Hadamards, repeating every $360^{\\circ}$.'],
+    [figRealDecay, 'With a small detuning the phase grows with the wait time, so the fringe repeats in $t$. It sits inside a decaying envelope $e^{-t/T_{2}}$, and that envelope is what a coherence time measures.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A clock reads a fringe, not a clock face', html:'An atomic clock steers a probe frequency until the fringe sits at its steepest point, then counts the oscillations of that frequency. The fringe is the fixed point it is locked to.'},
+    {t:'note', kind:'warn', head:'A decaying fringe is not a wrong one', html:'The envelope is not measurement error piling up. It is the atom losing its own phase to its surroundings, and it limits how long one Ramsey sequence can usefully run.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m5-code-ramsey', module:'M5', nav:'Interference in a Circuit in Code', title:'Interference in a Circuit in Code',
@@ -1395,6 +1523,21 @@ const SC = [
           why:'Grover needs $804$ queries, $8.0\\,\\text{ms}$. The classical scan needs $2^{19}=524{,}288$ queries, $5.2\\,\\text{ms}$. The crossing is near $N=2.5\\times10^{6}$.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------- 5.6 real --- */
+realGallery({ id:'m5-real-grover', nav:'Grover Search Around Us',
+  title:'Grover Search Around Us', eyebrow:'Module 5 · Grover search',
+  objective:'Use a library catalogue as the everyday picture of unstructured search, and see the success probability rise and then fall past the optimum.',
+  keywords:'examples library card catalogue drawer search photo real world grover success probability overshoot query',
+  photo:['m5_catalogue','A wall of library card-catalogue drawers, one pulled open','A catalogue is alphabetised: finding a title takes a handful of steps. Grover search assumes that kind of structure is not there.'],
+  figs:[
+    [figRealGrover, 'Success probability against Grover iterations, for one marked candidate among $64$. It peaks near $r_{*}=6$ and falls if the search keeps going past it.'],
+    [figRealQueries, 'Queries needed against list size, log scale. Quantum grows as $\\tfrac{\\pi}{4}\\sqrt{N}$, classical as $N/2$.']
+  ],
+  notes:[
+    {t:'note', kind:'warn', head:'The catalogue is the wrong shape for Grover', html:'Alphabetical order is exactly the structure that lets a search skip most drawers. Grover search is for the opposite case: no order to exploit, only "is this the one?" asked one entry at a time.'},
+    {t:'note', kind:'err', head:'Running it longer is not always better', html:'Past the peak, another iteration turns the state further and the success probability drops. A search stopped at the right count is not the same algorithm left running.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 5.L2 --- */
 { id:'m5-lab-j', module:'M5', nav:'Laboratory J \u2014 Grover Iterations and Overshoot', title:'Laboratory J \u2014 Grover Iterations and Overshoot',

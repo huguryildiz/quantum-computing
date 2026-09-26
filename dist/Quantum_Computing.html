@@ -16196,6 +16196,121 @@ function figGenerator(){
   ]});
 }
 
+/* ---- Around Us: where this section's idea shows up outside the notation.
+   Adapted from the engine's source course (signals-and-systems), with no
+   `src` field: this course does not cite a page for these. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M1', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery: two or three schematic figures beside one photograph.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[
+      {t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}
+    ].concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Malus's law: intensity through two linear polarisers as a function of the
+   angle between their transmission axes. A polariser projects the incoming
+   field onto its own axis, so the transmitted amplitude is the projection of
+   the field and the transmitted intensity is the squared overlap -- the same
+   $|\langle u|v\rangle|^2$ this section defines, with the projector built
+   from the axis rather than from a qubit basis vector. */
+function figMalus(){
+  const a = P.Axes({w:520,h:250,xr:[0,180],yr:[0,1.12],
+    xlabel:'\\theta\\;(\\text{deg})', ylabel:'I/I_{0}',
+    pad:{l:56,r:22,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(t => Math.cos(t*Math.PI/180)**2, {color:C.in, width:2.4, n:400});
+  a.point(0,1,{color:C.out,r:5});
+  a.point(45,0.5,{color:C.mid,r:5});
+  a.point(90,0,{color:C.err,r:5});
+  return a.svg();
+}
+
+/* The same law read as a projector's expectation value: keeping the axis
+   fixed and drawing the transmitted fraction as a bar at three angles most
+   students actually try with two polarising sheets. */
+function figMalusBars(){
+  const a = P.Axes({w:460,h:250,xr:[-0.6,2.6],yr:[0,1.12],
+    ylabel:'I/I_{0}', pad:{l:56,r:20,t:24,b:46}, xticksOverride:[], ytarget:4});
+  const vals=[[0,1,C.out],[1,0.5,C.mid],[2,0,C.err]];
+  vals.forEach(([x,v,col])=> a.rect(x-0.32,0,x+0.32,v,{fill:col}));
+  a.note(0,-0.10,'0^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  a.note(1,-0.10,'45^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  a.note(2,-0.10,'90^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  return a.svg();
+}
+
+/* A prism's refractive index against wavelength, the Cauchy relation for a
+   typical crown glass: n(lambda) = A + B/lambda^2. Every wavelength bends by
+   a different amount because it sees a different eigenvalue of the same
+   dispersion law -- one function, read off at many points of its spectrum,
+   which is exactly what "a function of an operator" means once the operator
+   is diagonal. */
+function figDispersion(){
+  const A = 1.5046, B = 0.00420; // BK7-like Cauchy coefficients, lambda in micrometres
+  const n = lam => A + B/(lam*lam);
+  const a = P.Axes({w:520,h:250,xr:[0.40,0.70],yr:[1.513,1.528],
+    xlabel:'\\lambda\\;(\\mu\\text{m})', ylabel:'n(\\lambda)',
+    pad:{l:64,r:22,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(n, {color:C.in, width:2.4, n:400});
+  const marks = [[0.44,C.h],[0.55,C.mid],[0.66,C.err]];
+  marks.forEach(([lam,col]) => a.point(lam, n(lam), {color:col, r:5}));
+  return a.svg();
+}
+
+/* The rainbow of eigenvalues the prism sorts by: the bend angle from Snell's
+   law at a fixed prism geometry, one point per sample wavelength, coloured to
+   match the visible light it stands for. */
+function figSpectrumBars(){
+  const A = 1.5046, B = 0.00420;
+  const n = lam => A + B/(lam*lam);
+  const apex = 60*Math.PI/180;
+  // minimum-deviation angle for a symmetric pass through a prism of apex angle A:
+  // delta_min = 2*asin(n*sin(A/2)) - A
+  const dev = lam => (2*Math.asin(n(lam)*Math.sin(apex/2)) - apex) * 180/Math.PI;
+  const a = P.Axes({w:460,h:250,xr:[0.40,0.70],yr:[38.5,40.5],
+    xlabel:'\\lambda\\;(\\mu\\text{m})', ylabel:'\\delta_{\\min}\\;(\\text{deg})',
+    pad:{l:60,r:20,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(dev, {color:C.mid, width:2.2, n:300});
+  [[0.44,C.h],[0.55,C.mid],[0.66,C.err]].forEach(([lam,col]) => a.point(lam, dev(lam), {color:col, r:5}));
+  return a.svg();
+}
+
+/* A guitar string's first three normal modes: sin(n*pi*x/L) on a fixed
+   length, the same orthonormal family the notes use for a function space. A
+   plucked string is a superposition of these, and the ear hears the
+   coefficients as the note's harmonics. */
+function figStringModes(){
+  const a = P.Axes({w:520,h:250,xr:[0,1],yr:[-1.25,1.25],
+    xlabel:'x/L', ylabel:'u_{n}(x)', pad:{l:52,r:22,t:24,b:42}, xtarget:4, ytarget:4});
+  a.curve(x=>Math.sin(Math.PI*x), {color:C.in, width:2.4, n:300});
+  a.curve(x=>Math.sin(2*Math.PI*x), {color:C.mid, width:2, dash:'5 4', n:300});
+  a.curve(x=>Math.sin(3*Math.PI*x), {color:C.out, width:1.8, dash:'2 3', n:300});
+  return a.svg();
+}
+
+/* A plucked shape (a triangle, the classic guitar pluck) rebuilt from a
+   truncated sine series, showing the partial sums approach the plucked shape
+   as more modes are kept -- completeness and truncation, read off a string
+   instead of an abstract coefficient list. */
+function figPluckSum(){
+  const pluck = x => x<=0.3 ? x/0.3 : (1-x)/0.7;
+  const coef = n => 2*Math.sin(n*Math.PI*0.3)/(Math.pow(n,2)*Math.PI*Math.PI*0.3*0.7);
+  const partial = (x,N) => { let s=0; for(let n=1;n<=N;n++) s+=coef(n)*Math.sin(n*Math.PI*x); return s; };
+  const a = P.Axes({w:460,h:250,xr:[0,1],yr:[-0.05,1.05],
+    xlabel:'x/L', ylabel:'\\text{shape}', pad:{l:44,r:20,t:24,b:42}, xtarget:4, ytarget:4});
+  a.curve(pluck, {color:C.muted, dash:'5 4', width:1.8, n:300});
+  a.curve(x=>partial(x,3), {color:C.mid, width:1.8, n:300});
+  a.curve(x=>partial(x,12), {color:C.in, width:2.2, n:300});
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
@@ -16480,6 +16595,22 @@ const SC = [
           why:'The two terms are $\\tfrac12$ and $-\\tfrac12$. Any basis gives the same number, and $\\langle 0|1\\rangle=0$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 1.3.R -- */
+realGallery({ id:'m1-real-projector', nav:'Projectors Around Us', title:'Projectors Around Us',
+  eyebrow:'Module 1 · Outer products and projectors',
+  objective:'Read Malus\'s law for two polarising sheets as the squared overlap a projector computes.',
+  keywords:'projector polariser malus law crossed polarisers cosine squared overlap real world example',
+  photo:['m1_polarizer','Two sheets of polarising film held up against a window, one rotated against the other',
+    'Rotating the second sheet against the first dims the light: at ninety degrees almost none gets through.'],
+  figs:[
+    [()=>figMalus(),'A polariser projects incoming light onto its own axis. The transmitted intensity is $I_{0}\\cos^{2}\\theta$, the squared overlap between the two axes.'],
+    [()=>figMalusBars(),'Three settings a student can try by hand: aligned sheets pass everything, sheets at $45^{\\circ}$ pass half, and crossed sheets pass (almost) none.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A polariser is a projector', html:'A sheet keeps the part of the light along its own axis $|u\\rangle$: exactly what $P=|u\\rangle\\langle u|$ does. Intensity survives as $I=I_{0}|\\langle u|v\\rangle|^{2}=I_{0}\\cos^{2}\\theta$.'},
+    {t:'note', kind:'warn', head:'Not a dimmer switch', html:'$\\cos^{2}\\theta$ is not light fading out. It is a projection: what gets through has been rotated onto the second axis.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 1.L-B1 -- */
 { id:'m1-lab-b1', module:'M1', nav:'Laboratory B1 — A Projector, Split and Put Back Together', title:'Laboratory B1 — A Projector, Split and Put Back Together',
@@ -16832,6 +16963,22 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 1.7.R -- */
+realGallery({ id:'m1-real-spectral', nav:'The Spectral Theorem Around Us', title:'The Spectral Theorem Around Us',
+  eyebrow:'Module 1 · The spectral theorem and functions of an operator',
+  objective:'Read a prism\'s spectrum as one dispersion law read off at many wavelengths, the way a function of an operator is its eigenvalues read off one at a time.',
+  keywords:'prism spectrum dispersion refractive index wavelength eigenvalue function of an operator real world example',
+  photo:['m1_prism','A glass prism splitting a beam of white light into a fan of coloured light',
+    'One prism, one law of refraction; the colours separate because each wavelength obeys it by a different amount.'],
+  figs:[
+    [()=>figDispersion(),'The refractive index of a crown-glass prism, $n(\\lambda)=A+B/\\lambda^{2}$. Blue light sees a larger $n$ than red, so it bends more.'],
+    [()=>figSpectrumBars(),'The angle by which the prism bends each wavelength, computed from $n(\\lambda)$ through the prism\'s own geometry. One formula, one output for every colour.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One law, many outputs', html:'In $f(A)=\\sum_{k}f(\\lambda_{k})P_{k}$ $f$ acts on each component alone. The prism applies one law, $n(\\lambda)$, to each wavelength alone.'},
+    {t:'note', kind:'warn', head:'Sorted, not created', html:'The prism sorts colours already in the beam; $f(A)$ keeps the eigenvectors and changes only their numbers. Here $\\lambda$ is a wavelength, not an eigenvalue.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 1.L-B3 -- */
 { id:'m1-lab-b3', module:'M1', nav:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt', title:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt',
   objective:'Let the reader build a Hermitian matrix, find its own spectral decomposition, and drive it to a repeated eigenvalue.',
@@ -16938,6 +17085,22 @@ const SC = [
           why:'The squared error is the sum of the omitted $|c_{n}|^{2}$, here only $|c_{3}|^{2}$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 1.9.R -- */
+realGallery({ id:'m1-real-functions', nav:'Functions as Vectors Around Us', title:'Functions as Vectors Around Us',
+  eyebrow:'Module 1 · Functions as vectors',
+  objective:'Hear a plucked string\'s normal modes as the orthonormal basis this section builds functions out of.',
+  keywords:'guitar string normal modes harmonics fourier series orthonormal basis completeness real world example',
+  photo:['m1_string','A guitar string vibrating after being plucked, its blurred outline showing the range of the motion',
+    'The string\'s shape at every instant is one function; the note you hear is built from a fixed set of others.'],
+  figs:[
+    [()=>figStringModes(),'The first three normal modes of a string fixed at both ends, $\\sin(n\\pi x/L)$. They are mutually orthogonal, the same property the inner product of functions checks.'],
+    [()=>figPluckSum(),'A plucked (triangular) shape, rebuilt from 3 modes and from 12. More terms kept means less squared error left over, exactly as Parseval states.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A pluck is a superposition', html:'The plucked shape is a sum $\\sum_{n}c_{n}\\sin(n\\pi x/L)$ over every mode, with $c_{n}=\\langle u_{n}|f\\rangle$. The ear hears these as the fundamental plus its overtones.'},
+    {t:'note', kind:'warn', head:'A finite sum is already close', html:'A dozen modes already sound right, because the coefficients fall off quickly. That is completeness and truncation, heard rather than computed.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m1-code-functions', module:'M1', nav:'Functions as Vectors in Code', title:'Functions as Vectors in Code',
@@ -17540,6 +17703,117 @@ function figPhaseCircle(){
   return a.svg();
 }
 
+/* ---- "Around Us" galleries, one per section, adapted from the reference
+   course's realGallery (signals-and-systems/build/src/82_scenes_m1.js). Two
+   framed figures on the left, one photo on the right, then one or two notes
+   revealed step by step. Every figure computes its curve or bars from the
+   physics definition rather than drawing a picture of one. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M2', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two everyday examples; each figure is one of them.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo.k]}" alt="${cfg.photo.alt}">`,
+        caption:cfg.photo.cap}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Section 2.1: two photon-counter clicks at a time, so the Born rule's
+   probability is a frequency over many runs, not a value one run returns. */
+function figMalus(){
+  const a = P.Axes({w:520,h:250,xr:[0,180],yr:[0,1.12],
+    xlabel:'\\theta\\;(^\\circ)', ylabel:'P(\\text{click})',
+    pad:{l:56,r:20,t:24,b:44}, xtarget:5, ytarget:4, xstep:45});
+  a.curve(deg => Math.cos(deg*Math.PI/180)**2, {color:C.in, width:2.4, n:400});
+  a.vline(45,{color:C.muted,width:1,dash:'4 4'});
+  a.note(45,1.0,'\\tfrac12',{tex:true,fs:13,color:C.muted,dx:12,dy:-6});
+  return a.svg();
+}
+function figClicks(){
+  /* One fixed angle (45 degrees, p=1/2) and a run of individual detector
+     clicks. Each stem is one shot: 0 or 1, nothing in between. The dashed
+     line is the Born-rule prediction the clicks average toward. */
+  const outcomes = [1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,0,1,0,0,1];
+  const a = P.Axes({w:520,h:250,xr:[0,21],yr:[-0.15,1.25],
+    xlabel:'\\text{shot }k', ylabel:'\\text{outcome}',
+    pad:{l:50,r:20,t:24,b:44}, xtarget:5, ytarget:3, xstep:5, yticksOverride:[0,1]});
+  a.stem(outcomes.map((v,i)=>[i+1,v]),{color:C.mid});
+  a.hline(0.5,{color:C.in,width:1.6,dash:'5 4'});
+  return a.svg();
+}
+
+/* Section 2.6: the proton Larmor frequency is proportional to the field
+   strength, and MRI reads that line out directly. */
+const GYRO_MHZ_PER_T = 42.577; /* proton gyromagnetic ratio, accepted value */
+function figLarmor(){
+  const a = P.Axes({w:520,h:250,xr:[0,3.2],yr:[0,145],
+    xlabel:'B\\;(\\text{T})', ylabel:'f\\;(\\text{MHz})',
+    pad:{l:56,r:20,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(B => GYRO_MHZ_PER_T*B, {color:C.in, width:2.4});
+  [0.5,1.5,3.0].forEach(B=>{ a.point(B,GYRO_MHZ_PER_T*B,{color:C.h,r:4});
+    a.note(B,GYRO_MHZ_PER_T*B,`${(GYRO_MHZ_PER_T*B).toFixed(0)}`,{fs:12,color:C.h,dx:6,dy:-8}); });
+  return a.svg();
+}
+function figPrecess(){
+  /* The Bloch vector precessing about B, a fixed circle at polar angle
+     theta=50 deg, in the equal-pixel-per-unit frame the isotropy trap needs. */
+  const a = P.Axes({w:400,h:260,xr:[-1.3,1.3],yr:[-1.3,1.3],
+    pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+    grid:false, zeroAxes:false, arrows:false});
+  const th = 50*Math.PI/180, r = Math.sin(th);
+  const ring=[]; for(let i=0;i<=160;i++){ const ph=2*Math.PI*i/160;
+    ring.push([r*Math.cos(ph), r*Math.sin(ph)*0.34]); }
+  a.poly(ring,{color:C.grid,width:1.3});
+  a.poly([[0,-1.2],[0,1.2]],{color:C.muted,width:1.4,dash:'3 3'});
+  a.note(0,1.2,'B',{tex:true,fs:13,color:C.muted,dy:-8});
+  const ph0 = Math.PI/5;
+  a.point(r*Math.cos(ph0), r*Math.sin(ph0)*0.34, {color:C.in,r:5});
+  a.poly([[0,0],[r*Math.cos(ph0), r*Math.sin(ph0)*0.34]],{color:C.in,width:2.2});
+  const arc=[]; for(let i=0;i<=30;i++){ const ph=ph0-0.02+ (Math.PI/6)*i/30;
+    arc.push([0.35*r*Math.cos(ph),0.35*r*Math.sin(ph)*0.34]); }
+  a.poly(arc,{color:C.h,width:1.6});
+  return a.svg();
+}
+
+/* Section 2.7: the standard error of a shot-counted probability, and the
+   count total of a random decay process settling into that same square-root
+   law. Both are the binomial standard error, seen from two instruments. */
+function figShotSE(){
+  const a = P.Axes({w:520,h:250,xr:[0,4.3],yr:[-3.4,-0.3],
+    xlabel:'\\log_{10}N', ylabel:'\\log_{10}\\mathrm{SE}',
+    pad:{l:60,r:20,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(k => Math.log10(0.5) - k/2, {color:C.in, width:2.4});
+  [1,2,3,4].forEach(k=>{ const se=0.5*Math.pow(10,-k/2);
+    a.point(k, Math.log10(se), {color:C.h, r:4}); });
+  return a.svg();
+}
+function figGeigerCounts(){
+  /* A simulated Geiger counter: cumulative counts over a fixed live time,
+     mean rate lambda = 4 counts/s, with the +-sqrt(N) band drawn about the
+     expected count. Poisson counting noise is the same square-root law as
+     the binomial standard error above, applied to a count instead of a
+     fraction. */
+  const lam = 4;
+  const a = P.Axes({w:520,h:250,xr:[0,10],yr:[0,55],
+    xlabel:'t\\;(\\text{s})', ylabel:'\\text{counts}',
+    pad:{l:52,r:20,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(t => lam*t, {color:C.muted, width:1.6, dash:'5 4'});
+  a.curve(t => lam*t + Math.sqrt(lam*t), {color:C.h, width:1.3});
+  a.curve(t => Math.max(0, lam*t - Math.sqrt(lam*t)), {color:C.h, width:1.3});
+  /* One fixed count trace, chosen to stay inside the band so the band reads
+     clearly; the caption says a real trace leaves it about a third of the time
+     (verify/around_m2.py checks both). */
+  const steps = [0,4,5,10,10,15,16,22,22,27,27,33,33,39,39];
+  a.stem(steps.map((v,i)=>[i*10/14, v]),{color:C.in});
+  return a.svg();
+}
+
 /* Small glyphs for the project cards, drawn as flat SVG in the dark-page
    tints this scene uses. Sized and styled the way the reference course's
    summary-card sketches are, and defined here rather than in 90_app.js. */
@@ -17659,6 +17933,22 @@ const SC = [
           why:'$|\\langle 0|+\\rangle|=1/\\sqrt2$, so $\\theta=\\pi/4$ and $\\tfrac12\\left(1+\\sin\\tfrac{\\pi}{4}\\right)\\approx 0.854$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 2.1.4b - */
+realGallery({ id:'m2-real-detector', nav:'The Born Rule Around Us',
+  title:'The Born Rule Around Us', eyebrow:'Module 2 · The Born rule',
+  objective:'Show the Born rule as the rule a photon-counting instrument actually obeys.',
+  keywords:'examples single photon detector polarizer malus law click probability born rule shot',
+  photo:{ k:'m2_detector', alt:'A fibre-coupled single-photon detector module on an optical table',
+    cap:'A single-photon detector returns one click or none. Only many runs trace out a probability.' },
+  figs:[
+    [figMalus, 'The chance a photon passes a second polariser at angle $\\theta$ to the first is $\\cos^{2}\\theta$: the same $|\\langle n|\\psi\\rangle|^{2}$ shape as the Born rule.'],
+    [figClicks, 'Twenty simulated single shots at $\\theta=45^{\\circ}$, each a click or nothing. No single shot reads $\\tfrac12$; only the average of many approaches it (dashed line).']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A probability is a long-run frequency', html:'The Born rule predicts a probability. An instrument reports outcomes one at a time; the probability is what the fraction of clicks approaches after many shots, not a number any single shot can return.'},
+    {t:'note', kind:'warn', head:'One click is not evidence of anything', html:'A student who sees three clicks in three tries has not measured $p=1$. The instrument is doing exactly what the Born rule says a small sample does: wandering.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 2.L1 --- */
 { id:'m2-lab-c', module:'M2', nav:'Laboratory C \u2014 Exact Probability and Finite Samples', title:'Laboratory C \u2014 Exact Probability and Finite Samples',
@@ -18130,6 +18420,22 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 2.6.6 -- */
+realGallery({ id:'m2-real-mri', nav:'Dynamics Around Us',
+  title:'Dynamics Around Us', eyebrow:'Module 2 \u00b7 Dynamics',
+  objective:'Connect Hamiltonian evolution and the Larmor precession that an MRI scanner reads out.',
+  keywords:'examples MRI magnetic resonance imaging larmor precession gyromagnetic ratio field strength unitary evolution',
+  photo:{ k:'m2_mri', alt:'The scanner room of a hospital MRI machine, with the patient table beside the bore',
+    cap:'An MRI scanner drives protons with a strong magnetic field and reads the frequency at which they precess.' },
+  figs:[
+    [figLarmor, 'The proton precession frequency $f=\\gamma B$ grows in step with the field strength; clinical scanners run at 0.5, 1.5 or 3 tesla.'],
+    [figPrecess, 'A spin\u2019s Bloch vector precessing about the field direction $B$: the same $U(t)=e^{-iHt}$ that turns a Hamiltonian into a gate.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A frequency, not a picture', html:'What an MRI scanner reads is a precession frequency $f=\\gamma B$, exactly the closed-form evolution of this section applied to a spin instead of a qubit gate.'},
+    {t:'note', kind:'warn', head:'The field, not the tissue, sets the frequency', html:'Two different field strengths give two different precession frequencies on the very same tissue. The image comes from small, deliberate variations in $B$ across the body, not from the frequency being a property of what is imaged.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 2.L2 --- */
 { id:'m2-lab-d', module:'M2', nav:'Laboratory D \u2014 Driving a Qubit', title:'Laboratory D \u2014 Driving a Qubit',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
@@ -18175,6 +18481,22 @@ const SC = [
           why:'$\\sqrt{0.25/10\\,000}=0.5/100=0.005$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 2.7.2 -- */
+realGallery({ id:'m2-real-geiger', nav:'Finite Shots Around Us',
+  title:'Finite Shots Around Us', eyebrow:'Module 2 · Finite shots',
+  objective:'Show the standard-error square-root law on a counting instrument the reader has met outside a laboratory.',
+  keywords:'examples geiger counter radioactive decay poisson counting statistics standard error square root',
+  photo:{ k:'m2_geiger', alt:'A handheld Geiger counter held near a rock sample',
+    cap:'A Geiger counter counts decays one click at a time; the count total has the same $\\sqrt{N}$ spread as a shot count.' },
+  figs:[
+    [figShotSE, 'The standard error of a $p=\\tfrac12$ shot fraction against the shot count, on log axes: half a decade of drop for every decade of shots.'],
+    [figGeigerCounts, 'Counts at 4 counts/s scatter about the mean $\\lambda t$; the band is one standard deviation, $\\pm\\sqrt{\\lambda t}$, and a real trace leaves it about a third of the time.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One counting law, two instruments', html:'A qubit measured $N$ times and a detector counting decays for a time $t$ are both binomial-style counting: the spread of the total grows like $\\sqrt{N}$ (or $\\sqrt{\\lambda t}$), not like $N$ itself.'},
+    {t:'note', kind:'warn', head:'A click is not noise in the bad sense', html:'The clicks arrive at random even from a perfectly working counter. A wider spread than $\\sqrt{N}$ predicts would point to a real problem; the $\\sqrt{N}$ spread itself is just what counting is.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m2-code-shots', module:'M2', nav:'Finite Shots in Code', title:'Finite Shots in Code',
@@ -18815,6 +19137,126 @@ function figSep(){
   return growBlocks({w:560,h:276,items});
 }
 
+/* ---- everyday examples, one gallery slide at the end of three sections. The
+       photo shows the physical thing; the figures are schematic but each is
+       computed from the section's own definition, not drawn by hand. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M3', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of real-world examples; each figure is one worked case.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px 14px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]]}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* A qubit's population and coherence against time, at the ceiling T2 = 2T1: no
+   pure-dephasing term at all, the best a real device can do. */
+function figRealT1T2(){
+  const a = P.Axes({w:560,h:250,xr:[0,3],yr:[0,1.35],
+    xlabel:'t/T_{1}', ylabel:'\\text{value}',
+    pad:{l:64,r:24,t:26,b:46}, xtarget:4, ytarget:4});
+  a.curve(t => Math.exp(-t), {color:C.in, width:2.4});
+  a.curve(t => Math.exp(-t/2), {color:C.mid, width:2.2, dash:'5 4'});
+  /* Both curves are below 0.55 past t/T1 = 1.2, so the strip above that is
+     empty and both names sit in it, well clear of either line. */
+  a.note(1.2,1.22,'\\rho_{11}(t)',{fs:13,color:C.in,tex:true});
+  a.note(2.1,1.22,'|\\rho_{01}(t)|',{fs:13,color:C.mid,tex:true});
+  return a.svg();
+}
+
+/* How many one-qubit gates fit inside T1 before the excited population has
+   fallen to 1/e, at three gate durations. A shorter gate buys more gates for
+   the same T1, and that ratio is exactly what a hardware roadmap reports. */
+function figGateBudget(){
+  const a = P.Axes({w:560,h:250,xr:[0,4.4],yr:[0,2300],
+    ylabel:'\\text{gates before } 1/e', pad:{l:70,r:24,t:26,b:56}, xticksOverride:[], ytarget:4});
+  const T1 = 100e-6;
+  const bar=(k,gate,f,l)=>{ const n=k+0.7, v=T1/gate; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6});
+    a.note(n,v,String(Math.round(v)),{fs:12,color:l,anchor:'middle',dy:-10}); };
+  bar(0,500e-9,C.dec.err,C.err); bar(1,100e-9,C.dec.mid,C.mid); bar(2,50e-9,C.dec.in,C.in);
+  [['500\\,\\text{ns}',0],['100\\,\\text{ns}',1],['50\\,\\text{ns}',2]].forEach(([t,k])=>
+    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  return a.svg();
+}
+
+/* The amplitude array of the down-converted pair, beside the array of a
+   product pair with the same marginal on each side: same figSep test, a
+   different worked case. */
+function figRealSep(){
+  const cell = (x,y,l,on,col) => ({t:'box',x,y,w:100,h:70,label:l,tex:true,fs:17,color:on?col:C.muted});
+  const r = '\\tfrac{1}{\\sqrt2}';
+  const items = [
+    cell(40,52,r,true,C.mid),   cell(140,52,'0',false),
+    cell(40,122,'0',false),     cell(140,122,r,true,C.mid),
+    cell(320,52,'\\tfrac12',true,C.in),  cell(420,52,'\\tfrac12',true,C.in),
+    cell(320,122,'\\tfrac12',true,C.in), cell(420,122,'\\tfrac12',true,C.in),
+    {t:'text',x:140,y:34,label:'\\tfrac{1}{\\sqrt2}(|HV\\rangle+|VH\\rangle)',tex:true,fs:15},
+    {t:'text',x:420,y:34,label:'|{+}\\rangle\\otimes|{+}\\rangle',tex:true,fs:16},
+    {t:'text',x:140,y:226,label:'c_{0}c_{3}-c_{1}c_{2}=\\tfrac12',tex:true,fs:15},
+    {t:'text',x:420,y:226,label:'c_{0}c_{3}-c_{1}c_{2}=0',tex:true,fs:15},
+    {t:'text',x:140,y:258,label:'entangled',fs:13},
+    {t:'text',x:420,y:258,label:'a product',fs:13}
+  ];
+  return growBlocks({w:560,h:276,items});
+}
+
+/* The Schmidt spectrum of the same pair: two equal coefficients, the
+   maximally-entangled case, against a product state's single term. */
+function figRealSchmidtBar(){
+  const a = P.Axes({w:560,h:250,xr:[0,4.4],yr:[0,1.14],
+    ylabel:'\\lambda', pad:{l:64,r:24,t:26,b:56}, xticksOverride:[], ytarget:4});
+  const bar=(k,v,f,l)=>{ const n = k + 0.7; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6}); };
+  bar(0,0.5,C.dec.mid,C.mid); bar(1,0.5,C.dec.mid,C.mid);
+  bar(2,1,C.dec.in,C.in);     bar(3,0,C.dec.in,C.in);
+  [['\\lambda_{1}',0],['\\lambda_{2}',1],['\\lambda_{1}',2],['\\lambda_{2}',3]].forEach(([t,k])=>
+    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  a.note(1.2,0,'\\text{down-converted pair}',{fs:12.5,color:C.mid,anchor:'middle',dy:48,tex:true});
+  a.note(3.2,0,'\\text{a product pair}',{fs:12.5,color:C.in,anchor:'middle',dy:48,tex:true});
+  return a.svg();
+}
+
+/* CHSH against the analyser-angle family this course's chapter already uses,
+   redrawn to carry the two ground-station telescopes' own numbers. */
+function figRealCHSH(){
+  const a = P.Axes({w:560,h:260,xr:[0,90],yr:[0,3.2],
+    xlabel:'\\varphi\\,(\\text{degrees})', ylabel:'S',
+    pad:{l:60,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  const d = Math.PI/180;
+  a.curve(f => 2*(Math.cos(f*d)+Math.sin(f*d)), {color:C.in, width:2.4});
+  a.hline(2,{color:C.err, width:1.8, dash:'5 4'});
+  a.hline(2*Math.SQRT2,{color:C.out, width:1.4, dash:'2 4'});
+  a.point(45,2*Math.SQRT2,{color:C.out,r:6});
+  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(8,1.28,'\\text{classical bound}',{fs:12.5,color:C.err,tex:true});
+  return a.svg();
+}
+
+/* The four correlations that make up S at the optimal angle, beside what the
+   largest classical model can offer at any angle at all: one of the four has
+   to flip sign for a model with fixed answers to reach 2, and no choice of
+   angle lets it reach 2 root 2. */
+function figRealCHSHBars(){
+  const a = P.Axes({w:560,h:250,xr:[0,5.4],yr:[-1.05,1.30],
+    ylabel:'\\text{corr.}', pad:{l:56,r:24,t:26,b:56}, xticksOverride:[], yticksOverride:[-1,-0.5,0,0.5,1]});
+  const r = Math.SQRT1_2;
+  const bar=(k,v,f,l)=>{ const n=k+0.7; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6}); };
+  bar(0,r,C.dec.in,C.in); bar(1,r,C.dec.in,C.in); bar(2,r,C.dec.in,C.in); bar(3,-r,C.dec.in,C.in);
+  ['E(a_0,b_0)','E(a_0,b_1)','E(a_1,b_0)','E(a_1,b_1)'].forEach((t,k)=>
+    a.note(k+0.7,0,t,{fs:11.5,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  a.note(2.4,1.16,'S=2\\sqrt2',{fs:14,color:C.out,anchor:'middle',tex:true});
+  return a.svg();
+}
+
 /* Small sketches for the projects deck, in the dark-page signal tints, styled
    like the summary glyphs of the reference course's m1-projects. */
 const G = (()=>{
@@ -19166,6 +19608,22 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------ 3.4 real --- */
+realGallery({ id:'m3-real-cryostat', nav:'Relaxation and Dephasing Around Us',
+  title:'Relaxation and Dephasing Around Us', eyebrow:'Module 3 · Relaxation and dephasing',
+  objective:'See T1 and T2 as properties of a real, cooled qubit, and see why the gate time and the coherence time are compared, not just T1 alone.',
+  keywords:'examples dilution refrigerator cryostat superconducting qubit T1 T2 coherence time gate count real world',
+  photo:['m3_cryostat','An open dilution refrigerator with gold-plated stages and coaxial cables running down to the coldest plate',
+    'A superconducting qubit sits on the coldest stage, near absolute zero, at the bottom of the wiring shown here.'],
+  figs:[
+    [()=>figRealT1T2(), 'Population and coherence at the best case $T_{2}=2T_{1}$.'],
+    [()=>figGateBudget(), 'Gates before $1/e$, at $T_{1}=100\\,\\mu\\text{s}$, for three gate times.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'Why the cold', html:'Below about $20\\,\\text{mK}$, stray thermal photons cannot flip the qubit on their own.'},
+    {t:'note', kind:'warn', head:'A gate count, not a runtime', html:'A long $T_{1}$ wasted on slow gates buys nothing: compare the gate time against $T_{1}$, not $T_1$ alone.'}
+  ]}),
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-t1t2', module:'M3', nav:'Relaxation and Dephasing in Code', title:'Relaxation and Dephasing in Code',
   objective:'Compute T2 from two rates, print the two decays, and build the continuous decay out of many small channels.',
@@ -19347,6 +19805,22 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------ 3.6 real --- */
+realGallery({ id:'m3-real-crystal', nav:'Separability Around Us',
+  title:'Separability Around Us', eyebrow:'Module 3 · Separability and the Schmidt decomposition',
+  objective:'Apply the product test to the pair of photons a down-conversion crystal produces, and see it fail exactly where the two photons are entangled.',
+  keywords:'examples spontaneous parametric down conversion crystal entangled photon pair product test schmidt determinant real world',
+  photo:['m3_crystal','A blue laser beam pumping a nonlinear crystal, producing two dimmer output beams',
+    'A crystal splits one pump photon into two lower-energy photons; their polarisations come out entangled.'],
+  figs:[
+    [()=>figRealSep(), 'The amplitude array of the down-converted pair beside a product pair. The determinant is nonzero only for the entangled pair.'],
+    [()=>figRealSchmidtBar(), 'The Schmidt spectrum of each pair: two equal terms for the entangled pair, one term for the product pair.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One photon in, two out', html:'Each photon’s own polarisation is undetermined, but the pair’s joint polarisation is fixed: the pattern of $|\\Phi^{+}\\rangle$.'},
+    {t:'note', kind:'warn', head:'Correlated is not entangled', html:'A random fixed polarisation, chosen pair by pair, is correlated too. Only the entangled pair fails the product test in every basis.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 3.L1c -- */
 { id:'m3-lab-f3', module:'M3', nav:'Laboratory F3 — The Product Test on a General State', title:'Laboratory F3 — The Product Test on a General State',
   objective:'Let the reader steer all four amplitudes of a two-qubit state and watch the determinant and the Schmidt coefficients together.',
@@ -19524,6 +19998,22 @@ const SC = [
           why:'Each outcome has probability $\\tfrac12$ and leaves $|0\\rangle$ or $|1\\rangle$, so the average is $\\tfrac12(1)+\\tfrac12(0)=\\tfrac12$, as before.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------ 3.8 real --- */
+realGallery({ id:'m3-real-telescopes', nav:'Bell Correlations Around Us',
+  title:'Bell Correlations Around Us', eyebrow:'Module 3 · Bell correlations',
+  objective:'See the CHSH test as something two distant, timed stations actually run, and see why the timing of the choice is what rules out an ordinary signal.',
+  keywords:'examples telescope ground station free space link CHSH bell test analyser angle distant real world',
+  photo:['m3_telescopes','Two optical ground-station telescopes on distant mountain ridges at dusk',
+    'Each station points a telescope at the other and at a shared source, and each picks its own analyser setting independently.'],
+  figs:[
+    [()=>figRealCHSH(), 'The CHSH value for one family of analyser angles, peaking at $2\\sqrt2$ near $\\varphi=45^{\\circ}$.'],
+    [()=>figRealCHSHBars(), 'The four correlations at the optimal angle: three agree and one changes sign.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'Why the distance and timing matter', html:'Each station picks its setting too close to its own measurement for a light-speed signal to carry the other station’s choice across the gap.'},
+    {t:'note', kind:'warn', head:'A violation is not a message', html:'No setting moves what the other station sees on its own; the correlation shows up only once the two records are compared.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-bell', module:'M3', nav:'Bell Correlations in Code', title:'Bell Correlations in Code',
@@ -20295,6 +20785,144 @@ const PG = (() => {
   };
 })();
 
+/* ---- "Around Us" galleries, one per photographed section. Adapted from the
+   reference course's realGallery (signals-and-systems/build/src/82_scenes_m1.js):
+   a c-8-4 slide, a grid of framed schematic figures on the left, the photo on
+   the right, then one or two notes revealed step by step. Every figure below
+   computes its curve or bars from the physics definition, never from a drawn
+   mnemonic, and every number it or a note states is checked in
+   verify/around_m4.py. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M4', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two or three real-world figures and one photo.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px 14px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]
+      ]}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* 4.1 · a proton's spin precesses about the field at the Larmor frequency
+   f = (gamma/2 pi) B; gamma/2 pi = 42.577 MHz/T is the accepted proton
+   gyromagnetic ratio. Both figures are the one relation, read two ways: the
+   frequency the field sets, and the period that frequency implies. */
+function figLarmor(){
+  const GAMMA = 42.577; // MHz/T, proton gyromagnetic ratio over 2 pi
+  const a = P.Axes({w:270,h:230,xr:[0,8],yr:[0,350],pad:{l:46,r:14,t:16,b:38},
+    xlabel:'B\\;(\\text{T})',ylabel:'f\\;(\\text{MHz})',xstep:2,ytarget:4});
+  a.curve(B=>GAMMA*B,{color:C.in});
+  [1.5,3.0,7.0].forEach(B=>{ a.point(B,GAMMA*B,{color:C.h}); });
+  a.note(0.3,328,'3\\,\\text{T}\\to 128\\,\\text{MHz}',{tex:true,color:C.h,fs:12,anchor:'start'});
+  return a.svg();
+}
+function figLarmorSignal(){
+  const GAMMA = 42.577, B = 3.0, f = GAMMA*B; // MHz, so the period is in ns
+  const a = P.Axes({w:270,h:230,xr:[0,30],yr:[-1.7,1.25],pad:{l:38,r:14,t:16,b:38},
+    xlabel:'t\\;(\\text{ns})',ylabel:'\\langle X\\rangle(t)',xstep:10,ytarget:3});
+  a.curve(t=>Math.cos(2*Math.PI*f*t/1000),{color:C.in,n:900});
+  a.span(0,1000/f,-1.55,'T=7.83\\,\\text{ns}',{tex:true,fs:12});
+  return a.svg();
+}
+
+/* 4.2 · a two-level ion driven by a resonant laser undergoes Rabi flopping,
+   P(1) = sin^2(Omega t / 2). The pulse length sets the rotation angle: a pi
+   pulse is an X gate, a pi/2 pulse is the 50/50 split Laboratory H2 studies.
+   The second figure is the same drive read as a rotation angle theta = Omega t
+   on the Bloch sphere, which is the fact the section is about. */
+function figRabi(){
+  const OMEGA = 2*Math.PI*0.1; // rad/us, a 100 kHz Rabi frequency
+  const a = P.Axes({w:270,h:230,xr:[0,10],yr:[0,1.08],pad:{l:38,r:14,t:16,b:38},
+    xlabel:'t\\;(\\mu\\text{s})',ylabel:'P(1)',xstep:2,ytarget:4});
+  a.curve(t=>Math.sin(OMEGA*t/2)**2,{color:C.in,n:900});
+  a.vline(2.5,{color:C.mid}); a.vline(5.0,{color:C.h});
+  a.note(2.5,1.0,'\\pi/2',{tex:true,color:C.mid,fs:12});
+  a.note(5.0,1.0,'\\pi',{tex:true,color:C.h,fs:12});
+  return a.svg();
+}
+function figRabiAngle(){
+  const OMEGA = 2*Math.PI*0.1; // rad/us
+  const a = P.Axes({w:270,h:230,xr:[0,10],yr:[0,190],pad:{l:42,r:14,t:16,b:38},
+    xlabel:'t\\;(\\mu\\text{s})',ylabel:'\\theta\\;(^{\\circ})',xstep:2,ytarget:4});
+  a.curve(t=>(OMEGA*t)*180/Math.PI,{color:C.mid});
+  a.hline(90,{color:C.mid,dash:'3 4'}); a.hline(180,{color:C.h,dash:'3 4'});
+  a.note(7.6,100,'90^{\\circ}',{tex:true,color:C.mid,fs:12});
+  a.note(7.6,172,'180^{\\circ}',{tex:true,color:C.h,fs:12});
+  return a.svg();
+}
+
+/* 4.5 · a CNOT applied after a Hadamard turns |00> into a Bell state, and a
+   chip's readout reports the two outcomes it keeps: 00 and 11, each half the
+   shots, and never 01 or 10. The second bar chart is the same qubits with the
+   Hadamard alone, before the entangling gate runs: every outcome is then
+   equally likely, which is what shows the CNOT is what ties the two readouts
+   together. Bars, not a curve, because the claim is about four discrete
+   outcomes. */
+function figChipBell(){
+  const probs = [0.5,0,0,0.5]; // |00>,|01>,|10>,|11>, from H(q0) then CNOT(0->1)
+  const a = P.Axes({w:270,h:230,xr:[-0.5,3.5],yr:[0,0.62],pad:{l:38,r:14,t:16,b:44},
+    xlabel:'\\text{outcome}',ylabel:'\\text{probability}',ystep:0.2,
+    xticksOverride:[0,1,2,3], xtickfmt:v=>['00','01','10','11'][v]||''});
+  a.stem(probs.map((p,i)=>[i,p]),{color:C.out,r:0,width:15});
+  return a.svg();
+}
+function figChipNoGate(){
+  const probs = [0.5,0.5,0,0]; // |00>,|01>,|10>,|11>, from H(q0) alone
+  const a = P.Axes({w:270,h:230,xr:[-0.5,3.5],yr:[0,0.62],pad:{l:38,r:14,t:16,b:44},
+    xlabel:'\\text{outcome}',ylabel:'\\text{probability}',ystep:0.2,
+    xticksOverride:[0,1,2,3], xtickfmt:v=>['00','01','10','11'][v]||''});
+  a.stem(probs.map((p,i)=>[i,p]),{color:C.h,r:0,width:15});
+  return a.svg();
+}
+
+const REAL_NMR = realGallery({ id:'m4-real-nmr', nav:'Spin Precession Around Us',
+  title:'Spin Precession Around Us', eyebrow:'Module 4 · The Bloch sphere',
+  objective:'Connect the Bloch-sphere picture to a spin precessing in a magnet.',
+  keywords:'examples nmr mri magnet larmor precession frequency proton gyromagnetic bloch sphere',
+  photo:['m4_nmr','A tall NMR spectrometer magnet in a chemistry laboratory','A proton inside this magnet precesses about its field, the way a Bloch vector turns about the axis a gate rotates it around.'],
+  figs:[
+    [()=>figLarmor(), '$f=(\\gamma/2\\pi)B$, with $\\gamma/2\\pi=42.577\\,\\text{MHz/T}$. A 3 T scanner drives protons near 128 MHz.'],
+    [()=>figLarmorSignal(), 'At 3 T the precession period is $7.83\\,\\text{ns}$ — the sphere’s rotation, timed on a real spin.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One rotation, one axis', html:'The magnet fixes the axis; the field strength fixes the rate. An NMR or MRI scanner reads the angle a real spin has turned through.'},
+    {t:'note', kind:'warn', head:'The picture is for one spin', html:'A sample holds many spins together; a scanner reads their combined signal. This sphere is one qubit — a large ensemble is chapter 3’s density operator.'}
+  ]});
+
+const REAL_IONTRAP = realGallery({ id:'m4-real-iontrap', nav:'Laser-Driven Rotations Around Us',
+  title:'Laser-Driven Rotations Around Us', eyebrow:'Module 4 · Single-qubit gates as rotations',
+  objective:'Show a laser pulse implementing a rotation gate on a trapped-ion qubit.',
+  keywords:'examples ion trap laser rabi oscillation pulse rotation angle gate x gate hadamard',
+  photo:['m4_iontrap','A vacuum chamber with viewports and laser beams crossing at its centre','A trapped ion sits where the beams cross. A pulse of the right length turns its state exactly as a gate turns a point on the sphere.'],
+  figs:[
+    [()=>figRabi(), 'Rabi flopping: $P(1)=\\sin^{2}(\\Omega t/2)$ at $\\Omega/2\\pi=100\\,\\text{kHz}$. A $5\\,\\mu\\text{s}$ pulse is a full flip, an $X$ gate.'],
+    [()=>figRabiAngle(), 'The same drive as a rotation angle $\\theta=\\Omega t$: a $2.5\\,\\mu\\text{s}$ pulse turns the state $90^{\\circ}$.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A pulse is a rotation', html:'The laser sets the rotation axis; the pulse length sets the angle. Choosing a duration is choosing a point on $R_{\\mathbf n}(\\alpha)$.'},
+    {t:'note', kind:'warn', head:'Halfway twice is not once', html:'A $\\pi/2$ pulse gives $P(1)=0.5$, a coin toss — but two of them in a row make one $\\pi$ pulse, $P(1)=1$, because amplitudes add before anything is read.'}
+  ]});
+
+const REAL_CHIP = realGallery({ id:'m4-real-chip', nav:'Entangling Gates Around Us',
+  title:'Entangling Gates Around Us', eyebrow:'Module 4 · Two-qubit gates',
+  objective:'Show a two-qubit gate on real hardware producing the correlated readout a CNOT predicts.',
+  keywords:'examples superconducting chip qubit cnot bell state entanglement readout wire bonds',
+  photo:['m4_chip','A superconducting chip in a gold sample holder with wire bonds','Each square is a qubit; the wires carry the pulses that drive one-qubit rotations and the two-qubit gate between neighbours.'],
+  figs:[
+    [()=>figChipBell(), 'A Hadamard, then a CNOT: the readout keeps only $00$ and $11$, half the shots each — a chip running the two gates that make a Bell pair.'],
+    [()=>figChipNoGate(), 'The Hadamard alone, before the CNOT: $00$ and $01$ are equally likely, and $q_{1}$ is untouched at $0$. The entangling gate is what ties the two readouts together.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A gate, not a wire', html:'The two qubits carry no signal between them at reading time. The correlation is set once, by the gate, before either is read.'},
+    {t:'note', kind:'err', head:'Correlated is not communicating', html:'Reading $00$ or $11$ every time looks like the qubits are talking. Chapter 3’s no-signalling result says they are not: either qubit’s own readout statistics never change.'}
+  ]});
+
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
@@ -20445,6 +21073,9 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 4.1.6 -- */
+REAL_NMR,
+
 /* ---------------------------------------------------------------- 4.L1 --- */
 { id:'m4-lab-h1', module:'M4', nav:'Laboratory H1 — The Point and the Angles', title:'Laboratory H1 — The Point and the Angles',
   objective:'Let the reader set both sphere angles directly and read the overlap with a chosen state off the two column vectors.',
@@ -20565,6 +21196,9 @@ const SC = [
           why:'Three quarter turns are $270^{\\circ}$, which carries $+\\hat{x}$ to $-\\hat{y}$. By matrices, $S^{3}=\\operatorname{diag}(1,-i)$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 4.2.5 -- */
+REAL_IONTRAP,
 
 /* ---------------------------------------------------------------- 4.L2 --- */
 { id:'m4-lab-h2', module:'M4', nav:'Laboratory H2 — One Gate, One Turn', title:'Laboratory H2 — One Gate, One Turn',
@@ -20842,6 +21476,9 @@ const SC = [
           why:'The two qubits change places: $|0\\rangle\\otimes|{+}\\rangle$, which has $q_{1}=0$ in both terms. The input was $\\tfrac{1}{\\sqrt2}(|00\\rangle+|10\\rangle)$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 4.5.5 -- */
+REAL_CHIP,
 
 /* ---------------------------------------------------------------- 4.L3 --- */
 { id:'m4-lab-h3', module:'M4', nav:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit', title:'Laboratory H3 — A Two-Qubit Gate on a Chosen Qubit',
@@ -21768,6 +22405,104 @@ const G = (()=>{
   };
 })();
 
+/* ---- "Around Us" galleries, one a section, adapted from the reference
+   course's realGallery (signals-and-systems/build/src/82_scenes_m1.js).
+   No src field: these scenes carry no textbook anchor of their own, since the
+   photo and its caption are the content, not a page of the syllabus. */
+const EXG = o => Object.assign({w:520,h:230,pad:{l:56,r:22,t:22,b:38},ytarget:3}, o);
+function realGallery(cfg){
+  return { id:cfg.id, module:'M5', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two everyday examples; each figure is one worked case.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]
+      ]}].concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Shot-noise SE against N at p=0.5, log-log so 1/sqrt(N) is a straight line. */
+function figRealShots(){
+  const a = P.Axes(EXG({xr:[Math.log10(20),Math.log10(20000)],yr:[Math.log10(0.003),Math.log10(0.13)],
+    xlabel:'N\\ (\\text{shots})', ylabel:'\\mathrm{SE}(\\hat p)', xticksOverride:[], yticksOverride:[]}));
+  const lx=n=>Math.log10(n), ly=se=>Math.log10(se);
+  a.curve(t=>{ const N=Math.pow(10,t); return ly(Math.sqrt(0.25/N)); },{color:C.in,n:200});
+  [[100,0.05],[10000,0.005]].forEach(([N,se])=>{
+    a.point(lx(N),ly(se),{color:C.out,r:4.4});
+    a.note(lx(N),ly(se),`N=${N}`,{fs:11.5,color:C.muted,dx:8,dy:-6});
+  });
+  a.note(lx(30),ly(0.11),'\\mathrm{SE}=\\sqrt{0.25/N}',{tex:true,fs:12.5,color:C.in});
+  return a.svg();
+}
+
+/* The estimate p-hat with its +-2 SE band, at two shot counts, same true p. */
+function figRealBand(){
+  const a = P.Axes(EXG({xr:[0,2],yr:[0.25,0.55],ylabel:'\\hat p',xstep:1,
+    xticksOverride:[0.5,1.5], xtickfmt:()=>''}));
+  const p=0.4, cases=[[0.5,200],[1.5,2000]];
+  cases.forEach(([x,N])=>{
+    const se=Math.sqrt(p*(1-p)/N);
+    a.poly([[x,p-2*se],[x,p+2*se]],{color:C.mid,width:2.4});
+    a.poly([[x-0.12,p-2*se],[x+0.12,p-2*se]],{color:C.mid,width:2.4});
+    a.poly([[x-0.12,p+2*se],[x+0.12,p+2*se]],{color:C.mid,width:2.4});
+    a.point(x,p,{color:C.in,r:5});
+    a.note(x,0.25,`N{=}${N}`,{tex:true,fs:12,color:C.muted,anchor:'middle',dy:22});
+  });
+  a.hline(p,{color:C.muted,dash:'3 4'});
+  a.note(1.98,p,'p=0.4',{tex:true,fs:11.5,color:C.muted,anchor:'end',dy:-6});
+  return a.svg();
+}
+
+/* The Ramsey fringe p(0)=cos^2(phi/2) against the phase, two full periods. */
+function figRealFringe(){
+  const a = P.Axes(EXG({xr:[0,720],yr:[-0.08,1.12],xlabel:'\\varphi\\ (^\\circ)',ylabel:'p(0)',xstep:180}));
+  a.curve(phi=>Math.cos(phi*Math.PI/360)**2,{color:C.in,n:900});
+  [0,180,360,540,720].forEach(phi=>a.vline(phi,{color:C.grid,opacity:0.5}));
+  return a.svg();
+}
+
+/* The fringe run out in time, with its oscillation shrinking inside the T2
+   envelope: the same curve the note beside m5-ramsey names but never draws. */
+function figRealDecay(){
+  const T2=1, domega=6*Math.PI;
+  const a = P.Axes(EXG({xr:[0,2.2],yr:[-1.08,1.08],xlabel:'t/T_{2}',ylabel:'p(0)-p(1)'}));
+  a.curve(t=>Math.exp(-t/T2),{color:C.muted,dash:'4 4',n:300});
+  a.curve(t=>-Math.exp(-t/T2),{color:C.muted,dash:'4 4',n:300});
+  a.curve(t=>Math.exp(-t/T2)*Math.cos(domega*t),{color:C.in,n:900});
+  a.note(1.55,0.55,'e^{-t/T_{2}}',{tex:true,fs:12.5,color:C.muted});
+  return a.svg();
+}
+
+/* Grover success probability against iteration count, N=64, M=1: the peak
+   near the optimum and the overshoot past it. */
+function figRealGrover(){
+  const N=64, M=1, th=Math.asin(Math.sqrt(M/N));
+  const a = P.Axes(EXG({xr:[0,13],yr:[0,1.08],xlabel:'r\\ (\\text{iterations})',ylabel:'P(\\text{success})',xstep:3}));
+  const pts=[]; for(let r=0;r<=13;r++) pts.push([r,Math.sin((2*r+1)*th)**2]);
+  a.poly(pts,{color:C.in,width:2.2});
+  pts.forEach(([r,p])=>a.point(r,p,{color:C.in,r:3.4}));
+  a.point(6,Math.sin(13*th)**2,{color:C.out,r:5});
+  a.note(6,Math.sin(13*th)**2,'r_{*}=6',{tex:true,fs:12,color:C.out,dx:8,dy:-8});
+  return a.svg();
+}
+
+/* Query counts, quantum against classical, over four decades of N. */
+function figRealQueries(){
+  const a = P.Axes(EXG({xr:[Math.log10(16),Math.log10(65536)],yr:[Math.log10(3),Math.log10(35000)],
+    xlabel:'N',ylabel:'\\text{queries}',xticksOverride:[],yticksOverride:[]}));
+  const lx=n=>Math.log10(n);
+  a.curve(t=>Math.log10(Math.PI/4*Math.sqrt(Math.pow(10,t))),{color:C.in,n:200});
+  a.curve(t=>Math.log10(Math.pow(10,t)/2),{color:C.mid,n:200});
+  a.note(lx(40),Math.log10(Math.PI/4*Math.sqrt(65536))-0.05,'\\tfrac{\\pi}{4}\\sqrt{N}',{tex:true,fs:12.5,color:C.in,anchor:'start'});
+  a.note(lx(65536),Math.log10(65536/2)+0.36,'N/2',{tex:true,fs:12.5,color:C.mid,anchor:'end'});
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
@@ -22014,6 +22749,21 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------- 5.2 real --- */
+realGallery({ id:'m5-real-run', nav:'Running a Circuit Around Us',
+  title:'Running a Circuit Around Us', eyebrow:'Module 5 · Running a circuit',
+  objective:'Show a real control rack running a circuit as finite shots, and see the sampling error shrink and the estimate settle.',
+  keywords:'examples control electronics rack cryostat shots sampling error standard error photo real world running a circuit',
+  photo:['m5_rack','A rack of control electronics with coaxial cables, standing beside a dilution-refrigerator cryostat','The pulses that run a circuit are generated and read out here, one shot at a time; the qubits sit in the cryostat behind it.'],
+  figs:[
+    [figRealShots, 'Standard error of an estimated probability, against shots. It falls as $1/\\sqrt{N}$: a hundred times the shots buys ten times the accuracy.'],
+    [figRealBand, 'The estimate for $p=0.4$ with its $\\pm2\\,\\mathrm{SE}$ band, at two shot counts. Ten times the shots narrows it by $\\sqrt{10}$, not by ten.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A shot is a full run', html:'Every point above cost a complete pass through the rack: prepare, run, read out. A reported probability is really a fraction of shots, with the spread chapter 5 derives.'},
+    {t:'note', kind:'warn', head:'A narrow band is not a correct one', html:'More shots shrink the spread around whatever the hardware produces. A miscalibrated pulse or a bad readout shifts that number and stays shifted, however many shots are taken.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 5.L4 --- */
 { id:'m5-lab-j2', module:'M5', nav:'Laboratory J2 — Deferred Measurement', title:'Laboratory J2 — Deferred Measurement',
   objective:'Let the reader compare measuring first against measuring last and find the one gate that breaks the equivalence.',
@@ -22180,6 +22930,21 @@ const SC = [
           why:'$\\cos^{2}30^{\\circ}=0.75$. The half angle is the step to watch: $\\cos^{2}60^{\\circ}$ would give $0.25$.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------- 5.4 real --- */
+realGallery({ id:'m5-real-ramsey', nav:'Interference Around Us',
+  title:'Interference Around Us', eyebrow:'Module 5 · Interference in a circuit',
+  objective:'Connect the Hadamard-sandwich fringe to the atomic-clock interrogation it is modelled on, and to the decay that limits it.',
+  keywords:'examples atomic clock caesium fountain ramsey fringe interference photo real world coherence time decay',
+  photo:['m5_clock','A caesium-fountain atomic-clock laboratory, with the vacuum chamber and optics that launch and interrogate the atoms','A caesium fountain clock counts the ticks of a caesium transition with a Ramsey sequence, the same phase-to-probability step as the circuit here.'],
+  figs:[
+    [figRealFringe, 'The fringe $p(0)=\\cos^{2}(\\varphi/2)$ against the phase between the two Hadamards, repeating every $360^{\\circ}$.'],
+    [figRealDecay, 'With a small detuning the phase grows with the wait time, so the fringe repeats in $t$. It sits inside a decaying envelope $e^{-t/T_{2}}$, and that envelope is what a coherence time measures.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A clock reads a fringe, not a clock face', html:'An atomic clock steers a probe frequency until the fringe sits at its steepest point, then counts the oscillations of that frequency. The fringe is the fixed point it is locked to.'},
+    {t:'note', kind:'warn', head:'A decaying fringe is not a wrong one', html:'The envelope is not measurement error piling up. It is the atom losing its own phase to its surroundings, and it limits how long one Ramsey sequence can usefully run.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m5-code-ramsey', module:'M5', nav:'Interference in a Circuit in Code', title:'Interference in a Circuit in Code',
@@ -22511,6 +23276,21 @@ const SC = [
           why:'Grover needs $804$ queries, $8.0\\,\\text{ms}$. The classical scan needs $2^{19}=524{,}288$ queries, $5.2\\,\\text{ms}$. The crossing is near $N=2.5\\times10^{6}$.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------- 5.6 real --- */
+realGallery({ id:'m5-real-grover', nav:'Grover Search Around Us',
+  title:'Grover Search Around Us', eyebrow:'Module 5 · Grover search',
+  objective:'Use a library catalogue as the everyday picture of unstructured search, and see the success probability rise and then fall past the optimum.',
+  keywords:'examples library card catalogue drawer search photo real world grover success probability overshoot query',
+  photo:['m5_catalogue','A wall of library card-catalogue drawers, one pulled open','A catalogue is alphabetised: finding a title takes a handful of steps. Grover search assumes that kind of structure is not there.'],
+  figs:[
+    [figRealGrover, 'Success probability against Grover iterations, for one marked candidate among $64$. It peaks near $r_{*}=6$ and falls if the search keeps going past it.'],
+    [figRealQueries, 'Queries needed against list size, log scale. Quantum grows as $\\tfrac{\\pi}{4}\\sqrt{N}$, classical as $N/2$.']
+  ],
+  notes:[
+    {t:'note', kind:'warn', head:'The catalogue is the wrong shape for Grover', html:'Alphabetical order is exactly the structure that lets a search skip most drawers. Grover search is for the opposite case: no order to exploit, only "is this the one?" asked one entry at a time.'},
+    {t:'note', kind:'err', head:'Running it longer is not always better', html:'Past the peak, another iteration turns the state further and the success probability drops. A search stopped at the right count is not the same algorithm left running.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 5.L2 --- */
 { id:'m5-lab-j', module:'M5', nav:'Laboratory J \u2014 Grover Iterations and Overshoot', title:'Laboratory J \u2014 Grover Iterations and Overshoot',
@@ -23372,6 +24152,103 @@ function figLadder(){
   ]});
 }
 
+/* ==== Around Us figures — one gallery slide at the end of three sections.
+   The figures below are schematic but true: each is computed from the same
+   definitions the teaching scenes use (`qpeProb`, `orderOf`, `gcd`), not
+   drawn from a table. ==== */
+
+/* Phase estimation, read as a tuning fork reads a pitch: the register never
+   lands on the true phase unless it happens to be an exact t-bit fraction,
+   but it always piles most of the probability onto the nearest reading. */
+function figForksSpread(){
+  const phi = 0.27, t = 4, Q = 1<<t;
+  const a = P.Axes({w:520,h:260,xr:[-0.02,1.02],yr:[0,0.62],
+    xlabel:'y/2^{t}', ylabel:'P(y)',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,0.2,0.4,0.6]});
+  const pts=[]; for(let y=0;y<Q;y++) pts.push([y/Q, qpeProb(phi,t,y)]);
+  a.stem(pts,{color:C.in,r:4});
+  const near = Math.round(phi*Q);
+  a.point(near/Q, qpeProb(phi,t,near), {color:C.out,r:6});
+  a.vline(phi,{color:C.err,width:1.4,dash:'4 4'});
+  a.note(phi+0.02,0.58,'\\varphi = 0.27',{fs:12,color:C.err,anchor:'start',tex:true});
+  return a.svg();
+}
+/* The floor is the physics, not the luck of one example: for every phase and
+   a fixed register size, the two nearest readings together never fall below
+   8/pi^2, the same bound m6-qpeprec states. Swept here over 400 phases. */
+function figForksFloor(){
+  const t = 4, Q = 1<<t, floor = 8/(Math.PI*Math.PI);
+  const a = P.Axes({w:520,h:260,xr:[0,1],yr:[0.75,1.02],
+    xlabel:'\\varphi', ylabel:'\\text{top two outcomes}',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0.75,0.811,0.9,1.0]});
+  a.curve(phi=>{
+    const probs=[]; for(let y=0;y<Q;y++) probs.push(qpeProb(phi,t,y));
+    probs.sort((x,y)=>y-x); return probs[0]+probs[1];
+  }, {color:C.in, n:400});
+  a.hline(floor, {color:C.err,width:1.4,dash:'4 4'});
+  a.note(0.55,0.775,'8/\\pi^{2} = 0.811',{fs:12,color:C.err,anchor:'start',tex:true});
+  return a.svg();
+}
+
+/* Order finding, read as a gear train: multiplying by a modulo N is one turn
+   of the mechanism, and it returns to the start after r turns whatever N and
+   a are, the same computation figOrder uses with a different pair. */
+function figGearsCycle(){
+  const N = 15, a0 = 7, r = orderOf(a0,N);
+  const pts=[]; let x=1;
+  for(let k=0;k<=10;k++){ pts.push([k,x]); x=(x*a0)%N; }
+  const a = P.Axes({w:520,h:260,xr:[0,10],yr:[0,15.8],
+    xlabel:'k', ylabel:'7^{k} \\bmod 15',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,4,8,12]});
+  a.stem(pts,{color:C.in,r:4.6});
+  for(let k=0;k<=10;k+=r) a.point(k,1,{color:C.out,r:6});
+  a.span(0,r,13.8,'r = '+r,{color:C.out,fs:13,tex:true});
+  return a.svg();
+}
+/* The order is a property of the base as much as of the modulus: sweeping a
+   over every value coprime to 15 gives orders of very different lengths, the
+   gear analogy for six forks each ringing a different, fixed number of beats
+   before the whole train realigns. */
+function figGearsSpread(){
+  const N = 15, bases=[]; for(let x=1;x<N;x++) if(gcd(x,N)===1) bases.push(x);
+  const pts = bases.map((x,i)=>[i,orderOf(x,N)]);
+  const a = P.Axes({w:520,h:260,xr:[-0.5,bases.length-0.5],yr:[0,5],
+    xlabel:'a', ylabel:'\\text{order of }a\\text{ mod }15',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:8, xticksOverride:bases.map((_,i)=>i),
+    xtickfmt:(v)=>String(bases[Math.round(v)]??''), yticksOverride:[0,1,2,4]});
+  a.stem(pts,{color:C.in,r:4.6});
+  return a.svg();
+}
+
+/* Factoring, read against the data centre it protects: the classical route
+   through the modulus (trial division, about sqrt(N) = 2^{L/2} steps) and
+   the arithmetic order finding needs (about L^3 gates, m6-modexp's own
+   scaling) against the size of the modulus in bits. */
+function figDataGrowth(){
+  const a = P.Axes({w:520,h:260,xr:[0,256],yr:[0,42],
+    xlabel:'L\\,(\\text{bits of }N)', ylabel:'\\log_{10}(\\text{steps})',
+    pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,10,20,30,40]});
+  a.curve(L=>L>0? (L/2)*Math.log10(2) : null, {color:C.err,width:2.4});
+  a.curve(L=>L>0? 3*Math.log10(L) : null, {color:C.out,width:2.4});
+  a.note(6,34,'\\text{trial division: }2^{L/2}',{fs:12,color:C.err,anchor:'start',tex:true});
+  a.note(6,18,'\\text{order finding: }L^{3}',{fs:12,color:C.out,anchor:'start',tex:true});
+  return a.svg();
+}
+/* The one classical step in Shor's own procedure, shown as what it is: two
+   greatest-common-divisor computations turning one order into two factors.
+   Same N=21, a=2, r=6 the m6-shor worked example already states and checks. */
+function figDataGcd(){
+  const rows = [['a^{r/2}-1=7','\\gcd(7,21)=7',C.in],['a^{r/2}+1=9','\\gcd(9,21)=3',C.h]];
+  const items=[];
+  rows.forEach(([lab,glab,col],i)=>{
+    const y=20+i*100;
+    items.push({t:'text',x:130,y:y+18,anchor:'middle',label:lab,tex:true,fs:15,color:C.muted});
+    items.push({t:'text',x:280,y:y+18,anchor:'middle',label:'\\to',tex:true,fs:15,color:C.muted});
+    items.push({t:'box',x:330,y,w:150,h:44,label:glab,tex:true,fs:14,color:col});
+  });
+  return growBlocks({w:520,h:220,items});
+}
+
 /* Small sketches for the projects cards. The projects page is dark, so they
    are drawn in the dark-page signal tints, the same four used throughout this
    file's figures. Modelled on the equivalent block in the reference course;
@@ -23393,6 +24270,73 @@ const G6 = (() => {
       +`<circle cx="62" cy="22" r="4" fill="${AM}"/>`)
   };
 })();
+
+/* ==== Around Us — one gallery slide at the end of three sections. Adapted
+   from the reference course's realGallery (signals-and-systems, 82_scenes_m1.js):
+   no `src` field, module fixed to M6. ==== */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M6', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two figures and a photo; each figure is one example.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:(cfg.photos ? [{t:'grid', cols:cfg.photos.length, gap:'12px 14px', items:cfg.photos.map(([k,alt,cap])=>
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[k]}" alt="${alt}">`, caption:cap}])}] : [])
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* ---------------------------------------------------------------- 6.5.6 -- */
+const M6_REAL_FORKS = realGallery({ id:'m6-real-forks', nav:'Phase Estimation Around Us',
+  title:'Phase Estimation Around Us', eyebrow:'Module 6 · Phase estimation',
+  objective:'Connect reading off a fixed pitch or frequency to the way phase estimation reads off a fixed phase.',
+  keywords:'examples tuning fork pitch frequency reading register precision phase estimation everyday',
+  photos:[['m6_forks','A row of six graded steel tuning forks of different sizes standing on wooden blocks',
+    'Each fork is built to ring at one fixed pitch. Phase estimation is the same kind of reading: naming a fixed number as precisely as the instrument allows.']],
+  figs:[
+    [()=>figForksSpread(), 'A phase that is not an exact fraction of the register: the reading spreads over several outcomes, but almost all of it piles onto the one nearest the truth (green).'],
+    [()=>figForksFloor(), 'The two nearest outcomes together, for every possible phase, at a fixed register size. The curve never dips below $8/\\pi^{2}$: the guarantee is a property of the method, not of a lucky phase.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A count, not a spectrum', html:'A fork gives you one number, its pitch. Phase estimation returns one register reading, and $8/\\pi^{2}\\approx0.811$ is how often it is one of the two closest to the truth.'},
+    {t:'note', kind:'warn', head:'More qubits is a finer scale', html:'A longer row of forks only narrows which one you are nearest to; more counting qubits narrow the reading the same way, without making it exact.'}
+  ]});
+
+/* ---------------------------------------------------------------- 6.6.6 -- */
+const M6_REAL_GEARS = realGallery({ id:'m6-real-gears', nav:'Order Finding Around Us',
+  title:'Order Finding Around Us', eyebrow:'Module 6 · Order finding',
+  objective:'Connect a meshing gear train returning to its starting alignment to the order of a modular multiplication.',
+  keywords:'examples clock gears mechanism teeth cycle period order finding everyday interlocking',
+  photos:[['m6_gears','Interlocking brass gears of different tooth counts inside an old clock mechanism',
+    'Gears with different tooth counts realign only after a fixed number of turns, the mechanical version of an order.']],
+  figs:[
+    [()=>figGearsCycle(), 'Repeated multiplication by $7$ modulo $15$: the sequence returns to $1$ after $r=4$ steps (green), then repeats.'],
+    [()=>figGearsSpread(), 'The order of $a$ modulo $15$ for every $a$ coprime to $15$. Some bases cycle back in one step, others in four.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'The period is the point', html:'A twelve-tooth gear meshed with an eight-tooth one realigns every $\\mathrm{lcm}(12,8)=24$ teeth; order finding computes the modular version, $a^{r}\\equiv1\\pmod N$.'},
+    {t:'note', kind:'warn', head:'Size is the difficulty', html:'$N=15$ is short enough to draw; real moduli have hundreds of digits, where walking the cycle classically is the step order finding replaces.'}
+  ]});
+
+/* ---------------------------------------------------------------- 6.7.7 -- */
+const M6_REAL_DATACENTRE = realGallery({ id:'m6-real-datacentre', nav:'Factoring Around Us',
+  title:'Factoring Around Us', eyebrow:'Module 6 · Factoring and period finding',
+  objective:'Connect public-key cryptography in data centres to the classical-versus-quantum cost gap that order finding opens.',
+  keywords:'examples data centre server racks rsa keys encryption factoring cost gcd everyday',
+  photos:[['m6_datacentre','A data-centre aisle lined with tall server racks, cabling running along the ceiling',
+    'Public-key schemes such as RSA secure links to machines like these; RSA rests on a modulus that is hard to factor.']],
+  figs:[
+    [()=>figDataGrowth(), 'Steps against the modulus size: trial division ($2^{L/2}$, red) against the arithmetic order finding needs ($L^{3}$, green). The gap widens with every added bit.'],
+    [()=>figDataGcd(), 'The one classical step that turns an order into two factors: two gcd computations, for the $N=21$, $r=6$ example already checked on the order-finding pages.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One step changes, four do not', html:'Choosing the base, the two gcd computations and the classical check are ordinary arithmetic; order finding is the one piece no known classical method does quickly at RSA sizes.'},
+    {t:'note', kind:'warn', head:'A simpler baseline than the real attack', html:'Trial division is plotted because it states cleanly; the number field sieve that real attacks use is much faster, yet its cost still grows faster than any power of $L$.'}
+  ]});
 
 const SC = [
 
@@ -24333,7 +25277,9 @@ const SC = [
   {t:'reveal', at:1, items:[
     {t:'note', kind:'ok', head:'The check that catches most of it', html:'Probabilities add to one, an amplitude of a balanced function averages to exactly zero, a phase-estimation distribution puts at least $8/\\pi^{2}$ on the two nearest outcomes, a candidate order is confirmed by one modular exponentiation, and a query count is never quoted as a time. Five one-line tests, and between them they catch nearly every slip this chapter can produce.'}
   ]}
-]}
+]},
+
+M6_REAL_FORKS, M6_REAL_GEARS, M6_REAL_DATACENTRE
 
 ];
 
@@ -24414,15 +25360,15 @@ CONTENT.SECTIONS = {
     { n:'1.2', title:'Amplitude, phase and interference', ids:[
         'm1-amp','m1-phase','m1-lab-a','m1-code-phase'] },
     { n:'1.3', title:'Outer products and projectors',     ids:[
-        'm1-outer','m1-proj','m1-resid','m1-lab-b1','m1-code-proj'] },
+        'm1-outer','m1-proj','m1-resid','m1-real-projector','m1-lab-b1','m1-code-proj'] },
     { n:'1.4', title:'Building an orthonormal basis',     ids:['m1-gs','m1-lab-b','m1-code-gs'] },
     { n:'1.5', title:'The tensor product',                ids:['m1-tensor','m1-expo','m1-code-tensor'] },
     { n:'1.6', title:'Hermitian and unitary operators',   ids:[
         'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle','m1-lab-b2','m1-code-herm'] },
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
-        'm1-eig','m1-spectral','m1-fofa','m1-lab-b3','m1-code-spectral'] },
+        'm1-eig','m1-spectral','m1-fofa','m1-real-spectral','m1-lab-b3','m1-code-spectral'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac','m1-code-dirac'] },
-    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness','m1-code-functions'] },
+    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness','m1-real-functions','m1-code-functions'] },
     { n:'1.10', title:'Summary and practice',             ids:['m1-quick','m1-synth','m1-projects','m1-shapes'] }
   ],
 
@@ -24434,7 +25380,7 @@ CONTENT.SECTIONS = {
   M2: [
     { n:'2.0', title:'Opening',                           ids:['m2-open'] },
     { n:'2.1', title:'The Born rule',                     ids:[
-        'm2-born','m2-bases','m2-distinguish','m2-lab-c','m2-code-born'] },
+        'm2-born','m2-bases','m2-distinguish','m2-real-detector','m2-lab-c','m2-code-born'] },
     { n:'2.2', title:'Projective measurement',            ids:[
         'm2-proj','m2-collapse','m2-povm','m2-lab-d1','m2-code-measure'] },
     { n:'2.3', title:'Observables',                       ids:['m2-obs','m2-var','m2-code-obs'] },
@@ -24443,9 +25389,9 @@ CONTENT.SECTIONS = {
     { n:'2.5', title:'The Pauli algebra',                 ids:[
         'm2-pauli','m2-paulialg','m2-ndotsigma','m2-lab-d3','m2-code-pauli'] },
     { n:'2.6', title:'Dynamics',                          ids:[
-        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d',
+        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-real-mri','m2-lab-d',
         'm2-code-dynamics'] },
-    { n:'2.7', title:'Finite shots',                      ids:['m2-shots','m2-code-shots'] },
+    { n:'2.7', title:'Finite shots',                      ids:['m2-shots','m2-real-geiger','m2-code-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:[
         'm2-quick','m2-synth','m2-projects','m2-shapes'] }
   ],
@@ -24464,15 +25410,15 @@ CONTENT.SECTIONS = {
     { n:'3.2', title:'Purity and the ball of states',     ids:['m3-purity','m3-ball','m3-lab-f1','m3-code-purity'] },
     { n:'3.3', title:'Quantum channels',                  ids:[
         'm3-kraus','m3-damp','m3-dephase','m3-lab-e','m3-code-channels'] },
-    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2','m3-code-t1t2'] },
+    { n:'3.4', title:'Relaxation and dephasing',          ids:['m3-t1t2','m3-real-cryostat','m3-code-t1t2'] },
     { n:'3.5', title:'Composite systems and the partial trace', ids:[
         'm3-order','m3-ptrace','m3-local','m3-lab-f2','m3-code-ptrace'] },
     { n:'3.6', title:'Separability and the Schmidt decomposition', ids:[
-        'm3-sep','m3-schmidt','m3-svd','m3-lab-f3','m3-code-schmidt'] },
+        'm3-sep','m3-schmidt','m3-svd','m3-real-crystal','m3-lab-f3','m3-code-schmidt'] },
     { n:'3.7', title:'Entropy',                           ids:['m3-entropy','m3-lab-f4','m3-code-entropy'] },
     { n:'3.8', title:'Bell correlations',                 ids:[
         'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig',
-        'm3-code-bell'] },
+        'm3-real-telescopes','m3-code-bell'] },
     { n:'3.9', title:'Summary and practice',              ids:['m3-quick','m3-synth','m3-projects','m3-shapes'] }
   ],
 
@@ -24486,14 +25432,14 @@ CONTENT.SECTIONS = {
   M4: [
     { n:'4.0', title:'Opening',                           ids:['m4-open'] },
     { n:'4.1', title:'The Bloch sphere',                  ids:[
-        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover','m4-lab-h1','m4-code-sphere'] },
+        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover','m4-real-nmr','m4-lab-h1','m4-code-sphere'] },
     { n:'4.2', title:'Single-qubit gates as rotations',   ids:[
-        'm4-rot','m4-pauli','m4-had','m4-phase','m4-lab-h2','m4-code-rotations'] },
+        'm4-rot','m4-pauli','m4-had','m4-phase','m4-real-iontrap','m4-lab-h2','m4-code-rotations'] },
     { n:'4.3', title:'Composing gates',                   ids:[
         'm4-time','m4-euler','m4-ugate','m4-lab-g','m4-code-compose'] },
     { n:'4.4', title:'Reversible embeddings',             ids:['m4-rev','m4-toffoli','m4-code-reversible'] },
     { n:'4.5', title:'Two-qubit gates',                   ids:[
-        'm4-order','m4-cnot','m4-cz','m4-swap','m4-lab-h3','m4-code-twoqubit'] },
+        'm4-order','m4-cnot','m4-cz','m4-swap','m4-real-chip','m4-lab-h3','m4-code-twoqubit'] },
     { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h','m4-code-entangle'] },
     { n:'4.7', title:'Universality',                      ids:['m4-univ','m4-lab-h4','m4-code-univ'] },
     { n:'4.8', title:'Summary and practice',              ids:['m4-quick','m4-synth','m4-projects','m4-shapes'] }
@@ -24517,15 +25463,15 @@ CONTENT.SECTIONS = {
     { n:'5.1', title:'The circuit model',                 ids:[
         'm5-circuit','m5-model','m5-read','m5-depth','m5-lab-j1','m5-code-circuit'] },
     { n:'5.2', title:'Running a circuit',                 ids:[
-        'm5-state','m5-shots','m5-measure','m5-feed','m5-lab-j2','m5-code-run'] },
+        'm5-state','m5-shots','m5-measure','m5-feed','m5-real-run','m5-lab-j2','m5-code-run'] },
     { n:'5.3', title:'Compiling for a machine',           ids:[
         'm5-iset','m5-transpile','m5-cost','m5-fault','m5-lab-j3','m5-code-compile'] },
-    { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey','m5-code-ramsey'] },
+    { n:'5.4', title:'Interference in a circuit',         ids:['m5-ramsey','m5-real-ramsey','m5-code-ramsey'] },
     { n:'5.5', title:'Teleportation',                     ids:[
         'm5-nocopy','m5-tele','m5-teleid','m5-telecorr','m5-nosig','m5-teleres',
         'm5-lab-i','m5-code-tele'] },
     { n:'5.6', title:'Grover search',                     ids:[
-        'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
+        'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim','m5-real-grover',
         'm5-lab-j','m5-code-grover'] },
     { n:'5.7', title:'Summary and practice',              ids:['m5-quick','m5-synth','m5-projects','m5-shapes'] }
   ],
@@ -24557,13 +25503,13 @@ CONTENT.SECTIONS = {
     { n:'6.4', title:'The quantum Fourier transform',     ids:[
         'm6-qft','m6-qftcirc','m6-qftnot','m6-lab-k2','m6-code-qft'] },
     { n:'6.5', title:'Phase estimation',                  ids:[
-        'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-lab-k',
-        'm6-code-qpe'] },
+        'm6-qpe','m6-qpeexact','m6-qpeprec','m6-qpecost','m6-count','m6-real-forks',
+        'm6-lab-k','m6-code-qpe'] },
     { n:'6.6', title:'Order finding',                     ids:[
         'm6-order','m6-ordereig','m6-modexp','m6-lab-k3','m6-cf','m6-repeat',
-        'm6-code-order'] },
+        'm6-real-gears','m6-code-order'] },
     { n:'6.7', title:'Factoring and period finding', ids:[
-        'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family',
+        'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family','m6-real-datacentre',
         'm6-code-shor'] },
     { n:'6.8', title:'Summary and practice',              ids:['m6-quick','m6-synth','m6-projects','m6-shapes'] }
   ]

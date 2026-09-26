@@ -53,9 +53,9 @@ can catch it.
 
 ## The unanchored scenes, and why
 
-Fifty-three scenes carry no textbook anchor: the cover, six chapter openings, six summaries, a
-course map, a how-to-read, six question taxonomies, six drill scenes, eleven laboratories, and
-thirteen scenes whose material the book has no counterpart for — `m2-shots` and `m5-shots`, which
+Of the 272 scenes, 104 carry no textbook anchor (`seccheck.js`, 2026-09-27). Besides `m5-fault`,
+they include the cover, six chapter openings, six summaries, six quick checks, six project pages, eighteen Around Us galleries, a course
+map, a how-to-read, six question taxonomies, six drill scenes, thirty-one laboratories, and thirteen scenes whose material the book has no counterpart for — `m2-shots` and `m5-shots`, which
 are sampling statistics rather than quantum mechanics; `m5-state`, which is classical simulation;
 `m5-transpile`, whose layout and routing passes are a property of a chip; `m1-proj`, whose
 subsection in the book could not be verified; `m4-ugate`, whose three-parameter gate matrix is a

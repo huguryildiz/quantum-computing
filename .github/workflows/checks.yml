@@ -39,7 +39,7 @@ jobs:
         run: |
           python verify/verify_scenes.py
           python verify/verify_drills.py
-          for f in verify/notes_c*.py; do python "$f"; done
+          for f in verify/notes_c*.py verify/around_m*.py; do python "$f"; done
           python -m pytest verify/ .claude/hooks/ tools/ -q
 
       - name: Code pages (NumPy half; the Qiskit half runs locally)

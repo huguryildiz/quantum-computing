@@ -408,6 +408,117 @@ function figPhaseCircle(){
   return a.svg();
 }
 
+/* ---- "Around Us" galleries, one per section, adapted from the reference
+   course's realGallery (signals-and-systems/build/src/82_scenes_m1.js). Two
+   framed figures on the left, one photo on the right, then one or two notes
+   revealed step by step. Every figure computes its curve or bars from the
+   physics definition rather than drawing a picture of one. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M2', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of two everyday examples; each figure is one of them.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo.k]}" alt="${cfg.photo.alt}">`,
+        caption:cfg.photo.cap}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Section 2.1: two photon-counter clicks at a time, so the Born rule's
+   probability is a frequency over many runs, not a value one run returns. */
+function figMalus(){
+  const a = P.Axes({w:520,h:250,xr:[0,180],yr:[0,1.12],
+    xlabel:'\\theta\\;(^\\circ)', ylabel:'P(\\text{click})',
+    pad:{l:56,r:20,t:24,b:44}, xtarget:5, ytarget:4, xstep:45});
+  a.curve(deg => Math.cos(deg*Math.PI/180)**2, {color:C.in, width:2.4, n:400});
+  a.vline(45,{color:C.muted,width:1,dash:'4 4'});
+  a.note(45,1.0,'\\tfrac12',{tex:true,fs:13,color:C.muted,dx:12,dy:-6});
+  return a.svg();
+}
+function figClicks(){
+  /* One fixed angle (45 degrees, p=1/2) and a run of individual detector
+     clicks. Each stem is one shot: 0 or 1, nothing in between. The dashed
+     line is the Born-rule prediction the clicks average toward. */
+  const outcomes = [1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,0,1,0,0,1];
+  const a = P.Axes({w:520,h:250,xr:[0,21],yr:[-0.15,1.25],
+    xlabel:'\\text{shot }k', ylabel:'\\text{outcome}',
+    pad:{l:50,r:20,t:24,b:44}, xtarget:5, ytarget:3, xstep:5, yticksOverride:[0,1]});
+  a.stem(outcomes.map((v,i)=>[i+1,v]),{color:C.mid});
+  a.hline(0.5,{color:C.in,width:1.6,dash:'5 4'});
+  return a.svg();
+}
+
+/* Section 2.6: the proton Larmor frequency is proportional to the field
+   strength, and MRI reads that line out directly. */
+const GYRO_MHZ_PER_T = 42.577; /* proton gyromagnetic ratio, accepted value */
+function figLarmor(){
+  const a = P.Axes({w:520,h:250,xr:[0,3.2],yr:[0,145],
+    xlabel:'B\\;(\\text{T})', ylabel:'f\\;(\\text{MHz})',
+    pad:{l:56,r:20,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(B => GYRO_MHZ_PER_T*B, {color:C.in, width:2.4});
+  [0.5,1.5,3.0].forEach(B=>{ a.point(B,GYRO_MHZ_PER_T*B,{color:C.h,r:4});
+    a.note(B,GYRO_MHZ_PER_T*B,`${(GYRO_MHZ_PER_T*B).toFixed(0)}`,{fs:12,color:C.h,dx:6,dy:-8}); });
+  return a.svg();
+}
+function figPrecess(){
+  /* The Bloch vector precessing about B, a fixed circle at polar angle
+     theta=50 deg, in the equal-pixel-per-unit frame the isotropy trap needs. */
+  const a = P.Axes({w:400,h:260,xr:[-1.3,1.3],yr:[-1.3,1.3],
+    pad:{l:30,r:30,t:30,b:30}, xticksOverride:[], yticksOverride:[],
+    grid:false, zeroAxes:false, arrows:false});
+  const th = 50*Math.PI/180, r = Math.sin(th);
+  const ring=[]; for(let i=0;i<=160;i++){ const ph=2*Math.PI*i/160;
+    ring.push([r*Math.cos(ph), r*Math.sin(ph)*0.34]); }
+  a.poly(ring,{color:C.grid,width:1.3});
+  a.poly([[0,-1.2],[0,1.2]],{color:C.muted,width:1.4,dash:'3 3'});
+  a.note(0,1.2,'B',{tex:true,fs:13,color:C.muted,dy:-8});
+  const ph0 = Math.PI/5;
+  a.point(r*Math.cos(ph0), r*Math.sin(ph0)*0.34, {color:C.in,r:5});
+  a.poly([[0,0],[r*Math.cos(ph0), r*Math.sin(ph0)*0.34]],{color:C.in,width:2.2});
+  const arc=[]; for(let i=0;i<=30;i++){ const ph=ph0-0.02+ (Math.PI/6)*i/30;
+    arc.push([0.35*r*Math.cos(ph),0.35*r*Math.sin(ph)*0.34]); }
+  a.poly(arc,{color:C.h,width:1.6});
+  return a.svg();
+}
+
+/* Section 2.7: the standard error of a shot-counted probability, and the
+   count total of a random decay process settling into that same square-root
+   law. Both are the binomial standard error, seen from two instruments. */
+function figShotSE(){
+  const a = P.Axes({w:520,h:250,xr:[0,4.3],yr:[-3.4,-0.3],
+    xlabel:'\\log_{10}N', ylabel:'\\log_{10}\\mathrm{SE}',
+    pad:{l:60,r:20,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(k => Math.log10(0.5) - k/2, {color:C.in, width:2.4});
+  [1,2,3,4].forEach(k=>{ const se=0.5*Math.pow(10,-k/2);
+    a.point(k, Math.log10(se), {color:C.h, r:4}); });
+  return a.svg();
+}
+function figGeigerCounts(){
+  /* A simulated Geiger counter: cumulative counts over a fixed live time,
+     mean rate lambda = 4 counts/s, with the +-sqrt(N) band drawn about the
+     expected count. Poisson counting noise is the same square-root law as
+     the binomial standard error above, applied to a count instead of a
+     fraction. */
+  const lam = 4;
+  const a = P.Axes({w:520,h:250,xr:[0,10],yr:[0,55],
+    xlabel:'t\\;(\\text{s})', ylabel:'\\text{counts}',
+    pad:{l:52,r:20,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(t => lam*t, {color:C.muted, width:1.6, dash:'5 4'});
+  a.curve(t => lam*t + Math.sqrt(lam*t), {color:C.h, width:1.3});
+  a.curve(t => Math.max(0, lam*t - Math.sqrt(lam*t)), {color:C.h, width:1.3});
+  /* One fixed count trace, chosen to stay inside the band so the band reads
+     clearly; the caption says a real trace leaves it about a third of the time
+     (verify/around_m2.py checks both). */
+  const steps = [0,4,5,10,10,15,16,22,22,27,27,33,33,39,39];
+  a.stem(steps.map((v,i)=>[i*10/14, v]),{color:C.in});
+  return a.svg();
+}
+
 /* Small glyphs for the project cards, drawn as flat SVG in the dark-page
    tints this scene uses. Sized and styled the way the reference course's
    summary-card sketches are, and defined here rather than in 90_app.js. */
@@ -527,6 +638,22 @@ const SC = [
           why:'$|\\langle 0|+\\rangle|=1/\\sqrt2$, so $\\theta=\\pi/4$ and $\\tfrac12\\left(1+\\sin\\tfrac{\\pi}{4}\\right)\\approx 0.854$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 2.1.4b - */
+realGallery({ id:'m2-real-detector', nav:'The Born Rule Around Us',
+  title:'The Born Rule Around Us', eyebrow:'Module 2 · The Born rule',
+  objective:'Show the Born rule as the rule a photon-counting instrument actually obeys.',
+  keywords:'examples single photon detector polarizer malus law click probability born rule shot',
+  photo:{ k:'m2_detector', alt:'A fibre-coupled single-photon detector module on an optical table',
+    cap:'A single-photon detector returns one click or none. Only many runs trace out a probability.' },
+  figs:[
+    [figMalus, 'The chance a photon passes a second polariser at angle $\\theta$ to the first is $\\cos^{2}\\theta$: the same $|\\langle n|\\psi\\rangle|^{2}$ shape as the Born rule.'],
+    [figClicks, 'Twenty simulated single shots at $\\theta=45^{\\circ}$, each a click or nothing. No single shot reads $\\tfrac12$; only the average of many approaches it (dashed line).']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A probability is a long-run frequency', html:'The Born rule predicts a probability. An instrument reports outcomes one at a time; the probability is what the fraction of clicks approaches after many shots, not a number any single shot can return.'},
+    {t:'note', kind:'warn', head:'One click is not evidence of anything', html:'A student who sees three clicks in three tries has not measured $p=1$. The instrument is doing exactly what the Born rule says a small sample does: wandering.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 2.L1 --- */
 { id:'m2-lab-c', module:'M2', nav:'Laboratory C \u2014 Exact Probability and Finite Samples', title:'Laboratory C \u2014 Exact Probability and Finite Samples',
@@ -998,6 +1125,22 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 2.6.6 -- */
+realGallery({ id:'m2-real-mri', nav:'Dynamics Around Us',
+  title:'Dynamics Around Us', eyebrow:'Module 2 \u00b7 Dynamics',
+  objective:'Connect Hamiltonian evolution and the Larmor precession that an MRI scanner reads out.',
+  keywords:'examples MRI magnetic resonance imaging larmor precession gyromagnetic ratio field strength unitary evolution',
+  photo:{ k:'m2_mri', alt:'The scanner room of a hospital MRI machine, with the patient table beside the bore',
+    cap:'An MRI scanner drives protons with a strong magnetic field and reads the frequency at which they precess.' },
+  figs:[
+    [figLarmor, 'The proton precession frequency $f=\\gamma B$ grows in step with the field strength; clinical scanners run at 0.5, 1.5 or 3 tesla.'],
+    [figPrecess, 'A spin\u2019s Bloch vector precessing about the field direction $B$: the same $U(t)=e^{-iHt}$ that turns a Hamiltonian into a gate.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A frequency, not a picture', html:'What an MRI scanner reads is a precession frequency $f=\\gamma B$, exactly the closed-form evolution of this section applied to a spin instead of a qubit gate.'},
+    {t:'note', kind:'warn', head:'The field, not the tissue, sets the frequency', html:'Two different field strengths give two different precession frequencies on the very same tissue. The image comes from small, deliberate variations in $B$ across the body, not from the frequency being a property of what is imaged.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 2.L2 --- */
 { id:'m2-lab-d', module:'M2', nav:'Laboratory D \u2014 Driving a Qubit', title:'Laboratory D \u2014 Driving a Qubit',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
@@ -1043,6 +1186,22 @@ const SC = [
           why:'$\\sqrt{0.25/10\\,000}=0.5/100=0.005$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 2.7.2 -- */
+realGallery({ id:'m2-real-geiger', nav:'Finite Shots Around Us',
+  title:'Finite Shots Around Us', eyebrow:'Module 2 · Finite shots',
+  objective:'Show the standard-error square-root law on a counting instrument the reader has met outside a laboratory.',
+  keywords:'examples geiger counter radioactive decay poisson counting statistics standard error square root',
+  photo:{ k:'m2_geiger', alt:'A handheld Geiger counter held near a rock sample',
+    cap:'A Geiger counter counts decays one click at a time; the count total has the same $\\sqrt{N}$ spread as a shot count.' },
+  figs:[
+    [figShotSE, 'The standard error of a $p=\\tfrac12$ shot fraction against the shot count, on log axes: half a decade of drop for every decade of shots.'],
+    [figGeigerCounts, 'Counts at 4 counts/s scatter about the mean $\\lambda t$; the band is one standard deviation, $\\pm\\sqrt{\\lambda t}$, and a real trace leaves it about a third of the time.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One counting law, two instruments', html:'A qubit measured $N$ times and a detector counting decays for a time $t$ are both binomial-style counting: the spread of the total grows like $\\sqrt{N}$ (or $\\sqrt{\\lambda t}$), not like $N$ itself.'},
+    {t:'note', kind:'warn', head:'A click is not noise in the bad sense', html:'The clicks arrive at random even from a perfectly working counter. A wider spread than $\\sqrt{N}$ predicts would point to a real problem; the $\\sqrt{N}$ spread itself is just what counting is.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m2-code-shots', module:'M2', nav:'Finite Shots in Code', title:'Finite Shots in Code',

@@ -501,6 +501,121 @@ function figGenerator(){
   ]});
 }
 
+/* ---- Around Us: where this section's idea shows up outside the notation.
+   Adapted from the engine's source course (signals-and-systems), with no
+   `src` field: this course does not cite a page for these. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M1', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery: two or three schematic figures beside one photograph.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[
+      {t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}
+    ].concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* Malus's law: intensity through two linear polarisers as a function of the
+   angle between their transmission axes. A polariser projects the incoming
+   field onto its own axis, so the transmitted amplitude is the projection of
+   the field and the transmitted intensity is the squared overlap -- the same
+   $|\langle u|v\rangle|^2$ this section defines, with the projector built
+   from the axis rather than from a qubit basis vector. */
+function figMalus(){
+  const a = P.Axes({w:520,h:250,xr:[0,180],yr:[0,1.12],
+    xlabel:'\\theta\\;(\\text{deg})', ylabel:'I/I_{0}',
+    pad:{l:56,r:22,t:24,b:44}, xtarget:5, ytarget:4});
+  a.curve(t => Math.cos(t*Math.PI/180)**2, {color:C.in, width:2.4, n:400});
+  a.point(0,1,{color:C.out,r:5});
+  a.point(45,0.5,{color:C.mid,r:5});
+  a.point(90,0,{color:C.err,r:5});
+  return a.svg();
+}
+
+/* The same law read as a projector's expectation value: keeping the axis
+   fixed and drawing the transmitted fraction as a bar at three angles most
+   students actually try with two polarising sheets. */
+function figMalusBars(){
+  const a = P.Axes({w:460,h:250,xr:[-0.6,2.6],yr:[0,1.12],
+    ylabel:'I/I_{0}', pad:{l:56,r:20,t:24,b:46}, xticksOverride:[], ytarget:4});
+  const vals=[[0,1,C.out],[1,0.5,C.mid],[2,0,C.err]];
+  vals.forEach(([x,v,col])=> a.rect(x-0.32,0,x+0.32,v,{fill:col}));
+  a.note(0,-0.10,'0^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  a.note(1,-0.10,'45^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  a.note(2,-0.10,'90^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  return a.svg();
+}
+
+/* A prism's refractive index against wavelength, the Cauchy relation for a
+   typical crown glass: n(lambda) = A + B/lambda^2. Every wavelength bends by
+   a different amount because it sees a different eigenvalue of the same
+   dispersion law -- one function, read off at many points of its spectrum,
+   which is exactly what "a function of an operator" means once the operator
+   is diagonal. */
+function figDispersion(){
+  const A = 1.5046, B = 0.00420; // BK7-like Cauchy coefficients, lambda in micrometres
+  const n = lam => A + B/(lam*lam);
+  const a = P.Axes({w:520,h:250,xr:[0.40,0.70],yr:[1.513,1.528],
+    xlabel:'\\lambda\\;(\\mu\\text{m})', ylabel:'n(\\lambda)',
+    pad:{l:64,r:22,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(n, {color:C.in, width:2.4, n:400});
+  const marks = [[0.44,C.h],[0.55,C.mid],[0.66,C.err]];
+  marks.forEach(([lam,col]) => a.point(lam, n(lam), {color:col, r:5}));
+  return a.svg();
+}
+
+/* The rainbow of eigenvalues the prism sorts by: the bend angle from Snell's
+   law at a fixed prism geometry, one point per sample wavelength, coloured to
+   match the visible light it stands for. */
+function figSpectrumBars(){
+  const A = 1.5046, B = 0.00420;
+  const n = lam => A + B/(lam*lam);
+  const apex = 60*Math.PI/180;
+  // minimum-deviation angle for a symmetric pass through a prism of apex angle A:
+  // delta_min = 2*asin(n*sin(A/2)) - A
+  const dev = lam => (2*Math.asin(n(lam)*Math.sin(apex/2)) - apex) * 180/Math.PI;
+  const a = P.Axes({w:460,h:250,xr:[0.40,0.70],yr:[38.5,40.5],
+    xlabel:'\\lambda\\;(\\mu\\text{m})', ylabel:'\\delta_{\\min}\\;(\\text{deg})',
+    pad:{l:60,r:20,t:24,b:44}, xtarget:4, ytarget:4});
+  a.curve(dev, {color:C.mid, width:2.2, n:300});
+  [[0.44,C.h],[0.55,C.mid],[0.66,C.err]].forEach(([lam,col]) => a.point(lam, dev(lam), {color:col, r:5}));
+  return a.svg();
+}
+
+/* A guitar string's first three normal modes: sin(n*pi*x/L) on a fixed
+   length, the same orthonormal family the notes use for a function space. A
+   plucked string is a superposition of these, and the ear hears the
+   coefficients as the note's harmonics. */
+function figStringModes(){
+  const a = P.Axes({w:520,h:250,xr:[0,1],yr:[-1.25,1.25],
+    xlabel:'x/L', ylabel:'u_{n}(x)', pad:{l:52,r:22,t:24,b:42}, xtarget:4, ytarget:4});
+  a.curve(x=>Math.sin(Math.PI*x), {color:C.in, width:2.4, n:300});
+  a.curve(x=>Math.sin(2*Math.PI*x), {color:C.mid, width:2, dash:'5 4', n:300});
+  a.curve(x=>Math.sin(3*Math.PI*x), {color:C.out, width:1.8, dash:'2 3', n:300});
+  return a.svg();
+}
+
+/* A plucked shape (a triangle, the classic guitar pluck) rebuilt from a
+   truncated sine series, showing the partial sums approach the plucked shape
+   as more modes are kept -- completeness and truncation, read off a string
+   instead of an abstract coefficient list. */
+function figPluckSum(){
+  const pluck = x => x<=0.3 ? x/0.3 : (1-x)/0.7;
+  const coef = n => 2*Math.sin(n*Math.PI*0.3)/(Math.pow(n,2)*Math.PI*Math.PI*0.3*0.7);
+  const partial = (x,N) => { let s=0; for(let n=1;n<=N;n++) s+=coef(n)*Math.sin(n*Math.PI*x); return s; };
+  const a = P.Axes({w:460,h:250,xr:[0,1],yr:[-0.05,1.05],
+    xlabel:'x/L', ylabel:'\\text{shape}', pad:{l:44,r:20,t:24,b:42}, xtarget:4, ytarget:4});
+  a.curve(pluck, {color:C.muted, dash:'5 4', width:1.8, n:300});
+  a.curve(x=>partial(x,3), {color:C.mid, width:1.8, n:300});
+  a.curve(x=>partial(x,12), {color:C.in, width:2.2, n:300});
+  return a.svg();
+}
+
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
@@ -785,6 +900,22 @@ const SC = [
           why:'The two terms are $\\tfrac12$ and $-\\tfrac12$. Any basis gives the same number, and $\\langle 0|1\\rangle=0$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 1.3.R -- */
+realGallery({ id:'m1-real-projector', nav:'Projectors Around Us', title:'Projectors Around Us',
+  eyebrow:'Module 1 · Outer products and projectors',
+  objective:'Read Malus\'s law for two polarising sheets as the squared overlap a projector computes.',
+  keywords:'projector polariser malus law crossed polarisers cosine squared overlap real world example',
+  photo:['m1_polarizer','Two sheets of polarising film held up against a window, one rotated against the other',
+    'Rotating the second sheet against the first dims the light: at ninety degrees almost none gets through.'],
+  figs:[
+    [()=>figMalus(),'A polariser projects incoming light onto its own axis. The transmitted intensity is $I_{0}\\cos^{2}\\theta$, the squared overlap between the two axes.'],
+    [()=>figMalusBars(),'Three settings a student can try by hand: aligned sheets pass everything, sheets at $45^{\\circ}$ pass half, and crossed sheets pass (almost) none.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A polariser is a projector', html:'A sheet keeps the part of the light along its own axis $|u\\rangle$: exactly what $P=|u\\rangle\\langle u|$ does. Intensity survives as $I=I_{0}|\\langle u|v\\rangle|^{2}=I_{0}\\cos^{2}\\theta$.'},
+    {t:'note', kind:'warn', head:'Not a dimmer switch', html:'$\\cos^{2}\\theta$ is not light fading out. It is a projection: what gets through has been rotated onto the second axis.'}
+  ]}),
 
 /* ---------------------------------------------------------------- 1.L-B1 -- */
 { id:'m1-lab-b1', module:'M1', nav:'Laboratory B1 — A Projector, Split and Put Back Together', title:'Laboratory B1 — A Projector, Split and Put Back Together',
@@ -1137,6 +1268,22 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- 1.7.R -- */
+realGallery({ id:'m1-real-spectral', nav:'The Spectral Theorem Around Us', title:'The Spectral Theorem Around Us',
+  eyebrow:'Module 1 · The spectral theorem and functions of an operator',
+  objective:'Read a prism\'s spectrum as one dispersion law read off at many wavelengths, the way a function of an operator is its eigenvalues read off one at a time.',
+  keywords:'prism spectrum dispersion refractive index wavelength eigenvalue function of an operator real world example',
+  photo:['m1_prism','A glass prism splitting a beam of white light into a fan of coloured light',
+    'One prism, one law of refraction; the colours separate because each wavelength obeys it by a different amount.'],
+  figs:[
+    [()=>figDispersion(),'The refractive index of a crown-glass prism, $n(\\lambda)=A+B/\\lambda^{2}$. Blue light sees a larger $n$ than red, so it bends more.'],
+    [()=>figSpectrumBars(),'The angle by which the prism bends each wavelength, computed from $n(\\lambda)$ through the prism\'s own geometry. One formula, one output for every colour.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One law, many outputs', html:'In $f(A)=\\sum_{k}f(\\lambda_{k})P_{k}$ $f$ acts on each component alone. The prism applies one law, $n(\\lambda)$, to each wavelength alone.'},
+    {t:'note', kind:'warn', head:'Sorted, not created', html:'The prism sorts colours already in the beam; $f(A)$ keeps the eigenvectors and changes only their numbers. Here $\\lambda$ is a wavelength, not an eigenvalue.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 1.L-B3 -- */
 { id:'m1-lab-b3', module:'M1', nav:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt', title:'Laboratory B3 — A Hermitian Matrix, Taken Apart and Rebuilt',
   objective:'Let the reader build a Hermitian matrix, find its own spectral decomposition, and drive it to a repeated eigenvalue.',
@@ -1243,6 +1390,22 @@ const SC = [
           why:'The squared error is the sum of the omitted $|c_{n}|^{2}$, here only $|c_{3}|^{2}$.'}}]}
   ]}
 ]},
+
+/* ---------------------------------------------------------------- 1.9.R -- */
+realGallery({ id:'m1-real-functions', nav:'Functions as Vectors Around Us', title:'Functions as Vectors Around Us',
+  eyebrow:'Module 1 · Functions as vectors',
+  objective:'Hear a plucked string\'s normal modes as the orthonormal basis this section builds functions out of.',
+  keywords:'guitar string normal modes harmonics fourier series orthonormal basis completeness real world example',
+  photo:['m1_string','A guitar string vibrating after being plucked, its blurred outline showing the range of the motion',
+    'The string\'s shape at every instant is one function; the note you hear is built from a fixed set of others.'],
+  figs:[
+    [()=>figStringModes(),'The first three normal modes of a string fixed at both ends, $\\sin(n\\pi x/L)$. They are mutually orthogonal, the same property the inner product of functions checks.'],
+    [()=>figPluckSum(),'A plucked (triangular) shape, rebuilt from 3 modes and from 12. More terms kept means less squared error left over, exactly as Parseval states.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'A pluck is a superposition', html:'The plucked shape is a sum $\\sum_{n}c_{n}\\sin(n\\pi x/L)$ over every mode, with $c_{n}=\\langle u_{n}|f\\rangle$. The ear hears these as the fundamental plus its overtones.'},
+    {t:'note', kind:'warn', head:'A finite sum is already close', html:'A dozen modes already sound right, because the coefficients fall off quickly. That is completeness and truncation, heard rather than computed.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m1-code-functions', module:'M1', nav:'Functions as Vectors in Code', title:'Functions as Vectors in Code',

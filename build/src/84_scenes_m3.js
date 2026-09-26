@@ -472,6 +472,126 @@ function figSep(){
   return growBlocks({w:560,h:276,items});
 }
 
+/* ---- everyday examples, one gallery slide at the end of three sections. The
+       photo shows the physical thing; the figures are schematic but each is
+       computed from the section's own definition, not drawn by hand. */
+function realGallery(cfg){
+  return { id:cfg.id, module:'M3', nav:cfg.nav, title:cfg.title,
+    objective:cfg.objective, keywords:cfg.keywords,
+    budget:cfg.budget||'A gallery of real-world examples; each figure is one worked case.',
+    slide:true, steps:cfg.notes.length-1, blocks:[
+    {t:'eyebrow', text:cfg.eyebrow},
+    {t:'title', text:cfg.title},
+    {t:'cols', ratio:'c-8-4', fill:true, left:[
+      {t:'grid', cols:2, gap:'18px 22px', items:cfg.figs.map(([svg,cap])=>
+        [{t:'fig', frame:true, svg, caption:cap}])}
+    ], right:[{t:'grid', cols:1, gap:'12px 14px', items:[
+        [{t:'fig', svg:()=>`<img class="photo" src="${IMG[cfg.photo[0]]}" alt="${cfg.photo[1]}">`, caption:cfg.photo[2]}]]}]
+      .concat(cfg.notes.map((n,i)=>i ? {t:'reveal', at:i, items:[n]} : n))}
+  ]};
+}
+
+/* A qubit's population and coherence against time, at the ceiling T2 = 2T1: no
+   pure-dephasing term at all, the best a real device can do. */
+function figRealT1T2(){
+  const a = P.Axes({w:560,h:250,xr:[0,3],yr:[0,1.35],
+    xlabel:'t/T_{1}', ylabel:'\\text{value}',
+    pad:{l:64,r:24,t:26,b:46}, xtarget:4, ytarget:4});
+  a.curve(t => Math.exp(-t), {color:C.in, width:2.4});
+  a.curve(t => Math.exp(-t/2), {color:C.mid, width:2.2, dash:'5 4'});
+  /* Both curves are below 0.55 past t/T1 = 1.2, so the strip above that is
+     empty and both names sit in it, well clear of either line. */
+  a.note(1.2,1.22,'\\rho_{11}(t)',{fs:13,color:C.in,tex:true});
+  a.note(2.1,1.22,'|\\rho_{01}(t)|',{fs:13,color:C.mid,tex:true});
+  return a.svg();
+}
+
+/* How many one-qubit gates fit inside T1 before the excited population has
+   fallen to 1/e, at three gate durations. A shorter gate buys more gates for
+   the same T1, and that ratio is exactly what a hardware roadmap reports. */
+function figGateBudget(){
+  const a = P.Axes({w:560,h:250,xr:[0,4.4],yr:[0,2300],
+    ylabel:'\\text{gates before } 1/e', pad:{l:70,r:24,t:26,b:56}, xticksOverride:[], ytarget:4});
+  const T1 = 100e-6;
+  const bar=(k,gate,f,l)=>{ const n=k+0.7, v=T1/gate; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6});
+    a.note(n,v,String(Math.round(v)),{fs:12,color:l,anchor:'middle',dy:-10}); };
+  bar(0,500e-9,C.dec.err,C.err); bar(1,100e-9,C.dec.mid,C.mid); bar(2,50e-9,C.dec.in,C.in);
+  [['500\\,\\text{ns}',0],['100\\,\\text{ns}',1],['50\\,\\text{ns}',2]].forEach(([t,k])=>
+    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  return a.svg();
+}
+
+/* The amplitude array of the down-converted pair, beside the array of a
+   product pair with the same marginal on each side: same figSep test, a
+   different worked case. */
+function figRealSep(){
+  const cell = (x,y,l,on,col) => ({t:'box',x,y,w:100,h:70,label:l,tex:true,fs:17,color:on?col:C.muted});
+  const r = '\\tfrac{1}{\\sqrt2}';
+  const items = [
+    cell(40,52,r,true,C.mid),   cell(140,52,'0',false),
+    cell(40,122,'0',false),     cell(140,122,r,true,C.mid),
+    cell(320,52,'\\tfrac12',true,C.in),  cell(420,52,'\\tfrac12',true,C.in),
+    cell(320,122,'\\tfrac12',true,C.in), cell(420,122,'\\tfrac12',true,C.in),
+    {t:'text',x:140,y:34,label:'\\tfrac{1}{\\sqrt2}(|HV\\rangle+|VH\\rangle)',tex:true,fs:15},
+    {t:'text',x:420,y:34,label:'|{+}\\rangle\\otimes|{+}\\rangle',tex:true,fs:16},
+    {t:'text',x:140,y:226,label:'c_{0}c_{3}-c_{1}c_{2}=\\tfrac12',tex:true,fs:15},
+    {t:'text',x:420,y:226,label:'c_{0}c_{3}-c_{1}c_{2}=0',tex:true,fs:15},
+    {t:'text',x:140,y:258,label:'entangled',fs:13},
+    {t:'text',x:420,y:258,label:'a product',fs:13}
+  ];
+  return growBlocks({w:560,h:276,items});
+}
+
+/* The Schmidt spectrum of the same pair: two equal coefficients, the
+   maximally-entangled case, against a product state's single term. */
+function figRealSchmidtBar(){
+  const a = P.Axes({w:560,h:250,xr:[0,4.4],yr:[0,1.14],
+    ylabel:'\\lambda', pad:{l:64,r:24,t:26,b:56}, xticksOverride:[], ytarget:4});
+  const bar=(k,v,f,l)=>{ const n = k + 0.7; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6}); };
+  bar(0,0.5,C.dec.mid,C.mid); bar(1,0.5,C.dec.mid,C.mid);
+  bar(2,1,C.dec.in,C.in);     bar(3,0,C.dec.in,C.in);
+  [['\\lambda_{1}',0],['\\lambda_{2}',1],['\\lambda_{1}',2],['\\lambda_{2}',3]].forEach(([t,k])=>
+    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  a.note(1.2,0,'\\text{down-converted pair}',{fs:12.5,color:C.mid,anchor:'middle',dy:48,tex:true});
+  a.note(3.2,0,'\\text{a product pair}',{fs:12.5,color:C.in,anchor:'middle',dy:48,tex:true});
+  return a.svg();
+}
+
+/* CHSH against the analyser-angle family this course's chapter already uses,
+   redrawn to carry the two ground-station telescopes' own numbers. */
+function figRealCHSH(){
+  const a = P.Axes({w:560,h:260,xr:[0,90],yr:[0,3.2],
+    xlabel:'\\varphi\\,(\\text{degrees})', ylabel:'S',
+    pad:{l:60,r:24,t:30,b:46}, xtarget:4, ytarget:4});
+  const d = Math.PI/180;
+  a.curve(f => 2*(Math.cos(f*d)+Math.sin(f*d)), {color:C.in, width:2.4});
+  a.hline(2,{color:C.err, width:1.8, dash:'5 4'});
+  a.hline(2*Math.SQRT2,{color:C.out, width:1.4, dash:'2 4'});
+  a.point(45,2*Math.SQRT2,{color:C.out,r:6});
+  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(8,1.28,'\\text{classical bound}',{fs:12.5,color:C.err,tex:true});
+  return a.svg();
+}
+
+/* The four correlations that make up S at the optimal angle, beside what the
+   largest classical model can offer at any angle at all: one of the four has
+   to flip sign for a model with fixed answers to reach 2, and no choice of
+   angle lets it reach 2 root 2. */
+function figRealCHSHBars(){
+  const a = P.Axes({w:560,h:250,xr:[0,5.4],yr:[-1.05,1.30],
+    ylabel:'\\text{corr.}', pad:{l:56,r:24,t:26,b:56}, xticksOverride:[], yticksOverride:[-1,-0.5,0,0.5,1]});
+  const r = Math.SQRT1_2;
+  const bar=(k,v,f,l)=>{ const n=k+0.7; a.rect(n-0.28,0,n+0.28,v,{fill:f});
+    a.poly([[n-0.28,v],[n+0.28,v]],{color:l,width:2.6}); };
+  bar(0,r,C.dec.in,C.in); bar(1,r,C.dec.in,C.in); bar(2,r,C.dec.in,C.in); bar(3,-r,C.dec.in,C.in);
+  ['E(a_0,b_0)','E(a_0,b_1)','E(a_1,b_0)','E(a_1,b_1)'].forEach((t,k)=>
+    a.note(k+0.7,0,t,{fs:11.5,color:C.muted,anchor:'middle',dy:24,tex:true}));
+  a.note(2.4,1.16,'S=2\\sqrt2',{fs:14,color:C.out,anchor:'middle',tex:true});
+  return a.svg();
+}
+
 /* Small sketches for the projects deck, in the dark-page signal tints, styled
    like the summary glyphs of the reference course's m1-projects. */
 const G = (()=>{
@@ -823,6 +943,22 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------ 3.4 real --- */
+realGallery({ id:'m3-real-cryostat', nav:'Relaxation and Dephasing Around Us',
+  title:'Relaxation and Dephasing Around Us', eyebrow:'Module 3 · Relaxation and dephasing',
+  objective:'See T1 and T2 as properties of a real, cooled qubit, and see why the gate time and the coherence time are compared, not just T1 alone.',
+  keywords:'examples dilution refrigerator cryostat superconducting qubit T1 T2 coherence time gate count real world',
+  photo:['m3_cryostat','An open dilution refrigerator with gold-plated stages and coaxial cables running down to the coldest plate',
+    'A superconducting qubit sits on the coldest stage, near absolute zero, at the bottom of the wiring shown here.'],
+  figs:[
+    [()=>figRealT1T2(), 'Population and coherence at the best case $T_{2}=2T_{1}$.'],
+    [()=>figGateBudget(), 'Gates before $1/e$, at $T_{1}=100\\,\\mu\\text{s}$, for three gate times.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'Why the cold', html:'Below about $20\\,\\text{mK}$, stray thermal photons cannot flip the qubit on their own.'},
+    {t:'note', kind:'warn', head:'A gate count, not a runtime', html:'A long $T_{1}$ wasted on slow gates buys nothing: compare the gate time against $T_{1}$, not $T_1$ alone.'}
+  ]}),
+
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-t1t2', module:'M3', nav:'Relaxation and Dephasing in Code', title:'Relaxation and Dephasing in Code',
   objective:'Compute T2 from two rates, print the two decays, and build the continuous decay out of many small channels.',
@@ -1004,6 +1140,22 @@ const SC = [
   ]}
 ]},
 
+/* ------------------------------------------------------------ 3.6 real --- */
+realGallery({ id:'m3-real-crystal', nav:'Separability Around Us',
+  title:'Separability Around Us', eyebrow:'Module 3 · Separability and the Schmidt decomposition',
+  objective:'Apply the product test to the pair of photons a down-conversion crystal produces, and see it fail exactly where the two photons are entangled.',
+  keywords:'examples spontaneous parametric down conversion crystal entangled photon pair product test schmidt determinant real world',
+  photo:['m3_crystal','A blue laser beam pumping a nonlinear crystal, producing two dimmer output beams',
+    'A crystal splits one pump photon into two lower-energy photons; their polarisations come out entangled.'],
+  figs:[
+    [()=>figRealSep(), 'The amplitude array of the down-converted pair beside a product pair. The determinant is nonzero only for the entangled pair.'],
+    [()=>figRealSchmidtBar(), 'The Schmidt spectrum of each pair: two equal terms for the entangled pair, one term for the product pair.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'One photon in, two out', html:'Each photon’s own polarisation is undetermined, but the pair’s joint polarisation is fixed: the pattern of $|\\Phi^{+}\\rangle$.'},
+    {t:'note', kind:'warn', head:'Correlated is not entangled', html:'A random fixed polarisation, chosen pair by pair, is correlated too. Only the entangled pair fails the product test in every basis.'}
+  ]}),
+
 /* ---------------------------------------------------------------- 3.L1c -- */
 { id:'m3-lab-f3', module:'M3', nav:'Laboratory F3 — The Product Test on a General State', title:'Laboratory F3 — The Product Test on a General State',
   objective:'Let the reader steer all four amplitudes of a two-qubit state and watch the determinant and the Schmidt coefficients together.',
@@ -1181,6 +1333,22 @@ const SC = [
           why:'Each outcome has probability $\\tfrac12$ and leaves $|0\\rangle$ or $|1\\rangle$, so the average is $\\tfrac12(1)+\\tfrac12(0)=\\tfrac12$, as before.'}}]}
   ]}
 ]},
+
+/* ------------------------------------------------------------ 3.8 real --- */
+realGallery({ id:'m3-real-telescopes', nav:'Bell Correlations Around Us',
+  title:'Bell Correlations Around Us', eyebrow:'Module 3 · Bell correlations',
+  objective:'See the CHSH test as something two distant, timed stations actually run, and see why the timing of the choice is what rules out an ordinary signal.',
+  keywords:'examples telescope ground station free space link CHSH bell test analyser angle distant real world',
+  photo:['m3_telescopes','Two optical ground-station telescopes on distant mountain ridges at dusk',
+    'Each station points a telescope at the other and at a shared source, and each picks its own analyser setting independently.'],
+  figs:[
+    [()=>figRealCHSH(), 'The CHSH value for one family of analyser angles, peaking at $2\\sqrt2$ near $\\varphi=45^{\\circ}$.'],
+    [()=>figRealCHSHBars(), 'The four correlations at the optimal angle: three agree and one changes sign.']
+  ],
+  notes:[
+    {t:'note', kind:'def', head:'Why the distance and timing matter', html:'Each station picks its setting too close to its own measurement for a light-speed signal to carry the other station’s choice across the gap.'},
+    {t:'note', kind:'warn', head:'A violation is not a message', html:'No setting moves what the other station sees on its own; the correlation shows up only once the two records are compared.'}
+  ]}),
 
 /* ---------------------------------------------------------------- code --- */
 { id:'m3-code-bell', module:'M3', nav:'Bell Correlations in Code', title:'Bell Correlations in Code',
