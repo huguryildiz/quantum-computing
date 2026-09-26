@@ -216,7 +216,7 @@ window.C4 = [
 {t:'box', kind:'warn', hd:'The picture is for one qubit and stops there', html:'There is no drawing like this for two qubits: a pure state of a pair needs six real parameters and a mixed one fifteen. Everything in the second half of this chapter — the entangling gates — is therefore done in algebra, and the sphere is used only for what each qubit does alone.'},
 
 /* ---- 4.1 ---- */
-{t:'h2', num:'4.1', text:'The Bloch sphere, and the half angle'},
+{t:'h2', num:'4.1', text:'The Bloch sphere'},
 
 {t:'p', text:'Start from any normalised qubit state and use the freedom of chapter 1: multiply by whatever global phase makes the first amplitude real and not negative. What is left is one real number in the first amplitude and one phase in the second, which is two angles.'},
 
@@ -247,7 +247,7 @@ window.C4 = [
  ['Check','$0.6124^{2}+0.6124^{2}+0.5^{2}=1$, so the point is on the surface as a pure state must be, and $\\tfrac12(1+r_z)=0.75$ agrees with the amplitude.']]},
 
 /* ---- 4.2 ---- */
-{t:'h2', num:'4.2', text:'Global phase, relative phase, and the double cover'},
+{t:'h2', num:'4.2', text:'Global phase, relative phase and the double cover'},
 
 {t:'p', text:'The rule stated in chapter 1 and proved in chapter 3 is now a fact about a drawing. Multiplying the whole state by a phase leaves $\\rho$ alone, so it leaves the point alone. Putting a phase between the two amplitudes is a different operation entirely, and it moves the point round the equator by exactly that angle.'},
 
@@ -305,7 +305,7 @@ window.C4 = [
  ['Check','Directly, $\\left|\\langle0|HT|{+}\\rangle\\right|^{2}=\\cos^{2}(\\pi/8)=0.8536$. Both lengths are one throughout, as two rotations require.']]},
 
 /* ---- 4.4 ---- */
-{t:'h2', num:'4.4', text:'Composing gates: order, Euler angles and one gate with three dials'},
+{t:'h2', num:'4.4', text:'Composing gates and the Euler decomposition'},
 
 {t:'p', text:'A circuit diagram is a picture of time, and the first gate is drawn on the left. A matrix acts on a ket standing to its right, so the first gate is the one closest to the ket, which is the one written last. This is the transcription error of the chapter, and it is invisible whenever the example happens to be symmetric.'},
 
@@ -352,7 +352,7 @@ window.C4 = [
 {t:'box', kind:'err', hd:'A dirty ancilla destroys an algorithm silently', html:'It raises no error, the state is still normalised, and the circuit still runs. What is lost is the cancellation every algorithm in chapter 6 depends on, and the symptom is a flat output distribution that looks like noise. The smallest example is a two-qubit register left as a Bell pair with its ancilla: the register alone is $I/2$, so a Hadamard followed by a measurement returns a coin where a clean ancilla would have given $0$ with certainty. Counting the ancillas and checking that each returns to $|0\\rangle$ is part of reading a circuit, not an optimisation afterwards.'},
 
 /* ---- 4.6 ---- */
-{t:'h2', num:'4.6', text:'Two qubits, and the ordering a gate is silently wrong about'},
+{t:'h2', num:'4.6', text:'Two-qubit gates and qubit ordering'},
 
 {t:'p', text:'Chapter 3 fixed the convention for states, and it is repeated here because this is where it starts breaking results rather than merely labels. A pair is written $|q_1q_0\\rangle$ with the higher-numbered qubit on the left, and entry $x$ of the column is the amplitude of the bit string $x$, so $x=2q_1+q_0$. A gate on one qubit alone is then written with the identity in the other slot, and <b>which</b> slot is the whole content of the statement.'},
 

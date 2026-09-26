@@ -632,7 +632,7 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 5.0.1 -- */
-{ id:'m5-open', module:'M5', nav:'The machine, as it is run', title:'Circuits and Protocols',
+{ id:'m5-open', module:'M5', nav:'Circuits and Protocols', title:'Circuits and Protocols',
   objective:'Say what this chapter adds to the gates of chapter 4, and name the three objects it keeps apart.',
   keywords:'circuit model overview module 5 program run shots protocol teleportation grover resource claim introduction',
   src:'L8 · a circuit is an abstract program', steps:2, blocks:[
@@ -655,7 +655,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.1.1 -- */
-{ id:'m5-circuit', module:'M5', nav:'What a circuit is', title:'Quantum Circuits',
+{ id:'m5-circuit', module:'M5', nav:'Quantum Circuits', title:'Quantum Circuits',
   objective:'Read a circuit diagram: wires, gates, layers, and the order the gates act in.',
   keywords:'quantum circuit diagram wires gates layers program abstract not hardware time left to right qubit lines',
   src:'L8 · building an abstract circuit', steps:3, slide:true, blocks:[
@@ -680,7 +680,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.1.2 -- */
-{ id:'m5-model', module:'M5', nav:'The circuit model', title:'The Circuit Model of Computation',
+{ id:'m5-model', module:'M5', nav:'The Circuit Model of Computation', title:'The Circuit Model of Computation',
   objective:'State the four steps of the circuit model and say what each one fixes.',
   keywords:'circuit model computation prepare unitary measure repeat computational basis finite gate set model of computation',
   src:'L8 · a circuit is an abstract program', steps:3, slide:true, blocks:[
@@ -705,7 +705,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.1.3 -- */
-{ id:'m5-read', module:'M5', nav:'Reading the wires', title:'Reading Circuit Diagrams',
+{ id:'m5-read', module:'M5', nav:'Reading Circuit Diagrams', title:'Reading Circuit Diagrams',
   objective:'Translate between the wire order in a diagram, the ket, the vector index and the printed bit string.',
   keywords:'bit order convention wire order ket index vector entry classical register string little endian least significant',
   src:'L8 · bit order: wires, integers, kets and strings', steps:3, slide:true, blocks:[
@@ -730,7 +730,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.1.4 -- */
-{ id:'m5-depth', module:'M5', nav:'Depth against gate count', title:'Circuit Depth and Gate Count',
+{ id:'m5-depth', module:'M5', nav:'Circuit Depth and Gate Count', title:'Circuit Depth and Gate Count',
   objective:'Compute the depth and the gate count of a circuit and say which one a coherence budget limits.',
   keywords:'depth gate count layers parallel ghz chain tree coherence time budget circuit length two qubit count',
   src:'L8 · GHZ state, transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
@@ -755,7 +755,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-circuit', module:'M5', nav:'Code · The circuit model', title:'The Circuit Model in Code',
+{ id:'m5-code-circuit', module:'M5', nav:'The Circuit Model in Code', title:'The Circuit Model in Code',
   objective:'Build a circuit from its gate list, read the order of its wires, and count its layers.',
   keywords:'code qiskit numpy program circuit unitary gate list depth layers bit order run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -765,7 +765,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.2.1 -- */
-{ id:'m5-state', module:'M5', nav:'Exact simulation', title:'Statevector Simulation',
+{ id:'m5-state', module:'M5', nav:'Statevector Simulation', title:'Statevector Simulation',
   objective:'Say what an exact statevector simulation gives and where it stops being possible.',
   keywords:'statevector simulation exact amplitudes deterministic memory exponential debugging tool classical simulation limit',
   src:'L8 · exact statevector evolution and the operator representation', steps:3, slide:true, blocks:[
@@ -790,7 +790,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.2.2 -- */
-{ id:'m5-shots', module:'M5', nav:'Shots and their error', title:'Shots and Sampling Error',
+{ id:'m5-shots', module:'M5', nav:'Shots and Sampling Error', title:'Shots and Sampling Error',
   objective:'Give the standard error of a probability estimated from N shots and separate it from device noise.',
   keywords:'shots sampling binomial standard error one over root n estimation finite statistics not physical noise systematic',
   src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
@@ -815,7 +815,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.2.3 -- */
-{ id:'m5-measure', module:'M5', nav:'Measurement inside a circuit', title:'Mid-Circuit Measurement',
+{ id:'m5-measure', module:'M5', nav:'Mid-Circuit Measurement', title:'Mid-Circuit Measurement',
   objective:'Apply the deferred-measurement rule and say which rearrangements it does not permit.',
   keywords:'deferred measurement principle mid circuit measurement implicit measurement control classical equivalence commute barrier',
   src:'L8 · measurement, barriers and finite shots', steps:3, slide:true, blocks:[
@@ -840,7 +840,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.2.4 -- */
-{ id:'m5-feed', module:'M5', nav:'Classical feedforward', title:'Classical Feedforward',
+{ id:'m5-feed', module:'M5', nav:'Classical Feedforward', title:'Classical Feedforward',
   objective:'Read a dynamic circuit and say what feedforward costs that a fixed circuit does not.',
   keywords:'dynamic circuit classical feedforward conditional gate mid circuit measurement latency reset real time control flow',
   src:'L8 · dynamic circuits and classical feedforward', steps:3, slide:true, blocks:[
@@ -865,7 +865,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-run', module:'M5', nav:'Code · Running a circuit', title:'Running a Circuit in Code',
+{ id:'m5-code-run', module:'M5', nav:'Running a Circuit in Code', title:'Running a Circuit in Code',
   objective:'Compare an exact state with finite shots, and follow a measurement and a classically controlled gate branch by branch.',
   keywords:'code qiskit numpy program statevector shots standard error mid circuit measurement feedforward run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -875,7 +875,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.3.1 -- */
-{ id:'m5-iset', module:'M5', nav:'The instruction set', title:'Native Gate Sets',
+{ id:'m5-iset', module:'M5', nav:'Native Gate Sets', title:'Native Gate Sets',
   objective:'Rewrite a gate into a stated instruction set and count what the rewrite costs.',
   keywords:'instruction set native gates basis gates translation rewriting hadamard cz decomposition compile target isa',
   src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
@@ -900,7 +900,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.3.2 -- */
-{ id:'m5-transpile', module:'M5', nav:'Layout and routing', title:'Layout and Routing',
+{ id:'m5-transpile', module:'M5', nav:'Layout and Routing', title:'Layout and Routing',
   objective:'Count what routing a gate between distant qubits costs on a stated coupling map.',
   keywords:'transpilation layout routing coupling map connectivity swap overhead physical qubits virtual mapping compiler passes',
   src:'L8 · transpilation and instruction-set compliance', steps:3, slide:true, blocks:[
@@ -925,7 +925,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.3.3 -- */
-{ id:'m5-cost', module:'M5', nav:'What a resource claim names', title:'Resource Claims',
+{ id:'m5-cost', module:'M5', nav:'Resource Claims', title:'Resource Claims',
   objective:'State the five components of a resource claim and reject a claim that is missing one.',
   keywords:'resource claim task input model accuracy hardware model classical baseline speedup comparison honest reporting',
   src:'L8 · execution time, usage and experimental cost', steps:3, slide:true, blocks:[
@@ -950,7 +950,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.3.4 -- */
-{ id:'m5-fault', module:'M5', nav:'Physical and logical qubits', title:'Physical and Logical Qubits',
+{ id:'m5-fault', module:'M5', nav:'Physical and Logical Qubits', title:'Physical and Logical Qubits',
   objective:'Distinguish physical and logical qubits, explain syndrome checks and the threshold, and identify space and time overhead.',
   keywords:'quantum error correction physical qubit logical qubit code block syndrome checks decoder threshold code distance fault tolerance space overhead time overhead',
   src:'L0 · physical qubits, logical qubits and fault tolerance; L11 · fault-tolerant logical operations; L12 · error budgets and logical qubits; L13 · error correction changes scaling', steps:3, slide:true, blocks:[
@@ -975,7 +975,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-compile', module:'M5', nav:'Code · Compiling for a machine', title:'Compiling for a Machine in Code',
+{ id:'m5-code-compile', module:'M5', nav:'Compiling for a Machine in Code', title:'Compiling for a Machine in Code',
   objective:'Rewrite gates into a basis set, check them up to a global phase, and count what routing on a line costs.',
   keywords:'code qiskit numpy program decomposition basis gates global phase routing swap cnot count run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -985,7 +985,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.4.1 -- */
-{ id:'m5-ramsey', module:'M5', nav:'Turning phase into counts', title:'Ramsey Interference',
+{ id:'m5-ramsey', module:'M5', nav:'Ramsey Interference', title:'Ramsey Interference',
   objective:'Trace the Hadamard sandwich and give the probability it produces from a phase.',
   keywords:'ramsey interference hadamard sandwich phase to population conversion fringe measurement basis change cosine squared',
   src:'L8 · Ramsey-style phase-to-population conversion', steps:3, slide:true, blocks:[
@@ -1010,7 +1010,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-ramsey', module:'M5', nav:'Code · Interference in a circuit', title:'Interference in a Circuit in Code',
+{ id:'m5-code-ramsey', module:'M5', nav:'Interference in a Circuit in Code', title:'Interference in a Circuit in Code',
   objective:'Run the Hadamard sandwich and read the fringe off the counts it predicts.',
   keywords:'code qiskit numpy program ramsey hadamard phase fringe cosine squared run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1020,7 +1020,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.1 -- */
-{ id:'m5-nocopy', module:'M5', nav:'Why not just copy it', title:'The No-Cloning Theorem',
+{ id:'m5-nocopy', module:'M5', nav:'The No-Cloning Theorem', title:'The No-Cloning Theorem',
   objective:'Show that a universal copier is impossible and say what the CNOT copier actually does.',
   keywords:'no cloning theorem copy unknown state inner product proof cnot copier entangles instead orthogonal states classical bit',
   src:'L9 · the no-cloning theorem', steps:3, slide:true, blocks:[
@@ -1045,7 +1045,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.2 -- */
-{ id:'m5-tele', module:'M5', nav:'The teleportation circuit', title:'The Teleportation Circuit',
+{ id:'m5-tele', module:'M5', nav:'The Teleportation Circuit', title:'The Teleportation Circuit',
   objective:'Read the teleportation circuit stage by stage, name what each stage does, and state its role in a quantum network.',
   keywords:'teleportation circuit quantum network primitive nodes link bell pair bell measurement basis rotation classical wires correction three qubits protocol stages',
   src:'L0 · computing, sensing and networking; L9 · the three-qubit teleportation circuit', steps:3, slide:true, blocks:[
@@ -1070,7 +1070,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.3 -- */
-{ id:'m5-teleid', module:'M5', nav:'The identity, derived', title:'Deriving Teleportation',
+{ id:'m5-teleid', module:'M5', nav:'Deriving Teleportation', title:'Deriving Teleportation',
   objective:'Derive the four-branch teleportation identity from the initial product state.',
   keywords:'teleportation identity derivation four branches expansion cnot hadamard algebra three qubit state pauli frame',
   src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
@@ -1095,7 +1095,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.4 -- */
-{ id:'m5-telecorr', module:'M5', nav:'The correction table', title:'The Correction Table',
+{ id:'m5-telecorr', module:'M5', nav:'The Correction Table', title:'The Correction Table',
   objective:'Read the correction out of the two measured bits and verify one branch by hand.',
   keywords:'correction table pauli frame measured bits branches x z gates classical feedforward teleportation recovery four cases',
   src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
@@ -1120,7 +1120,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.5 -- */
-{ id:'m5-nosig', module:'M5', nav:'Nothing is sent', title:'Teleportation and No-Signalling',
+{ id:'m5-nosig', module:'M5', nav:'Teleportation and No-Signalling', title:'Teleportation and No-Signalling',
   objective:'Show that Bob’s reduced state is independent of the input and say what that rules out.',
   keywords:'no signaling reduced state maximally mixed independent of input classical channel light speed entanglement alone sends nothing',
   src:'L9 · teleportation identity, resources and no signaling', steps:3, slide:true, blocks:[
@@ -1145,7 +1145,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.5.6 -- */
-{ id:'m5-teleres', module:'M5', nav:'What it costs, and what counts as working', title:'The Cost and Fidelity of Teleportation',
+{ id:'m5-teleres', module:'M5', nav:'The Cost and Fidelity of Teleportation', title:'The Cost and Fidelity of Teleportation',
   objective:'Account for the resources one teleportation consumes and state the fidelity benchmark it must exceed.',
   keywords:'resources ebit classical bits fidelity benchmark two thirds measure and prepare singlet fraction average fidelity claim',
   src:'L9 · teleportation fidelity and experimental claims', steps:3, slide:true, blocks:[
@@ -1170,7 +1170,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.L1 --- */
-{ id:'m5-lab-i', module:'M5', nav:'Laboratory I', title:'Laboratory I \u2014 Teleportation, Step by Step',
+{ id:'m5-lab-i', module:'M5', nav:'Laboratory I \u2014 Teleportation, Step by Step', title:'Laboratory I \u2014 Teleportation, Step by Step',
   objective:'Let the reader step the teleportation circuit and see the correction selected by the measured bits.',
   keywords:'laboratory teleportation stepped branches correction measured bits reduced state bloch no signaling classical channel',
   steps:0, slide:true, blocks:[
@@ -1181,7 +1181,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-tele', module:'M5', nav:'Code · Teleportation', title:'Teleportation in Code',
+{ id:'m5-code-tele', module:'M5', nav:'Teleportation in Code', title:'Teleportation in Code',
   objective:'Run the teleportation circuit branch by branch, apply the correction the bits choose, and check what Bob holds before they arrive.',
   keywords:'code qiskit numpy program teleportation branches correction fidelity reduced state maximally mixed run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1191,7 +1191,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.1 -- */
-{ id:'m5-search', module:'M5', nav:'The search problem', title:'Unstructured Search',
+{ id:'m5-search', module:'M5', nav:'Unstructured Search', title:'Unstructured Search',
   objective:'State the search problem in the query model and say what the oracle is and is not.',
   keywords:'unstructured search oracle query model black box marked items reversible embedding classical baseline n over two',
   src:'L9 · Grover search and the oracle', steps:3, slide:true, blocks:[
@@ -1216,7 +1216,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.2 -- */
-{ id:'m5-kick', module:'M5', nav:'Phase kickback', title:'The Phase Oracle',
+{ id:'m5-kick', module:'M5', nav:'The Phase Oracle', title:'The Phase Oracle',
   objective:'Derive phase kickback and use it to turn the standard oracle into a phase oracle.',
   keywords:'phase kickback minus state eigenstate oracle sign marked items reflection relative phase mechanism interference algorithms',
   src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
@@ -1241,7 +1241,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.3 -- */
-{ id:'m5-geom', module:'M5', nav:'The plane it happens in', title:'The Geometry of Grover Search',
+{ id:'m5-geom', module:'M5', nav:'The Geometry of Grover Search', title:'The Geometry of Grover Search',
   objective:'Write the uniform superposition in the marked and unmarked basis and give the angle it makes.',
   keywords:'grover geometry two dimensional subspace good bad states uniform superposition angle theta arcsin marked fraction plane',
   src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
@@ -1266,7 +1266,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.4 -- */
-{ id:'m5-rotate', module:'M5', nav:'Two reflections make a turn', title:'The Grover Iteration',
+{ id:'m5-rotate', module:'M5', nav:'The Grover Iteration', title:'The Grover Iteration',
   objective:'Show that the Grover iteration rotates the state by twice the angle theta.',
   keywords:'grover iteration oracle reflection diffusion operator inversion about the mean rotation two theta amplitude amplification',
   src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
@@ -1291,7 +1291,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.5 -- */
-{ id:'m5-iter', module:'M5', nav:'How many iterations', title:'The Optimal Number of Iterations',
+{ id:'m5-iter', module:'M5', nav:'The Optimal Number of Iterations', title:'The Optimal Number of Iterations',
   objective:'Compute the optimal iteration count and the success probability, and describe the overshoot.',
   keywords:'optimal iterations grover success probability sine squared overshoot rotate past unknown m quantum counting stopping',
   src:'L9 · geometry of amplitude amplification', steps:3, slide:true, blocks:[
@@ -1316,7 +1316,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.6.6 -- */
-{ id:'m5-claim', module:'M5', nav:'What the square root claims', title:'The Grover Speedup',
+{ id:'m5-claim', module:'M5', nav:'The Grover Speedup', title:'The Grover Speedup',
   objective:'Write Grover\u2019s claim against the five components and say precisely what it does and does not assert.',
   keywords:'grover claim query complexity optimality lower bound end to end cost data loading error correction baseline speedup honest',
   src:'L9 · oracles and hidden implementation cost', steps:3, slide:true, blocks:[
@@ -1341,7 +1341,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.L2 --- */
-{ id:'m5-lab-j', module:'M5', nav:'Laboratory J', title:'Laboratory J \u2014 Grover Iterations and Overshoot',
+{ id:'m5-lab-j', module:'M5', nav:'Laboratory J \u2014 Grover Iterations and Overshoot', title:'Laboratory J \u2014 Grover Iterations and Overshoot',
   objective:'Let the reader turn the problem size and the iteration count and watch the success probability rise and fall.',
   keywords:'laboratory grover amplitude amplification iterations angle success probability overshoot optimum marked items amplitudes',
   steps:0, slide:true, blocks:[
@@ -1352,13 +1352,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m5-code-grover', module:'M5', nav:'Code · Grover search', title:'Grover Search in Code',
+{ id:'m5-code-grover', module:'M5', nav:'Grover Search in Code', title:'Grover Search in Code',
   objective:'Build Grover from two reflections, find the best iteration count, and watch the overshoot.',
   keywords:'code qiskit numpy program grover oracle diffusion reflection iterations success probability overshoot run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 5 · Grover search'},
   {t:'title', text:'Grover Search in Code'},
   {t:'raw', html:()=>CODEBANK.page('m5-code-grover')}
+]},
+
+/* ---------------------------------------------------------------- 5.6.7 -- */
+{ id:'m5-quick', module:'M5', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict circuit depth gate count shots native gate set routing fault tolerance ramsey grover',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 5 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Depth', html:'$H$ on both qubits, then $\\mathrm{CZ}$. Find the depth.',
+      ask:{key:'m5-qc0', choices:['$2$','$3$','$1$'], answer:0,
+        why:'One layer, then CZ.'}}],
+    [{t:'note', kind:'def', head:'Circuit model', html:'$n=3$ qubits, one shot. What comes back?',
+      ask:{key:'m5-qc1', choices:['3 bits','8 numbers','3 amps'], answer:0,
+        why:'One bit a qubit.'}}],
+    [{t:'note', kind:'def', head:'Bit order', html:'A three-qubit run prints $011$. Which entry?',
+      ask:{key:'m5-qc2', choices:['$3$','$6$','$4$'], answer:0,
+        why:'$0{+}2{+}1=3$.'}}],
+    [{t:'note', kind:'def', head:'GHZ tree', html:'$n=32$, gates of $50$ns. Find the time.',
+      ask:{key:'m5-qc3', choices:['$0.3\\mu s$','$1.6\\mu s$','$0.25\\mu s$'], answer:0,
+        why:'Depth $1{+}\\log_2 32$.'}}],
+    [{t:'note', kind:'def', head:'Memory', html:'$8$GB, one state vector. Largest qubit count?',
+      ask:{key:'m5-qc4', choices:['$28$','$29$','$32$'], answer:0,
+        why:'$16\\cdot2^{n}\\le8\\times10^{9}$.'}}],
+    [{t:'note', kind:'def', head:'Shot noise', html:'$p=0.2$, $N=400$. Find the SE.',
+      ask:{key:'m5-qc5', choices:['$0.02$','$0.2$','$0.002$'], answer:0,
+        why:'$\\sqrt{0.16/400}$.'}}],
+    [{t:'note', kind:'def', head:'Gate set', html:'$10$ CNOTs on CZ, $R_z$, $R_x$. Instructions?',
+      ask:{key:'m5-qc6', choices:['$30$','$10$','$20$'], answer:0,
+        why:'Three per CNOT.'}}],
+    [{t:'note', kind:'def', head:'Routing', html:'Qubits $3$ steps apart. Extra CNOTs?',
+      ask:{key:'m5-qc7', choices:['$6$','$3$','$9$'], answer:0,
+        why:'$3(d-1)=6$.'}}],
+    [{t:'note', kind:'def', head:'Resource claims', html:'"Solves it in $50$ queries." Missing?',
+      ask:{key:'m5-qc8', choices:['most of it','baseline','nothing'], answer:0,
+        why:'One of five is named.'}}],
+    [{t:'note', kind:'def', head:'Fault tolerance', html:'Three-copy code, $p=0.05$. Find $p_{L}$.',
+      ask:{key:'m5-qc9', choices:['$0.0073$','$0.05$','$0.15$'], answer:0,
+        why:'$3p^{2}-2p^{3}$.'}}],
+    [{t:'note', kind:'def', head:'Ramsey', html:'$\\varphi=120^{\\circ}$. Find $p(0)$.',
+      ask:{key:'m5-qc10', choices:['$0.25$','$0.75$','$0.5$'], answer:0,
+        why:'$\\cos^{2}60^{\\circ}$.'}}],
+    [{t:'note', kind:'def', head:'No-cloning', html:'CNOT copier on $|0\\rangle|0\\rangle$. Succeed?',
+      ask:{key:'m5-qc11', choices:['Yes','No','Only half'], answer:0,
+        why:'Basis states copy fine.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 5.7.1 -- */
@@ -1392,7 +1440,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 5.7.2 -- */
-{ id:'m5-shapes', module:'M5', nav:'The shapes of question', title:'Question Types',
+{ id:'m5-shapes', module:'M5', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types of chapter 5 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice circuit depth shots teleportation grover resource claim',
   steps:1, blocks:[

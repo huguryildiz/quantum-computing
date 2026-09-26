@@ -370,7 +370,7 @@ Object.assign(LABS, (function(){
 
     return { mount(root){
       root.innerHTML = `
-        <div class="cols c-7-5" style="gap:40px">
+        <div class="cols c-4-8" style="gap:40px">
           <div class="col stack"><div class="plots"></div></div>
           <div class="col stack">
             <div class="ctrls one">

@@ -504,7 +504,7 @@ function figGenerator(){
 const SC = [
 
 /* ---------------------------------------------------------------- 1.0.1 -- */
-{ id:'m1-open', module:'M1', nav:'One language', title:'The Mathematics of Quantum States',
+{ id:'m1-open', module:'M1', nav:'The Mathematics of Quantum States', title:'The Mathematics of Quantum States',
   objective:'Say what the chapter is for: the notation every later chapter is written in.',
   keywords:'linear algebra language complex vector space basis matrix inner product overview module 1',
   src:'L2 · why linear algebra is the language', steps:2, blocks:[
@@ -528,7 +528,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.1.1 -- */
-{ id:'m1-ket', module:'M1', nav:'A state is a column', title:'Kets as Column Vectors',
+{ id:'m1-ket', module:'M1', nav:'Kets as Column Vectors', title:'Kets as Column Vectors',
   objective:'Write a qubit state as a normalised complex column and read superposition as linearity.',
   keywords:'ket state vector complex vector space superposition linearity normalisation amplitude column',
   src:'L2 · vectors and dual vectors', steps:3, slide:true, blocks:[
@@ -553,7 +553,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.1.2 -- */
-{ id:'m1-bra', module:'M1', nav:'Bras and the inner product', title:'Bras and the Inner Product',
+{ id:'m1-bra', module:'M1', nav:'Bras and the Inner Product', title:'Bras and the Inner Product',
   objective:'Form the adjoint of a ket and compute an inner product with the conjugate in the right place.',
   keywords:'bra dual vector adjoint conjugate transpose inner product vdot overlap dagger',
   src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
@@ -579,7 +579,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.1.3 -- */
-{ id:'m1-overlap', module:'M1', nav:'Length and overlap', title:'Norm, Orthogonality and Overlap',
+{ id:'m1-overlap', module:'M1', nav:'Norm, Orthogonality and Overlap', title:'Norm, Orthogonality and Overlap',
   objective:'Read the modulus of an inner product as a measure of similarity, bounded by Cauchy-Schwarz.',
   keywords:'norm length orthogonality cauchy schwarz overlap distinguishable states unit vector angle',
   src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, slide:true, blocks:[
@@ -604,7 +604,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.1.4 -- */
-{ id:'m1-basis', module:'M1', nav:'Orthonormal bases', title:'Orthonormal Bases',
+{ id:'m1-basis', module:'M1', nav:'Orthonormal Bases', title:'Orthonormal Bases',
   objective:'Derive the expansion coefficient as an inner product and see that coefficients are basis dependent.',
   keywords:'orthonormal basis kronecker delta expansion coefficients change of basis completeness dimension',
   src:'L2 · dimension and bases', steps:3, slide:true, blocks:[
@@ -630,7 +630,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-inner', module:'M1', nav:'Code · The inner product', title:'The Inner Product in Code',
+{ id:'m1-code-inner', module:'M1', nav:'The Inner Product in Code', title:'The Inner Product in Code',
   objective:'Normalise a state, take an inner product with the conjugate in place, and read coefficients in a basis.',
   keywords:'code qiskit numpy program statevector inner product normalise conjugate basis coefficient run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -640,7 +640,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.2.1 -- */
-{ id:'m1-amp', module:'M1', nav:'Modulus and phase', title:'Complex Amplitudes',
+{ id:'m1-amp', module:'M1', nav:'Complex Amplitudes', title:'Complex Amplitudes',
   objective:'Split a complex amplitude into modulus and phase and compute both without losing the quadrant.',
   keywords:'complex number modulus phase argument euler formula conjugate polar form atan2 amplitude',
   src:'L3 · complex numbers', steps:3, slide:true, blocks:[
@@ -665,7 +665,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.2.2 -- */
-{ id:'m1-phase', module:'M1', nav:'Global and relative phase', title:'Global and Relative Phase',
+{ id:'m1-phase', module:'M1', nav:'Global and Relative Phase', title:'Global and Relative Phase',
   objective:'Show that a phase on the whole state changes no probability, and that a phase between two terms changes them all.',
   keywords:'global phase relative phase interference hadamard plus minus indistinguishable equivalence class',
   src:'L3 · global phase, relative phase and interference', steps:3, slide:true, blocks:[
@@ -690,7 +690,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.L1 --- */
-{ id:'m1-lab-a', module:'M1', nav:'Laboratory A', title:'Laboratory A \u2014 The Relative-Phase Interferometer',
+{ id:'m1-lab-a', module:'M1', nav:'Laboratory A \u2014 The Relative-Phase Interferometer', title:'Laboratory A \u2014 The Relative-Phase Interferometer',
   objective:'Let the reader move a global phase and a relative phase and watch only one of them do anything.',
   keywords:'laboratory interferometer relative phase global phase hadamard probabilities amplitudes interactive',
   steps:0, slide:true, blocks:[
@@ -702,7 +702,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-phase', module:'M1', nav:'Code · Amplitude and phase', title:'Amplitude and Phase in Code',
+{ id:'m1-code-phase', module:'M1', nav:'Amplitude and Phase in Code', title:'Amplitude and Phase in Code',
   objective:'Split an amplitude into modulus and phase, show that a global phase changes nothing, and read a relative phase with a Hadamard.',
   keywords:'code qiskit numpy program phase global relative hadamard angle atan2 run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -712,7 +712,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.3.1 -- */
-{ id:'m1-outer', module:'M1', nav:'The outer product', title:'The Outer Product',
+{ id:'m1-outer', module:'M1', nav:'The Outer Product', title:'The Outer Product',
   objective:'Build an operator from two states and tell the outer product apart from the inner and tensor products.',
   keywords:'outer product operator matrix unit dyad column times row rank one shapes',
   src:'L2 · outer products are not tensor products', steps:3, slide:true, blocks:[
@@ -762,7 +762,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.3.3 -- */
-{ id:'m1-resid', module:'M1', nav:'Resolving the identity', title:'Resolution of the Identity',
+{ id:'m1-resid', module:'M1', nav:'Resolution of the Identity', title:'Resolution of the Identity',
   objective:'State the completeness relation and use inserting it as a named derivation step.',
   keywords:'resolution of identity completeness relation basis expansion insert identity sum of projectors',
   src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
@@ -787,7 +787,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-proj', module:'M1', nav:'Code · Outer products and projectors', title:'Outer Products and Projectors in Code',
+{ id:'m1-code-proj', module:'M1', nav:'Outer Products and Projectors in Code', title:'Outer Products and Projectors in Code',
   objective:'Build an outer product, split a state with a projector, and insert the resolution of the identity.',
   keywords:'code qiskit numpy program outer product projector resolution identity run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -797,7 +797,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.4.1 -- */
-{ id:'m1-gs', module:'M1', nav:'Gram-Schmidt', title:'The Gram\u2013Schmidt Process',
+{ id:'m1-gs', module:'M1', nav:'The Gram\u2013Schmidt Process', title:'The Gram\u2013Schmidt Process',
   objective:'Run the Gram-Schmidt recursion by hand and say what makes it fail numerically.',
   keywords:'gram schmidt orthonormalisation qr factorisation projection subtract normalise conditioning stability',
   src:'L2 · constructing an orthonormal basis', steps:3, slide:true, blocks:[
@@ -822,7 +822,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.L2 --- */
-{ id:'m1-lab-b', module:'M1', nav:'Laboratory B', title:'Laboratory B \u2014 Gram\u2013Schmidt, Step by Step',
+{ id:'m1-lab-b', module:'M1', nav:'Laboratory B \u2014 Gram\u2013Schmidt, Step by Step', title:'Laboratory B \u2014 Gram\u2013Schmidt, Step by Step',
   objective:'Let the reader choose three vectors, step the orthogonalisation, and drive it to failure.',
   keywords:'laboratory gram schmidt orthonormalisation steps conditioning near dependent modified stability',
   steps:0, slide:true, blocks:[
@@ -833,7 +833,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-gs', module:'M1', nav:'Code · Gram-Schmidt', title:'Gram\u2013Schmidt in Code',
+{ id:'m1-code-gs', module:'M1', nav:'Gram\u2013Schmidt in Code', title:'Gram\u2013Schmidt in Code',
   objective:'Run Gram-Schmidt by hand, compare it with QR, and watch the classical recursion lose orthogonality.',
   keywords:'code qiskit numpy program gram schmidt qr modified orthonormal run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -843,7 +843,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.5.1 -- */
-{ id:'m1-tensor', module:'M1', nav:'The tensor product', title:'The Tensor Product',
+{ id:'m1-tensor', module:'M1', nav:'The Tensor Product', title:'The Tensor Product',
   objective:'Form a tensor product of columns and of matrices, under the bit order this course fixes.',
   keywords:'tensor product kronecker composite system dimension multiply bit order qubit register basis strings',
   src:'L2 · tensor products', steps:3, slide:true, blocks:[
@@ -867,7 +867,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.5.2 -- */
-{ id:'m1-expo', module:'M1', nav:'Where the exponential comes from', title:'Exponential Growth of the State Space',
+{ id:'m1-expo', module:'M1', nav:'Exponential Growth of the State Space', title:'Exponential Growth of the State Space',
   objective:'Derive the 2^n dimension from the tensor product and separate size from advantage.',
   keywords:'exponential dimension two to the n state space size readout n bits advantage structure scaling',
   src:'L2 · tensor products', steps:3, slide:true, blocks:[
@@ -891,7 +891,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-tensor', module:'M1', nav:'Code · The tensor product', title:'The Tensor Product in Code',
+{ id:'m1-code-tensor', module:'M1', nav:'The Tensor Product in Code', title:'The Tensor Product in Code',
   objective:'Form tensor products of states and operators in the course bit order and count the amplitudes of a register.',
   keywords:'code qiskit numpy program tensor kron bit order register dimension run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -901,7 +901,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.6.1 -- */
-{ id:'m1-adjoint', module:'M1', nav:'The adjoint', title:'The Adjoint',
+{ id:'m1-adjoint', module:'M1', nav:'The Adjoint', title:'The Adjoint',
   objective:'Form the adjoint of an operator, test a matrix for Hermiticity, and apply the order-reversal rule.',
   keywords:'adjoint dagger conjugate transpose hermitian test order reversal product numpy conj',
   src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
@@ -926,7 +926,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.6.2 -- */
-{ id:'m1-herm', module:'M1', nav:'Why observables are Hermitian', title:'Hermitian Operators',
+{ id:'m1-herm', module:'M1', nav:'Hermitian Operators', title:'Hermitian Operators',
   objective:'Prove that Hermiticity forces real eigenvalues and say why an observable therefore has to be Hermitian.',
   keywords:'hermitian real eigenvalues proof observable measurement outcomes orthonormal eigenbasis spectrum',
   src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
@@ -952,7 +952,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.6.3 -- */
-{ id:'m1-unit', module:'M1', nav:'Unitary operators', title:'Unitary Operators',
+{ id:'m1-unit', module:'M1', nav:'Unitary Operators', title:'Unitary Operators',
   objective:'Derive the unitarity condition from the requirement that overlaps are preserved.',
   keywords:'unitary inner product preserved norm reversible gate adjoint inverse orthonormal columns',
   src:'L3 · unitary operators', steps:3, slide:true, blocks:[
@@ -977,7 +977,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.6.4 -- */
-{ id:'m1-gen', module:'M1', nav:'Hermitian generators', title:'Hermitian Generators of Unitaries',
+{ id:'m1-gen', module:'M1', nav:'Hermitian Generators of Unitaries', title:'Hermitian Generators of Unitaries',
   objective:'Show that the exponential of a Hermitian operator is unitary and derive its closed form for a Pauli.',
   keywords:'generator exponential unitary family pauli series even odd terms closed form cosine sine',
   src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
@@ -1003,7 +1003,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.6.5 -- */
-{ id:'m1-halfangle', module:'M1', nav:'The half angle', title:'The Half Angle',
+{ id:'m1-halfangle', module:'M1', nav:'The Half Angle', title:'The Half Angle',
   objective:'Evaluate a Pauli rotation at a given angle and read the sign a full turn produces.',
   keywords:'half angle double cover full turn minus identity rotation rz worked example global phase period',
   src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
@@ -1028,7 +1028,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-herm', module:'M1', nav:'Code · Hermitian and unitary operators', title:'Hermitian and Unitary Operators in Code',
+{ id:'m1-code-herm', module:'M1', nav:'Hermitian and Unitary Operators in Code', title:'Hermitian and Unitary Operators in Code',
   objective:'Test for Hermiticity and unitarity, and build a rotation from its Hermitian generator.',
   keywords:'code qiskit numpy program adjoint hermitian unitary generator rotation rx run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1038,7 +1038,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.7.1 -- */
-{ id:'m1-eig', module:'M1', nav:'Eigenvectors', title:'Eigenvalues and Eigenvectors',
+{ id:'m1-eig', module:'M1', nav:'Eigenvalues and Eigenvectors', title:'Eigenvalues and Eigenvectors',
   objective:'Solve a two-by-two eigenvalue problem and say what an eigenvector is determined up to.',
   keywords:'eigenvector eigenvalue characteristic polynomial invariant direction degeneracy eigh eig scale phase',
   src:'L3 · eigenvectors and eigenvalues', steps:3, slide:true, blocks:[
@@ -1063,7 +1063,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.7.2 -- */
-{ id:'m1-spectral', module:'M1', nav:'The spectral theorem', title:'The Spectral Theorem',
+{ id:'m1-spectral', module:'M1', nav:'The Spectral Theorem', title:'The Spectral Theorem',
   objective:'Write a Hermitian operator as a weighted sum of projectors and verify the two properties they satisfy.',
   keywords:'spectral theorem decomposition projectors orthogonal eigenbasis diagonalisation weighted sum degeneracy',
   src:'L3 · the finite-dimensional spectral theorem', steps:3, slide:true, blocks:[
@@ -1089,7 +1089,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.7.3 -- */
-{ id:'m1-fofa', module:'M1', nav:'Functions of an operator', title:'Functions of an Operator',
+{ id:'m1-fofa', module:'M1', nav:'Functions of an Operator', title:'Functions of an Operator',
   objective:'Evaluate a function of a Hermitian operator through its spectral decomposition.',
   keywords:'operator function exponential spectral eigenvalues matrix exponential not elementwise square root',
   src:'L3 · spectral projectors and functions of an operator', steps:3, slide:true, blocks:[
@@ -1114,7 +1114,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-spectral', module:'M1', nav:'Code · The spectral theorem', title:'The Spectral Theorem in Code',
+{ id:'m1-code-spectral', module:'M1', nav:'The Spectral Theorem in Code', title:'The Spectral Theorem in Code',
   objective:'Diagonalise a Hermitian matrix, rebuild it from its projectors, and evaluate a function of it.',
   keywords:'code qiskit numpy program eigh eigenvalue spectral projector exponential function run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1124,7 +1124,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.8.1 -- */
-{ id:'m1-dirac', module:'M1', nav:'Dirac notation', title:'Dirac Notation',
+{ id:'m1-dirac', module:'M1', nav:'Dirac Notation', title:'Dirac Notation',
   objective:'Translate between Dirac notation and matrix notation in both directions and read a product right to left.',
   keywords:'dirac notation bra ket translation matrix column row expectation value basis independent order',
   src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
@@ -1149,7 +1149,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-dirac', module:'M1', nav:'Code · Dirac notation', title:'Dirac Notation in Code',
+{ id:'m1-code-dirac', module:'M1', nav:'Dirac Notation in Code', title:'Dirac Notation in Code',
   objective:'Compute expectation values and matrix elements, and read a circuit as a matrix product right to left.',
   keywords:'code qiskit numpy program expectation value matrix element circuit order run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1159,7 +1159,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.9.1 -- */
-{ id:'m1-wavefunctions', module:'M1', nav:'Functions as vectors', title:'Wavefunctions as Vectors',
+{ id:'m1-wavefunctions', module:'M1', nav:'Wavefunctions as Vectors', title:'Wavefunctions as Vectors',
   objective:'Use the inner product for square-integrable functions and recognise it as the continuous version of a complex column.',
   keywords:'wavefunction function vector Hilbert space square integrable L2 inner product integral norm orthogonal sine cosine',
   src:'L4 · square-integrable functions as vectors', steps:3, slide:true, blocks:[
@@ -1184,7 +1184,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 1.9.2 -- */
-{ id:'m1-completeness', module:'M1', nav:'Completeness and truncation', title:'Completeness and Truncation',
+{ id:'m1-completeness', module:'M1', nav:'Completeness and Truncation', title:'Completeness and Truncation',
   objective:'Use a complete orthonormal basis, Parseval identity and the coefficient tail to quantify a truncated expansion.',
   keywords:'complete basis Parseval Fourier expansion coefficients truncation error norm convergence function space',
   src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, slide:true, blocks:[
@@ -1209,13 +1209,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m1-code-functions', module:'M1', nav:'Code · Functions as vectors', title:'Functions as Vectors in Code',
+{ id:'m1-code-functions', module:'M1', nav:'Functions as Vectors in Code', title:'Functions as Vectors in Code',
   objective:'Store sampled functions as states, check an orthonormal family, and measure what truncation loses.',
   keywords:'code qiskit numpy program function amplitude encoding parseval truncation run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 1 · Functions as vectors'},
   {t:'title', text:'Functions as Vectors in Code'},
   {t:'raw', html:()=>CODEBANK.page('m1-code-functions')}
+]},
+
+/* ---------------------------------------------------------------- 1.9.3 -- */
+{ id:'m1-quick', module:'M1', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict inner product outer product tensor adjoint unitary hermitian spectral gram schmidt phase',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 1 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Conjugate', html:'$\\langle a|b\\rangle=2-3i$. Find $\\langle b|a\\rangle$.',
+      ask:{key:'m1-qc0', choices:['$2-3i$','$2+3i$','$-2+3i$'], answer:1,
+        why:'Swap and conjugate.'}}],
+    [{t:'note', kind:'def', head:'Modulus', html:'$z=4e^{i\\pi/3}$. Find $|z|^{2}$.',
+      ask:{key:'m1-qc1', choices:['$4$','$8$','$16$'], answer:2,
+        why:'$zz^{*}=16$.'}}],
+    [{t:'note', kind:'def', head:'Outer product', html:'$|0\\rangle\\langle 0|$ acts on $|1\\rangle$.',
+      ask:{key:'m1-qc2', choices:['$|0\\rangle$','$|1\\rangle$','Zero'], answer:2,
+        why:'$\\langle 0|1\\rangle=0$.'}}],
+    [{t:'note', kind:'def', head:'Tensor size', html:'Three qubits. How many amplitudes?',
+      ask:{key:'m1-qc3', choices:['$3$','$6$','$8$'], answer:2,
+        why:'$2^{3}=8$.'}}],
+    [{t:'note', kind:'def', head:'Adjoint order', html:'$(AB)^{\\dagger}$ equals',
+      ask:{key:'m1-qc4', choices:['$A^{\\dagger}B^{\\dagger}$','$B^{\\dagger}A^{\\dagger}$','$BA$'], answer:1,
+        why:'Order reverses.'}}],
+    [{t:'note', kind:'def', head:'Unitary test', html:'$Z=\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$. Unitary?',
+      ask:{key:'m1-qc5', choices:['Yes','No','Not invertible'], answer:0,
+        why:'$Z^{\\dagger}Z=I$.'}}],
+    [{t:'note', kind:'def', head:'Hermitian spectrum', html:'$A$ is Hermitian. Eigenvalue $3i$?',
+      ask:{key:'m1-qc6', choices:['Yes','No','If unitary'], answer:1,
+        why:'Eigenvalues are real.'}}],
+    [{t:'note', kind:'def', head:'Spectral trace', html:'$A=2P_{+}+6P_{-}$. Find $\\operatorname{tr}(A)$.',
+      ask:{key:'m1-qc7', choices:['$4$','$8$','$12$'], answer:1,
+        why:'$2+6$.'}}],
+    [{t:'note', kind:'def', head:'Cauchy-Schwarz', html:'Normalised $|a\\rangle,|b\\rangle$. Largest $|\\langle a|b\\rangle|$?',
+      ask:{key:'m1-qc8', choices:['$0$','$1$','$2$'], answer:1,
+        why:'Bounded by $\\|a\\|\\|b\\|$.'}}],
+    [{t:'note', kind:'def', head:'Gram-Schmidt', html:'$v_{1}=(0,1)$, $v_{2}=(1,1)$. Find $u_{2}$.',
+      ask:{key:'m1-qc9', choices:['$(1,0)$','$(1,1)$','$(0,1)$'], answer:0,
+        why:'$(1,1)-(0,1)$.'}}],
+    [{t:'note', kind:'def', head:'Global phase', html:'$\\tfrac35|0\\rangle+\\tfrac45|1\\rangle\\to-|\\psi\\rangle$. Find $P(0)$.',
+      ask:{key:'m1-qc10', choices:['$\\tfrac{9}{25}$','$-\\tfrac{9}{25}$','$0$'], answer:0,
+        why:'Phase changes nothing.'}}],
+    [{t:'note', kind:'def', head:'Function of $A$', html:'$A=9P_{+}+4P_{-}$. Find $\\operatorname{tr}(A^{2})$.',
+      ask:{key:'m1-qc11', choices:['$81+16$','$13$','$13^{2}$'], answer:0,
+        why:'$81P_{+}+16P_{-}$.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 1.10.1 - */
@@ -1254,7 +1302,7 @@ const SC = [
    question it sets before it sets them — is kept here. The list is the same
    object the questions themselves are labelled from, so a shape cannot be
    described here and set differently there. */
-{ id:'m1-shapes', module:'M1', nav:'The shapes of question', title:'Question Types',
+{ id:'m1-shapes', module:'M1', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types and the method each one is answered by.',
   keywords:'question types taxonomy shapes method examination practice inner basis phase operator spectral tensor',
   steps:1, blocks:[

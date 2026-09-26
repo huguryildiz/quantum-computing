@@ -78,7 +78,7 @@ CONTENT.SECTIONS = {
         'm1-eig','m1-spectral','m1-fofa','m1-code-spectral'] },
     { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac','m1-code-dirac'] },
     { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness','m1-code-functions'] },
-    { n:'1.10', title:'Summary and practice',             ids:['m1-synth','m1-shapes'] }
+    { n:'1.10', title:'Summary and practice',             ids:['m1-quick','m1-synth','m1-shapes'] }
   ],
 
   /* Chapter 2 carries the other two postulates. The measurement sections come
@@ -100,7 +100,7 @@ CONTENT.SECTIONS = {
         'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d',
         'm2-code-dynamics'] },
     { n:'2.7', title:'Finite shots',                      ids:['m2-shots','m2-code-shots'] },
-    { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
+    { n:'2.8', title:'Summary and practice',              ids:['m2-quick','m2-synth','m2-shapes'] }
   ],
 
   /* Chapter 3 drops the two assumptions chapters 1 and 2 rested on, one at a
@@ -126,7 +126,7 @@ CONTENT.SECTIONS = {
     { n:'3.8', title:'Bell correlations',                 ids:[
         'm3-bell','m3-chsh','m3-violate','m3-lab-f','m3-nosig',
         'm3-code-bell'] },
-    { n:'3.9', title:'Summary and practice',              ids:['m3-synth','m3-shapes'] }
+    { n:'3.9', title:'Summary and practice',              ids:['m3-quick','m3-synth','m3-shapes'] }
   ],
 
   /* Chapter 4 is one qubit drawn, and then everything that can be done to it
@@ -149,7 +149,7 @@ CONTENT.SECTIONS = {
         'm4-order','m4-cnot','m4-cz','m4-swap','m4-code-twoqubit'] },
     { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h','m4-code-entangle'] },
     { n:'4.7', title:'Universality',                      ids:['m4-univ','m4-code-univ'] },
-    { n:'4.8', title:'Summary and practice',              ids:['m4-synth','m4-shapes'] }
+    { n:'4.8', title:'Summary and practice',              ids:['m4-quick','m4-synth','m4-shapes'] }
   ],
 
   /* Chapter 5 has two halves and the section order is the join between them.
@@ -180,7 +180,7 @@ CONTENT.SECTIONS = {
     { n:'5.6', title:'Grover search',                     ids:[
         'm5-search','m5-kick','m5-geom','m5-rotate','m5-iter','m5-claim',
         'm5-lab-j','m5-code-grover'] },
-    { n:'5.7', title:'Summary and practice',              ids:['m5-synth','m5-shapes'] }
+    { n:'5.7', title:'Summary and practice',              ids:['m5-quick','m5-synth','m5-shapes'] }
   ],
 
   /* Chapter 6 is one mechanism and four uses of it, and the section order is
@@ -218,7 +218,7 @@ CONTENT.SECTIONS = {
     { n:'6.7', title:'Factoring and period finding', ids:[
         'm6-shor','m6-shor15','m6-rsa','m6-shorclaim','m6-family',
         'm6-code-shor'] },
-    { n:'6.8', title:'Summary and practice',              ids:['m6-synth','m6-shapes'] }
+    { n:'6.8', title:'Summary and practice',              ids:['m6-quick','m6-synth','m6-shapes'] }
   ]
 
 };

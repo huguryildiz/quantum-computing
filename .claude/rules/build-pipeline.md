@@ -37,6 +37,7 @@ paths:
 | `verify/verify_scenes.py`, `verify_drills.py` | every number in the scenes and in the worked solutions, re-derived |
 | `verify/*.py` | the numerical gates |
 | `tools/rule_check.py` | banned phrases, figure-label rules, the `NC` mark |
+| `tools/content_guard.py` | the R4 student-facing prose guard — hard AI-slop failures and review-only style warnings, over source and over `dist/` |
 | `source/` | the open course this one adapts — gitignored, never redistributed |
 
 `site/` is not tracked. It is generated on every deploy by `node web/build-site.js`, from
@@ -74,6 +75,7 @@ cd build && node pw.js seccheck.js           # PROBLEMS: none
 .venv/bin/python tools/rule_check.py "build/src/8[1-9]_scenes*.js" \
   "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7*_code*.js" \
   "notes/src/*.js" "web/index.html"
+.venv/bin/python tools/content_guard.py --source --artifacts   # CONTENT GUARD: PASS (N review warning(s))
 .venv/bin/python verify/verify_scenes.py     # N passed, 0 failed
 .venv/bin/python verify/verify_drills.py     # N passed, 0 failed
 .venv/bin/python -m pytest verify/ -q        # the runner's own tests
@@ -92,6 +94,18 @@ cd build && node pw.js mcheck.js              # PAGE SCROLLS SIDEWAYS / SPILLED 
 cd build && node pw.js mcheck.js --w=320 --h=568
 cd build && node pw.js mcheck.js --w=844 --h=390     # a phone on its side
 cd build && node pw.js mcheck.js --w=820 --h=1180    # a tablet upright
+```
+
+A few more browser scripts exist for looking at the artifact rather than gating it — none prints
+a pass/fail line, all are run the same way, through `pw.js`:
+
+```bash
+cd build && node pw.js shelltest.js   # clip L/R/T/B and doc overflow of the stage, six viewport sizes
+cd build && node pw.js tocshot.js [outDir]   # the contents rail, the course map and the eyebrow chip, light and dark
+cd build && node pw.js modeshot.js    # a handful of named scenes in fixed theme/display combinations
+cd build && node pw.js darkshot.js    # one scene's heading color and background, plus a screenshot
+cd build && node pw.js projtest.js    # median and worst-case body text size in projector vs normal display
+cd build && node pw.js projover.js    # scenes whose content clips in projector display
 ```
 
 On a local machine, run every browser gate through `pw.js`, one per command: `qa.js`,

@@ -112,10 +112,6 @@ Object.assign(LABS, (function(){
         <div><dt>Amplitude of |0⟩</dt><dd>${fmt(a0[0],4)} ${a0[1]<0?'−':'+'} ${fmt(Math.abs(a0[1]),4)}i</dd></div>
         <div><dt>Amplitude of |1⟩</dt><dd>${fmt(a1[0],4)} ${a1[1]<0?'−':'+'} ${fmt(Math.abs(a1[1]),4)}i</dd></div>
         <div><dt>Total probability</dt><dd class="okv">${fmt(p0+p1,6)}</dd></div>
-        <div><dt>P(0)</dt><dd>${fmt(p0,4)}</dd></div>
-        <div><dt>P(1)</dt><dd>${fmt(p1,4)}</dd></div>
-        <div><dt>P(+)</dt><dd class="okv">${fmt(pPlus,4)}</dd></div>
-        <div><dt>P(−)</dt><dd>${fmt(pMinus,4)}</dd></div>
         <div><dt>Fringe visibility sin θ</dt><dd>${fmt(vis,4)}</dd></div>
         <div><dt>P(+) from the closed form</dt><dd>${fmt(closed,4)}</dd></div>
         <div><dt>P(0) from cos²(θ/2)</dt><dd>${fmt(Math.cos(st.theta*D2R/2)**2,4)}</dd></div>`;
@@ -131,12 +127,10 @@ Object.assign(LABS, (function(){
              ${T('P(+)=P(-)=\\tfrac12',false)} whatever it is set to. A relative phase needs two
              amplitudes, and the mixing angle is what supplies the second one.</div>`
         : `<div class="note ok"><span class="note-h">What each control did</span>
-             The mixing angle set the computational probabilities, ${T('P(0)=\\cos^{2}(\\theta/2)',false)},
-             and the relative phase left them alone. In the ${T('X',false)} basis the phase is
-             everything: ${T('P(\\pm)=\\tfrac12\\left[1\\pm\\sin\\theta\\cos\\varphi\\right]',false)},
-             which is the fringe of Chapter 0 with a visibility of
-             ${T(fmt(vis,3),false)}. The global phase appears in neither expression, and moving it
-             turns both arrows in the left panel while every number on this page stands still.</div>`;
+             The mixing angle set ${T('P(0)=\\cos^{2}(\\theta/2)',false)}; the relative phase left it
+             alone but set the ${T('X',false)}-basis fringe,
+             ${T('P(\\pm)=\\tfrac12\\left[1\\pm\\sin\\theta\\cos\\varphi\\right]',false)}, at a visibility of
+             ${T(fmt(vis,3),false)}. The global phase appears in neither expression.</div>`;
       root.querySelector('.verdict').innerHTML = verdict;
 
       root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });

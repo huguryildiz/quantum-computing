@@ -180,7 +180,7 @@ window.C3 = [
 {t:'box', kind:'warn', hd:'Where this is misread', html:'"The qubit really was in $|0\\rangle$ or $|1\\rangle$, we just do not know which" is a story, not a fact, and device A shows it is not forced. Nothing in the mathematics picks a preferred decomposition and no experiment does either. The matrix is the physics; the ensemble behind it is a description of a laboratory.'},
 
 /* ---- 3.2 ---- */
-{t:'h2', num:'3.2', text:'Purity, and the ball of qubit states'},
+{t:'h2', num:'3.2', text:'Purity and the Bloch ball'},
 
 {t:'p', text:'The single most useful number about a density operator is the trace of its square. It is one exactly for pure states, where $\\rho^{2}=\\rho$ and the rank is one, and it is $1/d$ for the maximally mixed state $I/d$. It needs no diagonalisation: it is the sum of the squared moduli of all the entries.'},
 
@@ -219,7 +219,7 @@ window.C3 = [
 {t:'box', kind:'warn', hd:'Decoherence is basis-dependent and often misstated', html:'The phase-flip channel destroys coherence <b>in the $Z$ basis</b> and does nothing at all to a state already diagonal there: a qubit sitting in $|0\\rangle$ is untouched by any amount of dephasing. "The environment destroys superpositions" is only true once the basis is named, and naming it is what the engineering of a qubit is about.'},
 
 /* ---- 3.4 ---- */
-{t:'h2', num:'3.4', text:'Relaxation and dephasing in time'},
+{t:'h2', num:'3.4', text:'Relaxation and dephasing times'},
 
 {t:'p', text:'Applied continuously rather than once, the two channels give two exponentials with two time constants. $T_{1}$ is how long a population survives and $T_{2}$ how long a relative phase does, and they are not independent: losing the population also destroys the coherence, at half the rate, which is the same $\\sqrt{1-\\gamma}$ seen above.'},
 
@@ -231,7 +231,7 @@ window.C3 = [
 {t:'box', kind:'warn', hd:'$T_{2}$ and $T_{2}^{*}$ are different measurements', html:'$T_{2}^{*}$ is the decay seen in a plain interference experiment, and it includes drift of the qubit frequency between one run and the next. A spin echo reverses that drift and returns a longer $T_{2}$. Quoting one where the other was measured overstates or understates the device by a large factor, and the two are routinely confused.'},
 
 /* ---- 3.5 ---- */
-{t:'h2', num:'3.5', text:'Two systems, and one of them alone'},
+{t:'h2', num:'3.5', text:'Composite systems and the partial trace'},
 
 {t:'p', text:'A general two-qubit pure state has four amplitudes, $c_{0}|00\\rangle+c_{1}|01\\rangle+c_{2}|10\\rangle+c_{3}|11\\rangle$, and the product of two single-qubit states is the special case in which they factor. Reading the product column below shows the ordering: the left factor changes the amplitude in pairs and the right factor changes it every entry, so the left factor is the more significant bit and entry $x$ of the column is the amplitude of the bit string $x$ written in binary.'},
 

@@ -411,7 +411,7 @@ function figPhaseCircle(){
 const SC = [
 
 /* ---------------------------------------------------------------- 2.0.1 -- */
-{ id:'m2-open', module:'M2', nav:'What a postulate says', title:'States, Measurement and Dynamics',
+{ id:'m2-open', module:'M2', nav:'States, Measurement and Dynamics', title:'States, Measurement and Dynamics',
   objective:'Name the four postulates and say which parts of the course each one licenses.',
   keywords:'postulates state evolution measurement composition overview module 2 quantum mechanics',
   src:'L4 · quantum-mechanical state and measurement principles', steps:2, blocks:[
@@ -434,7 +434,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.1 -- */
-{ id:'m2-born', module:'M2', nav:'The Born rule', title:'The Born Rule',
+{ id:'m2-born', module:'M2', nav:'The Born Rule', title:'The Born Rule',
   objective:'State the Born rule and check that the probabilities it gives add to one.',
   keywords:'born rule probability amplitude squared modulus outcome basis completeness shot',
   src:'L4 · Born rule', steps:3, slide:true, blocks:[
@@ -459,7 +459,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.2 -- */
-{ id:'m2-bases', module:'M2', nav:'Choosing a basis is choosing an experiment', title:'Measurement Bases',
+{ id:'m2-bases', module:'M2', nav:'Measurement Bases', title:'Measurement Bases',
   objective:'Separate a passive change of coordinates from the choice of what to measure.',
   keywords:'measurement basis Z X Y eigenbasis passive change of coordinates different experiment pauli',
   src:'L4 · three standard qubit bases', steps:3, slide:true, blocks:[
@@ -484,7 +484,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.1.3 -- */
-{ id:'m2-distinguish', module:'M2', nav:'Telling two states apart', title:'Distinguishing Quantum States',
+{ id:'m2-distinguish', module:'M2', nav:'Distinguishing Quantum States', title:'Distinguishing Quantum States',
   objective:'Show that one measurement separates two states with certainty exactly when they are orthogonal.',
   keywords:'distinguishing states orthogonal certainty overlap single shot no cloning discrimination',
   src:'L4 · projectors and measurement geometry', steps:3, slide:true, blocks:[
@@ -509,7 +509,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.L1 --- */
-{ id:'m2-lab-c', module:'M2', nav:'Laboratory C', title:'Laboratory C \u2014 Exact Probability and Finite Samples',
+{ id:'m2-lab-c', module:'M2', nav:'Laboratory C \u2014 Exact Probability and Finite Samples', title:'Laboratory C \u2014 Exact Probability and Finite Samples',
   objective:'Let the reader set a state, a measurement basis and a shot count, and read the exact answer beside the sampled one.',
   keywords:'laboratory measurement basis shots histogram exact probability sampling error wilson interval',
   steps:0, slide:true, blocks:[
@@ -520,7 +520,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-born', module:'M2', nav:'Code · The Born rule', title:'The Born Rule in Code',
+{ id:'m2-code-born', module:'M2', nav:'The Born Rule in Code', title:'The Born Rule in Code',
   objective:'Turn amplitudes into probabilities, read one state in three bases, and compute the best guess between two states.',
   keywords:'code qiskit numpy program born rule probability basis measurement distinguish run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -530,7 +530,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.2.1 -- */
-{ id:'m2-proj', module:'M2', nav:'Projective measurement', title:'Projective Measurement',
+{ id:'m2-proj', module:'M2', nav:'Projective Measurement', title:'Projective Measurement',
   objective:'Write a measurement as a set of orthogonal projectors and compute an outcome probability from them.',
   keywords:'projective measurement projectors orthogonal complete degenerate eigenspace born probability rank',
   src:'L5 · projective measurement', steps:3, slide:true, blocks:[
@@ -555,7 +555,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.2.2 -- */
-{ id:'m2-collapse', module:'M2', nav:'The state afterwards', title:'The Post-Measurement State',
+{ id:'m2-collapse', module:'M2', nav:'The Post-Measurement State', title:'The Post-Measurement State',
   objective:'Apply the projection update rule and show that an immediate repeat gives the same answer.',
   keywords:'state update luders rule collapse conditioning renormalise repeatable measurement disturbance',
   src:'L5 · projective measurement', steps:3, slide:true, blocks:[
@@ -580,7 +580,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.2.3 -- */
-{ id:'m2-povm', module:'M2', nav:'When the reading is imperfect', title:'Generalized Measurements and Readout Error',
+{ id:'m2-povm', module:'M2', nav:'Generalized Measurements and Readout Error', title:'Generalized Measurements and Readout Error',
   objective:'Use effects for outcome probabilities, an instrument for the conditional state, and a POVM to model imperfect readout.',
   keywords:'povm effects positive operators readout error assignment fidelity calibration matrix instrument',
   src:'L5 · general measurements: POVMs and instruments', steps:3, slide:true, blocks:[
@@ -605,7 +605,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-measure', module:'M2', nav:'Code · Projective measurement', title:'Projective Measurement in Code',
+{ id:'m2-code-measure', module:'M2', nav:'Projective Measurement in Code', title:'Projective Measurement in Code',
   objective:'Apply the update rule, follow three measurements in a row, and model a readout error with effects.',
   keywords:'code qiskit numpy program projective measurement update rule collapse readout error povm run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -615,7 +615,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.3.1 -- */
-{ id:'m2-obs', module:'M2', nav:'Expectation values', title:'Expectation Values',
+{ id:'m2-obs', module:'M2', nav:'Expectation Values', title:'Expectation Values',
   objective:'Compute an expectation value two ways and say what it is an average over.',
   keywords:'observable expectation value ensemble average hermitian eigenvalue mean not an outcome',
   src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
@@ -640,7 +640,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.3.2 -- */
-{ id:'m2-var', module:'M2', nav:'Spread', title:'Variance and Sharp Observables',
+{ id:'m2-var', module:'M2', nav:'Variance and Sharp Observables', title:'Variance and Sharp Observables',
   objective:'Compute a variance and identify the states for which it vanishes.',
   keywords:'variance standard deviation spread sharp eigenstate certainty delta A observable',
   src:'L5 · expectation values and variance', steps:3, slide:true, blocks:[
@@ -665,7 +665,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-obs', module:'M2', nav:'Code · Observables', title:'Observables in Code',
+{ id:'m2-code-obs', module:'M2', nav:'Observables in Code', title:'Observables in Code',
   objective:'Compute an expectation value by two routes, a variance, and a mean from the eigenvalues.',
   keywords:'code qiskit numpy program expectation value variance observable eigenvalues run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -675,7 +675,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.4.1 -- */
-{ id:'m2-comm', module:'M2', nav:'Compatibility', title:'Commutators and Compatibility',
+{ id:'m2-comm', module:'M2', nav:'Commutators and Compatibility', title:'Commutators and Compatibility',
   objective:'Compute a commutator and connect it to whether two observables share an eigenbasis.',
   keywords:'commutator compatible observables shared eigenbasis simultaneous sharp sequential measurement disturbance',
   src:'L5 · compatibility, commutators and uncertainty', steps:3, slide:true, blocks:[
@@ -700,7 +700,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.4.2 -- */
-{ id:'m2-uncert', module:'M2', nav:'The uncertainty relation', title:'The Uncertainty Relation',
+{ id:'m2-uncert', module:'M2', nav:'The Uncertainty Relation', title:'The Uncertainty Relation',
   objective:'State the Robertson relation, check it on a family of states, and say what it does not claim.',
   keywords:'uncertainty relation robertson bound commutator spread product cauchy schwarz saturated',
   src:'L5 · Robertson uncertainty relation', steps:3, slide:true, blocks:[
@@ -725,7 +725,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-comm', module:'M2', nav:'Code · Compatibility', title:'Compatibility and Uncertainty in Code',
+{ id:'m2-code-comm', module:'M2', nav:'Compatibility and Uncertainty in Code', title:'Compatibility and Uncertainty in Code',
   objective:'Compute a commutator, check the Robertson bound on one state, and see the order of two measurements matter.',
   keywords:'code qiskit numpy program commutator uncertainty robertson sequential measurement run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -735,7 +735,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.5.1 -- */
-{ id:'m2-pauli', module:'M2', nav:'The Pauli operators', title:'The Pauli Operators',
+{ id:'m2-pauli', module:'M2', nav:'The Pauli Operators', title:'The Pauli Operators',
   objective:'List the three Pauli operators with their eigenvalues and eigenstates, and say why each is both an observable and a gate.',
   keywords:'pauli matrices X Y Z hermitian unitary traceless square identity eigenstates spin stern gerlach',
   src:'L5 · spin-1/2 observables and Pauli matrices', steps:3, slide:true, blocks:[
@@ -760,7 +760,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.5.2 -- */
-{ id:'m2-paulialg', module:'M2', nav:'The Pauli algebra', title:'The Pauli Algebra',
+{ id:'m2-paulialg', module:'M2', nav:'The Pauli Algebra', title:'The Pauli Algebra',
   objective:'Use the Pauli product rule to get any commutator or anticommutator without multiplying matrices.',
   keywords:'pauli algebra product rule commutator anticommutator cyclic levi civita identity operator basis',
   src:'L5 · Pauli algebra', steps:3, slide:true, blocks:[
@@ -785,7 +785,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.5.3 -- */
-{ id:'m2-ndotsigma', module:'M2', nav:'Measuring along any direction', title:'Spin Along an Arbitrary Direction',
+{ id:'m2-ndotsigma', module:'M2', nav:'Spin Along an Arbitrary Direction', title:'Spin Along an Arbitrary Direction',
   objective:'Build the projectors for a measurement along an arbitrary axis and read off the outcome probability.',
   keywords:'n dot sigma arbitrary direction projector half identity plus axis bloch vector cos squared',
   src:'L5 · Stern-Gerlach experiment', steps:3, slide:true, blocks:[
@@ -810,7 +810,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-pauli', module:'M2', nav:'Code · The Pauli algebra', title:'The Pauli Algebra in Code',
+{ id:'m2-code-pauli', module:'M2', nav:'The Pauli Algebra in Code', title:'The Pauli Algebra in Code',
   objective:'Check the Pauli properties, the product rule, and a measurement along a tilted direction.',
   keywords:'code qiskit numpy program pauli product rule anticommute direction projector run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -820,7 +820,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.1 -- */
-{ id:'m2-position', module:'M2', nav:'Position representation', title:'Position and Momentum Operators',
+{ id:'m2-position', module:'M2', nav:'Position and Momentum Operators', title:'Position and Momentum Operators',
   objective:'Write the position, momentum and free-particle Hamiltonian in the coordinate representation and distinguish a plane wave from a physical packet.',
   keywords:'coordinate representation position momentum operator wavefunction plane wave wave packet free particle Hamiltonian continuous spectrum hbar',
   src:'L5 · coordinate representation and the free particle', steps:3, slide:true, blocks:[
@@ -845,7 +845,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.2 -- */
-{ id:'m2-schrod', module:'M2', nav:'Evolution', title:'The Schrödinger Equation',
+{ id:'m2-schrod', module:'M2', nav:'The Schrödinger Equation', title:'The Schrödinger Equation',
   objective:'Go from the Schrodinger equation to the evolution operator and check that it is unitary.',
   keywords:'schrodinger equation hamiltonian evolution operator unitary exponential closed system energy',
   src:'L5 · closed-system time evolution', steps:3, slide:true, blocks:[
@@ -870,7 +870,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.3 -- */
-{ id:'m2-stationary', module:'M2', nav:'Stationary states and beats', title:'Stationary States and Beats',
+{ id:'m2-stationary', module:'M2', nav:'Stationary States and Beats', title:'Stationary States and Beats',
   objective:'Show that an energy eigenstate is stationary and that a superposition of two oscillates at their difference.',
   keywords:'stationary state energy eigenstate superposition beat frequency difference relative phase oscillation',
   src:'L5 · stationary states and superpositions', steps:3, slide:true, blocks:[
@@ -895,7 +895,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.4 -- */
-{ id:'m2-well', module:'M2', nav:'The infinite square well', title:'The Infinite Square Well',
+{ id:'m2-well', module:'M2', nav:'The Infinite Square Well', title:'The Infinite Square Well',
   objective:'Derive the allowed states and energies of an infinite square well and distinguish an energy eigenstate from a superposition.',
   keywords:'infinite square well particle in a box boundary conditions quantisation eigenfunction energy discrete stationary superposition',
   src:'L5 · infinite square well', steps:3, slide:true, blocks:[
@@ -921,7 +921,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.6.5 -- */
-{ id:'m2-gate', module:'M2', nav:'Why a gate is an exponential', title:'Gates as Hamiltonian Evolution',
+{ id:'m2-gate', module:'M2', nav:'Gates as Hamiltonian Evolution', title:'Gates as Hamiltonian Evolution',
   objective:'Read a driven-qubit Hamiltonian as a rotation axis and an angle, and identify what each control sets.',
   keywords:'driven qubit rabi drive strength detuning rotation axis pulse area gate calibration resonance',
   src:'L5 · driven qubit: Hamiltonians become gates', steps:3, slide:true, blocks:[
@@ -946,7 +946,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.L2 --- */
-{ id:'m2-lab-d', module:'M2', nav:'Laboratory D', title:'Laboratory D \u2014 Driving a Qubit',
+{ id:'m2-lab-d', module:'M2', nav:'Laboratory D \u2014 Driving a Qubit', title:'Laboratory D \u2014 Driving a Qubit',
   objective:'Let the reader move the drive strength and the detuning and watch the population follow.',
   keywords:'laboratory rabi oscillation drive strength detuning population resonance pulse area pi pulse',
   steps:0, slide:true, blocks:[
@@ -957,7 +957,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-dynamics', module:'M2', nav:'Code · Dynamics', title:'Dynamics in Code',
+{ id:'m2-code-dynamics', module:'M2', nav:'Dynamics in Code', title:'Dynamics in Code',
   objective:'Evolve a state under a Hamiltonian, shift the energy by a constant, and drive a qubit with a pulse.',
   keywords:'code qiskit numpy program evolution hamiltonian unitary exponential rabi pulse detuning run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -967,7 +967,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.7.1 -- */
-{ id:'m2-shots', module:'M2', nav:'What a count is worth', title:'Finite Shots and Estimation',
+{ id:'m2-shots', module:'M2', nav:'Finite Shots and Estimation', title:'Finite Shots and Estimation',
   objective:'Give the standard error of a probability estimated from N shots and say what it is not.',
   keywords:'shots binomial standard error sampling noise estimate histogram confidence square root scaling',
   src:'L5 · finite-shot estimation', steps:3, slide:true, blocks:[
@@ -992,13 +992,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m2-code-shots', module:'M2', nav:'Code · Finite shots', title:'Finite Shots in Code',
+{ id:'m2-code-shots', module:'M2', nav:'Finite Shots in Code', title:'Finite Shots in Code',
   objective:'Compute a standard error, the shots a precision needs, and the exact chance that an estimate lands near the truth.',
   keywords:'code qiskit numpy program shots standard error binomial precision estimate run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 2 · Finite shots'},
   {t:'title', text:'Finite Shots in Code'},
   {t:'raw', html:()=>CODEBANK.page('m2-code-shots')}
+]},
+
+/* ---------------------------------------------------------------- 2.7.1 -- */
+{ id:'m2-quick', module:'M2', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict born rule measurement collapse expectation variance commutator pauli algebra shots',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 2 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Born rule', html:'$|\\psi\\rangle=\\tfrac{1}{\\sqrt5}(|0\\rangle+2i|1\\rangle)$. Find $p(1)$.',
+      ask:{key:'m2-qc0', choices:['$\\tfrac15$','$\\tfrac45$','$-\\tfrac45$'], answer:1,
+        why:'$|2i/\\sqrt5|^{2}=4/5$.'}}],
+    [{t:'note', kind:'def', head:'Measurement basis', html:'$|1\\rangle$ measured in $X$. Find $p(-)$.',
+      ask:{key:'m2-qc1', choices:['$0$','$\\tfrac12$','$1$'], answer:1,
+        why:'$\\langle -|1\\rangle=-1/\\sqrt2$.'}}],
+    [{t:'note', kind:'def', head:'Repeated measurement', html:'$Z$ on $|+\\rangle$ gives $-1$, then $Z$ again. Find $p(-1)$.',
+      ask:{key:'m2-qc2', choices:['$\\tfrac12$','$1$','$0$'], answer:1,
+        why:'Collapse to $|1\\rangle$.'}}],
+    [{t:'note', kind:'def', head:'Expectation value', html:'$Z$ on $|1\\rangle$. Find $\\langle Z\\rangle$.',
+      ask:{key:'m2-qc3', choices:['$1$','$0$','$-1$'], answer:2,
+        why:'$|1\\rangle$ has eigenvalue $-1$.'}}],
+    [{t:'note', kind:'def', head:'Sharp observable', html:'$Z$ on the eigenstate $|0\\rangle$. Find $\\operatorname{Var}(Z)$.',
+      ask:{key:'m2-qc4', choices:['$0$','$\\tfrac12$','$1$'], answer:0,
+        why:'Zero spread on an eigenstate.'}}],
+    [{t:'note', kind:'def', head:'Commutator', html:'$XY=iZ$, $YX=-iZ$. Find $[X,Y]$.',
+      ask:{key:'m2-qc5', choices:['$0$','$2iZ$','$iZ$'], answer:1,
+        why:'$iZ-(-iZ)=2iZ$.'}}],
+    [{t:'note', kind:'def', head:'Pauli algebra', html:'Find the product $YZ$.',
+      ask:{key:'m2-qc6', choices:['$iX$','$-iX$','$X$'], answer:0,
+        why:'Cyclic order $Y\\to Z\\to X$.'}}],
+    [{t:'note', kind:'def', head:'Spin along z', html:'$\\mathbf{n}=(0,0,1)$, state $|+\\rangle$. Find $p(+)$.',
+      ask:{key:'m2-qc7', choices:['$1$','$\\tfrac12$','$0$'], answer:1,
+        why:'$\\mathbf{n}\\cdot\\mathbf{r}=0$.'}}],
+    [{t:'note', kind:'def', head:'Beat frequency', html:'$E_{1}=1$, $E_{2}=6$, $\\hbar=1$. Find the beat rate.',
+      ask:{key:'m2-qc8', choices:['$5$','$6$','$7$'], answer:0,
+        why:'Only $E_{2}-E_{1}$ shows.'}}],
+    [{t:'note', kind:'def', head:'Infinite well', html:'The square well. Find $E_{4}/E_{1}$.',
+      ask:{key:'m2-qc9', choices:['$4$','$8$','$16$'], answer:2,
+        why:'Energies grow as $n^{2}$.'}}],
+    [{t:'note', kind:'def', head:'Shot noise', html:'$N=2500$, $p=\\tfrac12$. Find the standard error.',
+      ask:{key:'m2-qc10', choices:['$0.01$','$0.1$','$0.001$'], answer:0,
+        why:'$\\sqrt{0.25/2500}$.'}}],
+    [{t:'note', kind:'def', head:'Resonant pulse', html:'Pulse area $\\Omega t=\\pi$ on $|0\\rangle$. Find $P(1)$.',
+      ask:{key:'m2-qc11', choices:['$0$','$\\tfrac12$','$1$'], answer:2,
+        why:'A full $\\pi$ pulse flips it.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 2.8.1 -- */
@@ -1032,7 +1080,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 2.8.2 -- */
-{ id:'m2-shapes', module:'M2', nav:'The shapes of question', title:'Question Types',
+{ id:'m2-shapes', module:'M2', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types of chapter 2 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice born projective expectation commutator evolution shots',
   steps:1, blocks:[

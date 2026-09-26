@@ -233,7 +233,7 @@ window.C6 = [
 {t:'box', kind:'err', hd:'The sentence every section here answers', html:'Preparing a superposition of $2^{n}$ inputs is one layer of Hadamards, it is free, and on its own it is worth nothing: a measurement of that state returns a uniformly random string, which is what a coin does. Every gain in this chapter comes from the interference after the query, never from the superposition before it.'},
 
 /* ---- 6.1 ---- */
-{t:'h2', num:'6.1', text:'What a query model counts'},
+{t:'h2', num:'6.1', text:'The query model and complexity classes'},
 
 {t:'p', text:'Most of the results here are stated in a <b>query model</b>. The algorithm is given a black box that computes an unknown function $f$, and it is charged one <b>query</b> each time it uses that box, whatever is inside. The exclusive-or in the second register is what makes the box reversible, and chapter 4 built exactly this embedding.'},
 
@@ -253,7 +253,7 @@ window.C6 = [
 {t:'box', kind:'warn', hd:'What is known, and what is not', html:'$\\mathrm{P}\\subseteq\\mathrm{BPP}\\subseteq\\mathrm{BQP}$ and $\\mathrm{P}\\subseteq\\mathrm{NP}$. Whether $\\mathrm{NP}\\subseteq\\mathrm{BQP}$ is open, and no efficient quantum algorithm is known for any NP-complete problem. Grover gives a square root on the search, and a square root of an exponential is still an exponential. Factoring is in NP and in BQP and is not known to be NP-complete \u2014 which is exactly why it can have the structure the rest of this chapter exploits.'},
 
 /* ---- 6.2 ---- */
-{t:'h2', num:'6.2', text:'One mechanism: phase kickback'},
+{t:'h2', num:'6.2', text:'Phase kickback'},
 
 {t:'p', text:'The oracle writes $f(x)$ into the second register by flipping it, and a flip is the gate $X$. So choose for the second register the one state that $X$ leaves alone up to a sign. When $f(x)=0$ nothing happens; when $f(x)=1$ the flip happens and produces a minus sign; and both cases are one line.'},
 
@@ -398,7 +398,7 @@ window.C6 = [
 {t:'box', kind:'err', hd:'The migration deadline is set by the data, not by the machine', html:'Traffic can be recorded today at negligible cost and decrypted whenever a capable machine exists. So the question for any particular secret is how long it has to hold, and a secret that must last twenty years is already exposed. A <b>post-quantum</b> scheme is a classical algorithm \u2014 it runs on ordinary computers \u2014 chosen because it rests on a problem for which no efficient quantum attack is known. It is not quantum cryptography, which is a different subject about distributing keys over physical channels.'},
 
 /* ---- 6.8 ---- */
-{t:'h2', num:'6.8', text:'What the claim says'},
+{t:'h2', num:'6.8', text:'The Shor speedup'},
 
 {t:'p', text:'Chapter 5 said a resource claim names five things. Written out for factoring, two of the five carry almost all the weight.'},
 

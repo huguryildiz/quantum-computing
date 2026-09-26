@@ -24,6 +24,9 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      # content_guard.py reads the lecture-notes PDF through pdftotext.
+      - run: sudo apt-get install -y poppler-utils
+
       - name: Syntax check
         run: for f in build/src/[789]*.js; do node --check "$f"; done
 
@@ -36,7 +39,7 @@ jobs:
         run: |
           python verify/verify_scenes.py
           python verify/verify_drills.py
-          python -m pytest verify/ .claude/hooks/ -q
+          python -m pytest verify/ .claude/hooks/ tools/ -q
 
       - name: Code pages (NumPy half; the Qiskit half runs locally)
         run: python verify/code_check.py
@@ -44,3 +47,4 @@ jobs:
       - name: Text rules
         run: |
           python tools/rule_check.py "build/src/8[1-9]_scenes*.js" "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7*_code*.js" "notes/src/*.js" "web/index.html"
+          python tools/content_guard.py --source --artifacts

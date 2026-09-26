@@ -131,7 +131,7 @@ function figFringe(){
 /* The field's development as a change in engineering regime. The dates are
    landmarks, not a claim that one resource model superseded all the others. */
 function figRegimes(){
-  return P.blocks({w:760,h:178,items:[
+  return P.blocks({w:760,h:112,items:[
     {t:'box',x:24,y:18,w:154,h:52,label:'device scaling',fs:14},
     {t:'arrow',x1:178,y1:44,x2:218,y2:44},
     {t:'box',x:218,y:18,w:154,h:52,label:'quantum models',fs:14},
@@ -142,9 +142,7 @@ function figRegimes(){
     {t:'text',x:101,y:96,label:'1965 — scaling',fs:11.5},
     {t:'text',x:295,y:96,label:'1982–85 — model',fs:11.5},
     {t:'text',x:489,y:96,label:'1994–96 — algorithms',fs:11.5},
-    {t:'text',x:671,y:96,label:'2018 — regime',fs:11.5},
-    {t:'line',d:'M42,128 h676'},
-    {t:'text',x:380,y:158,label:'different questions, one evidence standard',fs:12}
+    {t:'text',x:671,y:96,label:'2018 — regime',fs:11.5}
   ]});
 }
 
@@ -204,7 +202,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.1 ---- */
-{ id:'m0-open', module:'M0', nav:'What the course asks', title:'The Frame of the Course',
+{ id:'m0-open', module:'M0', nav:'The Frame of the Course', title:'The Frame of the Course',
   objective:'State the question the whole course answers before any machinery is introduced.',
   keywords:'opening quantum advantage coprocessor amplitude phase interference measurement',
   src:'L0 · why quantum engineering', steps:2, blocks:[
@@ -229,7 +227,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.2 ---- */
-{ id:'m0-what', module:'M0', nav:'What it is for', title:'What a Quantum Computer Is For',
+{ id:'m0-what', module:'M0', nav:'What a Quantum Computer Is For', title:'What a Quantum Computer Is For',
   objective:'Give the honest scope of the machine, and the shape of a defensible advantage claim.',
   keywords:'quantum advantage claim coprocessor simulation cannot replace classical baseline resources',
   src:'L0 · quantum computers do not replace classical computers', steps:3, slide:true, blocks:[
@@ -258,7 +256,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.3 ---- */
-{ id:'m0-regimes', module:'M0', nav:'How the field reached NISQ', title:'From Moore\u2019s Law to the NISQ Era',
+{ id:'m0-regimes', module:'M0', nav:'From Moore\u2019s Law to the NISQ Era', title:'From Moore\u2019s Law to the NISQ Era',
   objective:'Place NISQ hardware in the development of the field and state what its results do and do not establish.',
   keywords:'semiconductor scaling quantum engineering history Feynman Deutsch Shor Grover Preskill NISQ mitigation fault tolerance evidence',
   src:'L0 · from semiconductor scaling to quantum engineering; how the field developed; the NISQ engineering regime', steps:3, slide:true, blocks:[
@@ -266,7 +264,7 @@ const SC = [
   {t:'title', text:'From Moore\u2019s Law to the NISQ Era'},
   {t:'lede', text:'As devices became smaller, quantum effects changed from limits to suppress into effects selected platforms could control. The field then added a computational model, algorithms with proved advantages, and hardware able to run small noisy circuits.'},
   {t:'fig', frame:true, svg:()=>figRegimes(),
-    caption:'Four landmarks, from device scaling to the present noisy-hardware regime.'},
+    caption:'Four landmarks, from device scaling to the present noisy-hardware regime: different questions, one evidence standard.'},
   {t:'reveal', at:1, items:[
     {t:'grid', cols:3, gap:'18px', items:[
       [{t:'card', head:'The model', items:[{t:'small', html:'Feynman framed quantum simulation. Deutsch gave a general computational model. Neither step selected one hardware platform.'}]}],
@@ -283,7 +281,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.4 ---- */
-{ id:'m0-scale', module:'M0', nav:'The size of the state', title:'The Size of the State',
+{ id:'m0-scale', module:'M0', nav:'The Size of the State', title:'The Size of the State',
   objective:'Compute the classical memory a dense n-qubit state needs, and separate that from a speedup claim.',
   keywords:'state space scaling exponential memory statevector simulation not automatic speedup structure',
   src:'L0 · the state-space scaling challenge', steps:3, slide:true, blocks:[
@@ -311,7 +309,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.4 ---- */
-{ id:'m0-phase', module:'M0', nav:'Phase becomes probability', title:'From Phase to Probability',
+{ id:'m0-phase', module:'M0', nav:'From Phase to Probability', title:'From Phase to Probability',
   objective:'Follow the three-gate interferometer that turns a relative phase into a measurable population.',
   keywords:'interference relative phase hadamard rz interferometer ramsey probability cos squared sensing',
   src:'L0 · converting phase into a measurable probability', steps:4, slide:true, blocks:[
@@ -319,8 +317,7 @@ const SC = [
   {t:'title', text:'From Phase to Probability'},
   {t:'lede', text:'A phase is not observable. A probability is. This scene is the smallest machine that turns one into the other, and every algorithm in Module 6 is a larger version of it.'},
   {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Start in $|0\\rangle$ and apply three gates: a Hadamard, a rotation about $z$ by $\\varphi$, and a second Hadamard.</p>'},
-    {t:'body', html:'<p>The first Hadamard makes two coherent alternatives of equal size:</p>'},
+    {t:'body', html:'<p>Start in $|0\\rangle$ and apply a Hadamard, a rotation about $z$ by $\\varphi$, and a second Hadamard. The first Hadamard makes two coherent alternatives of equal size:</p>'},
     {t:'eq', tex:'|0\\rangle \\;\\xrightarrow{\\;H\\;}\\; |+\\rangle = \\tfrac{1}{\\sqrt2}\\left(|0\\rangle + |1\\rangle\\right)'},
     {t:'reveal', at:1, items:[
       {t:'body', html:'<p>The rotation leaves both sizes alone and puts an angle between them. Only the difference of the two phases can ever matter, so write it all on the second term:</p>'},
@@ -329,7 +326,6 @@ const SC = [
     {t:'reveal', at:2, items:[
       {t:'body', html:'<p>The second Hadamard sends $|0\\rangle\\mapsto(|0\\rangle+|1\\rangle)/\\sqrt2$ and $|1\\rangle\\mapsto(|0\\rangle-|1\\rangle)/\\sqrt2$. Substitute both and collect the two basis states:</p>'},
       {t:'eq', tex:'\\begin{aligned} \\tfrac{1}{\\sqrt2}\\left(|0\\rangle + e^{i\\varphi}|1\\rangle\\right) &\\;\\xrightarrow{\\;H\\;}\\; \\tfrac{1}{2}\\left(|0\\rangle+|1\\rangle\\right) + \\tfrac{e^{i\\varphi}}{2}\\left(|0\\rangle-|1\\rangle\\right) \\\\ &= \\tfrac{1+e^{i\\varphi}}{2}\\,|0\\rangle \\;+\\; \\tfrac{1-e^{i\\varphi}}{2}\\,|1\\rangle \\end{aligned}'},
-      {t:'small', html:'The phase has left the exponent and become part of a <b>sum</b> of two amplitudes. That step is the whole mechanism, and it is why the gate had to be applied twice: once to split, once to recombine.'}
     ]},
     {t:'reveal', at:3, items:[
       {t:'body', html:'<p>Now take the squared modulus of the first amplitude. Writing $1+e^{i\\varphi} = e^{i\\varphi/2}\\left(e^{-i\\varphi/2}+e^{i\\varphi/2}\\right) = 2e^{i\\varphi/2}\\cos(\\varphi/2)$ makes the modulus immediate:</p>'},
@@ -338,6 +334,9 @@ const SC = [
   ], right:[
     {t:'fig', frame:true, svg:()=>figInterferometer(),
       caption:'Split, phase, recombine. The first gate creates two alternatives, the middle gate puts an angle between them, and the last gate makes them add.'},
+    {t:'reveal', at:2, items:[
+      {t:'small', html:'The phase has left the exponent and become part of a <b>sum</b> of two amplitudes. That step is the whole mechanism, and it is why the gate had to be applied twice: once to split, once to recombine.'}
+    ]},
     {t:'reveal', at:4, items:[
       {t:'note', kind:'ok', head:'Why this is the pattern to remember', html:'Every algorithm in Module 6 has this shape. Something is put into superposition, the problem writes a phase onto the branches, and a final transform makes the branches add where the answer is and cancel where it is not. Only the middle step ever changes.'}
     ]}
@@ -348,7 +347,7 @@ const SC = [
    The fringe and the sensing reading are their own scene. Held together with
    the derivation the scene needed a scale of 0.82 to fit, which is the layout
    sweep saying what a reader would have said: that is two ideas. */
-{ id:'m0-fringe', module:'M0', nav:'Reading the fringe', title:'Interference Fringes and Sensing',
+{ id:'m0-fringe', module:'M0', nav:'Interference Fringes and Sensing', title:'Interference Fringes and Sensing',
   objective:'Read the interference curve as a measurement, and identify the phase source that turns it into a sensor.',
   keywords:'fringe interference curve ramsey sensing magnetometry coherence time shots estimate field',
   src:'L0 · why the same sequence is useful for sensing', steps:2, slide:true, blocks:[
@@ -371,7 +370,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 0.5 ---- */
-{ id:'m0-map', module:'M0', nav:'The course map', title:'The Six Modules',
+{ id:'m0-map', module:'M0', nav:'The Six Modules', title:'The Six Modules',
   objective:'Give the shape of the course and how the modules depend on each other.',
   keywords:'course map modules overview structure dependencies linear algebra measurement entanglement gates circuits algorithms',
   steps:2, slide:true, blocks:[
@@ -379,33 +378,33 @@ const SC = [
   {t:'title', text:'The Six Modules'},
   {t:'cols', ratio:'c-5-7', vcenter:true, left:[
     {t:'fig', frame:true, svg:()=>figMap(),
-      caption:'The six modules and the one question at the centre of them. Modules 1 to 4 build a single object in four passes: the state, what can be asked of it, what happens when it is not alone, and how it is moved.'}
+      caption:'The six modules and the one question at the centre of them. Modules 1 to 4 build a single object in four passes: the state, what can be asked of it, what happens when it is not alone, and how it is moved.'},
   ], right:[
     {t:'grid', cols:2, gap:'16px', items:[
       [{t:'card', head:'1 · The mathematics of quantum states', items:[
-        {t:'small', html:'Complex vectors, inner and outer products, projectors, tensor products, and the Hermitian and unitary operators that act on them. Dirac notation, introduced as a way of writing what is already there.'}]}],
+        {t:'small', html:'Complex vectors, inner and outer products, projectors, tensor products, and the Hermitian and unitary operators that act on them.'}]}],
       [{t:'card', head:'2 · States, measurement and dynamics', items:[
-        {t:'small', html:'The Born rule, projective measurement and the more general kind, expectation values, the uncertainty relation, and evolution under a Hamiltonian. What a shot is, and what a shot costs.'}]}],
+        {t:'small', html:'The Born rule, projective and general measurement, expectation values, the uncertainty relation, and evolution under a Hamiltonian.'}]}],
       [{t:'card', head:'3 · Mixed states and entanglement', items:[
         {t:'small', html:'The density operator, quantum channels, relaxation and dephasing, the partial trace, the Schmidt decomposition, and the Bell correlations no classical model reproduces.'}]}],
       [{t:'card', head:'4 · The Bloch sphere and quantum gates', items:[
-        {t:'small', html:'One qubit drawn as a ball, every single-qubit gate as a rotation of it, the two-qubit gates that entangle, and the bit-order conventions that silently break results.'}]}],
+        {t:'small', html:'One qubit drawn as a ball, every single-qubit gate as a rotation of it, and the two-qubit gates that entangle.'}]}],
       [{t:'card', head:'5 · Circuits and protocols', items:[
-        {t:'small', html:'The circuit model as it is actually run: transpilation, shots, depth. Then teleportation and Grover search, each worked from the algebra to the resource count.'}]}],
+        {t:'small', html:'The circuit model as it is run: shots, depth, compilation. Then teleportation and Grover search.'}]}],
       [{t:'card', head:'6 · Quantum algorithms', items:[
-        {t:'small', html:'Phase kickback, Deutsch–Jozsa, the quantum Fourier transform, phase estimation, and the order finding at the heart of factoring — with the cost of each written out honestly.'}]}]
+        {t:'small', html:'Phase kickback, Deutsch–Jozsa, the quantum Fourier transform, phase estimation, and the order finding inside factoring.'}]}]
     ]},
     {t:'reveal', at:1, items:[
-      {t:'note', kind:'def', head:'What depends on what', html:'Module 1 is the language and everything uses it. Modules 2 and 4 should be read in order and not sampled; Module 3 can wait until after 4 if the algebra of one qubit is not yet comfortable. Module 6 rests on 5, and 5 on 4.'}
+      {t:'note', kind:'def', head:'What depends on what', html:'Module 1 is the language and everything uses it. Modules 2 and 4 should be read in order; Module 3 can wait until after 4. Module 6 rests on 5, and 5 on 4.'}
     ]},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'ok', head:'Laboratories and worked questions', html:'Each module carries laboratories, where every control changes the mathematics rather than the picture, and practice questions whose solutions are worked rather than stated. Each module names the shapes of question it sets before it starts.'}
+      {t:'note', kind:'ok', head:'Laboratories and worked questions', html:'Each module carries laboratories, where every control changes the mathematics rather than the picture, and practice questions whose solutions are worked rather than stated.'}
     ]}
   ]}
 ]},
 
 /* ---------------------------------------------------------------- 0.6 ---- */
-{ id:'m0-how', module:'M0', nav:'How to read this', title:'How to Use This Course',
+{ id:'m0-how', module:'M0', nav:'How to Use This Course', title:'How to Use This Course',
   objective:'Explain the reveal, the laboratories, the editions and the textbook anchor convention.',
   keywords:'how to read reveal steps laboratories editions anchors textbook convention notation bit order',
   steps:1, slide:true, blocks:[

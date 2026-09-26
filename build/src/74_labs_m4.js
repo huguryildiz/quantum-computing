@@ -254,7 +254,7 @@ Object.assign(LABS, (function(){
 
       /* ---- the three components against the step number ---- */
       const n = states.length - 1;
-      const b = P.Axes({w:430,h:300,xr:[-0.35, Math.max(1,n)+0.35],yr:[-1.25,1.25],
+      const b = P.Axes({w:430,h:280,xr:[-0.35, Math.max(1,n)+0.35],yr:[-1.18,1.18],
         xlabel:'\\text{step}', ylabel:'\\text{component}',
         pad:{l:60,r:24,t:30,b:46},
         xticksOverride:Array.from({length:n+1},(_,i)=>i), ytarget:4});
@@ -266,9 +266,9 @@ Object.assign(LABS, (function(){
       /* The three names sit in the strip above every curve, which nothing
          reaches: a component of a unit vector never exceeds one. */
       const w = Math.max(1,n);
-      b.note(0.06*w, 1.14,'r_{x}',{fs:12.5,color:P.COL.in,tex:true});
-      b.note(0.40*w, 1.14,'r_{y}',{fs:12.5,color:P.COL.mid,tex:true});
-      b.note(0.74*w, 1.14,'r_{z}',{fs:12.5,color:P.COL.out,tex:true});
+      b.note(0.06*w, 1.08,'r_{x}',{fs:12.5,color:P.COL.in,tex:true});
+      b.note(0.40*w, 1.08,'r_{y}',{fs:12.5,color:P.COL.mid,tex:true});
+      b.note(0.74*w, 1.08,'r_{z}',{fs:12.5,color:P.COL.out,tex:true});
 
       root.querySelector('.plots').innerHTML =
         `<div class="labgrid">${KIT.orbitBox(a.svg())}${b.svg()}</div>`;
@@ -276,7 +276,6 @@ Object.assign(LABS, (function(){
       /* ---- the readout ---- */
       const v = states[k];
       const len = Math.hypot(cur[0],cur[1],cur[2]);
-      const p0 = v[0][0]*v[0][0] + v[0][1]*v[0][1];
       const gateHere = k === 0 ? 'the input state'
         : LABS.KIT.M('$'+SHOW[st.seq[k-1]]+'$') + ', gate ' + k;
       const seqShown = st.seq.length
@@ -288,32 +287,27 @@ Object.assign(LABS, (function(){
       root.querySelector('.ro').innerHTML = `
         <div style="grid-column:1/-1"><dt>Sequence</dt><dd>${seqShown}</dd></div>
         <div><dt>At this step</dt><dd>${gateHere}</dd></div>
-        <div><dt>Amplitude of 0</dt><dd>${fmt(z0(v[0][0]),4)} ${v[0][1]<0?'−':'+'} ${fmt(z0(Math.abs(v[0][1])),4)}i</dd></div>
-        <div><dt>Amplitude of 1</dt><dd>${fmt(z0(v[1][0]),4)} ${v[1][1]<0?'−':'+'} ${fmt(z0(Math.abs(v[1][1])),4)}i</dd></div>
         <div><dt>Bloch vector</dt><dd>(${fmt(z0(cur[0]),4)}, ${fmt(z0(cur[1]),4)}, ${fmt(z0(cur[2]),4)})</dd></div>
         <div><dt>Length</dt><dd class="${Math.abs(len-1)<1e-6?'okv':'warnv'}">${fmt(len,6)}</dd></div>
-        <div><dt>p(0)</dt><dd>${fmt(p0,4)}</dd></div>
         <div><dt>Norm of the state</dt><dd class="${Math.abs(norm(v)-1)<1e-6?'okv':'warnv'}">${fmt(norm(v),6)}</dd></div>
         <div><dt>Net turn</dt><dd>${fmt(aa.t/D2R,2)}°</dd></div>
         <div><dt>Net axis</dt><dd>${axis}</dd></div>`;
 
       const verdict = st.seq.length === 0
         ? `<div class="note warn"><span class="note-h">Nothing has been built yet</span>
-             Press a gate to add it to the end of the sequence. Up to ${MAXLEN} fit, and the
-             two rotation gates take their turn from the angle slider — all of them at once,
-             so moving it turns every rotation in the sequence together.</div>`
+             Press a gate to add it to the end of the sequence. Up to ${MAXLEN} fit, and both
+             rotation gates take their turn from the angle slider at once.</div>`
         : aa.trivial
         ? `<div class="note ok"><span class="note-h">The whole sequence is the identity</span>
-             Every gate in the list has been undone by the ones after it: the net unitary is
-             ${T('I',false)} up to a phase, so this sequence returns every input state exactly
-             where it started. That is a real fact about the product and not about the input —
-             switch the input state and the last point still lands on the first.</div>`
+             Every gate has been undone by the ones after it: the net unitary is
+             ${T('I',false)} up to a phase, so this sequence returns every input exactly
+             where it started, whichever input is chosen.</div>`
         : `<div class="note ok"><span class="note-h">The whole sequence is one rotation</span>
              ${st.seq.length} gates, and their product is a single turn of
              ${T(fmt(aa.t/D2R,2)+'^{\\circ}',false)} about
              ${T('\\mathbf{n}='+`(${fmt(z0(aa.n[0]),3)},\\,${fmt(z0(aa.n[1]),3)},\\,${fmt(z0(aa.n[2]),3)})`,false)}.
-             It has to be: a product of two-by-two unitaries is one, and every one of those is
-             ${T('e^{i\\gamma}R_{\\mathbf{n}}(\\alpha)',false)}. Depth buys nothing on one qubit.</div>`;
+             It has to be, since every one-qubit unitary is
+             ${T('e^{i\\gamma}R_{\\mathbf{n}}(\\alpha)',false)}: depth buys nothing on one qubit.</div>`;
       root.querySelector('.verdict').innerHTML = verdict;
 
       root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
@@ -437,7 +431,6 @@ Object.assign(LABS, (function(){
 
     function draw(root){
       const v = state();
-      const pr = v.map(z => z[0]*z[0] + z[1]*z[1]);
       const rd = reduced(v);
       const lam = Math.cos(st.theta*D2R/2)**2;
       const S = st.stage === 'out' ? Sof(st.theta) : 0;
@@ -449,7 +442,7 @@ Object.assign(LABS, (function(){
       /* The four bars sit at 0.5, 1.5, 2.5 and 3.5 so that the vertical axis
          at x = 0 falls on the left edge of the frame rather than through the
          middle of the first bar. */
-      const a = P.Axes({w:430,h:300,xr:[0,4],yr:[-1.60,1.45],
+      const a = P.Axes({w:430,h:280,xr:[0,4],yr:[-1.32,1.22],
         ylabel:'\\text{amplitude}', pad:{l:64,r:24,t:30,b:46},
         xticksOverride:[], ytarget:4});
       v.forEach((z,i)=>{
@@ -458,13 +451,13 @@ Object.assign(LABS, (function(){
         a.poly([[c-0.30,re],[c-0.01,re]],{color:P.COL.in,width:2.4});
         a.rect(c+0.01, 0, c+0.30, im, {fill:P.COL.dec.mid});
         a.poly([[c+0.01,im],[c+0.30,im]],{color:P.COL.mid,width:2.4});
-        a.note(c, -1.48, KET[i], {fs:12.5,color:P.COL.muted,anchor:'middle',tex:true});
+        a.note(c, -1.22, KET[i], {fs:12.5,color:P.COL.muted,anchor:'middle',tex:true});
       });
-      a.note(0.20, 1.32,'\\text{real}',{fs:12.5,color:P.COL.in,tex:true});
-      a.note(1.60, 1.32,'\\text{imaginary}',{fs:12.5,color:P.COL.mid,tex:true});
+      a.note(0.20, 1.10,'\\text{real}',{fs:12.5,color:P.COL.in,tex:true});
+      a.note(1.60, 1.10,'\\text{imaginary}',{fs:12.5,color:P.COL.mid,tex:true});
 
       /* ---- the entanglement of the output, against the tilt ---- */
-      const b = P.Axes({w:430,h:300,xr:[0,180],yr:[0,1.14],
+      const b = P.Axes({w:430,h:280,xr:[0,180],yr:[0,1.14],
         xlabel:'\\theta\\,(\\text{degrees})', ylabel:'S(\\rho_{A})\\,(\\text{bits})',
         pad:{l:74,r:24,t:30,b:46}, xtarget:4, ytarget:4});
       b.curve(d => Sof(d), {color:P.COL.in, width:2.4, n:360});
@@ -481,46 +474,36 @@ Object.assign(LABS, (function(){
       const m = (r) => `diag ${fmt(r[0][0],3)}, ${fmt(r[3][0],3)} · |off| ${fmt(Math.hypot(r[1][0],r[1][1]),3)}`;
       const prod = S < 1e-9;
       root.querySelector('.ro').innerHTML = `
-        <div style="grid-column:1/-1"><dt>Stage</dt><dd>${SNAME[st.stage]}</dd></div>
-        <div><dt>Input</dt><dd>${T('|'+st.q1+st.q0+'\\rangle',false)}</dd></div>
-        <div><dt>Probabilities</dt><dd>${pr.map(p=>fmt(p,3)).join(', ')}</dd></div>
+        <div style="grid-column:1/-1"><dt>Stage</dt><dd>${SNAME[st.stage]} · input ${T('|'+st.q1+st.q0+'\\rangle',false)}</dd></div>
         <div><dt>State of q₁</dt><dd>${m(rd.q1)}</dd></div>
         <div><dt>State of q₀</dt><dd>${m(rd.q0)}</dd></div>
-        <div><dt>Purity of q₁</dt><dd>${fmt(pur(rd.q1),4)}</dd></div>
-        <div><dt>Purity of q₀</dt><dd>${fmt(pur(rd.q0),4)}</dd></div>
+        <div><dt>Purity, q₁ · q₀</dt><dd>${fmt(pur(rd.q1),4)} · ${fmt(pur(rd.q0),4)}</dd></div>
         <div><dt>Schmidt weights</dt><dd>${st.stage==='out'?fmt(lam,4)+', '+fmt(1-lam,4):'1, 0'}</dd></div>
-        <div><dt>Entanglement, bits</dt><dd class="${prod?'warnv':'okv'}">${fmt(S,4)}</dd></div>
-        <div><dt>Total probability</dt><dd class="${Math.abs(pr.reduce((x,y)=>x+y,0)-1)<1e-9?'okv':'warnv'}">${fmt(pr.reduce((x,y)=>x+y,0),6)}</dd></div>`;
+        <div><dt>Entanglement, bits</dt><dd class="${prod?'warnv':'okv'}">${fmt(S,4)}</dd></div>`;
 
       const bellish = st.stage==='out' && Math.abs(st.theta-90)<1e-9;
       const NAMES = ['\\Phi^{+}','\\Phi^{-}','\\Psi^{+}','\\Psi^{-}'];
       const which = NAMES[2*st.q1 + st.q0];
       const verdict = st.stage !== 'out'
         ? `<div class="note warn"><span class="note-h">The pair is still a product</span>
-             Nothing that has run so far touches both qubits, and no one-qubit gate can change
-             the Schmidt weights. Both reduced states are pure, both purities read one, and the
-             entanglement is zero however the two sliders are set. Step to the last stage to see
-             the one gate that changes that.</div>`
+             No one-qubit gate can change the Schmidt weights, so both reduced states stay pure
+             and the entanglement is zero however the sliders are set — step to the last stage
+             for the one gate that changes that.</div>`
         : bellish && Math.abs(st.phi % 360) < 1e-9
         ? `<div class="note ok"><span class="note-h">This is ${T(`|${which}\\rangle`,false)}</span>
-             At a tilt of ${T('90^{\\circ}',false)} the first gate is the Hadamard, up to a sign on
-             the ${T('|1\\rangle',false)} input that nothing can see, and the four input bit
-             patterns give the four Bell states. Both reduced states are ${T('I/2',false)}, both
-             purities read one half, and the pair carries a full bit — while the pair itself is
-             perfectly known. Now turn the phase: the joint state moves and the entanglement does
-             not move at all.</div>`
+             At a tilt of ${T('90^{\\circ}',false)} the first gate is the Hadamard, and the four
+             input bit patterns give the four Bell states, each with both reduced states
+             ${T('I/2',false)} while the pair itself is perfectly known. Now turn the phase: the
+             joint state moves and the entanglement does not.</div>`
         : prod
         ? `<div class="note warn"><span class="note-h">One gate, and still a product</span>
-             At this tilt the control is left in a computational-basis state, so the CNOT is just
-             a permutation of basis states and cannot correlate anything. The gate is entangling
-             — it entangles <b>some</b> inputs — and this is not one of them. That distinction is
-             the whole content of the scene before this one.</div>`
+             At this tilt the control is left in a computational-basis state, so the CNOT only
+             permutes basis states — entangling for <b>some</b> inputs, and not this one.</div>`
         : `<div class="note ok"><span class="note-h">Entangled, and by this much</span>
              The output is ${T('\\cos\\tfrac{\\theta}{2}|00\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|11\\rangle',false)},
-             whose Schmidt weights are ${T(fmt(lam,4),false)} and ${T(fmt(1-lam,4),false)} and whose
-             entanglement is ${T(fmt(S,4),false)} bits. The phase control changes the joint state
-             and leaves both reduced states, both purities and this number exactly where they are:
-             a phase inside a Schmidt term is not entanglement.</div>`;
+             with Schmidt weights ${T(fmt(lam,4),false)} and ${T(fmt(1-lam,4),false)}, entanglement
+             ${T(fmt(S,4),false)} bits. The phase moves the joint state and leaves everything
+             else — reduced states, purities, this number — exactly where it is.</div>`;
       root.querySelector('.verdict').innerHTML = verdict;
 
       root.querySelectorAll('[data-out]').forEach(o=>{ o.textContent = String(st[o.dataset.out]); });
@@ -532,7 +515,7 @@ Object.assign(LABS, (function(){
 
     return { mount(root){
       root.innerHTML = `
-        <div class="cols c-7-5" style="gap:40px">
+        <div class="cols c-4-8" style="gap:40px">
           <div class="col stack"><div class="plots"></div></div>
           <div class="col stack">
             <div class="ctrls one">

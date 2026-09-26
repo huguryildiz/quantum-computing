@@ -475,7 +475,7 @@ function figSep(){
 const SC = [
 
 /* ---------------------------------------------------------------- 3.0.1 -- */
-{ id:'m3-open', module:'M3', nav:'Why a vector is not enough', title:'Mixed States and Entanglement',
+{ id:'m3-open', module:'M3', nav:'Mixed States and Entanglement', title:'Mixed States and Entanglement',
   objective:'Name the two situations in which a pure state vector cannot be written, and say what replaces it.',
   keywords:'mixed state density operator open system subsystem ignorance entanglement module 3 overview',
   src:'L6 · density operators: pure states, mixtures, and reduced states', steps:2, blocks:[
@@ -498,7 +498,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.1.1 -- */
-{ id:'m3-rho', module:'M3', nav:'The density operator', title:'The Density Operator',
+{ id:'m3-rho', module:'M3', nav:'The Density Operator', title:'The Density Operator',
   objective:'Write the density operator of a pure state and of a mixture, and name the meaning of each entry.',
   keywords:'density operator density matrix outer product ensemble populations coherences mixture pure state',
   src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
@@ -523,7 +523,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.1.2 -- */
-{ id:'m3-physical', module:'M3', nav:'Which matrices are states', title:'Physical Density Matrices',
+{ id:'m3-physical', module:'M3', nav:'Physical Density Matrices', title:'Physical Density Matrices',
   objective:'Test a candidate matrix against the three conditions and say which one a given matrix fails.',
   keywords:'hermitian positive semidefinite trace one physical density matrix eigenvalues test coherence bound',
   src:'L6 · which matrices are physical states?', steps:3, slide:true, blocks:[
@@ -548,7 +548,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.1.3 -- */
-{ id:'m3-expect', module:'M3', nav:'Predictions from the matrix', title:'Expectation Values from the Trace',
+{ id:'m3-expect', module:'M3', nav:'Expectation Values from the Trace', title:'Expectation Values from the Trace',
   objective:'Compute an outcome probability and an expectation value from a density operator.',
   keywords:'trace rho A expectation probability povm effects cyclicity born rule mixed state prediction',
   src:'L6 · expectation values and measurement probabilities', steps:3, slide:true, blocks:[
@@ -573,7 +573,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.1.4 -- */
-{ id:'m3-ensemble', module:'M3', nav:'Ensembles are not unique', title:'Non-Uniqueness of Ensembles',
+{ id:'m3-ensemble', module:'M3', nav:'Non-Uniqueness of Ensembles', title:'Non-Uniqueness of Ensembles',
   objective:'Show two different ensembles with the same density operator and say what follows.',
   keywords:'ensemble decomposition not unique maximally mixed identity over two operationally identical preparation',
   src:'L6 · density operators: pure states, mixtures, and reduced states', steps:3, slide:true, blocks:[
@@ -598,7 +598,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-rho', module:'M3', nav:'Code · The density operator', title:'The Density Operator in Code',
+{ id:'m3-code-rho', module:'M3', nav:'The Density Operator in Code', title:'The Density Operator in Code',
   objective:'Build a density matrix, test a candidate against the three conditions, and compare two preparations of one state.',
   keywords:'code qiskit numpy program density matrix outer product positivity eigenvalues ensemble run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -633,7 +633,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.2.2 -- */
-{ id:'m3-ball', module:'M3', nav:'The ball of qubit states', title:'The Bloch Ball',
+{ id:'m3-ball', module:'M3', nav:'The Bloch Ball', title:'The Bloch Ball',
   objective:'Write a qubit density operator in the Pauli basis and read purity off the length of its vector.',
   keywords:'bloch vector ball pauli expansion length purity eigenvalues mixed inside sphere surface qubit',
   src:'L6 · example: a pure qubit', steps:3, slide:true, blocks:[
@@ -658,7 +658,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-purity', module:'M3', nav:'Code · Purity and the ball', title:'Purity and the Bloch Ball in Code',
+{ id:'m3-code-purity', module:'M3', nav:'Purity and the Bloch Ball in Code', title:'Purity and the Bloch Ball in Code',
   objective:'Compute a purity by two routes, read the Bloch vector of a mixed state, and follow the purity of a mixture.',
   keywords:'code qiskit numpy program purity bloch vector pauli expansion mixture eigenvalues run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -668,7 +668,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.3.1 -- */
-{ id:'m3-kraus', module:'M3', nav:'Quantum channels', title:'Quantum Channels and Kraus Operators',
+{ id:'m3-kraus', module:'M3', nav:'Quantum Channels and Kraus Operators', title:'Quantum Channels and Kraus Operators',
   objective:'State the Kraus form of a channel and check that it preserves the trace.',
   keywords:'quantum channel kraus operators cptp completely positive trace preserving operator sum environment',
   src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
@@ -693,7 +693,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.3.2 -- */
-{ id:'m3-damp', module:'M3', nav:'Amplitude damping', title:'Amplitude Damping',
+{ id:'m3-damp', module:'M3', nav:'Amplitude Damping', title:'Amplitude Damping',
   objective:'Apply the amplitude-damping Kraus operators and say what happens to each entry.',
   keywords:'amplitude damping relaxation energy loss spontaneous emission kraus population coherence square root',
   src:'L6 · quantum channels and Kraus operators', steps:3, slide:true, blocks:[
@@ -743,7 +743,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.L1 --- */
-{ id:'m3-lab-e', module:'M3', nav:'Laboratory E', title:'Laboratory E \u2014 A Channel on the Bloch Ball',
+{ id:'m3-lab-e', module:'M3', nav:'Laboratory E \u2014 A Channel on the Bloch Ball', title:'Laboratory E \u2014 A Channel on the Bloch Ball',
   objective:'Let the reader choose a state and a channel and watch the ball of states deform.',
   keywords:'laboratory channel bloch ball depolarising amplitude damping dephasing purity contraction fixed point',
   steps:0, slide:true, blocks:[
@@ -754,7 +754,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-channels', module:'M3', nav:'Code · Quantum channels', title:'Quantum Channels in Code',
+{ id:'m3-code-channels', module:'M3', nav:'Quantum Channels in Code', title:'Quantum Channels in Code',
   objective:'Check that a set of Kraus operators keeps the trace, and apply amplitude damping and dephasing to a state.',
   keywords:'code qiskit numpy program kraus channel amplitude damping dephasing bit flip coherence run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -764,7 +764,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.4.1 -- */
-{ id:'m3-t1t2', module:'M3', nav:'T1 and T2', title:'Relaxation and Dephasing Times',
+{ id:'m3-t1t2', module:'M3', nav:'Relaxation and Dephasing Times', title:'Relaxation and Dephasing Times',
   objective:'Write the two exponential decays and derive the inequality between their times.',
   keywords:'T1 T2 relaxation dephasing lindblad master equation exponential decay coherence time inequality echo',
   src:'L6 · Markovian relaxation and dephasing', steps:3, slide:true, blocks:[
@@ -789,7 +789,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-t1t2', module:'M3', nav:'Code · T1 and T2', title:'Relaxation and Dephasing in Code',
+{ id:'m3-code-t1t2', module:'M3', nav:'Relaxation and Dephasing in Code', title:'Relaxation and Dephasing in Code',
   objective:'Compute T2 from two rates, print the two decays, and build the continuous decay out of many small channels.',
   keywords:'code qiskit numpy program T1 T2 relaxation dephasing decay exponential kraus steps run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -799,7 +799,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.5.1 -- */
-{ id:'m3-order', module:'M3', nav:'Two qubits, and their order', title:'Two-Qubit States and Qubit Ordering',
+{ id:'m3-order', module:'M3', nav:'Two-Qubit States and Qubit Ordering', title:'Two-Qubit States and Qubit Ordering',
   objective:'Write a two-qubit state in the fixed ordering and locate each amplitude.',
   keywords:'two qubits tensor product basis ordering convention kronecker significant bit index product state',
   src:'L6 · composite systems and tensor products', steps:3, slide:true, blocks:[
@@ -824,7 +824,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.5.2 -- */
-{ id:'m3-ptrace', module:'M3', nav:'The partial trace', title:'The Partial Trace',
+{ id:'m3-ptrace', module:'M3', nav:'The Partial Trace', title:'The Partial Trace',
   objective:'Compute a partial trace by the block rule and say what characterises it.',
   keywords:'partial trace reduced density operator subsystem block matrix trace out marginal characterisation',
   src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
@@ -849,7 +849,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.5.3 -- */
-{ id:'m3-local', module:'M3', nav:'A pure whole with mixed parts', title:'Reduced States of a Pure Pair',
+{ id:'m3-local', module:'M3', nav:'Reduced States of a Pure Pair', title:'Reduced States of a Pure Pair',
   objective:'Show that a maximally entangled pair has maximally mixed parts and say what that rules out.',
   keywords:'entanglement local mixedness reduced state maximally mixed pure joint state purity contrast product',
   src:'L6 · partial trace: the state of a subsystem', steps:3, slide:true, blocks:[
@@ -874,7 +874,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-ptrace', module:'M3', nav:'Code · Two systems', title:'Two Systems in Code',
+{ id:'m3-code-ptrace', module:'M3', nav:'Two Systems in Code', title:'Two Systems in Code',
   objective:'Build a two-qubit state in the fixed ordering, take both partial traces, and compare the purity of a pair with its halves.',
   keywords:'code qiskit numpy program tensor product ordering partial trace reduced state purity bell run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -884,7 +884,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.6.1 -- */
-{ id:'m3-sep', module:'M3', nav:'Product or entangled', title:'Separable and Entangled States',
+{ id:'m3-sep', module:'M3', nav:'Separable and Entangled States', title:'Separable and Entangled States',
   objective:'Decide whether a two-qubit pure state factors, and factor it when it does.',
   keywords:'separable product state entangled test determinant factor amplitudes bipartite pure mixed convex',
   src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
@@ -909,7 +909,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.6.2 -- */
-{ id:'m3-schmidt', module:'M3', nav:'The Schmidt decomposition', title:'The Schmidt Decomposition',
+{ id:'m3-schmidt', module:'M3', nav:'The Schmidt Decomposition', title:'The Schmidt Decomposition',
   objective:'State the Schmidt decomposition and read the entanglement off its rank.',
   keywords:'schmidt decomposition coefficients rank orthonormal bases bipartite pure state reduced eigenvalues',
   src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
@@ -934,7 +934,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.6.3 -- */
-{ id:'m3-svd', module:'M3', nav:'Computing it', title:'Computing the Schmidt Decomposition',
+{ id:'m3-svd', module:'M3', nav:'Computing the Schmidt Decomposition', title:'Computing the Schmidt Decomposition',
   objective:'Reshape a state vector into a coefficient matrix and get the Schmidt data from its singular values.',
   keywords:'singular value decomposition svd reshape coefficient matrix numerical rank tolerance schmidt computation',
   src:'L6 · computing Schmidt decompositions with an SVD', steps:3, slide:true, blocks:[
@@ -959,7 +959,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-schmidt', module:'M3', nav:'Code · Schmidt decomposition', title:'The Schmidt Decomposition in Code',
+{ id:'m3-code-schmidt', module:'M3', nav:'The Schmidt Decomposition in Code', title:'The Schmidt Decomposition in Code',
   objective:'Apply the product test, compute Schmidt coefficients with an SVD, and count a rank with a stated tolerance.',
   keywords:'code qiskit numpy program separable product test schmidt svd singular values rank tolerance run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -969,7 +969,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.7.1 -- */
-{ id:'m3-entropy', module:'M3', nav:'Entropy', title:'Entanglement Entropy',
+{ id:'m3-entropy', module:'M3', nav:'Entanglement Entropy', title:'Entanglement Entropy',
   objective:'Compute the von Neumann entropy of a reduced state and interpret it as an amount of entanglement.',
   keywords:'von neumann entropy entanglement entropy ebit bits log base two reduced state pure zero maximal',
   src:'L6 · separability and the Schmidt decomposition', steps:3, slide:true, blocks:[
@@ -994,7 +994,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-entropy', module:'M3', nav:'Code · Entropy', title:'Entropy in Code',
+{ id:'m3-code-entropy', module:'M3', nav:'Entropy in Code', title:'Entropy in Code',
   objective:'Compute the entanglement entropy of three pairs, follow it along a family of states, and see where it stops measuring entanglement.',
   keywords:'code qiskit numpy program von neumann entropy ebit schmidt reduced state mixture run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1004,7 +1004,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.8.1 -- */
-{ id:'m3-bell', module:'M3', nav:'The Bell states', title:'The Bell States',
+{ id:'m3-bell', module:'M3', nav:'The Bell States', title:'The Bell States',
   objective:'List the Bell states and compute the three Pauli correlations of one of them.',
   keywords:'bell states phi psi plus minus basis maximally entangled correlations XX YY ZZ classical mixture',
   src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
@@ -1029,7 +1029,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.8.2 -- */
-{ id:'m3-chsh', module:'M3', nav:'The classical bound', title:'The CHSH Inequality',
+{ id:'m3-chsh', module:'M3', nav:'The CHSH Inequality', title:'The CHSH Inequality',
   objective:'Assemble the CHSH combination and derive the bound a model with pre-existing values obeys.',
   keywords:'chsh bell inequality local hidden variable classical bound two pre-existing values correlations',
   src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
@@ -1054,7 +1054,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.8.3 -- */
-{ id:'m3-violate', module:'M3', nav:'The violation', title:'The Quantum Violation of CHSH',
+{ id:'m3-violate', module:'M3', nav:'The Quantum Violation of CHSH', title:'The Quantum Violation of CHSH',
   objective:'Evaluate the CHSH combination on a Bell state and say precisely which assumption fails.',
   keywords:'chsh violation tsirelson 2 root 2 bell state measurement angles refutation realism error bar shots',
   src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
@@ -1079,7 +1079,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.L2 --- */
-{ id:'m3-lab-f', module:'M3', nav:'Laboratory F', title:'Laboratory F \u2014 The CHSH Game',
+{ id:'m3-lab-f', module:'M3', nav:'Laboratory F \u2014 The CHSH Game', title:'Laboratory F \u2014 The CHSH Game',
   objective:'Let the reader set the four measurement directions and read the CHSH value against the classical bound.',
   keywords:'laboratory chsh bell inequality four angles classical bound tsirelson correlations violation sweep',
   steps:0, slide:true, blocks:[
@@ -1090,7 +1090,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.8.4 -- */
-{ id:'m3-nosig', module:'M3', nav:'No signalling', title:'The No-Signalling Theorem',
+{ id:'m3-nosig', module:'M3', nav:'The No-Signalling Theorem', title:'The No-Signalling Theorem',
   objective:'Show that one party\u2019s outcome distribution does not depend on the other party\u2019s choice.',
   keywords:'no signalling faster than light communication reduced state unchanged partial trace correlation classical channel',
   src:'L6 · Bell states, correlations, and no signaling', steps:3, slide:true, blocks:[
@@ -1115,13 +1115,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m3-code-bell', module:'M3', nav:'Code · Bell correlations', title:'Bell Correlations in Code',
+{ id:'m3-code-bell', module:'M3', nav:'Bell Correlations in Code', title:'Bell Correlations in Code',
   objective:'Compute the Pauli correlations of Bell states, the CHSH value over a range of angles, and the reduced state after a distant measurement.',
   keywords:'code qiskit numpy program bell states correlations chsh violation no signalling reduced state run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 3 · Bell correlations'},
   {t:'title', text:'Bell Correlations in Code'},
   {t:'raw', html:()=>CODEBANK.page('m3-code-bell')}
+]},
+
+/* ---------------------------------------------------------------- 3.8.4 -- */
+{ id:'m3-quick', module:'M3', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict density operator purity bloch ball partial trace schmidt entropy bell chsh',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 3 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Mixture', html:'A coin gives $|{+}\\rangle$ or $|{-}\\rangle$, unrecorded. Find $\\rho_{01}$.',
+      ask:{key:'m3-qc0', choices:['$0$','$\\tfrac12$','$-\\tfrac12$'], answer:0,
+        why:'Opposite off-diagonals cancel.'}}],
+    [{t:'note', kind:'def', head:'Physical states', html:'$M=\\begin{bmatrix}0.6&0.5\\\\0.5&0.4\\end{bmatrix}$. A state?',
+      ask:{key:'m3-qc1', choices:['Yes','No','Wrong trace'], answer:1,
+        why:'$\\sqrt{0.24}<0.5$.'}}],
+    [{t:'note', kind:'def', head:'Trace rule', html:'$\\rho=\\tfrac12|0\\rangle\\langle 0|+\\tfrac12|{-}\\rangle\\langle{-}|$. Find $\\langle X\\rangle$.',
+      ask:{key:'m3-qc2', choices:['$\\tfrac12$','$-\\tfrac12$','$0$'], answer:1,
+        why:'$\\tfrac12(0)+\\tfrac12(-1)$.'}}],
+    [{t:'note', kind:'def', head:'Purity', html:'$\\rho=\\begin{bmatrix}0.6&0\\\\0&0.4\\end{bmatrix}$. Find its purity.',
+      ask:{key:'m3-qc3', choices:['$0.24$','$0.52$','$1$'], answer:1,
+        why:'$0.36+0.16$.'}}],
+    [{t:'note', kind:'def', head:'Bloch ball', html:'$\\mathbf{r}=(0,0.8,0)$. Find the eigenvalues of $\\rho$.',
+      ask:{key:'m3-qc4', choices:['$0.9,0.1$','$0.8,0.2$','$0.64,0.36$'], answer:0,
+        why:'$\\tfrac12(1\\pm0.8)$.'}}],
+    [{t:'note', kind:'def', head:'T2 bound', html:'$T_{1}=50\\mu s$, $T_{\\phi}=100\\mu s$. Find $T_{2}$.',
+      ask:{key:'m3-qc5', choices:['$50\\mu s$','$100\\mu s$','$150\\mu s$'], answer:0,
+        why:'$1/100+1/100=1/50$.'}}],
+    [{t:'note', kind:'def', head:'Ordering', html:'$|1\\rangle\\otimes|{+}\\rangle$: which entries are non-zero?',
+      ask:{key:'m3-qc6', choices:['$c_{0},c_{1}$','$c_{2},c_{3}$','$c_{1},c_{3}$'], answer:1,
+        why:'Strings $10$ and $11$.'}}],
+    [{t:'note', kind:'def', head:'Partial trace', html:'$\\tfrac{1}{\\sqrt2}(|10\\rangle+|11\\rangle)$. Find $\\rho_{A}$.',
+      ask:{key:'m3-qc7', choices:['$|1\\rangle\\langle 1|$','$I/2$','$|{+}\\rangle\\langle{+}|$'], answer:0,
+        why:'Left qubit is $1$ in both.'}}],
+    [{t:'note', kind:'def', head:'Product test', html:'$|\\Phi^{+}\\rangle$: product or entangled?',
+      ask:{key:'m3-qc8', choices:['Entangled','Product','Unclear'], answer:0,
+        why:'$c_{0}c_{3}-c_{1}c_{2}=\\tfrac12$.'}}],
+    [{t:'note', kind:'def', head:'Entropy', html:'Four Bell pairs, one qubit each side. Find $S(\\rho_{A})$.',
+      ask:{key:'m3-qc9', choices:['$1$ bit','$2$ bits','$4$ bits'], answer:2,
+        why:'$\\log_{2}16=4$.'}}],
+    [{t:'note', kind:'def', head:'Bell correlation', html:'$|\\Phi^{-}\\rangle$. Find $\\langle X{\\otimes}X\\rangle$.',
+      ask:{key:'m3-qc10', choices:['$1$','$-1$','$0$'], answer:1,
+        why:'An eigenvalue $-1$.'}}],
+    [{t:'note', kind:'def', head:'CHSH value', html:'$a_{0}=-1$, $a_{1}=b_{0}=b_{1}=1$. Find the CHSH sum.',
+      ask:{key:'m3-qc11', choices:['$-2$','$2$','$0$'], answer:0,
+        why:'$-1-1+1-1$.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 3.9.1 -- */
@@ -1155,7 +1203,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 3.9.2 -- */
-{ id:'m3-shapes', module:'M3', nav:'The shapes of question', title:'Question Types',
+{ id:'m3-shapes', module:'M3', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types of chapter 3 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice density purity channel partial trace schmidt chsh',
   steps:1, blocks:[

@@ -3020,5 +3020,247 @@ CHECKS += [
 ]
 
 
+# ── quick checks ─────────────────────────────────────────────────────────────
+#
+# One block per module. Each card's number is re-derived by a route the scene
+# itself does not take, using the same qops.py helpers as the rest of the
+# suite. Conceptual cards with no stated number carry no check here.
+
+
+def _m6qc_signed_terms(f, n):
+    """The query terms that carry a minus sign after one query on |+>^n|->,
+    for the quick-check phase-kickback cards."""
+    d = 2 ** (n + 1)
+    U = np.zeros((d, d))
+    for x in range(2 ** n):
+        for y in range(2):
+            U[(x << 1) | (y ^ (int(f(x)) & 1)), (x << 1) | y] = 1.0
+    v = np.zeros(d)
+    for x in range(2 ** n):
+        v[(x << 1) | 0], v[(x << 1) | 1] = 1.0, -1.0
+    v = U @ v
+    return [x for x in range(2 ** n) if v[(x << 1) | 0] < 0]
+
+
+def _m6qc_dj_queries(eps):
+    """The smallest k with 2^-(k-1) <= eps, by counting up."""
+    k = 1
+    while 2 ** (-(k - 1)) > eps:
+        k += 1
+    return k
+
+
+def _m6qc_qft_gate_count(n):
+    gates = []
+    for q in reversed(range(n)):
+        gates.append(("H", q))
+        for c in reversed(range(q)):
+            gates.append(("R", c, q))
+    return len(gates)
+
+
+def _m6qc_deutsch_no_kickback():
+    """f(x) = x, target prepared in |+> instead of |->: the query register
+    after the CNOT and the closing Hadamard, on the two-qubit toy space of
+    (query, target)."""
+    CNOT = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
+    plus = KETP
+    psi = np.kron(plus, plus)
+    out = CNOT @ psi
+    out = np.kron(H, I2) @ out
+    # probability the query (first) qubit reads 0
+    return float(abs(out[0]) ** 2 + abs(out[1]) ** 2)
+
+
+CHECKS += [
+    # ---- Module 1 ----------------------------------------------------------
+    {"name": "m1 quick: <a|b>=2-3i gives <b|a>=2+3i", "stated": 0.0,
+     "derive": lambda: abs(np.conj(complex(2, -3)) - complex(2, 3)),
+     "atol": 1e-12},
+    {"name": "m1 quick: |4 e^{i pi/3}|^2 = 16", "stated": 16.0,
+     "derive": lambda: abs(4 * cmath.exp(1j * math.pi / 3)) ** 2, "rtol": 1e-12},
+    {"name": "m1 quick: |0><0| on |1> is the zero vector", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(outer(KET0, KET0) @ KET1)),
+     "atol": 1e-12},
+    {"name": "m1 quick: three qubits carry 8 amplitudes", "stated": 8.0,
+     "derive": lambda: float(2 ** 3), "atol": 1e-12},
+    {"name": "m1 quick: Z is unitary", "stated": 0.0,
+     "derive": lambda: unitarity(Z), "atol": 1e-12},
+    {"name": "m1 quick: tr(2 P+ + 6 P-) = 8", "stated": 8.0,
+     "derive": lambda: float(2 * np.trace(proj(KETP)).real
+                              + 6 * np.trace(proj(KETM)).real), "atol": 1e-12},
+    {"name": "m1 quick: Gram-Schmidt u2 for v1=(0,1), v2=(1,1)", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         (np.array([1.0, 1.0]) - inner(np.array([0.0, 1.0]), np.array([1.0, 1.0]))
+          * np.array([0.0, 1.0])) - np.array([1.0, 0.0]))),
+     "atol": 1e-12},
+    {"name": "m1 quick: global phase leaves P(0) at 9/25", "stated": 9 / 25,
+     "derive": lambda: abs(-3 / 5) ** 2, "rtol": 1e-12},
+    {"name": "m1 quick: tr((9 P+ + 4 P-)^2) = 97", "stated": 97.0,
+     "derive": lambda: float(np.trace(
+         (9 * proj(KETP) + 4 * proj(KETM))
+         @ (9 * proj(KETP) + 4 * proj(KETM))).real), "atol": 1e-9},
+
+    # ---- Module 2 ----------------------------------------------------------
+    {"name": "m2 quick: |(1/sqrt5)(|0>+2i|1>)> gives p(1)=4/5", "stated": 0.8,
+     "derive": lambda: abs(2j / math.sqrt(5)) ** 2, "rtol": 1e-12},
+    {"name": "m2 quick: p(-) for |1> measured in X is 1/2", "stated": 0.5,
+     "derive": lambda: abs(inner(KETM, KET1)) ** 2, "rtol": 1e-12},
+    {"name": "m2 quick: <Z> on |1> is -1", "stated": -1.0,
+     "derive": lambda: float(np.vdot(KET1, Z @ KET1).real), "atol": 1e-12},
+    {"name": "m2 quick: [X,Y] = 2iZ", "stated": 0.0,
+     "derive": lambda: dev(X @ Y - Y @ X, 2j * Z), "atol": 1e-12},
+    {"name": "m2 quick: YZ = iX", "stated": 0.0,
+     "derive": lambda: dev(Y @ Z, 1j * X), "atol": 1e-12},
+    {"name": "m2 quick: p(+) along z for |+> is 1/2", "stated": 0.5,
+     "derive": lambda: float(np.vdot(KETP, 0.5 * (I2 + Z) @ KETP).real),
+     "rtol": 1e-12},
+    {"name": "m2 quick: beat frequency E2-E1 = 5", "stated": 5.0,
+     "derive": lambda: float(6 - 1), "atol": 1e-12},
+    {"name": "m2 quick: infinite well E4/E1 = 16", "stated": 16.0,
+     "derive": lambda: float(4 ** 2 / 1 ** 2), "atol": 1e-12},
+    {"name": "m2 quick: SE at N=2500, p=1/2 is 0.01", "stated": 0.01,
+     "derive": lambda: math.sqrt(0.25 / 2500), "rtol": 1e-12},
+    {"name": "m2 quick: pi pulse on |0> gives P(1)=1", "stated": 1.0,
+     "derive": lambda: float(abs((-1j * X @ KET0)[1]) ** 2), "rtol": 1e-12},
+
+    # ---- Module 3 ----------------------------------------------------------
+    {"name": "m3 quick: mixture of |+>,|-> gives rho01 = 0", "stated": 0.0,
+     "derive": lambda: abs((0.5 * proj(KETP) + 0.5 * proj(KETM))[0, 1]),
+     "atol": 1e-12},
+    {"name": "m3 quick: positivity bound for p0=0.6 is sqrt(0.24)",
+     "stated": math.sqrt(0.24), "derive": lambda: math.sqrt(0.6 * 0.4),
+     "rtol": 1e-12},
+    {"name": "m3 quick: <X> for rho = 1/2|0><0|+1/2|-><-| is -1/2",
+     "stated": -0.5,
+     "derive": lambda: float(np.trace(
+         (0.5 * proj(KET0) + 0.5 * proj(KETM)) @ X).real), "atol": 1e-12},
+    {"name": "m3 quick: purity of diag(0.6,0.4) is 0.52", "stated": 0.52,
+     "derive": lambda: purity(np.diag([0.6, 0.4])), "rtol": 1e-12},
+    {"name": "m3 quick: Bloch r=(0,0.8,0) larger eigenvalue is 0.9",
+     "stated": 0.9, "derive": lambda: (1 + 0.8) / 2, "rtol": 1e-12},
+    {"name": "m3 quick: Bloch r=(0,0.8,0) smaller eigenvalue is 0.1",
+     "stated": 0.1, "derive": lambda: (1 - 0.8) / 2, "rtol": 1e-9},
+    {"name": "m3 quick: T1=50, Tphi=100 gives T2=50", "stated": 50.0,
+     "derive": lambda: 1.0 / (1.0 / (2 * 50) + 1.0 / 100), "rtol": 1e-9},
+    {"name": "m3 quick: |1>x|+> has zero weight on entries 0 and 1",
+     "stated": 0.0,
+     "derive": lambda: float(np.sum(np.abs(
+         ((ket(1, 0) + ket(1, 1)) / math.sqrt(2))[:2]))), "atol": 1e-12},
+    {"name": "m3 quick: |1>x|+> has equal weight on entries 2 and 3",
+     "stated": 0.0,
+     "derive": lambda: float(abs(
+         ((ket(1, 0) + ket(1, 1)) / math.sqrt(2))[2]
+         - ((ket(1, 0) + ket(1, 1)) / math.sqrt(2))[3])), "atol": 1e-12},
+    {"name": "m3 quick: rho_A of (|10>+|11>)/sqrt2 is |1><1|", "stated": 0.0,
+     "derive": lambda: dev(partial_trace(np.outer(
+         (ket(1, 0) + ket(1, 1)) / math.sqrt(2),
+         ((ket(1, 0) + ket(1, 1)) / math.sqrt(2)).conj()), keep=0), proj(KET1)),
+     "atol": 1e-9},
+    {"name": "m3 quick: Phi+ product test gives 1/2, not 0", "stated": 0.5,
+     "derive": lambda: float(1 / math.sqrt(2) * 1 / math.sqrt(2) - 0.0),
+     "rtol": 1e-12},
+    {"name": "m3 quick: entropy of four Bell pairs is 4 bits", "stated": 4.0,
+     "derive": lambda: math.log2(2 ** 4), "atol": 1e-12},
+    {"name": "m3 quick: <X x X> on Phi- is -1", "stated": -1.0,
+     "derive": lambda: float(np.vdot(
+         (kron_state(KET0, KET0) - kron_state(KET1, KET1)) / math.sqrt(2),
+         kron(X, X) @ (kron_state(KET0, KET0) - kron_state(KET1, KET1))
+         / math.sqrt(2)).real), "rtol": 1e-12},
+    {"name": "m3 quick: CHSH value for a=(-1,1), b=(1,1) is -2", "stated": -2.0,
+     "derive": lambda: float(-1 * 1 + -1 * 1 + 1 * 1 - 1 * 1), "atol": 1e-12},
+
+    # ---- Module 4 ------------------------------------------------------------
+    {"name": "m4 quick: r_z for (sqrt3/2, 1/2) is 0.5", "stated": 0.5,
+     "derive": lambda: (math.sqrt(3) / 2) ** 2 - (1 / 2) ** 2, "rtol": 1e-12},
+    {"name": "m4 quick: overlap for r=(0,0,1), s=(0,0.6,0.8) is 0.9",
+     "stated": 0.9, "derive": lambda: 0.5 * (1 + np.dot([0, 0, 1], [0, 0.6, 0.8])),
+     "rtol": 1e-12},
+    {"name": "m4 quick: R_y(8 pi) = I", "stated": 0.0,
+     "derive": lambda: dev(rot((0, 1, 0), 8 * math.pi), I2), "atol": 1e-9},
+    {"name": "m4 quick: H maps r=(0.6,0,-0.8) to (-0.8,0,0.6)", "stated": 0.0,
+     "derive": lambda: float(np.linalg.norm(
+         bloch(H @ (0.5 * (I2 + ndotsigma([0.6, 0, -0.8]))) @ H.conj().T)
+         - np.array([-0.8, 0.0, 0.6]))), "atol": 1e-9},
+    {"name": "m4 quick: T^2 |+> is |+i> up to phase", "stated": 0.0,
+     "derive": lambda: same_state(T_GATE @ T_GATE @ KETP,
+                                   (KET0 + 1j * KET1) / math.sqrt(2)),
+     "atol": 1e-9},
+    {"name": "m4 quick: Z H |0> is |-> up to phase", "stated": 0.0,
+     "derive": lambda: same_state(Z @ H @ KET0, KETM), "atol": 1e-9},
+    {"name": "m4 quick: theta=0 for Z in ZYZ form", "stated": 0.0,
+     "derive": lambda: 2 * math.acos(min(1.0, abs(Z[0, 0]))), "atol": 1e-9},
+    {"name": "m4 quick: U(pi,0,0)|0> is |1>", "stated": 0.0,
+     "derive": lambda: same_state(u_gate(math.pi, 0, 0) @ KET0, KET1),
+     "atol": 1e-9},
+    {"name": "m4 quick: X on q0 of |10> gives |11>", "stated": 0.0,
+     "derive": lambda: dev(on_qubit(X, 0, 2) @ ket(1, 0), ket(1, 1)),
+     "atol": 1e-12},
+    {"name": "m4 quick: CNOT_{0->1} on |0>x|+> gives Phi+", "stated": 0.0,
+     "derive": lambda: dev(cnot(0, 1, 2) @ kron_state(KET0, KETP),
+                            (ket(0, 0) + ket(1, 1)) / math.sqrt(2)),
+     "atol": 1e-9},
+
+    # ---- Module 5 ------------------------------------------------------------
+    {"name": "m5 quick: 2-qubit H,H,CZ has depth 2", "stated": 2.0,
+     "derive": lambda: 1.0 + 1.0, "atol": 1e-12},
+    {"name": "m5 quick: n=3 one shot returns 3 bits", "stated": 3.0,
+     "derive": lambda: 3.0, "atol": 1e-12},
+    {"name": "m5 quick: n=3 state has 8 amplitudes", "stated": 8.0,
+     "derive": lambda: float(2.0 ** 3), "atol": 1e-12},
+    {"name": "m5 quick: string 011 is entry 3", "stated": 3.0,
+     "derive": lambda: float(0 * 4 + 1 * 2 + 1 * 1), "atol": 1e-12},
+    {"name": "m5 quick: GHZ tree n=32 at 50ns takes 0.3us", "stated": 0.3,
+     "derive": lambda: (1 + math.log2(32)) * 0.05, "rtol": 1e-9},
+    {"name": "m5 quick: 8GB caps a statevector at 28 qubits", "stated": 28.0,
+     "derive": lambda: float(math.floor(math.log2(8e9 / 16))), "atol": 1e-12},
+    {"name": "m5 quick: SE at p=0.2, N=400 is 0.02", "stated": 0.02,
+     "derive": lambda: math.sqrt(0.2 * 0.8 / 400), "rtol": 1e-12},
+    {"name": "m5 quick: 10 CNOTs into CZ+H+H is 30 instructions",
+     "stated": 30.0, "derive": lambda: float(10 * 3), "atol": 1e-12},
+    {"name": "m5 quick: routing 3 steps apart costs 6 extra CNOTs",
+     "stated": 6.0, "derive": lambda: float(3 * (3 - 1)), "atol": 1e-12},
+    {"name": "m5 quick: three-copy code at p=0.05 gives pL=0.00725",
+     "stated": 0.00725, "derive": lambda: 3 * 0.05 ** 2 - 2 * 0.05 ** 3,
+     "rtol": 1e-9},
+    {"name": "m5 quick: Ramsey p(0) at phi=120 deg is 0.25", "stated": 0.25,
+     "derive": lambda: math.cos(math.radians(120) / 2) ** 2, "rtol": 1e-12},
+
+    # ---- Module 6 ------------------------------------------------------------
+    {"name": "m6 quick: quantum work is 500x1000 = 5e5", "stated": 5.0e5,
+     "derive": lambda: 500 * 1000.0, "rtol": 1e-9},
+    {"name": "m6 quick: classical work is 2e5x40 = 8e6", "stated": 8.0e6,
+     "derive": lambda: 2e5 * 40.0, "rtol": 1e-9},
+    {"name": "m6 quick: OR oracle signs three terms", "stated": 3.0,
+     "derive": lambda: float(len(_m6qc_signed_terms(
+         lambda x: (x & 1) | ((x >> 1) & 1), 2))), "atol": 1e-12},
+    {"name": "m6 quick: cancellation n=3, f=1 on 0 and 2 gives p(000)=1/4",
+     "stated": 1 / 4,
+     "derive": lambda: float(deutsch_jozsa(
+         lambda x: 1 if x in (0, 2) else 0, 3)[0]), "rtol": 1e-9},
+    {"name": "m6 quick: S kicks i back onto control |1> with target |1>",
+     "stated": 1.0, "derive": lambda: float((np.diag([1, 1j]) @ KET1)[1].imag),
+     "rtol": 1e-12},
+    {"name": "m6 quick: Deutsch with target |+> reads 0 with certainty",
+     "stated": 1.0, "derive": _m6qc_deutsch_no_kickback, "rtol": 1e-9},
+    {"name": "m6 quick: DJ string for f=x1, n=3 is 010", "stated": 1.0,
+     "derive": lambda: float(abs(deutsch_jozsa(
+         lambda x: (x >> 1) & 1, 3)[0b010])), "rtol": 1e-9},
+    {"name": "m6 quick: DJ separation at eps=1e-4 needs 15 queries",
+     "stated": 15.0, "derive": lambda: float(_m6qc_dj_queries(1e-4)),
+     "atol": 1e-12},
+    {"name": "m6 quick: QFT amplitude modulus on Q=8 is 1/sqrt(8)",
+     "stated": 1 / math.sqrt(8),
+     "derive": lambda: float(abs(qft_matrix(3)[3, 2])), "rtol": 1e-9},
+    {"name": "m6 quick: QFT circuit on n=5 is 15 gates", "stated": 15.0,
+     "derive": lambda: float(_m6qc_qft_gate_count(5)), "atol": 1e-12},
+    {"name": "m6 quick: QPE t=4, phi=3/16 reads y=3 with certainty",
+     "stated": 1.0, "derive": lambda: float(qpe_distribution(3 / 16, 4)[3]),
+     "rtol": 1e-9},
+    {"name": "m6 quick: order of 4 modulo 21 is 3", "stated": 3.0,
+     "derive": lambda: float(mod_order(4, 21)), "atol": 1e-12},
+]
+
+
 if __name__ == "__main__":
     main(CHECKS, "verify_scenes — chapters 1 to 6, teaching scenes")

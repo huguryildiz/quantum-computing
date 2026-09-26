@@ -314,7 +314,7 @@ window.C1 = [
 {t:'box', kind:'warn', hd:'Where it breaks on a computer', html:'If two input vectors are nearly parallel, the subtraction cancels almost everything and $u_j$ is a small difference of large numbers. Rounding error, negligible in the inputs, is then a large fraction of the result, and the "orthonormal" vectors come out neither orthogonal nor normal. A QR factorisation computes the same span by a different arithmetic route and loses far less; in NumPy that is <code>np.linalg.qr</code>, and the columns of $Q$ are the orthonormal set. Gram–Schmidt stays the right thing to know because it says <b>what</b> is being computed; QR is the right thing to run because it says how.'},
 
 /* ---- 1.5 ---- */
-{t:'h2', num:'1.5', text:'The tensor product, and where the exponential comes from'},
+{t:'h2', num:'1.5', text:'The tensor product'},
 
 {t:'p', text:'Two separate systems are described by one state, and the construction that builds it is the <b>tensor product</b>: every product of an entry of the first with an entry of the second.'},
 
@@ -401,7 +401,7 @@ window.C1 = [
 {t:'p', text:'A matrix product acts on a ket from the right, so the operator written <b>last</b> in a product is applied <b>first</b>: a circuit that runs $H$, then $R_z$, then $H$ is the operator $HR_zH$. Circuit diagrams run left to right and algebra runs right to left, and the two are not in conflict — they are two orders for the same sequence. An operator can also be written entirely in the notation, with no matrix anywhere, by inserting the identity on both sides: $A=\\sum_{j,k}|e_j\\rangle\\langle e_j|A|e_k\\rangle\\langle e_k|$, where $\\langle e_j|A|e_k\\rangle$ is the matrix entry $A_{jk}$. The matrix is not a different object from the operator; it is the operator, read in a basis.'},
 
 /* ---- 1.9 ---- */
-{t:'h2', num:'1.9', text:'Square-integrable functions, completeness and truncation'},
+{t:'h2', num:'1.9', text:'Function spaces and completeness'},
 
 {t:'p', text:'A column labels its entries with integers. A function labels them with a continuous coordinate. The same vector-space construction therefore uses an integral in place of a sum. A function belongs to $L^{2}[a,b]$ when its squared modulus has a finite integral, which gives it a finite norm and allows it to be normalised.'},
 

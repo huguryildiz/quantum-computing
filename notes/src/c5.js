@@ -304,7 +304,7 @@ window.C5 = [
 {t:'box', kind:'err', hd:'Logical resources are not hardware resources', html:'A count of logical qubits and logical gates is only the first line of a hardware estimate. The estimate must name the code and distance, physical error assumptions, ancillas and routing. It must also name the correction-cycle time and target failure probability. Error correction expands both space and time, sometimes by many orders of magnitude.'},
 
 /* ---- 5.4 ---- */
-{t:'h2', num:'5.4', text:'Turning a phase into counts'},
+{t:'h2', num:'5.4', text:'Ramsey interference'},
 
 {t:'p', text:'Every algorithm in this course and the next works by arranging a relative phase and then converting it into a probability. The smallest circuit that does both is three gates long and is worth being able to write from memory.'},
 
@@ -391,7 +391,7 @@ window.C5 = [
 {t:'box', kind:'err', hd:'More iterations are not better', html:'Past $r_{*}$ the rotation carries the vector beyond $|G\\rangle$ and the success probability falls; at about $2r_{*}$ it is back where it started. Running "as many as the time allows" is therefore worse than running the right number, and it fails in a way that looks like a broken machine — a flat distribution over every outcome — produced by a perfect machine following a bad plan. When $M$ is not known the fix is not more iterations: it is a randomised schedule of iteration counts, or estimating $M$ first.'},
 
 /* ---- 5.7 ---- */
-{t:'h2', num:'5.7', text:'What the square root claims'},
+{t:'h2', num:'5.7', text:'The Grover speedup'},
 
 {t:'p', text:'The result is real and it is provable. About $\\tfrac{\\pi}{4}\\sqrt{N}$ queries find a marked candidate among $N$, where a classical search needs about $N/2$, and it is optimal: no quantum algorithm in this model does better than order $\\sqrt{N}$, so the quadratic saving is the end of the story rather than the beginning of it. Written out against the five components, three of them turn out to be doing heavy work.'},
 

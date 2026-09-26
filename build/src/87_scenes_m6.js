@@ -685,7 +685,7 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 6.0.1 -- */
-{ id:'m6-open', module:'M6', nav:'One mechanism, four uses', title:'Quantum Algorithms',
+{ id:'m6-open', module:'M6', nav:'Quantum Algorithms', title:'Quantum Algorithms',
   objective:'State the one mechanism this chapter is built on and the sentence every algorithm in it has to answer.',
   keywords:'quantum algorithms overview module 6 phase kickback interference cancellation deutsch jozsa fourier phase estimation shor introduction',
   src:'L10 · computational models: what is being counted?', steps:2, blocks:[
@@ -708,7 +708,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.1.1 -- */
-{ id:'m6-query', module:'M6', nav:'What a query counts', title:'The Query Model',
+{ id:'m6-query', module:'M6', nav:'The Query Model', title:'The Query Model',
   objective:'Distinguish query complexity, gate complexity and end-to-end cost, and say what each one omits.',
   keywords:'query model oracle black box query complexity gate complexity end to end cost separation counting calls resource claim',
   src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
@@ -733,7 +733,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.1.2 -- */
-{ id:'m6-classes', module:'M6', nav:'What the classes mean', title:'Complexity Classes',
+{ id:'m6-classes', module:'M6', nav:'Complexity Classes', title:'Complexity Classes',
   objective:'State what P, BPP, BQP and NP contain, and which containments are known.',
   keywords:'complexity classes P BPP BQP NP decision problem polynomial time bounded error containment factoring np complete input length',
   src:'L10 · computational models: what is being counted?', steps:3, slide:true, blocks:[
@@ -758,7 +758,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-query', module:'M6', nav:'Code · The query model', title:'The Query Model in Code',
+{ id:'m6-code-query', module:'M6', nav:'The Query Model in Code', title:'The Query Model in Code',
   objective:'Build an oracle as a permutation, count the queries a tester makes, and price a randomised one.',
   keywords:'code qiskit numpy program oracle permutation query count exact randomised tester error',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -768,7 +768,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.2.1 -- */
-{ id:'m6-kick', module:'M6', nav:'Phase kickback', title:'Phase Kickback',
+{ id:'m6-kick', module:'M6', nav:'Phase Kickback', title:'Phase Kickback',
   objective:'Derive phase kickback for a Boolean oracle and say why the target register is left untouched.',
   keywords:'phase kickback minus state eigenstate of x oracle boolean function sign relative phase mechanism ancilla unchanged',
   src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
@@ -793,7 +793,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.2.2 -- */
-{ id:'m6-eigen', module:'M6', nav:'The general form', title:'Phase Kickback from an Eigenstate',
+{ id:'m6-eigen', module:'M6', nav:'Phase Kickback from an Eigenstate', title:'Phase Kickback from an Eigenstate',
   objective:'Show that a controlled unitary acting on one of its eigenstates writes the eigenphase onto the control qubit.',
   keywords:'controlled unitary eigenstate eigenphase kickback general form control qubit relative phase estimation preparation',
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
@@ -818,7 +818,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.2.3 -- */
-{ id:'m6-cancel', module:'M6', nav:'Why a superposition is free', title:'Quantum Parallelism and Interference',
+{ id:'m6-cancel', module:'M6', nav:'Quantum Parallelism and Interference', title:'Quantum Parallelism and Interference',
   objective:'Explain why quantum parallelism alone gives no advantage, and what interference has to do before a measurement is worth taking.',
   keywords:'quantum parallelism superposition free interference cancellation readout small state large amplitudes measurement one string',
   src:'L10 · phase kickback and the Deutsch-Jozsa proof', steps:3, slide:true, blocks:[
@@ -843,7 +843,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-kick', module:'M6', nav:'Code · Phase kickback', title:'Phase Kickback in Code',
+{ id:'m6-code-kick', module:'M6', nav:'Phase Kickback in Code', title:'Phase Kickback in Code',
   objective:'Watch an oracle write a sign, a controlled gate write an eigenphase, and interference turn signs into one string.',
   keywords:'code qiskit numpy program phase kickback oracle sign eigenstate controlled phase interference',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -853,7 +853,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.3.1 -- */
-{ id:'m6-deutsch', module:'M6', nav:'Deutsch\u2019s problem', title:'Deutsch\u2019s Algorithm',
+{ id:'m6-deutsch', module:'M6', nav:'Deutsch\u2019s Algorithm', title:'Deutsch\u2019s Algorithm',
   objective:'State Deutsch\u2019s promise problem, run the three-gate circuit, and say exactly what the reading means.',
   keywords:'deutsch algorithm promise problem constant balanced one query four functions circuit hadamard oracle single bit',
   src:'L10 · Deutsch\u2019s promise problem', steps:3, slide:true, blocks:[
@@ -878,7 +878,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.3.2 -- */
-{ id:'m6-dj', module:'M6', nav:'Deutsch\u2013Jozsa', title:'The Deutsch\u2013Jozsa Algorithm',
+{ id:'m6-dj', module:'M6', nav:'The Deutsch\u2013Jozsa Algorithm', title:'The Deutsch\u2013Jozsa Algorithm',
   objective:'Run the Deutsch-Jozsa circuit on n query qubits and evaluate the amplitude of the all-zero string.',
   keywords:'deutsch jozsa n qubits balanced constant promise all zero string amplitude mean of signs certainty hadamard transform',
   src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
@@ -903,7 +903,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.3.3 -- */
-{ id:'m6-djcost', module:'M6', nav:'What the separation is', title:'The Deutsch\u2013Jozsa Separation',
+{ id:'m6-djcost', module:'M6', nav:'The Deutsch\u2013Jozsa Separation', title:'The Deutsch\u2013Jozsa Separation',
   objective:'Compare the quantum query count with the exact and the randomised classical query counts, and say which separation is real.',
   keywords:'separation exact deterministic randomised bounded error queries worst case exponential gap honest statement promise problem',
   src:'L10 · extending Deutsch\u2019s algorithm to n inputs', steps:3, slide:true, blocks:[
@@ -928,7 +928,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-dj', module:'M6', nav:'Code · Deutsch and Deutsch\u2013Jozsa', title:'Deutsch\u2013Jozsa in Code',
+{ id:'m6-code-dj', module:'M6', nav:'Deutsch\u2013Jozsa in Code', title:'Deutsch\u2013Jozsa in Code',
   objective:'Run Deutsch\u2013Jozsa on several oracles, check the mean of the signs, and see what happens without the promise.',
   keywords:'code qiskit numpy program deutsch jozsa oracles balanced constant mean of signs promise',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -938,7 +938,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.4.1 -- */
-{ id:'m6-qft', module:'M6', nav:'The Fourier transform', title:'The Quantum Fourier Transform',
+{ id:'m6-qft', module:'M6', nav:'The Quantum Fourier Transform', title:'The Quantum Fourier Transform',
   objective:'Write the quantum Fourier transform, apply it to one basis state, and describe the result.',
   keywords:'quantum fourier transform definition basis state phase ramp winding rate unitary discrete fourier amplitudes equal magnitude',
   src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
@@ -963,7 +963,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.4.2 -- */
-{ id:'m6-qftcirc', module:'M6', nav:'The circuit', title:'The QFT Circuit',
+{ id:'m6-qftcirc', module:'M6', nav:'The QFT Circuit', title:'The QFT Circuit',
   objective:'Read the QFT circuit, count its gates, and say what an approximate version trades away.',
   keywords:'qft circuit hadamard controlled rotation R_k swaps gate count quadratic n squared approximate qft truncation depth',
   src:'L10 · QFT circuit in Qiskit', steps:3, slide:true, blocks:[
@@ -988,7 +988,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.4.3 -- */
-{ id:'m6-qftnot', module:'M6', nav:'What it does not return', title:'What the QFT Returns',
+{ id:'m6-qftnot', module:'M6', nav:'What the QFT Returns', title:'What the QFT Returns',
   objective:'Say what a run of the quantum Fourier transform actually gives back, and why it is not a spectrum.',
   keywords:'qft limitation not a spectrum amplitudes measurement one sample fft comparison input output model advantage inference',
   src:'L10 · what the QFT does and does not return', steps:3, slide:true, blocks:[
@@ -1013,7 +1013,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-qft', module:'M6', nav:'Code · The quantum Fourier transform', title:'The Quantum Fourier Transform in Code',
+{ id:'m6-code-qft', module:'M6', nav:'The Quantum Fourier Transform in Code', title:'The Quantum Fourier Transform in Code',
   objective:'Compare the transform matrix with its circuit, draw a phase ramp, and transform a periodic input.',
   keywords:'code qiskit numpy program quantum fourier transform matrix circuit phase ramp periodic input',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1023,7 +1023,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.5.1 -- */
-{ id:'m6-qpe', module:'M6', nav:'Phase estimation', title:'Quantum Phase Estimation',
+{ id:'m6-qpe', module:'M6', nav:'Quantum Phase Estimation', title:'Quantum Phase Estimation',
   objective:'Assemble the phase-estimation circuit and say what each of its three parts does.',
   keywords:'quantum phase estimation circuit counting register controlled powers inverse qft eigenphase binary expansion measurement',
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
@@ -1048,7 +1048,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.5.2 -- */
-{ id:'m6-qpeexact', module:'M6', nav:'When it is exact', title:'Exact Phase Estimation',
+{ id:'m6-qpeexact', module:'M6', nav:'Exact Phase Estimation', title:'Exact Phase Estimation',
   objective:'Show that a phase of the form y/2^t is returned with probability one, and identify the cancellation that makes it so.',
   keywords:'phase estimation exact case binary fraction certainty geometric sum cancellation all wrong outcomes zero amplitude',
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
@@ -1073,7 +1073,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.5.3 -- */
-{ id:'m6-qpeprec', module:'M6', nav:'Precision and confidence', title:'Precision and Success Probability',
+{ id:'m6-qpeprec', module:'M6', nav:'Precision and Success Probability', title:'Precision and Success Probability',
   objective:'Describe the outcome distribution for a general phase and say how many counting qubits a stated accuracy and confidence need.',
   keywords:'phase estimation precision success probability distribution nearest outcome eight over pi squared extra qubits accuracy confidence',
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
@@ -1098,7 +1098,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.5.4 -- */
-{ id:'m6-qpecost', module:'M6', nav:'Where the cost is', title:'The Cost of Phase Estimation',
+{ id:'m6-qpecost', module:'M6', nav:'The Cost of Phase Estimation', title:'The Cost of Phase Estimation',
   objective:'Compare the cost of the controlled powers with the cost of the inverse transform and say which one a resource estimate must be about.',
   keywords:'phase estimation cost controlled powers 2^t applications inverse qft quadratic dominant term resource estimate coherent evolution',
   src:'L10 · quantum phase estimation: interface and limitations', steps:3, slide:true, blocks:[
@@ -1123,7 +1123,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.5.5 -- */
-{ id:'m6-count', module:'M6', nav:'Counting the marked', title:'Quantum Counting',
+{ id:'m6-count', module:'M6', nav:'Quantum Counting', title:'Quantum Counting',
   objective:'Explain quantum counting and use it to close the gap chapter 5 left open about an unknown number of marked items.',
   keywords:'quantum counting grover iterate eigenvalue two theta estimate M number of solutions unknown marked items decide existence',
   src:'L10 · Grover search and amplitude amplification', steps:3, slide:true, blocks:[
@@ -1148,7 +1148,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.L1 --- */
-{ id:'m6-lab-k', module:'M6', nav:'Laboratory K', title:'Laboratory K \u2014 Phase Estimation',
+{ id:'m6-lab-k', module:'M6', nav:'Laboratory K \u2014 Phase Estimation', title:'Laboratory K \u2014 Phase Estimation',
   objective:'Let the reader turn the phase and the number of counting qubits and watch the outcome distribution answer.',
   keywords:'laboratory phase estimation counting qubits distribution outcomes precision success probability exact case tails guarantee',
   steps:0, slide:true, blocks:[
@@ -1159,7 +1159,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-qpe', module:'M6', nav:'Code · Phase estimation', title:'Phase Estimation in Code',
+{ id:'m6-code-qpe', module:'M6', nav:'Phase Estimation in Code', title:'Phase Estimation in Code',
   objective:'Read an exact phase, a halfway phase against the two bounds, and the register a target error needs.',
   keywords:'code qiskit numpy program phase estimation exact halfway bounds counting qubits success',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1169,7 +1169,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.6.1 -- */
-{ id:'m6-order', module:'M6', nav:'The order of a number', title:'The Order of an Integer',
+{ id:'m6-order', module:'M6', nav:'The Order of an Integer', title:'The Order of an Integer',
   objective:'Define the order of a modulo N and the unitary whose eigenphases carry it.',
   keywords:'order finding modular multiplication cycle period coprime permutation unitary reversible work register definition',
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
@@ -1194,7 +1194,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.6.2 -- */
-{ id:'m6-ordereig', module:'M6', nav:'Where the order hides', title:'Eigenphases of Modular Multiplication',
+{ id:'m6-ordereig', module:'M6', nav:'Eigenphases of Modular Multiplication', title:'Eigenphases of Modular Multiplication',
   objective:'Give the eigenstates and eigenphases of the modular multiplier and explain why the register is started in the state one.',
   keywords:'eigenstates modular multiplier eigenphase s over r superposition state one even mixture sampling eigenphase preparation trick',
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
@@ -1219,7 +1219,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.6.3 -- */
-{ id:'m6-modexp', module:'M6', nav:'What it costs to build', title:'Modular Exponentiation',
+{ id:'m6-modexp', module:'M6', nav:'Modular Exponentiation', title:'Modular Exponentiation',
   objective:'Say how the controlled powers of the modular multiplier are built and which term dominates the circuit.',
   keywords:'modular exponentiation repeated squaring controlled multiplication cost cubic L gate count dominant term qft small',
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
@@ -1244,7 +1244,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.6.4 -- */
-{ id:'m6-cf', module:'M6', nav:'Reading the order out', title:'Continued Fractions',
+{ id:'m6-cf', module:'M6', nav:'Continued Fractions', title:'Continued Fractions',
   objective:'Use the continued-fraction expansion to recover r from a measured y over Q, and check the candidate.',
   keywords:'continued fractions convergents denominator recover order classical post processing candidate check modular exponentiation verify',
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
@@ -1269,7 +1269,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.6.5 -- */
-{ id:'m6-repeat', module:'M6', nav:'When a run fails', title:'Failure Modes and Repetition',
+{ id:'m6-repeat', module:'M6', nav:'Failure Modes and Repetition', title:'Failure Modes and Repetition',
   objective:'List the ways an order-finding run fails, say how each is detected, and describe the repetition strategy.',
   keywords:'failure modes s zero common factor odd order minus one repeat runs detection classical check probability constant expected runs',
   src:'L10 · order-finding workflow', steps:3, slide:true, blocks:[
@@ -1294,7 +1294,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-order', module:'M6', nav:'Code · Order finding', title:'Order Finding in Code',
+{ id:'m6-code-order', module:'M6', nav:'Order Finding in Code', title:'Order Finding in Code',
   objective:'Find an order by brute force, simulate the order-finding readings, and turn a reading into an order.',
   keywords:'code qiskit numpy program order finding modular exponentiation continued fractions readings',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1304,7 +1304,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.7.1 -- */
-{ id:'m6-shor', module:'M6', nav:'Factoring, assembled', title:'Shor\u2019s Algorithm',
+{ id:'m6-shor', module:'M6', nav:'Shor\u2019s Algorithm', title:'Shor\u2019s Algorithm',
   objective:'Assemble the factoring algorithm from order finding and the classical steps around it, and identify which step is quantum.',
   keywords:'shor factoring algorithm workflow reduction order finding gcd classical steps square root difference of squares assembly',
   src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
@@ -1329,7 +1329,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.7.2 -- */
-{ id:'m6-shor15', module:'M6', nav:'Fifteen, worked', title:'Factoring 15',
+{ id:'m6-shor15', module:'M6', nav:'Factoring 15', title:'Factoring 15',
   objective:'Factor fifteen through order finding, and show a choice of a for which the same procedure fails.',
   keywords:'worked example fifteen factoring order four gcd three five failure case fourteen minus one repeat choose another base',
   src:'L10 · worked order-finding example: N = 15', steps:3, slide:true, blocks:[
@@ -1354,7 +1354,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.7.3 -- */
-{ id:'m6-rsa', module:'M6', nav:'What is actually threatened', title:'RSA and Post-Quantum Cryptography',
+{ id:'m6-rsa', module:'M6', nav:'RSA and Post-Quantum Cryptography', title:'RSA and Post-Quantum Cryptography',
   objective:'Say which cryptographic systems a large fault-tolerant machine would break and why migration cannot wait for one.',
   keywords:'rsa public key discrete logarithm broken symmetric aes hash grover square root post quantum migration harvest now decrypt later',
   src:'L10 · RSA and the scope of the quantum threat', steps:3, slide:true, blocks:[
@@ -1379,7 +1379,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.7.4 -- */
-{ id:'m6-shorclaim', module:'M6', nav:'What Shor claims', title:'The Shor Speedup',
+{ id:'m6-shorclaim', module:'M6', nav:'The Shor Speedup', title:'The Shor Speedup',
   objective:'Write the factoring claim against the five components and say precisely what it does and does not assert.',
   keywords:'shor claim resource five components fault tolerance physical qubits number field sieve baseline no lower bound superpolynomial',
   src:'L10 · Shor\u2019s factoring algorithm', steps:3, slide:true, blocks:[
@@ -1404,7 +1404,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.7.5 -- */
-{ id:'m6-family', module:'M6', nav:'The family', title:'Period Finding and the Hidden Subgroup Problem',
+{ id:'m6-family', module:'M6', nav:'Period Finding and the Hidden Subgroup Problem', title:'Period Finding and the Hidden Subgroup Problem',
   objective:'Place order finding inside the family of problems the same mechanism solves, and say what is outside it.',
   keywords:'period finding hidden subgroup problem discrete logarithm family abelian structure grover outside quadratic limits of the method',
   src:'L10 · quantum Fourier transform', steps:3, slide:true, blocks:[
@@ -1429,13 +1429,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m6-code-shor', module:'M6', nav:'Code · Factoring', title:'Shor\u2019s Algorithm in Code',
+{ id:'m6-code-shor', module:'M6', nav:'Shor\u2019s Algorithm in Code', title:'Shor\u2019s Algorithm in Code',
   objective:'Factor fifteen end to end, meet the failure cases, and count the bases that work.',
   keywords:'code qiskit numpy program shor factoring gcd order failure cases bases',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 6 · Factoring and period finding'},
   {t:'title', text:'Shor\u2019s Algorithm in Code'},
   {t:'raw', html:()=>CODEBANK.page('m6-code-shor')}
+]},
+
+/* ---------------------------------------------------------------- 6.7.6 -- */
+{ id:'m6-quick', module:'M6', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict query model phase kickback deutsch jozsa qft phase estimation order finding shor',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 6 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Queries', html:'$500{\\times}1000$ vs $2{\\times}10^5{\\times}40$. Less work?',
+      ask:{key:'m6-qc0', choices:['quantum','classical','equal'], answer:0,
+        why:'$5{\\times}10^5$ vs $8{\\times}10^6$.'}}],
+    [{t:'note', kind:'def', head:'Complexity', html:'$2^{L}$ steps, $L$-bit input. Growth?',
+      ask:{key:'m6-qc1', choices:['exponential','polynomial','linear'], answer:0,
+        why:'Grows in $L$.'}}],
+    [{t:'note', kind:'def', head:'Kickback', html:'$|{+}{+}\\rangle$, target $|{-}\\rangle$, $f=x_1$ OR $x_0$. Terms signed?',
+      ask:{key:'m6-qc2', choices:['$3$','$1$','$4$'], answer:0,
+        why:'$f=1$ on $01,10,11$.'}}],
+    [{t:'note', kind:'def', head:'Eigen-kickback', html:'$U=S$, control $|{+}\\rangle$, target $|1\\rangle$. Control $|1\\rangle$ gains?',
+      ask:{key:'m6-qc3', choices:['$i$','$-1$','unchanged'], answer:0,
+        why:'$S|1\\rangle=i|1\\rangle$.'}}],
+    [{t:'note', kind:'def', head:'Cancellation', html:'$n=3$, $f=1$ on $000,010$. Find $p(000)$.',
+      ask:{key:'m6-qc4', choices:['$\\tfrac14$','$\\tfrac{1}{16}$','$0$'], answer:0,
+        why:'Mean sign $\\tfrac{6-2}{8}=\\tfrac12$, squared.'}}],
+    [{t:'note', kind:'def', head:'No kickback', html:'$f(x)=x$, target $|{+}\\rangle$, not $|{-}\\rangle$. Reads:',
+      ask:{key:'m6-qc5', choices:['$0$ always','$1$ always','a coin'], answer:0,
+        why:'No phase kicked back.'}}],
+    [{t:'note', kind:'def', head:'DJ string', html:'$n=3$, $f(x)=x_1$. String printed?',
+      ask:{key:'m6-qc6', choices:['$010$','$000$','$100$'], answer:0,
+        why:'Only bit $x_1$ matters.'}}],
+    [{t:'note', kind:'def', head:'DJ bound', html:'Wrong once in $10^{4}$. Queries needed?',
+      ask:{key:'m6-qc7', choices:['$15$','$14$','$10^{4}$'], answer:0,
+        why:'$2^{-(k-1)}\\le\\varepsilon$.'}}],
+    [{t:'note', kind:'def', head:'The QFT', html:'$Q=8$, input $|2\\rangle$. Modulus at $|3\\rangle$?',
+      ask:{key:'m6-qc8', choices:['$\\tfrac{1}{\\sqrt8}$','$\\tfrac12$','$0$'], answer:0,
+        why:'Modulus $1/\\sqrt Q$.'}}],
+    [{t:'note', kind:'def', head:'QFT circuit', html:'$n=5$, swaps aside. Gates needed?',
+      ask:{key:'m6-qc9', choices:['$15$','$10$','$21$'], answer:0,
+        why:'$5{+}4{+}3{+}2{+}1$.'}}],
+    [{t:'note', kind:'def', head:'QPE', html:'$t=4$, $\\varphi=3/16$. Certain reading?',
+      ask:{key:'m6-qc10', choices:['$y=3$','$y=16$','$y=4$'], answer:0,
+        why:'$\\varphi\\cdot2^{t}=3$.'}}],
+    [{t:'note', kind:'def', head:'Order', html:'$N=21$, $a=4$. Find the order.',
+      ask:{key:'m6-qc11', choices:['$3$','$6$','$2$'], answer:0,
+        why:'$4^{3}\\equiv1$.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 6.8.1 -- */
@@ -1469,7 +1517,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 6.8.2 -- */
-{ id:'m6-shapes', module:'M6', nav:'The shapes of question', title:'Question Types',
+{ id:'m6-shapes', module:'M6', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types of chapter 6 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice kickback interference fourier phase estimation order finding claim',
   steps:1, blocks:[

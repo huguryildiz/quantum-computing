@@ -168,7 +168,7 @@ window.C2 = [
 {t:'box', kind:'warn', hd:'Inverting the calibration is not free', html:'That line can be inverted to recover $q$, which is what readout-error mitigation does. Dividing by $1-2\\epsilon$ removes the bias and multiplies the statistical error by the same factor. The correction is exact in expectation and noisier in practice, and a report that gives the corrected number without the widened error bar has not reported the measurement it made.'},
 
 /* ---- 2.3 ---- */
-{t:'h2', num:'2.3', text:'Observables, means and spreads'},
+{t:'h2', num:'2.3', text:'Observables, expectation values and variance'},
 
 {t:'p', text:'An observable is a Hermitian operator, its eigenvalues are the numbers an instrument can report, and its projectors say how often. The average of many readings is one sandwich, and that it agrees with the average is a calculation rather than a definition: expand $A$ spectrally and use the Born rule on each term.'},
 

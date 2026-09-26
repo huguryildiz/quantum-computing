@@ -575,7 +575,7 @@ function figLadder(){
 const SC = [
 
 /* ---------------------------------------------------------------- 4.0.1 -- */
-{ id:'m4-open', module:'M4', nav:'One qubit, drawn', title:'The Bloch Sphere and Quantum Gates',
+{ id:'m4-open', module:'M4', nav:'The Bloch Sphere and Quantum Gates', title:'The Bloch Sphere and Quantum Gates',
   objective:'Say what the chapter turns into a picture, and what that picture is exact about.',
   keywords:'bloch sphere overview module 4 rotation gate picture geometry one qubit introduction',
   src:'L7 · pure qubit states and the Bloch sphere', steps:2, blocks:[
@@ -598,7 +598,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.1.1 -- */
-{ id:'m4-sphere', module:'M4', nav:'The sphere and the half angle', title:'The Bloch Sphere',
+{ id:'m4-sphere', module:'M4', nav:'The Bloch Sphere', title:'The Bloch Sphere',
   objective:'Write a pure qubit state in its two angles and give the Bloch vector it names.',
   keywords:'bloch sphere polar azimuthal angle theta phi half angle parameterisation pure state north south pole',
   src:'L7 · pure qubit states and the Bloch sphere', steps:3, slide:true, blocks:[
@@ -623,7 +623,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.1.2 -- */
-{ id:'m4-cardinal', module:'M4', nav:'The six states', title:'The Six Cardinal States',
+{ id:'m4-cardinal', module:'M4', nav:'The Six Cardinal States', title:'The Six Cardinal States',
   objective:'Place the six eigenstates of the Pauli operators on the sphere and read a Bloch vector back into a state.',
   keywords:'cardinal states eigenstates pauli plus minus plus i basis axes positions poles equator six points',
   src:'L7 · computational, X and Y basis states', steps:3, slide:true, blocks:[
@@ -648,7 +648,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.1.3 -- */
-{ id:'m4-overlap', module:'M4', nav:'Angles and overlaps', title:'Angles and Overlaps on the Sphere',
+{ id:'m4-overlap', module:'M4', nav:'Angles and Overlaps on the Sphere', title:'Angles and Overlaps on the Sphere',
   objective:'Use the overlap formula to turn an angle on the sphere into a probability.',
   keywords:'overlap fidelity angle between bloch vectors antipodal orthogonal half angle distinguishability coin',
   src:'L7 · pure qubit states and the Bloch sphere', steps:3, slide:true, blocks:[
@@ -673,7 +673,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.1.4 -- */
-{ id:'m4-glob', module:'M4', nav:'Global against relative phase', title:'Global and Relative Phase on the Sphere',
+{ id:'m4-glob', module:'M4', nav:'Global and Relative Phase on the Sphere', title:'Global and Relative Phase on the Sphere',
   objective:'Say which phase changes the Bloch vector and demonstrate it on a pair of states.',
   keywords:'global phase relative phase azimuth unobservable interference distinguishable density operator picture',
   src:'L7 · global phase, relative phase and the double cover', steps:3, slide:true, blocks:[
@@ -698,7 +698,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.1.5 -- */
-{ id:'m4-cover', module:'M4', nav:'Two turns to come back', title:'The Double Cover',
+{ id:'m4-cover', module:'M4', nav:'The Double Cover', title:'The Double Cover',
   objective:'Show that a full rotation returns minus the identity and say when that sign is observable.',
   keywords:'double cover su2 so3 spinor two pi rotation minus identity four pi controlled phase observable',
   src:'L7 · global phase, relative phase and the double cover', steps:3, slide:true, blocks:[
@@ -723,7 +723,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-sphere', module:'M4', nav:'Code · The Bloch sphere', title:'The Bloch Sphere in Code',
+{ id:'m4-code-sphere', module:'M4', nav:'The Bloch Sphere in Code', title:'The Bloch Sphere in Code',
   objective:'Turn a state into its Bloch vector and back, compute an overlap from two vectors, and compare a global with a relative phase.',
   keywords:'code qiskit numpy program bloch vector angles overlap global phase relative phase run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -733,7 +733,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.2.1 -- */
-{ id:'m4-rot', module:'M4', nav:'Every gate is a rotation', title:'Single-Qubit Gates as Rotations',
+{ id:'m4-rot', module:'M4', nav:'Single-Qubit Gates as Rotations', title:'Single-Qubit Gates as Rotations',
   objective:'Write a one-qubit unitary as a rotation and read its axis and angle.',
   keywords:'rotation operator exponential pauli axis angle generator half angle unitary one qubit gate geometry',
   src:'L7 · single-qubit gates as rotations', steps:3, slide:true, blocks:[
@@ -758,7 +758,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.2.2 -- */
-{ id:'m4-pauli', module:'M4', nav:'The Pauli gates', title:'The Pauli Gates',
+{ id:'m4-pauli', module:'M4', nav:'The Pauli Gates', title:'The Pauli Gates',
   objective:'Give the axis and angle of each Pauli gate and its action on the six cardinal states.',
   keywords:'pauli gates X Y Z bit flip phase flip half turn axis fixed points eigenstates action',
   src:'L7 · the X, Y and Z gates', steps:3, slide:true, blocks:[
@@ -783,7 +783,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.2.3 -- */
-{ id:'m4-had', module:'M4', nav:'The Hadamard', title:'The Hadamard Gate',
+{ id:'m4-had', module:'M4', nav:'The Hadamard Gate', title:'The Hadamard Gate',
   objective:'Give the Hadamard as a rotation and use it to exchange the two bases.',
   keywords:'hadamard gate superposition basis change diagonal axis half turn self inverse HXH HZH conjugation',
   src:'L7 · the Hadamard gate', steps:3, slide:true, blocks:[
@@ -808,7 +808,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.2.4 -- */
-{ id:'m4-phase', module:'M4', nav:'Phase gates', title:'Phase Gates',
+{ id:'m4-phase', module:'M4', nav:'Phase Gates', title:'Phase Gates',
   objective:'Write the phase gate family and place S and T inside it.',
   keywords:'phase gate P S T gate quarter turn eighth turn clifford non clifford diagonal z rotation equator',
   src:'L7 · the phase, S and T gates', steps:3, slide:true, blocks:[
@@ -833,7 +833,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-rotations', module:'M4', nav:'Code · Gates as rotations', title:'Gates as Rotations in Code',
+{ id:'m4-code-rotations', module:'M4', nav:'Gates as Rotations in Code', title:'Gates as Rotations in Code',
   objective:'Build a rotation from its exponential, check the Pauli gates as half turns, and follow the phase gates round the equator.',
   keywords:'code qiskit numpy program rotation exponential eigh pauli half turn hadamard phase gate S T run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -843,7 +843,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.3.1 -- */
-{ id:'m4-time', module:'M4', nav:'The order gates compose in', title:'Gate Order and Matrix Order',
+{ id:'m4-time', module:'M4', nav:'Gate Order and Matrix Order', title:'Gate Order and Matrix Order',
   objective:'Convert a drawn gate sequence into the correct matrix product.',
   keywords:'circuit order matrix multiplication right to left composition time order non commuting gates sequence',
   src:'L7 · the quantum circuit model', steps:3, slide:true, blocks:[
@@ -868,7 +868,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.3.2 -- */
-{ id:'m4-euler', module:'M4', nav:'Three turns are enough', title:'The Euler Decomposition',
+{ id:'m4-euler', module:'M4', nav:'The Euler Decomposition', title:'The Euler Decomposition',
   objective:'Decompose a one-qubit unitary into two z rotations and one y rotation.',
   keywords:'euler decomposition zyz rotation three angles universal one qubit synthesis native gate set compiler',
   src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, slide:true, blocks:[
@@ -893,7 +893,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.3.3 -- */
-{ id:'m4-ugate', module:'M4', nav:'The gate a machine takes', title:'The U Gate',
+{ id:'m4-ugate', module:'M4', nav:'The U Gate', title:'The U Gate',
   objective:'Read the standard three-parameter gate matrix and recover the named gates from it.',
   keywords:'u gate three parameters theta phi lambda instruction set native gate qiskit parameterised unitary',
   src:'L7 · arbitrary single-qubit gates and Euler angles', steps:3, slide:true, blocks:[
@@ -918,7 +918,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.L1 --- */
-{ id:'m4-lab-g', module:'M4', nav:'Laboratory G', title:'Laboratory G \u2014 A Gate Sequence on the Sphere',
+{ id:'m4-lab-g', module:'M4', nav:'Laboratory G \u2014 A Gate Sequence on the Sphere', title:'Laboratory G \u2014 A Gate Sequence on the Sphere',
   objective:'Let the reader build a single-qubit sequence and follow the Bloch vector through it.',
   keywords:'laboratory gate sequence bloch vector path intermediate states net rotation axis angle composition order',
   steps:0, slide:true, blocks:[
@@ -929,7 +929,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-compose', module:'M4', nav:'Code · Composing gates', title:'Composing Gates in Code',
+{ id:'m4-code-compose', module:'M4', nav:'Composing Gates in Code', title:'Composing Gates in Code',
   objective:'Multiply gates in the order they run, recover the Euler angles of a gate, and build the named gates from the three-parameter gate.',
   keywords:'code qiskit numpy program circuit order matrix product euler zyz angles u gate run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -939,7 +939,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.4.1 -- */
-{ id:'m4-rev', module:'M4', nav:'Reversible embeddings', title:'Reversible Computation',
+{ id:'m4-rev', module:'M4', nav:'Reversible Computation', title:'Reversible Computation',
   objective:'Embed an irreversible Boolean function and a half adder in reversible gates, and state the extra wires they require.',
   keywords:'reversible computation irreversible AND XOR half adder sum carry landauer erasure bijection cnot toffoli embedding classical logic',
   src:'L7 · classical logic, information loss and reversible embeddings', steps:3, slide:true, blocks:[
@@ -964,7 +964,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.4.2 -- */
-{ id:'m4-toffoli', module:'M4', nav:'Ancillas and uncomputing', title:'The Toffoli Gate, Ancillas and Uncomputing',
+{ id:'m4-toffoli', module:'M4', nav:'The Toffoli Gate, Ancillas and Uncomputing', title:'The Toffoli Gate, Ancillas and Uncomputing',
   objective:'Explain uncomputation and say what goes wrong when a workspace is left dirty.',
   keywords:'toffoli ancilla uncompute garbage entangled workspace interference reversible circuit clean up bennett',
   src:'L7 · classical logic, information loss and reversible embeddings', steps:3, slide:true, blocks:[
@@ -989,7 +989,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-reversible', module:'M4', nav:'Code · Reversible embeddings', title:'Reversible Embeddings in Code',
+{ id:'m4-code-reversible', module:'M4', nav:'Reversible Embeddings in Code', title:'Reversible Embeddings in Code',
   objective:'Count what AND erases, build a half adder from CNOTs and a Toffoli, and compare a dirty ancilla with a clean one.',
   keywords:'code qiskit numpy program reversible and cnot toffoli half adder ancilla uncompute run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -999,7 +999,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.5.1 -- */
-{ id:'m4-order', module:'M4', nav:'Which qubit is which', title:'Qubit Ordering in Two-Qubit Gates',
+{ id:'m4-order', module:'M4', nav:'Qubit Ordering in Two-Qubit Gates', title:'Qubit Ordering in Two-Qubit Gates',
   objective:'Apply a one-qubit gate to a named qubit of a pair without ambiguity.',
   keywords:'qubit order convention tensor product significant bit index kron identity gate wrong qubit silent error',
   src:'L7 · qubit and bit-order conventions', steps:3, slide:true, blocks:[
@@ -1024,7 +1024,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.5.2 -- */
-{ id:'m4-cnot', module:'M4', nav:'The controlled-NOT', title:'The Controlled-NOT Gate',
+{ id:'m4-cnot', module:'M4', nav:'The Controlled-NOT Gate', title:'The Controlled-NOT Gate',
   objective:'Write the CNOT matrix for a stated control and target and use it in both bases.',
   keywords:'cnot controlled not gate control target matrix permutation phase kickback X basis conjugation entangling',
   src:'L7 · the CNOT gate', steps:3, slide:true, blocks:[
@@ -1049,7 +1049,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.5.3 -- */
-{ id:'m4-cz', module:'M4', nav:'The controlled-Z', title:'The Controlled-Z Gate',
+{ id:'m4-cz', module:'M4', nav:'The Controlled-Z Gate', title:'The Controlled-Z Gate',
   objective:'Write CZ and convert between it and CNOT with one Hadamard.',
   keywords:'controlled z gate cz symmetric diagonal locally equivalent hadamard conjugation native gate hardware',
   src:'L7 · the controlled-Z gate', steps:3, slide:true, blocks:[
@@ -1074,7 +1074,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.5.4 -- */
-{ id:'m4-swap', module:'M4', nav:'The SWAP', title:'The SWAP Gate',
+{ id:'m4-swap', module:'M4', nav:'The SWAP Gate', title:'The SWAP Gate',
   objective:'Write the SWAP gate and build it from three CNOTs.',
   keywords:'swap gate exchange qubits three cnots connectivity routing transpilation coupling map cost depth',
   src:'L7 · the SWAP gate', steps:3, slide:true, blocks:[
@@ -1099,7 +1099,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-twoqubit', module:'M4', nav:'Code · Two-qubit gates', title:'Two-Qubit Gates in Code',
+{ id:'m4-code-twoqubit', module:'M4', nav:'Two-Qubit Gates in Code', title:'Two-Qubit Gates in Code',
   objective:'Place a one-qubit gate on a named qubit, print the two CNOT matrices, and build CZ and SWAP from CNOTs.',
   keywords:'code qiskit numpy program qubit order kron cnot matrix control target cz swap run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1109,7 +1109,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.6.1 -- */
-{ id:'m4-entangle', module:'M4', nav:'Which gates entangle', title:'Entangling Gates',
+{ id:'m4-entangle', module:'M4', nav:'Entangling Gates', title:'Entangling Gates',
   objective:'Say why local gates cannot entangle and how much entanglement one CNOT makes.',
   keywords:'entangling gate local unitary schmidt coefficients invariant bell state preparation ebit cnot hadamard',
   src:'L7 · local gates, entangling gates and universality', steps:3, slide:true, blocks:[
@@ -1134,7 +1134,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.L2 --- */
-{ id:'m4-lab-h', module:'M4', nav:'Laboratory H', title:'Laboratory H \u2014 The Bell Circuit',
+{ id:'m4-lab-h', module:'M4', nav:'Laboratory H \u2014 The Bell Circuit', title:'Laboratory H \u2014 The Bell Circuit',
   objective:'Let the reader run the Bell circuit and watch the joint state and both reduced states.',
   keywords:'laboratory bell circuit hadamard cnot joint state reduced states entropy four bell states input bits',
   steps:0, slide:true, blocks:[
@@ -1145,7 +1145,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-entangle', module:'M4', nav:'Code · Entanglement from a gate', title:'Entanglement from a Gate in Code',
+{ id:'m4-code-entangle', module:'M4', nav:'Entanglement from a Gate in Code', title:'Entanglement from a Gate in Code',
   objective:'Measure the entanglement one CNOT makes against the tilt it is handed, and check that a local gate cannot change it.',
   keywords:'code qiskit numpy program cnot entanglement entropy schmidt local gate bell states run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
@@ -1155,7 +1155,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.7.1 -- */
-{ id:'m4-univ', module:'M4', nav:'Universality', title:'Universal Gate Sets',
+{ id:'m4-univ', module:'M4', nav:'Universal Gate Sets', title:'Universal Gate Sets',
   objective:'State a universal gate set and say what universality costs in circuit length.',
   keywords:'universal gate set clifford T solovay kitaev approximation exact synthesis discrete continuous cost',
   src:'L7 · local gates, entangling gates and universality', steps:3, slide:true, blocks:[
@@ -1180,13 +1180,61 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- code --- */
-{ id:'m4-code-univ', module:'M4', nav:'Code · Universality', title:'Universality in Code',
+{ id:'m4-code-univ', module:'M4', nav:'Universality in Code', title:'Universality in Code',
   objective:'Approximate a rotation with a word in H and T, watch the error fall as the word grows, and see T leave the Clifford group.',
   keywords:'code qiskit numpy program clifford T approximation error solovay kitaev universality run',
   slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
   {t:'eyebrow', text:'Module 4 · Universality'},
   {t:'title', text:'Universality in Code'},
   {t:'raw', html:()=>CODEBANK.page('m4-code-univ')}
+]},
+
+/* ---------------------------------------------------------------- 4.7.1 -- */
+{ id:'m4-quick', module:'M4', nav:'Quick Check', title:'Quick Check',
+  objective:'Check the module ideas with twelve short predictions.',
+  keywords:'quick check predict bloch sphere cardinal states overlap phase double cover hadamard gate order euler cnot',
+  budget:'A set of twelve prediction cards; the questions carry no figure.',
+  slide:true, steps:0, blocks:[
+  {t:'eyebrow', text:'Module 4 · Quick check'},
+  {t:'title', text:'Quick Check'},
+  {t:'grid', cols:4, gap:'22px 20px', style:'flex:1;grid-auto-rows:1fr;padding-bottom:8px', items:[
+    [{t:'note', kind:'def', head:'Bloch vector', html:'$|\\psi\\rangle=\\tfrac{\\sqrt3}{2}|0\\rangle+\\tfrac12|1\\rangle$. Find $r_{z}$.',
+      ask:{key:'m4-qc0', choices:['$0.5$','$-0.5$','$0.866$'], answer:0,
+        why:'$0.75-0.25$.'}}],
+    [{t:'note', kind:'def', head:'Cardinal states', html:'$\\mathbf{r}=(0,1,0)$. Which state?',
+      ask:{key:'m4-qc1', choices:['$|{+}i\\rangle$','$|{-}i\\rangle$','$|{+}\\rangle$'], answer:0,
+        why:'$+\\hat{y}$ is $Y$\'s $+1$ eigenstate.'}}],
+    [{t:'note', kind:'def', head:'Overlap on the sphere', html:'$\\mathbf{r}=(0,0,1)$, $\\mathbf{s}=(0,0.6,0.8)$. Find the overlap.',
+      ask:{key:'m4-qc2', choices:['$0.9$','$0.8$','$0.36$'], answer:0,
+        why:'$\\tfrac12(1+0.8)$.'}}],
+    [{t:'note', kind:'def', head:'Global phase', html:'Which state is $-|0\\rangle$?',
+      ask:{key:'m4-qc3', choices:['$|0\\rangle$','$|1\\rangle$','Not $|0\\rangle$'], answer:0,
+        why:'A global phase is the same state.'}}],
+    [{t:'note', kind:'def', head:'Double cover', html:'Find the gate $R_{y}(8\\pi)$.',
+      ask:{key:'m4-qc4', choices:['$I$','$-I$','$-iY$'], answer:0,
+        why:'Four full turns: even.'}}],
+    [{t:'note', kind:'def', head:'Hadamard on the sphere', html:'$\\mathbf{r}=(0.6,0,-0.8)$, apply $H$. New $r_x$?',
+      ask:{key:'m4-qc5', choices:['$-0.8$','$0.6$','$0.8$'], answer:0,
+        why:'$H$ swaps $x$ and $z$.'}}],
+    [{t:'note', kind:'def', head:'Phase gates', html:'$T$ applied twice to $|{+}\\rangle$. Which state?',
+      ask:{key:'m4-qc6', choices:['$|{+}i\\rangle$','$|{-}i\\rangle$','$|{-}\\rangle$'], answer:0,
+        why:'$T^{2}=S$ carries $x$ to $y$.'}}],
+    [{t:'note', kind:'def', head:'Gate order', html:'$H$ then $Z$ on $|0\\rangle$. Result?',
+      ask:{key:'m4-qc7', choices:['$|{-}\\rangle$','$|{+}\\rangle$','$|1\\rangle$'], answer:0,
+        why:'$Z$ acts last: $ZH|0\\rangle$.'}}],
+    [{t:'note', kind:'def', head:'Euler angles', html:'$Z$ in ZYZ form. Find $\\theta$.',
+      ask:{key:'m4-qc8', choices:['$0$','$\\pi$','$\\pi/2$'], answer:0,
+        why:'$Z$ is diagonal already.'}}],
+    [{t:'note', kind:'def', head:'The U gate', html:'$U(\\pi,0,0)$ on $|0\\rangle$. Which state?',
+      ask:{key:'m4-qc9', choices:['$|1\\rangle$','$|0\\rangle$','$i|1\\rangle$'], answer:0,
+        why:'This setting is $X$.'}}],
+    [{t:'note', kind:'def', head:'Two-qubit ordering', html:'$X$ on $q_{0}$ of $|10\\rangle$. Which state?',
+      ask:{key:'m4-qc10', choices:['$|11\\rangle$','$|00\\rangle$','$|01\\rangle$'], answer:0,
+        why:'$I\\otimes X$ flips $q_{0}$.'}}],
+    [{t:'note', kind:'def', head:'CNOT and entanglement', html:'$\\mathrm{CNOT}_{0\\to1}$ on $|0\\rangle{\\otimes}|{+}\\rangle$, $q_{0}$ control. Result?',
+      ask:{key:'m4-qc11', choices:['$\\Phi^{+}$','unchanged','$\\Psi^{+}$'], answer:0,
+        why:'A superposed control entangles.'}}]
+  ]}
 ]},
 
 /* ---------------------------------------------------------------- 4.8.1 -- */
@@ -1220,7 +1268,7 @@ const SC = [
 ]},
 
 /* ---------------------------------------------------------------- 4.8.2 -- */
-{ id:'m4-shapes', module:'M4', nav:'The shapes of question', title:'Question Types',
+{ id:'m4-shapes', module:'M4', nav:'Question Types', title:'Question Types',
   objective:'Name the recurring question types of chapter 4 and the method each is answered by.',
   keywords:'question types taxonomy shapes method examination practice bloch rotation sequence decomposition two qubit',
   steps:1, blocks:[
