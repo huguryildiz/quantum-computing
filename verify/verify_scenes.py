@@ -35,7 +35,7 @@ import sys
 
 import numpy as np
 import sympy as sp
-from scipy.linalg import expm
+from scipy.linalg import expm, sqrtm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -714,6 +714,84 @@ SCENE_SWAP = np.array([[1, 0, 0, 0],
                        [0, 0, 0, 1]], dtype=complex)
 
 
+# ── Chapter 1 prediction cards ──────────────────────────────────────────────
+# Every teaching slide of chapter 1 ends on a prediction card with a number in
+# its answer. Each is re-derived here by a route the card does not state.
+
+
+def _m1_ket_beta_squared():
+    beta = sp.Rational(4, 5) * sp.I
+    return float(sp.simplify(beta * sp.conjugate(beta)))
+
+
+def _m1_bra_swapped_imag():
+    a = np.array([1, 0], dtype=complex)
+    b = np.array([2j, 0], dtype=complex)
+    assert abs(inner(a, b) - 2j) < 1e-15
+    return inner(b, a).imag
+
+
+def _m1_overlap_third_of_pi():
+    psi = math.cos(math.pi / 3) * KET0 + math.sin(math.pi / 3) * KET1
+    return abs(inner(KET0, psi)) ** 2
+
+
+def _m1_minus_coefficient_of_one():
+    return inner(KETM, KET1).real
+
+
+def _m1_modulus_squared_of_polar():
+    z = cmath.rect(3, math.pi / 5)
+    return (z * z.conjugate()).real
+
+
+def _m1_p0_after_hadamard_on_plus_i():
+    psi = (KET0 + 1j * KET1) / math.sqrt(2)
+    return abs((H @ psi)[0]) ** 2
+
+
+def _m1_outer_one_zero_on_zero():
+    return dev(outer(KET1, KET0) @ KET0, KET1)
+
+
+def _m1_projected_length():
+    v = (math.sqrt(3) * KET0 + KET1) / 2
+    return float(np.linalg.norm(proj(KET1) @ v))
+
+
+def _m1_gram_schmidt_residual_length():
+    _, r = np.linalg.qr(np.array([[1.0, 3.0], [0.0, 4.0]]))
+    return abs(r[1, 1])
+
+
+def _m1_nonzero_entry_of_one_zero():
+    return float(np.flatnonzero(np.abs(kron(KET1, KET0).ravel()) > 0.5)[0])
+
+
+def _m1_hermiticity_of_symmetric_imaginary():
+    return hermiticity(np.array([[1, 2j], [2j, 3]]))
+
+
+def _m1_herm_eigs():
+    return np.linalg.eigvalsh(np.array([[3, 1 - 1j], [1 + 1j, 2]]))
+
+
+def _m1_projector_sum(wp, wm):
+    return wp * proj(KETP) + wm * proj(KETM)
+
+
+def _m1_squared_tail():
+    # Three orthonormal functions on [0, 1], a sine family, with the stated
+    # coefficient weights; the error is integrated rather than summed.
+    x = sp.symbols("x")
+    u = [sp.sqrt(2) * sp.sin(k * sp.pi * x) for k in (1, 2, 3)]
+    c = [sp.sqrt(sp.Rational(5, 10)), sp.sqrt(sp.Rational(3, 10)),
+         sp.sqrt(sp.Rational(2, 10))]
+    f = sum(ck * uk for ck, uk in zip(c, u))
+    err = f - c[0] * u[0] - c[1] * u[1]
+    return float(sp.integrate(err ** 2, (x, 0, 1)))
+
+
 R2 = 1 / math.sqrt(2)
 
 
@@ -836,6 +914,60 @@ CHECKS = [
          sp.sin(sp.symbols("x")) * sp.cos(sp.symbols("x")) / sp.pi,
          (sp.symbols("x"), -sp.pi, sp.pi))),
      "atol": 1e-15},
+
+    # ---- chapter 1 prediction cards --------------------------------------
+    {"name": "1.1.1 prediction: |beta|^2 for beta = 4i/5", "stated": 16 / 25,
+     "derive": _m1_ket_beta_squared, "rtol": 1e-12},
+    {"name": "1.1.2 prediction: <b|a> is -2i when <a|b> is 2i", "stated": -2.0,
+     "derive": _m1_bra_swapped_imag, "rtol": 1e-12},
+    {"name": "1.1.3 prediction: |<0|psi>|^2 at angle pi/3", "stated": 0.25,
+     "derive": _m1_overlap_third_of_pi, "rtol": 1e-12},
+    {"name": "1.1.4 prediction: <-|1>", "stated": -1 / math.sqrt(2),
+     "derive": _m1_minus_coefficient_of_one, "rtol": 1e-12},
+    {"name": "1.2.1 prediction: |3 e^{i pi/5}|^2", "stated": 9.0,
+     "derive": _m1_modulus_squared_of_polar, "rtol": 1e-12},
+    {"name": "1.2.2 prediction: P(0) after H on (|0>+i|1>)/sqrt2", "stated": 0.5,
+     "derive": _m1_p0_after_hadamard_on_plus_i, "rtol": 1e-12},
+    {"name": "1.3.1 prediction: |1><0| sends |0> to |1>", "stated": 0.0,
+     "derive": _m1_outer_one_zero_on_zero, "atol": 1e-15},
+    {"name": "1.3.2 prediction: length of |1><1| (sqrt3|0>+|1>)/2", "stated": 0.5,
+     "derive": _m1_projected_length, "rtol": 1e-12},
+    {"name": "1.4.1 prediction: length of u2 for (1,0), (3,4)", "stated": 4.0,
+     "derive": _m1_gram_schmidt_residual_length, "rtol": 1e-12},
+    {"name": "1.5.1 prediction: |1> tensor |0> sits in entry 2", "stated": 2.0,
+     "derive": _m1_nonzero_entry_of_one_zero, "rtol": 1e-12},
+    {"name": "1.5.2 prediction: amplitudes of a 20-qubit register",
+     "stated": 1048576.0,
+     "derive": lambda: float(kron(*([np.ones(2)] * 20)).size), "rtol": 1e-12},
+    {"name": "1.6.1 prediction: [[1,2i],[2i,3]] is not Hermitian",
+     "stated": 4 * math.sqrt(2),
+     "derive": _m1_hermiticity_of_symmetric_imaginary, "rtol": 1e-12},
+    {"name": "1.6.2 prediction: larger eigenvalue of [[3,1-i],[1+i,2]]",
+     "stated": 4.0, "derive": lambda: float(_m1_herm_eigs()[-1]), "rtol": 1e-12},
+    {"name": "1.6.2 prediction: smaller eigenvalue of [[3,1-i],[1+i,2]]",
+     "stated": 1.0, "derive": lambda: float(_m1_herm_eigs()[0]), "rtol": 1e-12},
+    {"name": "1.6.3 prediction: [[0,i],[i,0]] is unitary", "stated": 0.0,
+     "derive": lambda: unitarity(np.array([[0, 1j], [1j, 0]])), "atol": 1e-15},
+    {"name": "1.6.4 prediction: exp(-i pi X/2) is -iX", "stated": 0.0,
+     "derive": lambda: dev(expm(-1j * math.pi * X / 2), -1j * X), "atol": 1e-14},
+    {"name": "1.6.5 prediction: exp(-i 4pi Z/2) is I", "stated": 0.0,
+     "derive": lambda: dev(expm(-1j * 4 * math.pi * Z / 2), I2), "atol": 1e-13},
+    {"name": "1.7.1 prediction: larger eigenvalue of diag(5,-2)", "stated": 5.0,
+     "derive": lambda: float(_eigs(np.diag([5.0, -2.0]))[-1]), "rtol": 1e-12},
+    {"name": "1.7.1 prediction: smaller eigenvalue of diag(5,-2)", "stated": -2.0,
+     "derive": lambda: float(_eigs(np.diag([5.0, -2.0]))[0]), "rtol": 1e-12},
+    {"name": "1.7.2 prediction: larger eigenvalue of 4P+ - P-", "stated": 4.0,
+     "derive": lambda: float(_eigs(_m1_projector_sum(4, -1))[-1]), "rtol": 1e-12},
+    {"name": "1.7.2 prediction: smaller eigenvalue of 4P+ - P-", "stated": -1.0,
+     "derive": lambda: float(_eigs(_m1_projector_sum(4, -1))[0]), "rtol": 1e-12},
+    {"name": "1.7.3 prediction: sqrt(4P+ + 9P-) is 2P+ + 3P-", "stated": 0.0,
+     "derive": lambda: dev(sqrtm(_m1_projector_sum(4, 9)), _m1_projector_sum(2, 3)),
+     "atol": 1e-12},
+    {"name": "1.9.1 prediction: norm of f = 1 on [0, 4]", "stated": 2.0,
+     "derive": lambda: float(sp.sqrt(sp.integrate(1, (sp.symbols("x"), 0, 4)))),
+     "rtol": 1e-12},
+    {"name": "1.9.2 prediction: squared error after two of three terms",
+     "stated": 0.2, "derive": _m1_squared_tail, "rtol": 1e-12},
 
     # ---- 2.1 -----------------------------------------------------------
     {"name": "2.1.1 p(0) for (3, 4i)/5", "stated": 0.36,

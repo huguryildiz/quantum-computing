@@ -8015,6 +8015,22 @@ const R2 = Math.SQRT1_2;
    built once at load time keeps the palette it was born with, and the theme
    can change under it. */
 
+/* A box diagram has no axes to stretch, so when a slide grows its figure into
+   the spare height of the column, the diagram keeps its size and is centred in
+   the taller frame. Without this the frame stops short and leaves the lower
+   half of the column empty. */
+function growBlocks(spec){
+  const h1 = P.hOverride;
+  if(!h1 || h1 <= spec.h) return P.blocks(spec);
+  const dy = (h1 - spec.h) / 2;
+  const items = spec.items.map(it => {
+    const o = Object.assign({}, it);
+    ['y','y1','y2'].forEach(k => { if(o[k] != null) o[k] += dy; });
+    return o;
+  });
+  return P.blocks({w:spec.w, h:h1, items:items});
+}
+
 /* The three translations this chapter installs. Drawn as a table of arrows
    rather than written as a list, because the point is that the left column and
    the right column are the same objects and not two subjects. */
@@ -8059,7 +8075,7 @@ function figKet(){
    in the two possible orders, and the shapes say why one is a number and the
    other an operator. */
 function figShapes(){
-  return P.blocks({w:700,h:210,items:[
+  return growBlocks({w:700,h:210,items:[
     {t:'box',x:40,y:34,w:120,h:52,label:'1\\times n',tex:true,fs:15},
     {t:'box',x:172,y:34,w:120,h:52,label:'n\\times 1',tex:true,fs:15},
     {t:'arrow',x1:300,y1:60,x2:400,y2:60},
@@ -8132,23 +8148,23 @@ function figComplex(){
    Before the gate all four bars are one half; the caption says so, and the
    figure shows only the part that changed. */
 function figPhaseBars(){
-  const a = P.Axes({w:540,h:254,xr:[-0.6,3.8],yr:[0,1.15],
+  const a = P.Axes({w:540,h:254,xr:[0,4.4],yr:[0,1.15],
     ylabel:'\\text{probability}', pad:{l:62,r:24,t:28,b:56},
     xticksOverride:[], ytarget:4});
-  a.rect(-0.22,0,0.22,1,{fill:C.dec.out});
-  a.rect(0.78,0,1.22,0,{fill:C.dec.out});
-  a.rect(1.78,0,2.22,0,{fill:C.dec.err});
-  a.rect(2.78,0,3.22,1,{fill:C.dec.err});
-  a.poly([[-0.22,1],[0.22,1]],{color:C.out,width:2.6});
-  a.poly([[2.78,1],[3.22,1]],{color:C.err,width:2.6});
-  a.poly([[0.78,0],[1.22,0]],{color:C.out,width:2.6});
-  a.poly([[1.78,0],[2.22,0]],{color:C.err,width:2.6});
-  a.note(0,-0.10,'0',{fs:13,color:C.muted,anchor:'middle'});
-  a.note(1,-0.10,'1',{fs:13,color:C.muted,anchor:'middle'});
-  a.note(2,-0.10,'0',{fs:13,color:C.muted,anchor:'middle'});
-  a.note(3,-0.10,'1',{fs:13,color:C.muted,anchor:'middle'});
-  a.note(0.5,-0.21,'H|+\\rangle',{fs:14,color:C.out,anchor:'middle',tex:true});
-  a.note(2.5,-0.21,'H|-\\rangle',{fs:14,color:C.err,anchor:'middle',tex:true});
+  a.rect(0.38,0,0.82,1,{fill:C.dec.out});
+  a.rect(1.38,0,1.82,0,{fill:C.dec.out});
+  a.rect(2.38,0,2.82,0,{fill:C.dec.err});
+  a.rect(3.38,0,3.82,1,{fill:C.dec.err});
+  a.poly([[0.38,1],[0.82,1]],{color:C.out,width:2.6});
+  a.poly([[3.38,1],[3.82,1]],{color:C.err,width:2.6});
+  a.poly([[1.38,0],[1.82,0]],{color:C.out,width:2.6});
+  a.poly([[2.38,0],[2.82,0]],{color:C.err,width:2.6});
+  a.note(0.6,-0.10,'0',{fs:13,color:C.muted,anchor:'middle'});
+  a.note(1.6,-0.10,'1',{fs:13,color:C.muted,anchor:'middle'});
+  a.note(2.6,-0.10,'0',{fs:13,color:C.muted,anchor:'middle'});
+  a.note(3.6,-0.10,'1',{fs:13,color:C.muted,anchor:'middle'});
+  a.note(1.1,-0.21,'H|+\\rangle',{fs:14,color:C.out,anchor:'middle',tex:true});
+  a.note(3.1,-0.21,'H|-\\rangle',{fs:14,color:C.err,anchor:'middle',tex:true});
   return a.svg();
 }
 
@@ -8329,7 +8345,7 @@ function figEigen(){
    projector is an operator, and the sum of the products is the operator back
    again. */
 function figSpectral(){
-  return P.blocks({w:700,h:150,items:[
+  return growBlocks({w:700,h:150,items:[
     {t:'box',x:40,y:46,w:110,h:56,label:'A',tex:true,fs:17},
     {t:'arrow',x1:150,y1:74,x2:250,y2:74},
     {t:'box',x:250,y:46,w:170,h:56,label:'\\lambda_{1}P_{1}',tex:true,fs:16},
@@ -8384,7 +8400,7 @@ function figMoves(){
    common way an adjoint comes out wrong. */
 function figAdjoint(){
   const cell = (x,y,t) => ({t:'box',x:x,y:y,w:96,h:44,label:t,tex:true,fs:14});
-  return P.blocks({w:640,h:168,items:[
+  return growBlocks({w:640,h:168,items:[
     cell(40,36,'A_{11}'), cell(140,36,'A_{12}'),
     cell(40,86,'A_{21}'), cell(140,86,'A_{22}'),
     {t:'arrow',x1:250,y1:86,x2:360,y2:86},
@@ -8417,6 +8433,65 @@ function figParseval(){
   a.vline(4.5,{color:C.err,width:1.4,dash:'4 4'});
   a.note(5.0,0.78,'omitted tail',{fs:12.5,color:C.err});
   return a.svg();
+}
+
+/* The outer product |0><1| worked out as shapes: a column times a row is a
+   square array, and the one non-zero entry sits where the 1 of the column
+   meets the 1 of the row. */
+function figOuter(){
+  const c = (x,y,t,col) => ({t:'box',x:x,y:y,w:52,h:44,label:t,fs:16,color:col});
+  return growBlocks({w:470,h:196,items:[
+    {t:'text',x:66,y:34,label:'|0\\rangle',tex:true,fs:15,color:C.in},
+    c(40,50,'1',C.in), c(40,94,'0',C.in),
+    {t:'text',x:156,y:56,label:'\\langle 1|',tex:true,fs:15,color:C.in},
+    c(130,72,'0',C.in), c(182,72,'1',C.in),
+    {t:'text',x:268,y:100,label:'=',tex:true,fs:22,color:C.ink},
+    {t:'text',x:356,y:34,label:'|0\\rangle\\langle 1|',tex:true,fs:15,color:C.out},
+    c(304,50,'0'), c(356,50,'1',C.out),
+    c(304,94,'0'), c(356,94,'0'),
+    {t:'text',x:235,y:180,label:'a column times a row: an operator',fs:13}
+  ]});
+}
+
+/* The tensor product of two columns, with each entry of the result named by
+   the basis string it is the amplitude of. The strings are read q1 q0, the
+   order this course fixes, so the index of each row is the string in binary. */
+function figTensor(){
+  const b = (x,y,t,col,w) => ({t:'box',x:x,y:y,w:w||60,h:40,label:t,tex:true,fs:15,color:col});
+  const rows = [['a_{1}b_{1}','|00\\rangle','0'],['a_{1}b_{2}','|01\\rangle','1'],
+                ['a_{2}b_{1}','|10\\rangle','2'],['a_{2}b_{2}','|11\\rangle','3']];
+  const items = [
+    {t:'text',x:70,y:62,label:'q_{1}',tex:true,fs:14,color:C.in},
+    b(40,76,'a_{1}',C.in), b(40,116,'a_{2}',C.in),
+    {t:'text',x:128,y:144,label:'\\otimes',tex:true,fs:18,color:C.ink},
+    {t:'text',x:186,y:62,label:'q_{0}',tex:true,fs:14,color:C.in},
+    b(156,76,'b_{1}',C.in), b(156,116,'b_{2}',C.in),
+    {t:'text',x:250,y:140,label:'=',tex:true,fs:22,color:C.ink},
+    {t:'text',x:326,y:14,label:'entry',fs:12,anchor:'end'}
+  ];
+  rows.forEach(([t,s,k],i)=>{
+    const y = 26 + i*46;
+    items.push({t:'text',x:326,y:y+26,label:k,fs:14,anchor:'end'});
+    items.push(b(340,y,t,C.out,92));
+    items.push({t:'text',x:448,y:y+24,label:s,tex:true,fs:14,anchor:'start',color:C.out});
+  });
+  return growBlocks({w:520,h:216,items:items});
+}
+
+/* Why the exponential of a Hermitian operator is unitary, drawn as what it
+   does to the eigenvalues: a real number goes in, a number of modulus one
+   comes out. */
+function figGenerator(){
+  return growBlocks({w:640,h:170,items:[
+    {t:'box',x:30,y:44,w:190,h:56,label:'G=G^{\\dagger}',tex:true,fs:17},
+    {t:'arrow',x1:220,y1:72,x2:410,y2:72,color:C.h},
+    {t:'text',x:315,y:52,label:'e^{-i\\theta G}',tex:true,fs:16,color:C.h},
+    {t:'box',x:410,y:44,w:200,h:56,label:'U^{\\dagger}U=I',tex:true,fs:17},
+    {t:'text',x:125,y:132,label:'real eigenvalues',fs:13},
+    {t:'text',x:125,y:156,label:'\\lambda\\in\\mathbb{R}',tex:true,fs:14},
+    {t:'text',x:510,y:132,label:'eigenvalues on the unit circle',fs:13},
+    {t:'text',x:510,y:156,label:'|e^{-i\\theta\\lambda}|=1',tex:true,fs:14}
+  ]});
 }
 
 const SC = [
@@ -8452,30 +8527,21 @@ const SC = [
   src:'L2 · vectors and dual vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'A state is a column of complex numbers'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A quantum state is written $|\\psi\\rangle$ and is called a <b>ket</b>. Once a basis $\\{|0\\rangle,|1\\rangle\\}$ has been named, the ket is a column of two complex numbers, called <b>amplitudes</b>:</p>'},
-    {t:'eq', key:true, tex:'|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle = \\begin{bmatrix}\\alpha\\\\ \\beta\\end{bmatrix}, \\qquad \\alpha,\\beta\\in\\mathbb{C}'},
-    {t:'body', html:'<p>The space these live in is a complex vector space, which means only that adding two states gives a state and multiplying a state by a complex number gives a state. That closure is the whole content of the word <b>superposition</b>: if $|\\psi\\rangle$ and $|\\phi\\rangle$ are allowed, so is $\\alpha|\\psi\\rangle+\\beta|\\phi\\rangle$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>One condition is imposed on top of the vector-space axioms. A physical state has length one:</p>'},
-      {t:'eq', tex:'|\\alpha|^{2} + |\\beta|^{2} = 1'},
-      {t:'small', html:'This is not a mathematical necessity; it is the bookkeeping that makes the probabilities of Chapter 2 add up to one. A column that is not normalised still names a direction, and dividing by its length is how the state is recovered.'}
-    ]},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figKet(),
+      caption:'A superposition drawn in a real slice of the state space. The picture shows two of the four real numbers a qubit carries, so it cannot show a phase.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'The unnormalised column $\\begin{bmatrix}2+i\\\\ 1-3i\\end{bmatrix}$.'],
-        ['Method', 'Square the modulus of each entry, add, take the square root, and divide.'],
-        ['Work', '$|2+i|^{2}=4+1=5$ and $|1-3i|^{2}=1+9=10$, so the squared length is $15$.'],
-        ['Answer', '$|\\psi\\rangle=\\tfrac{1}{\\sqrt{15}}\\left[(2+i)|0\\rangle + (1-3i)|1\\rangle\\right]$.'],
-        ['Check', '$\\tfrac{5}{15}+\\tfrac{10}{15}=1$, and the two probabilities of Chapter 2 will be $1/3$ and $2/3$.']
-      ]}
-    ]}
+      {t:'note', kind:'warn', head:'Not one or the other', html:'A superposition is one state with two amplitudes. It is not a qubit that is secretly $|0\\rangle$ or $|1\\rangle$; the interferometer of Chapter 0 tells the two ideas apart.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figKet(),
-      caption:'A superposition drawn in a real slice of the state space. The picture shows two of the four real numbers a qubit carries, so it is a shadow and not the object: it can show that a state is a sum of two basis states, and it cannot show a phase.'},
+    {t:'eq', key:true, label:'Ket', tex:'|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle = \\begin{bmatrix}\\alpha\\\\ \\beta\\end{bmatrix}, \\qquad \\alpha,\\beta\\in\\mathbb{C}',
+      note:'Adding two states, or scaling one by a complex number, gives a state. That closure is what <b>superposition</b> means.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Normalisation', tex:'|\\alpha|^{2} + |\\beta|^{2} = 1',
+        note:'Divide a column by its length to get the state. $(2+i,\\,1-3i)$ has squared length $5+10=15$, so its probabilities are $\\tfrac13$ and $\\tfrac23$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'What a superposition is not', html:'It is <b>not</b> the statement that the qubit is really in $|0\\rangle$ or really in $|1\\rangle$ and that we do not yet know which. That description predicts different numbers, and the interferometer of Chapter 0 is the experiment that separates the two. A superposition is one state, with two amplitudes, and both of them are there at once.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$|\\psi\\rangle=\\tfrac{3}{5}|0\\rangle+\\tfrac{4i}{5}|1\\rangle$.<div class="nsep"></div>What is $|\\beta|^{2}$?',
+        ask:{key:'m1-ket', choices:['$\\tfrac{16}{25}$','$-\\tfrac{16}{25}$','$\\tfrac{4}{5}$'], answer:0,
+          why:'$|4i/5|^{2}=16/25$. A squared modulus is never negative.'}}]}
   ]}
 ]},
 
@@ -8486,29 +8552,22 @@ const SC = [
   src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'The bra, and the inner product it computes'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Every ket has a partner. The <b>bra</b> $\\langle a|$ is the ket $|a\\rangle$ transposed and conjugated, written with a dagger:</p>'},
-    {t:'eq', tex:'\\langle a| = |a\\rangle^{\\dagger} = \\begin{bmatrix}a_{1}^{*} & a_{2}^{*} & \\cdots & a_{n}^{*}\\end{bmatrix}'},
-    {t:'body', html:'<p>A bra is a row. Put a row on the left of a column and the shapes contract to a single number. That number is the <b>inner product</b>:</p>'},
-    {t:'eq', key:true, tex:'\\langle a|b\\rangle = \\sum_{k} a_{k}^{*}\\,b_{k}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The conjugate sits on the <b>first</b> argument and on nothing else. Swapping the two arguments therefore conjugates the answer, $\\langle b|a\\rangle=\\langle a|b\\rangle^{*}$, and the inner product of a state with itself, $\\langle a|a\\rangle=\\sum_k|a_k|^{2}$, is real and never negative — which is what lets it be a squared length.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figShapes(),
-      caption:'The two ways of putting a row and a column together. A row on the left contracts to one number; a column on the left spreads into a matrix. The shapes decide which of the two happened, and they are the quickest check on a line of algebra.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figShapes(),
+      caption:'A row on the left of a column contracts to one number. A column on the left of a row spreads into a matrix. Counting shapes is the quickest check on a line of algebra.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$|a\\rangle=\\tfrac{1}{\\sqrt2}\\begin{bmatrix}1\\\\ i\\end{bmatrix}$ and $|b\\rangle=\\tfrac{1}{\\sqrt2}\\begin{bmatrix}1\\\\ -i\\end{bmatrix}$.'],
-        ['Method', 'Conjugate the entries of $|a\\rangle$, then multiply term by term and add.'],
-        ['Work', '$\\langle a| = \\tfrac{1}{\\sqrt2}\\begin{bmatrix}1 & -i\\end{bmatrix}$, so $\\langle a|b\\rangle = \\tfrac12\\left[(1)(1) + (-i)(-i)\\right] = \\tfrac12\\left[1 - 1\\right]$.'],
-        ['Answer', '$\\langle a|b\\rangle = 0$: the two states are orthogonal.'],
-        ['Check', 'Both are normalised, $\\langle a|a\\rangle=\\tfrac12(1+1)=1$, so an overlap of zero is the smallest it could have been.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'The missing conjugate', html:'Without it the sum is $\\tfrac12[1+1]=1$, which says the two states are the same state. Use <code>np.vdot(a, b)</code>, never <code>np.dot(a, b)</code>.'}]},
+  ], right:[
+    {t:'eq', tex:'\\langle a| = |a\\rangle^{\\dagger} = \\begin{bmatrix}a_{1}^{*} & a_{2}^{*} & \\cdots & a_{n}^{*}\\end{bmatrix}'},
+    {t:'eq', key:true, label:'Inner product', tex:'\\langle a|b\\rangle = \\sum_{k} a_{k}^{*}\\,b_{k}',
+      note:'The conjugate sits on the first argument only, so $\\langle b|a\\rangle=\\langle a|b\\rangle^{*}$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned}\\langle a|b\\rangle &= \\tfrac12\\left[(1)(1)+(-i)(-i)\\right]\\\\ &= \\tfrac12\\left[1-1\\right] = 0\\end{aligned}',
+        note:'For $|a\\rangle=\\tfrac{1}{\\sqrt2}(1,i)$ and $|b\\rangle=\\tfrac{1}{\\sqrt2}(1,-i)$. The two states are orthogonal.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'The mistake this scene exists to stop', html:'Leaving the conjugate out gives $\\tfrac12\\left[(1)(1)+(i)(-i)\\right]=\\tfrac12\\left[1+1\\right]=1$. That is not a small error: an overlap of one says the two states are <b>the same state</b>, where the truth is that they are perfectly distinguishable. In NumPy the conjugating product is <code>np.vdot(a, b)</code>; <code>np.dot(a, b)</code> is the version without it and will return the wrong number without complaint.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$\\langle a|b\\rangle=2i$.<div class="nsep"></div>What is $\\langle b|a\\rangle$?',
+        ask:{key:'m1-bra', choices:['$2i$','$-2i$','$2$'], answer:1,
+          why:'Swapping the two arguments conjugates the answer.'}}]}
   ]}
 ]},
 
@@ -8519,30 +8578,21 @@ const SC = [
   src:'L2 · Cauchy-Schwarz and quantum overlaps', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'Length, orthogonality and how alike two states are'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The inner product of a state with itself gives its length, and the inner product of two different states says how alike they are:</p>'},
-    {t:'eq', tex:'\\|a\\| = \\sqrt{\\langle a|a\\rangle}, \\qquad \\langle a|b\\rangle = 0 \\;\\Longleftrightarrow\\; \\text{orthogonal}'},
-    {t:'body', html:'<p>The second is bounded. In any inner-product space the <b>Cauchy–Schwarz inequality</b> holds:</p>'},
-    {t:'eq', key:true, tex:'|\\langle a|b\\rangle| \\le \\|a\\|\\,\\|b\\|'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>For two normalised states both lengths are one, so the squared modulus of the overlap lies in a closed interval:</p>'},
-      {t:'eq', tex:'0 \\le |\\langle a|b\\rangle|^{2} \\le 1'},
-      {t:'small', html:'The two ends have names. Zero means the states are <b>orthogonal</b> and a single measurement can tell them apart with certainty. One means they are the same state up to a phase on the whole vector, and no measurement can tell them apart at all.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figOverlap(),
-      caption:'The overlap of $|0\\rangle$ with the family $|\\psi(\\theta)\\rangle=\\cos(\\theta/2)|0\\rangle+\\sin(\\theta/2)|1\\rangle$. The three marks are $\\theta=0$, where the states coincide; $\\theta=\\pi/2$, where the squared overlap is one half; and $\\theta=\\pi$, where they are orthogonal. The half angle is the first sighting of a factor Chapter 4 explains.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figOverlap(),
+      caption:'The squared overlap of $|0\\rangle$ with $|\\psi(\\theta)\\rangle=\\cos(\\theta/2)|0\\rangle+\\sin(\\theta/2)|1\\rangle$ is $\\cos^{2}(\\theta/2)$: $1$ at $\\theta=0$, one half at $\\theta=\\pi/2$, $0$ at $\\theta=\\pi$.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$|\\psi(\\theta)\\rangle = \\cos(\\theta/2)|0\\rangle+\\sin(\\theta/2)|1\\rangle$, all coefficients real.'],
-        ['Work', '$\\langle 0|\\psi(\\theta)\\rangle = \\cos(\\theta/2)$, so the squared overlap is $\\cos^{2}(\\theta/2)$.'],
-        ['Answer', 'It is $1$ at $\\theta=0$, one half at $\\theta=\\pi/2$, and $0$ at $\\theta=\\pi$.'],
-        ['Check', '$\\theta=\\pi$ gives $|\\psi\\rangle=|1\\rangle$, and $|1\\rangle$ is orthogonal to $|0\\rangle$ by construction.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'An overlap is an angle', html:'An overlap of one half is the cosine of an angle. Turning it into a chance of a correct guess needs the measurement rules of Chapter 2.'}]},
+  ], right:[
+    {t:'eq', tex:'\\|a\\| = \\sqrt{\\langle a|a\\rangle}, \\qquad \\langle a|b\\rangle = 0 \\;\\Longleftrightarrow\\; \\text{orthogonal}'},
+    {t:'eq', key:true, label:'Cauchy-Schwarz', tex:'|\\langle a|b\\rangle| \\le \\|a\\|\\,\\|b\\|',
+      note:'For two normalised states this gives $0\\le|\\langle a|b\\rangle|^{2}\\le 1$.'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'The two ends', html:'Zero: the states are orthogonal, and one measurement tells them apart with certainty. One: they are the same state up to a global phase, and no measurement can tell them apart.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'What an overlap of one half does not mean', html:'It does not mean the two states can be told apart half the time by any sensible procedure. Turning an overlap into a probability of a correct guess needs a measurement rule and a strategy, and both belong to Chapter 2. Here the overlap is a geometric quantity: the cosine of an angle, nothing more.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$|\\psi\\rangle=\\cos(\\pi/3)|0\\rangle+\\sin(\\pi/3)|1\\rangle$.<div class="nsep"></div>What is $|\\langle 0|\\psi\\rangle|^{2}$?',
+        ask:{key:'m1-overlap', choices:['$\\tfrac14$','$\\tfrac12$','$\\tfrac34$'], answer:0,
+          why:'$\\langle 0|\\psi\\rangle=\\cos(\\pi/3)=\\tfrac12$, and its square is $\\tfrac14$.'}}]}
   ]}
 ]},
 
@@ -8553,31 +8603,22 @@ const SC = [
   src:'L2 · dimension and bases', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
   {t:'title', text:'An orthonormal basis, and reading the coefficients off'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A set $\\{|e_{1}\\rangle,\\ldots,|e_{n}\\rangle\\}$ is an <b>orthonormal basis</b> when its members are mutually orthogonal, each has length one, and they span the space:</p>'},
-    {t:'eq', tex:'\\langle e_{i}|e_{j}\\rangle = \\delta_{ij}'},
-    {t:'body', html:'<p>Every vector then has one expansion in that basis, $|v\\rangle=\\sum_{i} v_{i}|e_{i}\\rangle$. The coefficients are not guessed; they are computed. Apply the bra $\\langle e_{j}|$ to both sides:</p>'},
-    {t:'eq', tex:'\\langle e_{j}|v\\rangle = \\sum_{i} v_{i}\\,\\langle e_{j}|e_{i}\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Orthonormality kills every term of the sum but one, the term with $i=j$:</p>'},
-      {t:'eq', key:true, tex:'v_{j} = \\langle e_{j}|v\\rangle'},
-      {t:'small', html:'That single line is used constantly and is worth naming: <b>a coefficient is an inner product with the corresponding basis vector</b>. It is why the basis is chosen orthonormal in the first place, and it fails as soon as the basis is not.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figBasis(),
-      caption:'The state $|0\\rangle$, read off in two bases. In the computational basis the two coefficients are $1$ and $0$; in the $X$ basis they are both $1/\\sqrt2$. The state did not change between the two readings.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figBasis(),
+      caption:'The state $|0\\rangle$ read in two bases. In the computational basis its coefficients are $1$ and $0$. In the $X$ basis both are $1/\\sqrt2$, so $|0\\rangle=\\tfrac{1}{\\sqrt2}|+\\rangle+\\tfrac{1}{\\sqrt2}|-\\rangle$. The state did not change.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'The state $|0\\rangle$, and the basis $|\\pm\\rangle=(|0\\rangle\\pm|1\\rangle)/\\sqrt2$.'],
-        ['Method', 'One inner product per basis vector.'],
-        ['Work', '$\\langle +|0\\rangle=\\tfrac{1}{\\sqrt2}$ and $\\langle -|0\\rangle=\\tfrac{1}{\\sqrt2}$.'],
-        ['Answer', '$|0\\rangle = \\tfrac{1}{\\sqrt2}|+\\rangle + \\tfrac{1}{\\sqrt2}|-\\rangle$.'],
-        ['Check', 'The squared coefficients add to $\\tfrac12+\\tfrac12=1$, as they must for any orthonormal basis.']
-      ]}
-    ]},
+      {t:'note', kind:'def', head:'The state is not its coordinates', html:'A definite state in one basis is an even superposition in another. "Superposition" always means superposition in a named basis.'}]},
+  ], right:[
+    {t:'eq', label:'Orthonormal basis', tex:'\\langle e_{i}|e_{j}\\rangle = \\delta_{ij}',
+      note:'Every vector then has exactly one expansion $|v\\rangle=\\sum_{i} v_{i}|e_{i}\\rangle$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', tex:'\\langle e_{j}|v\\rangle = \\sum_{i} v_{i}\\,\\langle e_{j}|e_{i}\\rangle'},
+      {t:'eq', key:true, label:'Coefficient', tex:'v_{j} = \\langle e_{j}|v\\rangle',
+        note:'Apply the bra $\\langle e_{j}|$ to both sides. Orthonormality keeps only the term $i=j$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'The state is not its coordinates', html:'A definite state in one basis is an even superposition in another. Neither reading is more true than the other, and the word "superposition" is therefore incomplete on its own: a state is a superposition <b>with respect to a named basis</b>. Chapter 2 makes the basis physical by attaching it to a measuring device.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'The state $|1\\rangle$ and the basis $|\\pm\\rangle=(|0\\rangle\\pm|1\\rangle)/\\sqrt2$.<div class="nsep"></div>What is the coefficient $\\langle -|1\\rangle$?',
+        ask:{key:'m1-basis', choices:['$\\tfrac{1}{\\sqrt2}$','$-\\tfrac{1}{\\sqrt2}$','$0$'], answer:1,
+          why:'The minus sign of $|-\\rangle$ sits on $|1\\rangle$, so $\\langle -|1\\rangle=-\\tfrac{1}{\\sqrt2}$.'}}]}
   ]}
 ]},
 
@@ -8588,30 +8629,21 @@ const SC = [
   src:'L3 · complex numbers', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'What a complex amplitude carries: a size and an angle'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>An amplitude is one complex number, and it carries two real ones. In Cartesian form it is a real part and an imaginary part; in polar form it is a size and an angle:</p>'},
-    {t:'eq', tex:'z = x + iy = r\\,e^{i\\varphi}, \\qquad r=|z|=\\sqrt{x^{2}+y^{2}}'},
-    {t:'body', html:'<p>The bridge between the two forms is Euler\u2019s formula, $e^{i\\varphi}=\\cos\\varphi+i\\sin\\varphi$. The size is recovered from the conjugate:</p>'},
-    {t:'eq', tex:'zz^{*} = (x+iy)(x-iy) = x^{2}+y^{2} = |z|^{2}'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Every probability in this course is a $|z|^{2}$, and every interference effect is a difference of two $\\varphi$. That division of labour is worth fixing now:</p>'},
-      {t:'note', kind:'def', head:'Which part does what', html:'The <b>modulus</b> becomes a probability, through the Born rule of Chapter 2. The <b>phase</b> never becomes a probability on its own, and only ever acts by being added to or subtracted from another phase. An amplitude with no partner to interfere with has a phase that no experiment can see.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figComplex(),
-      caption:'A complex number, its modulus $r$, its phase $\\varphi$, and its conjugate. Conjugation is a reflection in the real axis. It is not a rotation by $\\pi$, which would send $z$ to $-z$ instead.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figComplex(),
+      caption:'A complex number, its modulus $r$, its phase $\\varphi$ and its conjugate. Conjugation is a reflection in the real axis. It is not a rotation by $\\pi$, which would give $-z$.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$z = -1 + i$.'],
-        ['Method', 'Modulus from $\\sqrt{x^{2}+y^{2}}$, phase from the quadrant the point is actually in.'],
-        ['Work', '$r=\\sqrt{1+1}=\\sqrt2$. The point is up and to the left, so the phase is in the second quadrant.'],
-        ['Answer', '$z=\\sqrt2\\,e^{i3\\pi/4}$.'],
-        ['Check', '$\\sqrt2\\cos(3\\pi/4)=-1$ and $\\sqrt2\\sin(3\\pi/4)=+1$, which is the $z$ we started with.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'Where the phase gets lost', html:'$\\arctan(y/x)=\\arctan(-1)=-\\pi/4$ points at $1-i$, not at $-1+i$. Use $\\operatorname{atan2}(y,x)$, which is <code>np.angle</code> in NumPy.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Polar form', tex:'z = x + iy = r\\,e^{i\\varphi}, \\qquad r=|z|=\\sqrt{x^{2}+y^{2}}',
+      note:'$zz^{*}=|z|^{2}$. The modulus becomes a probability; the phase acts only against another phase.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} z &= -1+i \\\\ r &= \\sqrt{1+1} = \\sqrt2 \\\\ \\varphi &= \\operatorname{atan2}(1,-1) = \\tfrac{3\\pi}{4} \\end{aligned}',
+        note:'The point is up and to the left, so the phase is in the second quadrant: $z=\\sqrt2\\,e^{i3\\pi/4}$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'Where the phase gets lost', html:'Computing the phase as $\\arctan(y/x)$ gives $\\arctan(-1)=-\\pi/4$ here, which is the wrong quadrant and points at $1-i$ rather than $-1+i$. The function that keeps the quadrant takes the two arguments separately: $\\operatorname{atan2}(y,x)$, which is <code>np.angle</code> in NumPy. It also survives $x=0$, where the ratio does not exist at all.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$z=3e^{i\\pi/5}$.<div class="nsep"></div>What is $|z|^{2}$?',
+        ask:{key:'m1-amp', choices:['$3$','$9$','$9e^{2i\\pi/5}$'], answer:1,
+          why:'$zz^{*}=3e^{i\\pi/5}\\cdot 3e^{-i\\pi/5}=9$. The phase cancels.'}}]}
   ]}
 ]},
 
@@ -8619,32 +8651,24 @@ const SC = [
 { id:'m1-phase', module:'M1', nav:'Global and relative phase', title:'A global phase is invisible; a relative phase is everything',
   objective:'Show that a phase on the whole state changes no probability, and that a phase between two terms changes them all.',
   keywords:'global phase relative phase interference hadamard plus minus indistinguishable equivalence class',
-  src:'L3 · global phase, relative phase and interference', steps:4, slide:true, blocks:[
+  src:'L3 · global phase, relative phase and interference', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
   {t:'title', text:'A global phase is invisible; a relative phase is everything'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Multiply a whole state by a phase and ask what changes. Take any other state $|\\phi\\rangle$ and form the overlap:</p>'},
-    {t:'eq', tex:'\\left|\\langle\\phi|\\,e^{i\\gamma}\\psi\\rangle\\right|^{2} = \\left|e^{i\\gamma}\\right|^{2}\\left|\\langle\\phi|\\psi\\rangle\\right|^{2} = \\left|\\langle\\phi|\\psi\\rangle\\right|^{2}'},
-    {t:'body', html:'<p>Nothing changes, because $|e^{i\\gamma}|=1$. Every number an experiment can produce is of this form, so the two columns describe one physical state:</p>'},
-    {t:'eq', key:true, tex:'e^{i\\gamma}|\\psi\\rangle \\;\\equiv\\; |\\psi\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Now put the phase on one term only, and compare the two states</p>'},
-      {t:'eq', tex:'|+\\rangle = \\tfrac{1}{\\sqrt2}\\left(|0\\rangle+|1\\rangle\\right), \\qquad |-\\rangle = \\tfrac{1}{\\sqrt2}\\left(|0\\rangle-|1\\rangle\\right)'},
-      {t:'small', html:'The minus sign is a relative phase of $\\pi$. Both states give $|{\\pm}\\tfrac{1}{\\sqrt2}|^{2}=\\tfrac12$ for each computational outcome, so a measurement in that basis cannot tell them apart.'}
-    ]},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figPhaseBars(),
+      caption:'After one Hadamard, $|+\\rangle$ and $|-\\rangle$ give opposite certain answers. Before the gate both gave one half on each outcome. Only the relative phase differs between them.'},
     {t:'reveal', at:2, items:[
-      {t:'body', html:'<p>Apply a Hadamard, which sends $|0\\rangle\\mapsto(|0\\rangle+|1\\rangle)/\\sqrt2$ and $|1\\rangle\\mapsto(|0\\rangle-|1\\rangle)/\\sqrt2$, and collect terms:</p>'},
-      {t:'eq', tex:'\\begin{aligned} H|+\\rangle &= \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)+\\tfrac12\\left(|0\\rangle-|1\\rangle\\right) = |0\\rangle \\\\ H|-\\rangle &= \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)-\\tfrac12\\left(|0\\rangle-|1\\rangle\\right) = |1\\rangle \\end{aligned}'}
-    ]}
+      {t:'note', kind:'warn', head:'Global for one qubit is not global', html:'In $|0\\rangle e^{i\\varphi}|\\psi\\rangle+|1\\rangle|\\psi\\rangle$ the $e^{i\\varphi}$ sits on one branch, so it is a relative phase. Chapter 6 builds phase kickback out of this.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figPhaseBars(),
-      caption:'After one Hadamard, the two states of the derivation give opposite certain answers. Before the gate both gave one half and one half on each outcome, which is why the figure shows only the half of the story that the relative phase decides.'},
+    {t:'eq', label:'Global phase', tex:'\\begin{aligned}\\left|\\langle\\phi|\\,e^{i\\gamma}\\psi\\rangle\\right|^{2} &= \\left|e^{i\\gamma}\\right|^{2}\\left|\\langle\\phi|\\psi\\rangle\\right|^{2} \\\\ &= \\left|\\langle\\phi|\\psi\\rangle\\right|^{2}\\end{aligned}',
+      note:'No probability changes, so $e^{i\\gamma}|\\psi\\rangle$ and $|\\psi\\rangle$ are one physical state.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', key:true, label:'Relative phase', tex:'\\begin{aligned} H|+\\rangle &= \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)+\\tfrac12\\left(|0\\rangle-|1\\rangle\\right) = |0\\rangle \\\\ H|-\\rangle &= \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)-\\tfrac12\\left(|0\\rangle-|1\\rangle\\right) = |1\\rangle \\end{aligned}',
+        note:'$|\\pm\\rangle=(|0\\rangle\\pm|1\\rangle)/\\sqrt2$ differ only by a relative phase of $\\pi$, and a Hadamard turns that phase into different outcomes.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'The rule to carry forward', html:'A phase on the <b>whole</b> state can always be dropped. A phase <b>between two terms</b> can never be dropped. Interference is the only mechanism any algorithm in this course has, and interference is entirely a statement about relative phase.'}
-    ]},
-    {t:'reveal', at:4, items:[
-      {t:'note', kind:'warn', head:'And the trap inside that rule', html:'A phase that is global for one qubit stops being global as soon as that qubit is one branch of a larger superposition. Writing $|0\\rangle(e^{i\\varphi}|\\psi\\rangle) + |1\\rangle|\\psi\\rangle$ and cancelling the $e^{i\\varphi}$ as "just a global phase" changes the state. Chapter 6 builds its whole mechanism, phase kickback, out of exactly this.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$|\\psi\\rangle=\\tfrac{1}{\\sqrt2}\\left(|0\\rangle+i|1\\rangle\\right)$ goes through a Hadamard.<div class="nsep"></div>What is $P(0)$?',
+        ask:{key:'m1-phase', choices:['$0$','$\\tfrac12$','$1$'], answer:1,
+          why:'$H|\\psi\\rangle=\\tfrac{1+i}{2}|0\\rangle+\\tfrac{1-i}{2}|1\\rangle$, and $|(1+i)/2|^{2}=\\tfrac12$.'}}]}
   ]}
 ]},
 
@@ -8667,29 +8691,21 @@ const SC = [
   src:'L2 · outer products are not tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'A ket beside a bra is an operator'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Reverse the order of the row and the column. A column on the left of a row does not contract; it spreads into a square array, and that array is an operator:</p>'},
-    {t:'eq', key:true, tex:'|a\\rangle\\langle b| = |a\\rangle\\,|b\\rangle^{\\dagger}, \\qquad \\left(|a\\rangle\\langle b|\\right)_{jk} = a_{j}\\,b_{k}^{*}'},
-    {t:'body', html:'<p>This is the one construction that turns states into the things that act on states, and it is the reason a course can be written entirely in kets and bras without ever writing a matrix down.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>What it does is easy to read. Feed it a ket and the bra eats that ket first, leaving a number times $|a\\rangle$:</p>'},
-      {t:'eq', tex:'\\left(|a\\rangle\\langle b|\\right)|v\\rangle = |a\\rangle\\,\\langle b|v\\rangle = \\langle b|v\\rangle\\,|a\\rangle'},
-      {t:'small', html:'So every outer product sends the whole space onto one line, the line through $|a\\rangle$. It has rank one, and the number it multiplies by is the overlap of the input with $|b\\rangle$.'}
-    ]}
-  ], right:[
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figOuter(),
+      caption:'The column $|0\\rangle$ times the row $\\langle 1|$. The one non-zero entry sits where the $1$ of the column meets the $1$ of the row.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$|0\\rangle=\\begin{bmatrix}1\\\\0\\end{bmatrix}$ and $|1\\rangle=\\begin{bmatrix}0\\\\1\\end{bmatrix}$.'],
-        ['Method', 'Write the column, write the conjugated row, and multiply.'],
-        ['Work', '$|0\\rangle\\langle 1| = \\begin{bmatrix}1\\\\0\\end{bmatrix}\\begin{bmatrix}0&1\\end{bmatrix}$.'],
-        ['Answer', '$|0\\rangle\\langle 1| = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$, the operator that turns $|1\\rangle$ into $|0\\rangle$ and kills $|0\\rangle$.'],
-        ['Check', 'Its square is the zero matrix, which is right: it sends everything to the $|0\\rangle$ line, and it then kills $|0\\rangle$.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'Three products, three shapes', html:'$\\langle a|b\\rangle$ is a number. $|a\\rangle\\langle b|$ is an $n\\times n$ operator. $|a\\rangle\\otimes|b\\rangle$ is a column of length $n^{2}$. When a line of algebra does not fit together, count the shapes first.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Outer product', tex:'|a\\rangle\\langle b| = |a\\rangle\\,|b\\rangle^{\\dagger}, \\qquad \\left(|a\\rangle\\langle b|\\right)_{jk} = a_{j}\\,b_{k}^{*}',
+      note:'Fed a ket, the bra acts first: $\\left(|a\\rangle\\langle b|\\right)|v\\rangle=\\langle b|v\\rangle\\,|a\\rangle$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'|0\\rangle\\langle 1| = \\begin{bmatrix}1\\\\0\\end{bmatrix}\\begin{bmatrix}0&1\\end{bmatrix} = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}',
+        note:'It turns $|1\\rangle$ into $|0\\rangle$ and sends $|0\\rangle$ to zero, so its square is the zero matrix.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'Three products, three shapes', html:'$\\langle a|b\\rangle$ is a <b>number</b>. $|a\\rangle\\langle b|$ is an $n\\times n$ <b>operator</b>. $|a\\rangle\\otimes|b\\rangle$, which is the next section, is a longer <b>column</b> of length $n^{2}$. They are built from the same two arrays and they are not interchangeable, so when a line of algebra will not typecheck, the shapes are the first thing to count.'}
-    ]},
-    {t:'note', kind:'def', head:'Order matters here too', html:'$|a\\rangle\\langle b|$ and $|b\\rangle\\langle a|$ are different operators: one is the adjoint of the other, $\\left(|a\\rangle\\langle b|\\right)^{\\dagger}=|b\\rangle\\langle a|$. They are equal only when $|a\\rangle$ and $|b\\rangle$ are the same state up to a phase, which is the case the next scene is about.'}
+      {t:'note', kind:'def', head:'Given', html:'The operator $|1\\rangle\\langle 0|$ acts on $|0\\rangle$.<div class="nsep"></div>What comes out?',
+        ask:{key:'m1-outer', choices:['$|0\\rangle$','$|1\\rangle$','The zero vector'], answer:1,
+          why:'The bra $\\langle 0|$ meets $|0\\rangle$ and gives $1$, which multiplies $|1\\rangle$.'}}]}
   ]}
 ]},
 
@@ -8700,27 +8716,21 @@ const SC = [
   src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projector, and the part of a state it keeps'},
-  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
-    {t:'body', html:'<p>Take the outer product of a normalised state with itself. The result is called a <b>projector</b>:</p>'},
-    {t:'eq', key:true, tex:'P_{u} = |u\\rangle\\langle u|, \\qquad \\langle u|u\\rangle = 1'},
-    {t:'body', html:'<p>It has two properties and both are one line. It is its own adjoint, because reversing an outer product swaps two copies of the same state; and applying it twice is the same as applying it once:</p>'},
-    {t:'eq', tex:'P_{u}^{2} = |u\\rangle\\underbrace{\\langle u|u\\rangle}_{=\\,1}\\langle u| = P_{u}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'An operator with $P^{2}=P$ can only have eigenvalues $0$ and $1$, since $\\lambda^{2}=\\lambda$. Those two numbers are "kept" and "discarded", and in Chapter 2 they become the two things a measurement can report.'}
-    ]}
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figProject(),
+      caption:'The state $|v\\rangle=|0\\rangle$ split along $|u\\rangle=|+\\rangle$. The kept part $P|v\\rangle=\\tfrac{1}{\\sqrt2}|+\\rangle$ and the discarded part $(I-P)|v\\rangle=\\tfrac{1}{\\sqrt2}|-\\rangle$ meet at a right angle and add back to $|v\\rangle$.'},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figProject(),
-      caption:'A state split into the part along $|u\\rangle$ and the part orthogonal to it. The two pieces are $P|v\\rangle$ and $(I-P)|v\\rangle$, they meet at a right angle, and they add back to $|v\\rangle$.'},
+    {t:'eq', key:true, label:'Projector', tex:'P_{u} = |u\\rangle\\langle u|, \\qquad \\langle u|u\\rangle = 1',
+      note:'It is its own adjoint: reversing it swaps two copies of the same state.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Applied twice', tex:'P_{u}^{2} = |u\\rangle\\underbrace{\\langle u|u\\rangle}_{=\\,1}\\langle u| = P_{u}',
+        note:'So an eigenvalue satisfies $\\lambda^{2}=\\lambda$: only $0$ (discarded) and $1$ (kept).'}]},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$|u\\rangle=|+\\rangle$ and $|v\\rangle=|0\\rangle$.'],
-        ['Work', '$\\langle +|0\\rangle = 1/\\sqrt2$, so $P|0\\rangle = \\tfrac{1}{\\sqrt2}|+\\rangle = \\tfrac12\\left(|0\\rangle+|1\\rangle\\right)$, of length $1/\\sqrt2$.'],
-        ['Check', 'The discarded part is $(I-P)|0\\rangle=\\tfrac{1}{\\sqrt2}|-\\rangle$, orthogonal to it because $\\langle+|-\\rangle=0$.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'A projector shortens a state', html:'In the figure $P|0\\rangle$ has length $1/\\sqrt2$, not $1$. The lost length is the probability of the other outcome. Renormalising is a separate step, taken in Chapter 2.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'A projector does not preserve length', html:'The output has length $1/\\sqrt2$, not $1$, and that is not an arithmetic slip: the lost length is exactly the probability of the other outcome. Renormalising is a separate step, and Chapter 2 says when it is taken.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$P=|1\\rangle\\langle 1|$ and $|v\\rangle=\\tfrac{\\sqrt3}{2}|0\\rangle+\\tfrac12|1\\rangle$.<div class="nsep"></div>What is the length of $P|v\\rangle$?',
+        ask:{key:'m1-proj', choices:['$\\tfrac12$','$\\tfrac{\\sqrt3}{2}$','$1$'], answer:0,
+          why:'$P|v\\rangle=\\tfrac12|1\\rangle$: the projector keeps only the $|1\\rangle$ part.'}}]}
   ]}
 ]},
 
@@ -8731,25 +8741,21 @@ const SC = [
   src:'L2 · projectors and the resolution of identity', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
   {t:'title', text:'The projectors of a basis add to the identity'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Take one projector for each vector of an orthonormal basis and add them. Nothing has been thrown away, so nothing has changed:</p>'},
-    {t:'eq', key:true, tex:'\\sum_{k} |e_{k}\\rangle\\langle e_{k}| = I'},
-    {t:'body', html:'<p>This is the <b>resolution of the identity</b>, and it is used as a move rather than as a fact. Inserting it turns a statement about a vector into a statement about its coefficients, without any guessing. Start with a triviality and insert it:</p>'},
-    {t:'eq', tex:'|v\\rangle = I|v\\rangle = \\sum_{k}|e_{k}\\rangle\\langle e_{k}|v\\rangle = \\sum_{k}\\langle e_{k}|v\\rangle\\,|e_{k}\\rangle'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The basis expansion of the previous scene has just been <b>derived</b> rather than assumed, and in one line. That is the pattern: wherever a sum over basis states is wanted and is not there, the identity is what puts it there.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figResolve(),
-      caption:'One vector, resolved by the identity. Each dashed guide is one inner product $\\langle e_{k}|v\\rangle$, and each solid piece is that number multiplying its own basis vector. The pieces add back to the vector exactly.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figResolve(),
+      caption:'One vector, resolved by the identity. Each dashed guide is one inner product $\\langle e_{k}|v\\rangle$, and each solid piece is that number times its basis vector. The pieces add back to the vector exactly.'},
     {t:'reveal', at:2, items:[
-      {t:'body', html:'<p>The same move works between two bras, and it is how an inner product becomes a sum:</p>'},
-      {t:'eq', tex:'\\langle a|b\\rangle = \\langle a|I|b\\rangle = \\sum_{k}\\langle a|e_{k}\\rangle\\langle e_{k}|b\\rangle'},
-      {t:'small', html:'With the computational basis this reproduces $\\sum_{k}a_{k}^{*}b_{k}$, which is where the definition came from. With any other basis it gives the same number computed a different way, and that freedom is the point.'}
-    ]},
+      {t:'note', kind:'ok', head:'Name the move', html:'"Insert the resolution of the identity" means this step. The only choice is the basis: pick one in which some object in the expression is simple.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Resolution of the identity', tex:'\\sum_{k} |e_{k}\\rangle\\langle e_{k}| = I',
+      note:'One projector for each vector of an orthonormal basis. Nothing is thrown away, so nothing changes.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Insert it', tex:'\\begin{aligned}|v\\rangle &= I|v\\rangle \\\\ &= \\sum_{k}|e_{k}\\rangle\\langle e_{k}|v\\rangle \\\\ &= \\sum_{k}\\langle e_{k}|v\\rangle\\,|e_{k}\\rangle\\end{aligned}',
+        note:'The basis expansion of the last scene is now derived, not assumed.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'Name the move', html:'When a derivation in this course says <b>insert the resolution of the identity</b>, this is the step being taken, and the only decision is which basis to insert. Choose the basis in which one of the objects in the expression is simple, and the sum usually collapses.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'Insert the $X$ basis into $\\langle 0|1\\rangle$: $\\langle 0|+\\rangle\\langle +|1\\rangle+\\langle 0|-\\rangle\\langle -|1\\rangle$.<div class="nsep"></div>What is the sum?',
+        ask:{key:'m1-resid', choices:['$0$','$\\tfrac12$','$1$'], answer:0,
+          why:'The two terms are $\\tfrac12$ and $-\\tfrac12$. Any basis gives the same number, and $\\langle 0|1\\rangle=0$.'}}]}
   ]}
 ]},
 
@@ -8760,27 +8766,21 @@ const SC = [
   src:'L2 · constructing an orthonormal basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
   {t:'title', text:'Gram-Schmidt: making an orthonormal basis out of what you have'},
-  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
-    {t:'body', html:'<p>Given independent vectors $v_{1},\\ldots,v_{k}$, the <b>Gram–Schmidt procedure</b> produces an orthonormal set spanning the same space. Each step removes from the next vector everything that already lies along the vectors already built, then divides by the length of what is left:</p>'},
-    {t:'eq', key:true, tex:'u_{j} = v_{j} - \\sum_{i<j}\\langle e_{i}|v_{j}\\rangle\\,e_{i}, \\qquad e_{j} = \\frac{u_{j}}{\\|u_{j}\\|}'},
-    {t:'body', html:'<p>The subtraction is the whole idea, and the picture beside it is the whole proof: what is left after removing the component along $e_{1}$ has no component along $e_{1}$, so it is orthogonal to it.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'wex', rows:[
-        ['Given', '$v_{1}=(1,1)$ and $v_{2}=(1,0)$, real.'],
-        ['Step 1', '$\\|v_{1}\\|=\\sqrt2$, so $e_{1}=\\tfrac{1}{\\sqrt2}(1,1)$.'],
-        ['Step 2', '$\\langle e_{1}|v_{2}\\rangle = \\tfrac{1}{\\sqrt2}$, so $u_{2}=(1,0)-\\tfrac12(1,1)=(\\tfrac12,-\\tfrac12)$, of length $\\tfrac{1}{\\sqrt2}$, and $e_{2}=\\tfrac{1}{\\sqrt2}(1,-1)$.'],
-        ['Check', '$\\langle e_{1}|e_{2}\\rangle = \\tfrac12(1-1)=0$ and both have length one. The pair is $|+\\rangle$ and $|-\\rangle$ in disguise.']
-      ]}
-    ]}
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figGram(),
+      caption:'One step. The amber arrow is the part of $v_{2}$ that already lies along $e_{1}$. Removing it leaves $u_{2}$, which is at a right angle to $e_{1}$ by construction.'},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figGram(),
-      caption:'One step of the procedure. The amber arrow is the part of $v_{2}$ that already lies along $e_{1}$; removing it leaves $u_{2}$, which is at a right angle to $e_{1}$ by construction and only has to be scaled to length one.'},
+    {t:'eq', key:true, label:'One step', tex:'u_{j} = v_{j} - \\sum_{i<j}\\langle e_{i}|v_{j}\\rangle\\,e_{i}, \\qquad e_{j} = \\frac{u_{j}}{\\|u_{j}\\|}',
+      note:'Remove what already lies along the vectors built so far, then divide by the length that is left.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} e_{1} &= \\tfrac{1}{\\sqrt2}(1,1) \\\\ u_{2} &= (1,0)-\\tfrac12(1,1) = \\left(\\tfrac12,-\\tfrac12\\right) \\\\ e_{2} &= \\tfrac{1}{\\sqrt2}(1,-1) \\end{aligned}',
+        note:'For $v_{1}=(1,1)$ and $v_{2}=(1,0)$, as in the figure. The pair is $|+\\rangle$ and $|-\\rangle$ in disguise.'}]},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'warn', head:'Where it breaks on a computer', html:'If two input vectors are nearly parallel the subtraction cancels almost everything, and $u_{j}$ is a small difference of large numbers. Rounding error, negligible in the inputs, is then a large fraction of the result, and the "orthonormal" vectors come out neither orthogonal nor normal. Laboratory B is this failure, driven by the reader.'}
-    ]},
+      {t:'note', kind:'warn', head:'Where it breaks on a computer', html:'For nearly parallel inputs the subtraction cancels almost everything, and rounding error becomes a large part of $u_{j}$. To compute, use a QR factorisation, <code>np.linalg.qr</code>. Laboratory B shows the failure.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'What is used instead', html:'A QR factorisation computes the same span by a different arithmetic route and loses far less; in NumPy that is <code>np.linalg.qr</code>. Gram–Schmidt stays the right thing to know because it says <b>what</b> is computed; QR is the right thing to run because it says how.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$v_{1}=(1,0)$ and $v_{2}=(3,4)$.<div class="nsep"></div>What is $u_{2}$?',
+        ask:{key:'m1-gs', choices:['$(0,4)$','$(3,0)$','$(0,1)$'], answer:0,
+          why:'$\\langle e_{1}|v_{2}\\rangle=3$, so $u_{2}=(3,4)-3(1,0)=(0,4)$. Normalising it gives $(0,1)$.'}}]}
   ]}
 ]},
 
@@ -8799,33 +8799,23 @@ const SC = [
 { id:'m1-tensor', module:'M1', nav:'The tensor product', title:'Two systems make one, and the dimensions multiply',
   objective:'Form a tensor product of columns and of matrices, under the bit order this course fixes.',
   keywords:'tensor product kronecker composite system dimension multiply bit order qubit register basis strings',
-  src:'L2 · tensor products', steps:4, slide:true, blocks:[
+  src:'L2 · tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Two systems make one, and the dimensions multiply'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Two separate systems are described by one state, and the construction that builds it is the <b>tensor product</b>. For two columns it is every product of an entry of the first with an entry of the second:</p>'},
-    {t:'eq', key:true, tex:'\\begin{bmatrix}a_{1}\\\\a_{2}\\end{bmatrix}\\otimes\\begin{bmatrix}b_{1}\\\\b_{2}\\end{bmatrix} = \\begin{bmatrix}a_{1}b_{1}\\\\a_{1}b_{2}\\\\a_{2}b_{1}\\\\a_{2}b_{2}\\end{bmatrix}'},
-    {t:'body', html:'<p>Two qubits are therefore described by four numbers and not by two plus two. For matrices the rule is the same one block by block: $A\\otimes B$ has the block $A_{ij}B$ in position $(i,j)$.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'note', kind:'def', head:'The convention that fails silently', html:'This course writes a register as $|q_{n-1}\\ldots q_{1}q_{0}\\rangle$, and entry $x$ of the column is the amplitude of $|x\\rangle$ read as a binary number. So $|01\\rangle$ means $q_{1}=0$, $q_{0}=1$, and it is entry $1$. Courses that count the other way write the same symbols and mean a different state. Nothing looks wrong when the two are mixed; every number afterwards is simply another problem’s answer.'}
-    ]}
-  ], right:[
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figTensor(),
+      caption:'Every entry of the first column times every entry of the second. Each product is the amplitude of one basis string, and entry $x$ belongs to the string that is $x$ in binary.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', 'Qubit $1$ in $|0\\rangle$ and qubit $0$ in $|1\\rangle$.'],
-        ['Method', 'Order the factors $q_{1}\\otimes q_{0}$ and expand.'],
-        ['Work', '$(1,0)\\otimes(0,1) = (1\\cdot 0,\\;1\\cdot 1,\\;0\\cdot 0,\\;0\\cdot 1)$.'],
-        ['Answer', '$(0,1,0,0)$, which is $|01\\rangle$: the amplitude sits in entry $1$.'],
-        ['Check', 'Binary $01$ is the number $1$, and entry $1$ is the one that is non-zero.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'Not every joint state is a product', html:'Most four-entry columns cannot be written as $|a\\rangle\\otimes|b\\rangle$. Those are the entangled states of Chapter 3.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Tensor product', tex:'\\begin{bmatrix}a_{1}\\\\a_{2}\\end{bmatrix}\\otimes\\begin{bmatrix}b_{1}\\\\b_{2}\\end{bmatrix} = \\begin{bmatrix}a_{1}b_{1}\\\\a_{1}b_{2}\\\\a_{2}b_{1}\\\\a_{2}b_{2}\\end{bmatrix}',
+      note:'Two qubits carry four amplitudes, not two plus two. For matrices, $A\\otimes B$ has the block $A_{ij}B$ at $(i,j)$, so $X\\otimes X$ has a $1$ in its corner entry $(0,3)$.'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'def', head:'The bit order', html:'This course writes $|q_{n-1}\\ldots q_{1}q_{0}\\rangle$. So $(1,0)\\otimes(0,1)=(0,1,0,0)$ is $|01\\rangle$, entry $1$. The other order names a different state, and nothing looks wrong.'}]},
     {t:'reveal', at:3, items:[
-      {t:'body', html:'<p>The same product applies to operators. Acting with $X$ on both qubits at once is one $4\\times4$ matrix:</p>'},
-      {t:'eq', tex:'X\\otimes X = \\begin{bmatrix}0&0&0&1\\\\0&0&1&0\\\\0&1&0&0\\\\1&0&0&0\\end{bmatrix}'}
-    ]},
-    {t:'reveal', at:4, items:[
-      {t:'note', kind:'warn', head:'Not every joint state is a product', html:'Every $|a\\rangle\\otimes|b\\rangle$ is a legal two-qubit state, but the reverse fails: most four-entry columns cannot be written that way. Those that cannot are the entangled ones, and they are the subject of Chapter 3. The tensor product is what makes room for them; it does not produce them by itself.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'Qubit $1$ is in $|1\\rangle$ and qubit $0$ is in $|0\\rangle$.<div class="nsep"></div>Which entry of the four is non-zero?',
+        ask:{key:'m1-tensor', choices:['Entry $1$','Entry $2$','Entry $3$'], answer:1,
+          why:'The string is $|10\\rangle$, and binary $10$ is the number $2$.'}}]}
   ]}
 ]},
 
@@ -8836,22 +8826,20 @@ const SC = [
   src:'L2 · tensor products', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The tensor product'},
   {t:'title', text:'Where the exponential comes from, and what it does not buy'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The tensor product multiplies dimensions. One qubit has dimension two, so adding a qubit doubles the space, and $n$ of them give</p>'},
-    {t:'eq', key:true, tex:'\\dim\\left(\\mathbb{C}^{2}\\right)^{\\otimes n} = 2^{n}'},
-    {t:'body', html:'<p>That is the entire origin of the exponential this subject is famous for. It is not a physical postulate, it is not an assumption about speed, and it is not special to quantum mechanics: it is what "combine two systems" means, applied $n$ times.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'At $n=10$ the column has $1024$ entries. At $n=50$ it has about $1.13\\times10^{15}$, which is more numbers than a large classical machine can hold. At $n=300$ it has more entries than there are atoms in the observable universe, and the register still fits on a bench.'}
-    ]},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figTree(),
+      caption:'Each new qubit gives every basis string two continuations, so the count goes $1, 2, 4, 8$. At $n=50$ the column has about $1.13\\times10^{15}$ entries.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'warn', head:'What the reading out costs', html:'A measurement of $n$ qubits returns $n$ bits. Not $2^{n}$ amplitudes, and not a summary of them: one string. Holding many amplitudes is therefore worth nothing on its own, and an algorithm has to make the unwanted amplitudes cancel <b>before</b> the readout. That is the first of the three sentences this course exists to install.'}
-    ]}
+      {t:'note', kind:'ok', head:'What the size does not prove', html:'Many states are easy to simulate on a classical computer, through locality, sparsity, low entanglement or stabilizer structure. A large dimension makes a problem interesting; it does not prove it hard.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figTree(),
-      caption:'Why the count doubles. Each new qubit gives every basis string of the register two continuations rather than one, so the number of strings goes $1, 2, 4, 8$ and the amplitude column grows with it.'},
+    {t:'eq', key:true, label:'Dimension', tex:'\\dim\\left(\\mathbb{C}^{2}\\right)^{\\otimes n} = 2^{n}',
+      note:'This is what "combine two systems" means, applied $n$ times. It is not a claim about speed.'},
+    {t:'reveal', at:1, items:[
+      {t:'note', kind:'warn', head:'What the reading out costs', html:'Measuring $n$ qubits returns $n$ bits: one string, not $2^{n}$ amplitudes. An algorithm must make the unwanted amplitudes cancel before the readout.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'And what the size does not prove', html:'A large state space does not prove the physics is hard to simulate. Classical methods use locality, symmetry, sparsity, low entanglement and stabilizer structure, and a great many quantum states fall to one of them. The dimension is a fact about a <b>generic dense description</b>. It is a reason the problem might be interesting, never a proof that it is.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'A register of $20$ qubits.<div class="nsep"></div>How many amplitudes does its column hold?',
+        ask:{key:'m1-expo', choices:['$40$','$400$','$1\\,048\\,576$'], answer:2,
+          why:'$2^{20}=1\\,048\\,576$. The dimensions multiply; they do not add.'}}]}
   ]}
 ]},
 
@@ -8862,29 +8850,21 @@ const SC = [
   src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The adjoint, and how to take one without losing a conjugate'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The <b>adjoint</b> of an operator is its conjugate transpose. It is the same operation that turned a ket into a bra, applied to a square array instead of a column:</p>'},
-    {t:'eq', key:true, tex:'A^{\\dagger} = \\left(A^{*}\\right)^{T}, \\qquad \\left(A^{\\dagger}\\right)_{jk} = A_{kj}^{*}'},
-    {t:'body', html:'<p>Two things happen and both are needed. Every entry is conjugated, and every entry is moved across the diagonal. In NumPy that is <code>A.conj().T</code>; <code>A.T</code> alone is the real-valued version and drops the conjugation without warning.</p>'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>An operator that equals its own adjoint is called <b>Hermitian</b>:</p>'},
-      {t:'eq', key:true, tex:'A = A^{\\dagger}'},
-      {t:'small', html:'The diagonal entries of such an operator satisfy $A_{jj}=A_{jj}^{*}$ and are therefore real, and the off-diagonal entries come in conjugate pairs. Both are visible at a glance and are the fastest first check.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figAdjoint(),
-      caption:'The adjoint as the two steps it is made of. Doing only the transpose, or only the conjugation, produces a well-formed matrix that is not the adjoint, and nothing later in a calculation announces the error.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figAdjoint(),
+      caption:'The adjoint as the two steps it is made of. Doing only one of them gives a well-formed matrix that is not the adjoint, and nothing later announces the error.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$C=\\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}$.'],
-        ['Work', 'Conjugating gives $\\begin{bmatrix}1&-i\\\\i&1\\end{bmatrix}$; transposing that gives $\\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}$.'],
-        ['Answer', '$C^{\\dagger}=C$, so $C$ is Hermitian.'],
-        ['Check', 'Its diagonal is real and its off-diagonal pair is $i$ and $-i$, which are conjugates. Both signs of Hermiticity are present.']
-      ]}
-    ]},
+      {t:'note', kind:'warn', head:'The adjoint reverses a product', html:'$(AB)^{\\dagger}=B^{\\dagger}A^{\\dagger}$. So a product of two Hermitian operators is Hermitian only when they commute.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Adjoint', tex:'A^{\\dagger} = \\left(A^{*}\\right)^{T}, \\qquad \\left(A^{\\dagger}\\right)_{jk} = A_{kj}^{*}',
+      note:'In NumPy: <code>A.conj().T</code>. The call <code>A.T</code> alone drops the conjugate.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Hermitian', tex:'\\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}^{*} = \\begin{bmatrix}1&-i\\\\i&1\\end{bmatrix} \\;\\xrightarrow{\\;T\\;}\\; \\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}',
+        note:'This matrix equals its adjoint, so it is <b>Hermitian</b>: $A=A^{\\dagger}$. Its diagonal is real and its off-diagonal pair is conjugate.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'The adjoint reverses a product', html:'$(AB)^{\\dagger}=B^{\\dagger}A^{\\dagger}$, exactly as the transpose does. One consequence is worth storing now: a product of two Hermitian operators is Hermitian only when they commute, since $(AB)^{\\dagger}=B^{\\dagger}A^{\\dagger}=BA$, and that equals $AB$ only if the two commute. This is the first place the commutator of Chapter 2 makes itself felt.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$A=\\begin{bmatrix}1&2i\\\\2i&3\\end{bmatrix}$.<div class="nsep"></div>Is $A$ Hermitian?',
+        ask:{key:'m1-adjoint', choices:['Yes','No: the off-diagonal entries are not conjugates','No: the diagonal is not real'], answer:1,
+          why:'The conjugate of $2i$ is $-2i$, so $A^{\\dagger}$ has $-2i$ off the diagonal.'}}]}
   ]}
 ]},
 
@@ -8895,86 +8875,73 @@ const SC = [
   src:'L3 · Hermitian matrices', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian operator has real eigenvalues'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The proof is three lines and it is worth following, because it is the reason the whole course insists on Hermiticity. Let $A|v\\rangle=\\lambda|v\\rangle$ with $|v\\rangle$ normalised, and compute the number $\\langle v|A|v\\rangle$ twice.</p>'},
-    {t:'body', html:'<p>Let the operator act to the right, on the ket:</p>'},
-    {t:'eq', tex:'\\langle v|A|v\\rangle = \\langle v|\\lambda v\\rangle = \\lambda\\,\\langle v|v\\rangle = \\lambda'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>Now let it act to the left instead. Moving an operator onto the bra turns it into its adjoint, and $A^{\\dagger}=A$, so the same $A$ arrives there. The bra conjugates whatever it meets, so $\\lambda$ becomes $\\lambda^{*}$:</p>'},
-      {t:'eq', tex:'\\langle v|A|v\\rangle = \\langle A v|v\\rangle = \\lambda^{*}\\,\\langle v|v\\rangle = \\lambda^{*}'},
-      {t:'body', html:'<p>One number, computed two ways, so the two answers agree:</p>'},
-      {t:'eq', key:true, tex:'\\lambda = \\lambda^{*} \\quad\\Longrightarrow\\quad \\lambda \\in \\mathbb{R}'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figSpectrum(),
-      caption:'Where eigenvalues are allowed to sit. The rotation $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ has eigenvalues $\\pm i$, off the axis. The Hermitian $\\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}$ has $0$ and $2$, on it. Only the second can be a list of laboratory readings.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figSpectrum(),
+      caption:'The rotation $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ has eigenvalues $\\pm i$, off the real axis. The Hermitian $\\begin{bmatrix}1&i\\\\-i&1\\end{bmatrix}$ has $0$ and $2$, on it.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'ok', head:'This is the whole reason observables are Hermitian', html:'A measuring instrument reports a real number. An operator whose job is to carry the list of readings that instrument can produce must therefore have real eigenvalues, and Hermiticity is the condition that guarantees it.'}
-    ]},
+      {t:'note', kind:'ok', head:'Why observables are Hermitian', html:'An instrument reports a real number. Hermiticity guarantees real eigenvalues, and also an orthonormal eigenbasis, so two different readings are perfectly distinguishable.'}]},
+  ], right:[
+    {t:'eq', label:'Act to the right', tex:'\\langle v|A|v\\rangle = \\langle v|\\lambda v\\rangle = \\lambda\\,\\langle v|v\\rangle = \\lambda',
+      note:'Let $A|v\\rangle=\\lambda|v\\rangle$ with $|v\\rangle$ normalised, and compute one number twice.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Act to the left', tex:'\\langle v|A|v\\rangle = \\langle A v|v\\rangle = \\lambda^{*}\\,\\langle v|v\\rangle = \\lambda^{*}',
+        note:'On the bra, $A$ becomes $A^{\\dagger}=A$, and the bra conjugates $\\lambda$.'},
+      {t:'eq', key:true, tex:'\\lambda = \\lambda^{*} \\quad\\Longrightarrow\\quad \\lambda \\in \\mathbb{R}'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'def', head:'And the second half of the theorem', html:'Hermiticity also gives an orthonormal basis of eigenvectors, and eigenvectors belonging to different eigenvalues are orthogonal. That is what makes two different readings perfectly distinguishable, and it is what the spectral theorem two scenes from here is built on.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$A=\\begin{bmatrix}3&1-i\\\\1+i&2\\end{bmatrix}$ is Hermitian.<div class="nsep"></div>Can $A$ have the eigenvalue $2+i$?',
+        ask:{key:'m1-herm', choices:['Yes','No','Only if $A$ is also unitary'], answer:1,
+          why:'Every eigenvalue of a Hermitian operator is real. Here they are $4$ and $1$.'}}]}
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 1.6.2 -- */
+/* ---------------------------------------------------------------- 1.6.3 -- */
 { id:'m1-unit', module:'M1', nav:'Unitary operators', title:'Unitary operators preserve every inner product',
   objective:'Derive the unitarity condition from the requirement that overlaps are preserved.',
   keywords:'unitary inner product preserved norm reversible gate adjoint inverse orthonormal columns',
   src:'L3 · unitary operators', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'Unitary operators preserve every inner product'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Ask for the operators that leave every overlap alone, and the condition writes itself. Apply $U$ to both arguments and move one copy across the inner product:</p>'},
-    {t:'eq', tex:'\\langle Ua|Ub\\rangle = (Ua)^{\\dagger}(Ub) = a^{\\dagger}U^{\\dagger}U\\,b = \\langle a|U^{\\dagger}U|b\\rangle'},
-    {t:'body', html:'<p>For this to equal $\\langle a|b\\rangle$ for <b>every</b> pair of vectors, the operator in the middle must be the identity:</p>'},
-    {t:'eq', key:true, tex:'U^{\\dagger}U = I \\qquad\\Longleftrightarrow\\qquad U^{-1}=U^{\\dagger}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'Three consequences follow at once. Lengths are preserved, so a normalised state stays normalised and the probabilities of Chapter 2 keep adding to one. The operator is invertible, so the evolution is reversible. And the columns of $U$ are an orthonormal basis, which is what $U^{\\dagger}U=I$ says entry by entry.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figUnitCircle(),
-      caption:'What unitarity is, drawn as what it preserves. The teal circle is every state of unit length. A unitary sends that set to itself; a map that is merely invertible sends it to the dashed ellipse, and states that started normalised no longer are.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figUnitCircle(),
+      caption:'The teal circle is every state of unit length. A unitary sends it to itself. A map that is only invertible sends it to the dashed ellipse, and normalised states stop being normalised.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$H=\\tfrac{1}{\\sqrt2}\\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$.'],
-        ['Work', 'Every entry is real and the matrix is symmetric, so $H^{\\dagger}=H$ and the product to check is $H^{2}$.'],
-        ['Answer', '$H^{2}=I$, so $H$ is unitary — and it is its own inverse.'],
-        ['Check', 'Its columns are $|+\\rangle$ and $|-\\rangle$: orthonormal, as the condition requires.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'Determinant one is not enough', html:'The shear $\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ has determinant $1$, but it sends $(0,1)$ to $(1,1)$, of length $\\sqrt2$. Test $U^{\\dagger}U=I$.'}]},
+  ], right:[
+    {t:'eq', label:'Keep every overlap', tex:'\\begin{aligned}\\langle Ua|Ub\\rangle &= (Ua)^{\\dagger}(Ub) \\\\ &= a^{\\dagger}U^{\\dagger}U\\,b = \\langle a|U^{\\dagger}U|b\\rangle\\end{aligned}',
+      note:'For this to equal $\\langle a|b\\rangle$ for every pair, $U^{\\dagger}U$ must be $I$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', key:true, label:'Unitary', tex:'U^{\\dagger}U = I \\qquad\\Longleftrightarrow\\qquad U^{-1}=U^{\\dagger}',
+        note:'Lengths are kept, the map is reversible, and the columns are orthonormal. The Hadamard has $H^{2}=I$: it is unitary and its own inverse.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'A determinant of modulus one is not enough', html:'The matrix $\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ has determinant $1$ and is invertible, and it is not unitary: it sends $(0,1)$ to $(1,1)$, whose length is $\\sqrt2$. Unitarity is a statement about every vector, and the only way to test it is $U^{\\dagger}U=I$.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$U=\\begin{bmatrix}0&i\\\\i&0\\end{bmatrix}$.<div class="nsep"></div>Is $U$ unitary?',
+        ask:{key:'m1-unit', choices:['Yes','No: its entries are imaginary','No: it has no inverse'], answer:0,
+          why:'$U^{\\dagger}=\\begin{bmatrix}0&-i\\\\-i&0\\end{bmatrix}$, and $U^{\\dagger}U=I$.'}}]}
   ]}
 ]},
 
-/* ---------------------------------------------------------------- 1.6.3 -- */
+/* ---------------------------------------------------------------- 1.6.4 -- */
 { id:'m1-gen', module:'M1', nav:'Hermitian generators', title:'A Hermitian generator makes a family of unitaries',
   objective:'Show that the exponential of a Hermitian operator is unitary and derive its closed form for a Pauli.',
   keywords:'generator exponential unitary family pauli series even odd terms closed form cosine sine',
   src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'A Hermitian generator makes a family of unitaries'},
-  {t:'lede', text:'The two kinds of operator this course needs are joined by one construction. Feed a Hermitian operator to an exponential and a unitary comes out, one for every value of a real parameter.'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>If $G$ is Hermitian and $\\theta$ is real, then</p>'},
-    {t:'eq', key:true, tex:'U(\\theta) = e^{-i\\theta G} \\quad\\text{is unitary}'},
-    {t:'body', html:'<p>The check is one line. The adjoint of an exponential is the exponential of the adjoint, and the $-i$ picks up a sign, so $U^{\\dagger}=e^{+i\\theta G^{\\dagger}}=e^{+i\\theta G}$. The two exponentials share a generator, so their exponents add:</p>'},
-    {t:'eq', tex:'U^{\\dagger}U = e^{+i\\theta G}\\,e^{-i\\theta G} = e^{0} = I'},
-    {t:'small', html:'The step that adds the exponents is legal only because the two operators commute, which they do here since both are functions of the same $G$. For two different generators it fails, and that failure is why gate sequences do not simplify the way a reader expects.'}
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figGenerator(),
+      caption:'A real eigenvalue $\\lambda$ of $G$ becomes $e^{-i\\theta\\lambda}$, which has modulus one. Chapter 2 uses the same construction with $\\theta G$ replaced by $Ht$.'}
   ], right:[
+    {t:'eq', key:true, label:'Generator', tex:'U(\\theta) = e^{-i\\theta G} \\quad\\text{is unitary}',
+      note:'For every Hermitian $G$ and every real $\\theta$.'},
     {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>For a Pauli operator the exponential closes in two terms. Use $\\sigma^{2}=I$, which makes every even power the identity and every odd power $\\sigma$ again, and split the series accordingly:</p>'},
-      {t:'eq', tex:'e^{-i\\theta\\sigma/2} = \\sum_{m\\ \\mathrm{even}} \\frac{(-i\\theta/2)^{m}}{m!}\\,I \\;+\\; \\sum_{m\\ \\mathrm{odd}} \\frac{(-i\\theta/2)^{m}}{m!}\\,\\sigma'}
-    ]},
+      {t:'eq', label:'Check', tex:'U^{\\dagger}U = e^{+i\\theta G}\\,e^{-i\\theta G} = e^{0} = I',
+        note:'The exponents may be added because both are functions of the same $G$. For two different generators this step fails.'}]},
     {t:'reveal', at:2, items:[
-      {t:'body', html:'<p>The two sums are the series for a cosine and for a sine, with the argument halved by the $\\tfrac12$ in the exponent:</p>'},
-      {t:'eq', key:true, tex:'e^{-i\\theta\\sigma/2} = \\cos\\!\\left(\\tfrac{\\theta}{2}\\right) I \\;-\\; i\\sin\\!\\left(\\tfrac{\\theta}{2}\\right)\\sigma'}
-    ]},
+      {t:'eq', key:true, label:'Pauli closed form', tex:'e^{-i\\theta\\sigma/2} = \\cos\\!\\left(\\tfrac{\\theta}{2}\\right) I \\;-\\; i\\sin\\!\\left(\\tfrac{\\theta}{2}\\right)\\sigma',
+        note:'$\\sigma^{2}=I$, so the even terms of the series sum to a cosine and the odd terms to a sine.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'Where this is going', html:'Chapter 2 will say that a closed system evolves as $U(t)=e^{-iHt}$ with $H$ the Hamiltonian. None of that is new mathematics: it is this scene, with $\\theta G$ replaced by $Ht$. What Chapter 2 adds is the claim that nature does it.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$\\sigma=X$ and $\\theta=\\pi$.<div class="nsep"></div>What is $e^{-i\\pi X/2}$?',
+        ask:{key:'m1-gen', choices:['$-iX$','$X$','$I$'], answer:0,
+          why:'$\\cos(\\pi/2)=0$ and $\\sin(\\pi/2)=1$, so only $-iX$ is left.'}}]}
   ]}
 ]},
 
@@ -8985,27 +8952,21 @@ const SC = [
   src:'L3 · Hermitian generators produce unitary transformations', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
   {t:'title', text:'The half angle, and what a full turn leaves behind'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>The angle inside the closed form is halved, so the operator repeats only after $\\theta$ has gone round twice. Set $\\theta=2\\pi$ and read it off: the cosine is $-1$, the sine is $0$, and</p>'},
-    {t:'eq', key:true, tex:'e^{-i(2\\pi)\\sigma/2} = -I'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figHalfAngle(),
+      caption:'The two coefficients over two full turns. At $\\theta=2\\pi$ the operator is $-I$; at $\\theta=4\\pi$ it is $I$ again. On one branch of a superposition that $-1$ becomes a relative phase, and Chapter 5 uses it.'},
     {t:'reveal', at:1, items:[
-      {t:'note', kind:'def', head:'The half angle is not a typographic accident', html:'The operator has period $4\\pi$ while the physical state has period $2\\pi$. The two are consistent because the leftover $-1$ is a phase on the <b>whole</b> state, which the second scene of this chapter showed is not physical. So the state does come back after one full turn; the matrix that brought it back is not the identity. Chapter 4 gives this a picture and calls it the double cover.'}
-    ]},
-    {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$\\sigma=Z=\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ and $\\theta=\\pi/3$.'],
-        ['Method', 'Substitute into the closed form; no series and no diagonalisation are needed.'],
-        ['Work', '$\\cos(\\pi/6)=\\tfrac{\\sqrt3}{2}$ and $\\sin(\\pi/6)=\\tfrac12$.'],
-        ['Answer', '$R_{z}(\\pi/3)=\\begin{bmatrix}e^{-i\\pi/6}&0\\\\0&e^{i\\pi/6}\\end{bmatrix}$.'],
-        ['Check', 'Each diagonal entry has modulus one and the matrix is diagonal, so $U^{\\dagger}U=I$. The relative phase between the two entries is $\\pi/3$, which is the $\\theta$ that went in.']
-      ]}
-    ]}
+      {t:'note', kind:'def', head:'Not a typing accident', html:'The operator has period $4\\pi$ and the state has period $2\\pi$. They agree because $-1$ on the whole state is a global phase, which is not physical.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figHalfAngle(),
-      caption:'The two coefficients over two full turns. At $\\theta=2\\pi$ the operator is $-I$ and at $\\theta=4\\pi$ it is the identity again, so the matrix takes twice as long to come home as the state it acts on.'},
+    {t:'eq', key:true, label:'A full turn', tex:'e^{-i(2\\pi)\\sigma/2} = -I',
+      note:'At $\\theta=2\\pi$ the cosine is $-1$ and the sine is $0$.'},
+    {t:'reveal', at:2, items:[
+      {t:'eq', label:'Example', tex:'R_{z}(\\pi/3)=\\begin{bmatrix}e^{-i\\pi/6}&0\\\\0&e^{i\\pi/6}\\end{bmatrix}',
+        note:'Put $\\sigma=Z$, $\\cos(\\pi/6)=\\tfrac{\\sqrt3}{2}$ and $\\sin(\\pi/6)=\\tfrac12$ into the closed form. The relative phase is $\\pi/3$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'Where the extra sign stops being harmless', html:'It is unobservable only while it is global. Apply the rotation to one branch of a larger superposition — one qubit of a controlled operation, for instance — and the $-1$ sits between two terms that will later interfere. Chapter 5 uses exactly that to build a controlled phase out of rotations, and a reader who dismissed the sign here will not be able to follow it.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$\\sigma=Z$ and $\\theta=4\\pi$.<div class="nsep"></div>What is $e^{-i(4\\pi)Z/2}$?',
+        ask:{key:'m1-halfangle', choices:['$-I$','$I$','$iZ$'], answer:1,
+          why:'$\\cos(2\\pi)=1$ and $\\sin(2\\pi)=0$. Two full turns bring the matrix home.'}}]}
   ]}
 ]},
 
@@ -9016,29 +8977,21 @@ const SC = [
   src:'L3 · eigenvectors and eigenvalues', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'Eigenvectors: the directions an operator leaves alone'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>Most vectors are turned by an operator. A few are not: they come back pointing the same way, scaled by a number. Those are its <b>eigenvectors</b>, and the numbers are its <b>eigenvalues</b>:</p>'},
-    {t:'eq', key:true, tex:'A|v\\rangle = \\lambda|v\\rangle, \\qquad |v\\rangle \\ne 0'},
-    {t:'body', html:'<p>Rearranged, $(A-\\lambda I)|v\\rangle=0$ has a non-zero solution only when the matrix in front is not invertible, which happens exactly when its determinant vanishes:</p>'},
-    {t:'eq', tex:'\\det\\left(A-\\lambda I\\right) = 0'},
-    {t:'reveal', at:1, items:[
-      {t:'wex', rows:[
-        ['Given', '$A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$.'],
-        ['Method', 'Write the determinant condition, solve for $\\lambda$, then solve for each $|v\\rangle$.'],
-        ['Work', '$(2-\\lambda)^{2}-1=0$, so $2-\\lambda=\\pm1$.'],
-        ['Answer', '$\\lambda=3$ with $|v\\rangle\\propto(1,1)$, and $\\lambda=1$ with $|v\\rangle\\propto(1,-1)$.'],
-        ['Check', '$A(1,1)=(3,3)$ and $A(1,-1)=(1,-1)$. The eigenvalues also add to the trace, $3+1=4=2+2$.']
-      ]}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figEigen(),
-      caption:'Teal arrows in, red arrows out. Every input leaves its own line except the two dashed directions: along one the operator stretches by three, along the other it does nothing at all.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figEigen(),
+      caption:'Teal arrows in, red arrows out. Every input leaves its own line except along the two dashed directions: along one the operator stretches by three, along the other it does nothing.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'def', head:'An eigenvector is a direction, not a vector', html:'If $|v\\rangle$ works then so does $c|v\\rangle$ for any non-zero complex $c$. Two conventions remove most of the freedom: normalise to length one, and then only a phase is left. For a quantum state that leftover phase is global and unobservable, so an eigenvector really is one physical state.'}
-    ]},
+      {t:'note', kind:'warn', head:'A direction, and the right routine', html:'If $|v\\rangle$ works, so does $c|v\\rangle$; after normalising only a global phase is left. For a Hermitian matrix call <code>np.linalg.eigh</code>, not <code>np.linalg.eig</code>.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Eigenvector', tex:'A|v\\rangle = \\lambda|v\\rangle, \\qquad |v\\rangle \\ne 0',
+      note:'A non-zero solution of $(A-\\lambda I)|v\\rangle=0$ exists only when $\\det(A-\\lambda I)=0$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned} (2-\\lambda)^{2}-1 &= 0 \\\\ \\lambda=3:&\\quad |v\\rangle\\propto(1,1) \\\\ \\lambda=1:&\\quad |v\\rangle\\propto(1,-1) \\end{aligned}',
+        note:'For $A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$. Check: the eigenvalues add to the trace, $3+1=4$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'Which routine to call', html:'For a Hermitian matrix use <code>np.linalg.eigh</code>, which exploits the structure, returns real eigenvalues in order, and gives genuinely orthonormal eigenvectors. The general <code>np.linalg.eig</code> returns tiny imaginary parts on eigenvalues that are known in advance to be real, and eigenvectors that are not orthogonal to machine precision. Choosing the wrong one turns an exact statement into a numerical question.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$A=\\begin{bmatrix}5&0\\\\0&-2\\end{bmatrix}$.<div class="nsep"></div>What are its eigenvalues?',
+        ask:{key:'m1-eig', choices:['$5$ and $-2$','$5$ and $0$','$3$ and $7$'], answer:0,
+          why:'A diagonal matrix leaves $|0\\rangle$ and $|1\\rangle$ on their own lines, so its eigenvalues are the diagonal entries.'}}]}
   ]}
 ]},
 
@@ -9049,29 +9002,22 @@ const SC = [
   src:'L3 · the finite-dimensional spectral theorem', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'The spectral theorem: eigenvalues, and the projectors that belong to them'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A Hermitian operator has an orthonormal basis of eigenvectors. Take the projector onto each eigenspace and weight it by that eigenvalue:</p>'},
-    {t:'eq', key:true, tex:'A = \\sum_{k}\\lambda_{k}P_{k}, \\qquad P_{k}=|v_{k}\\rangle\\langle v_{k}|'},
-    {t:'body', html:'<p>The projectors that appear are not an arbitrary set. They are mutually annihilating, and together they resolve the identity:</p>'},
-    {t:'eq', tex:'P_{j}P_{k} = \\delta_{jk}P_{k}, \\qquad \\sum_{k}P_{k} = I'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The second of these is the resolution of the identity again, now in the eigenbasis of a particular operator. Multiplying it by $A$ on the left and using $AP_{k}=\\lambda_{k}P_{k}$ is one way to derive the decomposition rather than assert it.'}
-    ]}
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figSpectral(),
+      caption:'An operator taken apart into eigenvalues and projectors, and put back together exactly. In Chapter 2 each projector becomes one outcome of a measurement.'}
   ], right:[
-    {t:'fig', frame:true, svg:()=>figSpectral(),
-      caption:'An operator, taken apart. Each eigenvalue is a number and each projector is an operator, and the sum of the products is the operator back again. Nothing has been approximated; the two sides are equal.'},
+    {t:'eq', key:true, label:'Spectral decomposition', tex:'A = \\sum_{k}\\lambda_{k}P_{k}, \\qquad P_{k}=|v_{k}\\rangle\\langle v_{k}|',
+      note:'A Hermitian operator has an orthonormal eigenbasis; weight each projector by its eigenvalue.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'The projectors', tex:'P_{j}P_{k} = \\delta_{jk}P_{k}, \\qquad \\sum_{k}P_{k} = I',
+        note:'They annihilate each other, and together they resolve the identity.'}]},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$, with $\\lambda=3$ on $|+\\rangle$ and $\\lambda=1$ on $|-\\rangle$.'],
-        ['Method', 'Build the two projectors, weight them, and add.'],
-        ['Work', '$|+\\rangle\\langle+| = \\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$ and $|-\\rangle\\langle-| = \\tfrac12\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}$.'],
-        ['Answer', '$3\\cdot\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} + 1\\cdot\\tfrac12\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$.'],
-        ['Check', 'The two projectors add to $\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$, and their product is the zero matrix, as $P_{j}P_{k}=\\delta_{jk}P_{k}$ requires.']
-      ]}
-    ]},
+      {t:'eq', label:'Example', tex:'3\\cdot\\tfrac12\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} + 1\\cdot\\tfrac12\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}',
+        note:'$\\lambda=3$ on $|+\\rangle$ and $\\lambda=1$ on $|-\\rangle$, the eigenvectors of the last scene.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'ok', head:'This is the shape of every measurement in Chapter 2', html:'A projective measurement of an observable $A$ has one outcome per eigenvalue $\\lambda_{k}$, and the projector $P_{k}$ decides both how likely that outcome is and what the state becomes afterwards. The decomposition above is not a computational trick; it is the statement of what an observable is.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$A=4P_{+}-P_{-}$, with $P_{\\pm}=|\\pm\\rangle\\langle\\pm|$.<div class="nsep"></div>What are the eigenvalues of $A$?',
+        ask:{key:'m1-spectral', choices:['$4$ and $-1$','$4$ and $1$','$3$ and $5$'], answer:0,
+          why:'In a spectral decomposition the weights of the projectors are the eigenvalues.'}}]}
   ]}
 ]},
 
@@ -9079,33 +9025,24 @@ const SC = [
 { id:'m1-fofa', module:'M1', nav:'Functions of an operator', title:'A function of an operator acts on its eigenvalues',
   objective:'Evaluate a function of a Hermitian operator through its spectral decomposition.',
   keywords:'operator function exponential spectral eigenvalues matrix exponential not elementwise square root',
-  src:'L3 · spectral projectors and functions of an operator', steps:4, slide:true, blocks:[
+  src:'L3 · spectral projectors and functions of an operator', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
   {t:'title', text:'A function of an operator acts on its eigenvalues'},
-  {t:'cols', ratio:'c-7-5', vcenter:true, left:[
-    {t:'body', html:'<p>Once an operator is written as eigenvalues times projectors, a function of it means one thing only: apply the function to the eigenvalues and leave the projectors alone.</p>'},
-    {t:'eq', key:true, tex:'f(A) = \\sum_{k} f(\\lambda_{k})\\,P_{k}'},
-    {t:'reveal', at:1, items:[
-      {t:'body', html:'<p>The definition agrees with the obvious one wherever the obvious one exists. For a power, $A^{2}=\\sum_{j,k}\\lambda_{j}\\lambda_{k}P_{j}P_{k}$, and $P_{j}P_{k}=\\delta_{jk}P_{k}$ collapses the double sum to $\\sum_{k}\\lambda_{k}^{2}P_{k}$. Every power therefore follows the rule, so every power series does — which is why the definition may be used for functions with no series at all, such as a square root.</p>'}
-    ]},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figFunction(),
+      caption:'The exponential acts on the eigenvalues. Each eigenvalue on the real axis goes to a point of modulus one at angle $-\\lambda t$. The projectors do not move.'},
     {t:'reveal', at:2, items:[
-      {t:'body', html:'<p>The case this course needs constantly is the exponential. With $A=\\sum_{k}\\lambda_{k}P_{k}$,</p>'},
-      {t:'eq', key:true, tex:'e^{-iAt} = \\sum_{k} e^{-i\\lambda_{k}t}\\,P_{k}'}
-    ]},
-    {t:'reveal', at:4, items:[
-      {t:'note', kind:'err', head:'The mistake this scene exists to stop', html:'$e^{A}$ is <b>not</b> the matrix of $e^{A_{jk}}$. Entry by entry, $A$ above would give $\\begin{bmatrix}e^{2}&e\\\\e&e^{2}\\end{bmatrix}$, with eigenvalues $e^{2}\\pm e$; the correct answer has $e^{3}$ and $e^{1}$. The two agree only for a diagonal matrix, so checking on one teaches the wrong lesson.'}
-    ]}
+      {t:'note', kind:'err', head:'Not entry by entry', html:'$e^{A}$ is not the matrix of $e^{A_{jk}}$. For the $A$ above that gives $\\begin{bmatrix}e^{2}&e\\\\e&e^{2}\\end{bmatrix}$, with eigenvalues $e^{2}\\pm e$; the correct ones are $e^{3}$ and $e^{1}$.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figFunction(),
-      caption:'The exponential, drawn on the eigenvalues it acts on. Each eigenvalue sits on the real axis; the map sends it to a point of unit modulus at angle $-\\lambda t$. The projectors do not move, so the operator is fully described by two points on a circle.'},
+    {t:'eq', key:true, label:'Function of an operator', tex:'f(A) = \\sum_{k} f(\\lambda_{k})\\,P_{k}',
+      note:'Apply $f$ to the eigenvalues and keep the projectors. For a power this follows from $P_{j}P_{k}=\\delta_{jk}P_{k}$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', key:true, label:'The exponential', tex:'e^{-iAt} = \\sum_{k} e^{-i\\lambda_{k}t}\\,P_{k}',
+        note:'For $A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$: $e^{-iAt}=e^{-3it}P_{+}+e^{-it}P_{-}$, unitary at every $t$.'}]},
     {t:'reveal', at:3, items:[
-      {t:'wex', rows:[
-        ['Given', '$A=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$ again, with eigenvalues $3$ on $|+\\rangle$ and $1$ on $|-\\rangle$.'],
-        ['Method', 'Exponentiate each eigenvalue; keep the projectors.'],
-        ['Answer', '$e^{-iAt} = e^{-3it}\\,|+\\rangle\\langle+| \\;+\\; e^{-it}\\,|-\\rangle\\langle-|$.'],
-        ['Check', 'At $t=0$ both factors are one and the sum is $P_{+}+P_{-}=I$. Each factor has modulus one at every $t$, so the result is unitary, which it must be because $A$ is Hermitian.']
-      ]}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$A=4P_{+}+9P_{-}$.<div class="nsep"></div>What is $\\sqrt{A}$?',
+        ask:{key:'m1-fofa', choices:['$2P_{+}+3P_{-}$','$\\sqrt{13}\\,I$','$4P_{+}+9P_{-}$'], answer:0,
+          why:'The square root acts on the eigenvalues $4$ and $9$ and keeps the projectors.'}}]}
   ]}
 ]},
 
@@ -9116,30 +9053,21 @@ const SC = [
   src:'L3 · Dirac notation', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Dirac notation'},
   {t:'title', text:'Dirac notation is a way of writing what is already there'},
-  {t:'lede', text:'Nothing in this chapter needed the notation. Every result was a statement about columns, rows and matrices, and could have been written that way throughout. The notation earns its place because it says which object is which without naming a basis, and because the shapes then check themselves.'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'wex', rows:[
-      ['$|\\psi\\rangle$', 'A column of $n$ complex numbers, once a basis is chosen.'],
-      ['$\\langle\\psi|$', 'The same column, conjugated and laid on its side: a row.'],
-      ['$\\langle\\phi|\\psi\\rangle$', 'Row times column: one complex number.'],
-      ['$|\\phi\\rangle\\langle\\psi|$', 'Column times row: an $n\\times n$ operator.'],
-      ['$A|\\psi\\rangle$', 'Matrix times column: another column, another state.'],
-      ['$\\langle\\psi|A|\\psi\\rangle$', 'Row times matrix times column: one number, the expectation value of Chapter 2.']
-    ]},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figShapes(),
+      caption:'The shapes are the check. A line of algebra that gives a number where an operator was expected has an inner product where an outer product belonged.'},
     {t:'reveal', at:1, items:[
-      {t:'note', kind:'def', head:'How to read a product', html:'A matrix product acts on a ket from the right, so the operator written <b>last</b> in a product is applied <b>first</b>. The circuit $H$ then $R_{z}$ then $H$ of Chapter 0 is the operator $H R_{z} H$, read right to left. Circuit diagrams run left to right and algebra runs right to left, and the two are not in conflict — they are two orders for the same sequence.'}
-    ]}
+      {t:'note', kind:'def', head:'Read a product right to left', html:'The operator written last acts first. The circuit $H$, then $R_{z}$, then $H$ is the operator $HR_{z}H$.'}]},
   ], right:[
-    {t:'fig', frame:true, svg:()=>figShapes(),
-      caption:'The shapes again, because they are the check. A line of algebra that produces a number where an operator was expected has an inner product where an outer product belonged, and counting rows and columns finds it faster than reading the symbols does.'},
+    {t:'eq', tex:'\\begin{array}{ll} |\\psi\\rangle & \\text{a column, } n\\times 1 \\\\ \\langle\\phi|\\psi\\rangle & \\text{row times column: a number} \\\\ |\\phi\\rangle\\langle\\psi| & \\text{column times row: an } n\\times n \\text{ operator} \\\\ \\langle\\psi|A|\\psi\\rangle & \\text{row, matrix, column: a number} \\end{array}',
+      note:'Each symbol is an array once a basis is chosen. The last line is the expectation value of Chapter 2.'},
     {t:'reveal', at:2, items:[
-      {t:'body', html:'<p>An operator can also be written entirely in the notation, with no matrix anywhere. Insert the identity on both sides:</p>'},
-      {t:'eq', tex:'A = I\\,A\\,I = \\sum_{j,k} |e_{j}\\rangle\\,\\langle e_{j}|A|e_{k}\\rangle\\,\\langle e_{k}|'},
-      {t:'small', html:'The number $\\langle e_{j}|A|e_{k}\\rangle$ is the matrix entry $A_{jk}$. So the matrix is not a different object from the operator: it is the operator, read in a basis, and the notation says which basis was used.'}
-    ]},
+      {t:'eq', label:'An operator in the notation', tex:'A = I\\,A\\,I = \\sum_{j,k} |e_{j}\\rangle\\,\\langle e_{j}|A|e_{k}\\rangle\\,\\langle e_{k}|',
+        note:'The number $\\langle e_{j}|A|e_{k}\\rangle$ is the matrix entry $A_{jk}$: the matrix is the operator read in a basis.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'One symbol, two jobs', html:'$H$ is the Hadamard gate and $H$ is a Hamiltonian, and this course uses both. They are told apart by where they stand: a gate acts in a circuit or on a ket, a Hamiltonian sits inside an exponential. Where a scene could be read either way it says which is meant, and the notation panel repeats both entries.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$|\\phi\\rangle$ and $|\\psi\\rangle$ are columns and $A$ is a matrix.<div class="nsep"></div>What is $A|\\psi\\rangle\\langle\\phi|$?',
+        ask:{key:'m1-dirac', choices:['A number','A column','A matrix'], answer:2,
+          why:'Matrix times column is a column, and a column times a row is an $n\\times n$ matrix.'}}]}
   ]}
 ]},
 
@@ -9150,26 +9078,21 @@ const SC = [
   src:'L4 · square-integrable functions as vectors', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'A wavefunction is a vector with a continuous index'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>A column labels its entries by an integer. A function labels them by a continuous coordinate. The vector-space rules stay the same, but the sum in the inner product becomes an integral:</p>'},
-    {t:'eq', key:true, tex:'\\langle f|g\\rangle = \\int_{a}^{b} f^{*}(x)\\,g(x)\\,\\mathrm{d}x, \\qquad \\|f\\|^{2}=\\int_{a}^{b}|f(x)|^{2}\\,\\mathrm{d}x'},
-    {t:'reveal', at:1, items:[
-      {t:'note', kind:'def', head:'The space $L^{2}[a,b]$', html:'A function belongs to $L^{2}[a,b]$ when its squared modulus has a finite integral. That condition gives the function a finite norm, so it can be normalised and used as a state. Addition and multiplication by complex numbers work exactly as they do for columns.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figFunctionVector(),
-      caption:'Two normalised functions on $[-\\pi,\\pi]$: $\\sin x/\\sqrt\\pi$ and $\\cos x/\\sqrt\\pi$. Their inner product is zero, so they are orthogonal vectors even though their curves cross many times.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figFunctionVector(),
+      caption:'Two normalised functions on $[-\\pi,\\pi]$: $\\sin x/\\sqrt\\pi$ and $\\cos x/\\sqrt\\pi$. Their inner product is zero, so they are orthogonal vectors, although their curves cross.'},
     {t:'reveal', at:2, items:[
-      {t:'wex', rows:[
-        ['Given', '$u(x)=\\sin x/\\sqrt\\pi$ and $v(x)=\\cos x/\\sqrt\\pi$ on $[-\\pi,\\pi]$.'],
-        ['Work', '$\\langle u|v\\rangle=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin x\\cos x\\,\\mathrm dx=0$. Also $\\|u\\|^{2}=\\pi^{-1}\\int_{-\\pi}^{\\pi}\\sin^{2}x\\,\\mathrm dx=1$.'],
-        ['Answer', '$u$ and $v$ are orthonormal vectors in a function space.'],
-        ['Check', 'The product is odd on a symmetric interval, so its integral must vanish.']
-      ]}
-    ]},
+      {t:'note', kind:'err', head:'Finite at every point is not enough', html:'A function can be finite at each point and still have an infinite squared norm on an unbounded interval. The integral of $|f|^{2}$ decides membership.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Inner product of functions', tex:'\\langle f|g\\rangle = \\int_{a}^{b} f^{*}(x)\\,g(x)\\,\\mathrm{d}x, \\qquad \\|f\\|^{2}=\\int_{a}^{b}|f(x)|^{2}\\,\\mathrm{d}x',
+      note:'The sum over entries becomes an integral. A function whose $\\|f\\|^{2}$ is finite belongs to $L^{2}[a,b]$ and can be normalised and used as a state.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Example', tex:'\\begin{aligned}\\langle u|v\\rangle &= \\tfrac{1}{\\pi}\\int_{-\\pi}^{\\pi}\\sin x\\cos x\\,\\mathrm{d}x = 0 \\\\ \\|u\\|^{2} &= \\tfrac{1}{\\pi}\\int_{-\\pi}^{\\pi}\\sin^{2}x\\,\\mathrm{d}x = 1\\end{aligned}',
+        note:'The product $\\sin x\\cos x$ is odd on a symmetric interval, so its integral vanishes.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'err', head:'Finite at every point is not enough', html:'A function can have a finite value at each point and still have an infinite squared norm over an unbounded interval. Membership in the state space is decided by the integral of $|f|^{2}$, not by inspecting the height of the curve.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$f(x)=1$ on $[0,4]$.<div class="nsep"></div>What is $\\|f\\|$?',
+        ask:{key:'m1-wavefunctions', choices:['$4$','$2$','$16$'], answer:1,
+          why:'$\\|f\\|^{2}=\\int_{0}^{4}1\\,\\mathrm{d}x=4$, so $\\|f\\|=2$.'}}]}
   ]}
 ]},
 
@@ -9180,22 +9103,21 @@ const SC = [
   src:'L4 · completeness and Parseval; Fourier expansion as a change of basis', steps:3, slide:true, blocks:[
   {t:'eyebrow', text:'Module 1 · Function spaces'},
   {t:'title', text:'Completeness turns a function into coefficients and measures what truncation loses'},
-  {t:'cols', ratio:'c-6-6', vcenter:true, left:[
-    {t:'body', html:'<p>An orthonormal family is complete when no non-zero vector is orthogonal to every member. Then every function in the space is recovered from its inner products with the basis:</p>'},
-    {t:'eq', key:true, tex:'|f\\rangle=\\sum_{n=1}^{\\infty}c_{n}|u_{n}\\rangle, \\qquad c_{n}=\\langle u_{n}|f\\rangle'},
-    {t:'eq', tex:'\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_{n}|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_{n}u_{n}\\right\\|^{2}=\\sum_{n>N}|c_{n}|^{2}'},
-    {t:'reveal', at:1, items:[
-      {t:'small', html:'The first equality is Parseval identity. The second makes a numerical promise: the coefficient tail is exactly the squared error of the truncated approximation. It is not an informal sign that later terms look small.'}
-    ]}
-  ], right:[
-    {t:'fig', frame:true, svg:()=>figParseval(),
-      caption:'A coefficient spectrum with the first four terms retained. Parseval says the total bar height is the squared norm; the bars to the right of the dashed line add to the squared truncation error.'},
+  {t:'cols', ratio:'c-5-7', fill:true, left:[
+    {t:'fig', frame:true, grow:true, svg:()=>figParseval(),
+      caption:'A coefficient spectrum with the first four terms kept. The bars add to the squared norm; the bars right of the dashed line add to the squared truncation error. Sines and cosines on an interval are one such basis.'},
     {t:'reveal', at:2, items:[
-      {t:'note', kind:'def', head:'Fourier expansion is one basis choice', html:'On a finite interval, the constant, sine and cosine functions form an orthonormal basis after normalisation. Multiplying an expansion by one basis function and integrating isolates its coefficient, just as multiplying a column by a basis bra selects one entry.'}
-    ]},
+      {t:'note', kind:'warn', head:'Norm convergence is not pointwise', html:'Parseval controls the integrated error. It does not say that every point of the curve approaches the target at the same rate.'}]},
+  ], right:[
+    {t:'eq', key:true, label:'Expansion', tex:'|f\\rangle=\\sum_{n=1}^{\\infty}c_{n}|u_{n}\\rangle, \\qquad c_{n}=\\langle u_{n}|f\\rangle',
+      note:'The family is complete: no non-zero vector is orthogonal to every $u_{n}$.'},
+    {t:'reveal', at:1, items:[
+      {t:'eq', label:'Parseval and the tail', tex:'\\|f\\|^{2}=\\sum_{n=1}^{\\infty}|c_{n}|^{2}, \\qquad \\left\\|f-\\sum_{n=1}^{N}c_{n}u_{n}\\right\\|^{2}=\\sum_{n>N}|c_{n}|^{2}',
+        note:'The coefficient tail is exactly the squared error of the truncated expansion.'}]},
     {t:'reveal', at:3, items:[
-      {t:'note', kind:'warn', head:'Norm convergence is not pointwise convergence', html:'A Fourier approximation can converge in squared norm while behaving poorly at selected points. Parseval controls the integrated error. It does not state that every plotted point approaches the target at the same rate.'}
-    ]}
+      {t:'note', kind:'def', head:'Given', html:'$|c_{1}|^{2}=0.5$, $|c_{2}|^{2}=0.3$, $|c_{3}|^{2}=0.2$, and every other $c_{n}$ is $0$. Keep the first two terms.<div class="nsep"></div>What is the squared error?',
+        ask:{key:'m1-completeness', choices:['$0.2$','$0.8$','$0.5$'], answer:0,
+          why:'The squared error is the sum of the omitted $|c_{n}|^{2}$, here only $|c_{3}|^{2}$.'}}]}
   ]}
 ]},
 

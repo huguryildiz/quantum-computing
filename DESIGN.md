@@ -213,18 +213,21 @@ uppercased by the style sheet, so Greek letters and TeX macros never go in it.
 The fixed 1920×1080 stage, scaled to the window; `fitScene()` and its floor; the fit rule that a
 scene needing below about 0.90 is split. These are the reference's.
 
-### Slides — the conversion is owed
+### Slides — Module 1 converted, Modules 2 to 6 owed
 
 Every scene carries `slide:true` except the title, the chapter openings, the summaries, the
 question-type pages (`m*-shapes`) and the practice questions. That is the reference's rule.
 
 The reference converted each module by rewriting its scenes into two columns in the ratio 5:7
 (`{t:'cols', ratio:'c-5-7', fill:true, …}`): the framed figure and its caption on the left, two to
-four tabbed cards on the right. That conversion is not done here yet, because it changes content: the
-scenes keep their blocks, their prose and their order. The consequence is recorded, not hidden: at the
-slide type sizes many scenes fit only below 0.90, and `build/qa.js` lists them under `dense` (96 of
-178 on 2026-09-26). Converting the modules, one at a time, is the next piece of work; `TODO.md` holds
-its state.
+four tabbed cards on the right. Module 1 was converted this way on 2026-09-26: its 21 teaching slides
+each carry one figure, two to four cards and a prediction card (`note.ask`, head **Given**), and every
+number a prediction states has a PASS line in `verify/verify_scenes.py`. A worked example became one
+labelled `Example` equation, and the card the right column had no room for sits under the figure. A
+box diagram cannot stretch like a plot, so `growBlocks()` in `82_scenes_m1.js` centres it in the
+taller frame when the slide grows its figure. The two laboratories keep their layout; Laboratory A
+still fits only at 0.82 and waits for the laboratory pass. Modules 2 to 6 are not converted yet and
+`build/qa.js` still lists many of their scenes under `dense`; `TODO.md` holds the state.
 
 ### Phone and portrait tablet — REFERENCE
 
