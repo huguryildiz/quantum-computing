@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run every program on a code page (build/src/7?_code_m*.js) in both of its
+"""Run every program on a code page (build/src/7*_code_m*.js) in both of its
 forms, the Qiskit listing and the NumPy version, and compare what each prints
 with the entry's `out`.
 
@@ -11,7 +11,7 @@ Optional arguments name key prefixes; only those entries are run."""
 import glob, json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FILES = sorted(glob.glob(os.path.join(ROOT, 'build', 'src', '7?_code_m*.js')))
+FILES = sorted(glob.glob(os.path.join(ROOT, 'build', 'src', '7*_code_m*.js')))
 
 def load(path):
     js = ("const fs=require('fs');const src=fs.readFileSync(process.argv[1],'utf8');"

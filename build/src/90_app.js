@@ -347,7 +347,7 @@ const RENDER = (() => {
   }
 
   /* ---------- code: programs in MATLAB and Python ----------
-     The programs live in build/src/7?_code_m*.js, one entry a program. Each
+     The programs live in build/src/7*_code_m*.js, one entry a program. Each
      section closes with a code page (a scene `*-code-*`) that pages through
      its programs one at a time, as the practice questions do. `title`,
      `what` and `try` go through md(); the code is plain text. The chosen language is kept on the device; the program on show,

@@ -3,7 +3,7 @@ const SRC = path.join(__dirname,'src');
 const read = f => fs.readFileSync(path.join(SRC,f),'utf8');
 
 const jsFiles = ['30_katex.js','60_plot.js','80_content_core.js','40_core.js','70_labs.js','90_app.js']
-  .concat(fs.readdirSync(SRC).filter(f=>/^[78][1-9]_|^9[1-9]_/.test(f) && f.endsWith('.js')).sort());
+  .concat(fs.readdirSync(SRC).filter(f=>/^[78][1-9][a-z]?_|^9[1-9]_/.test(f) && f.endsWith('.js')).sort());
 
 /* `assets/icon.svg` is the only copy of the mark. It reaches the page twice — as the
    favicon, where it has to be a URL-encoded data URI, and as the header logo,

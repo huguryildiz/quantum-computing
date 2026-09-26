@@ -43,4 +43,4 @@ jobs:
 
       - name: Text rules
         run: |
-          python tools/rule_check.py "build/src/8[1-9]_scenes*.js" "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7[0-9]_code*.js" "notes/src/*.js" "web/index.html"
+          python tools/rule_check.py "build/src/8[1-9]_scenes*.js" "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7*_code*.js" "notes/src/*.js" "web/index.html"

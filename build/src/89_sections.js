@@ -139,16 +139,16 @@ CONTENT.SECTIONS = {
   M4: [
     { n:'4.0', title:'Opening',                           ids:['m4-open'] },
     { n:'4.1', title:'The Bloch sphere',                  ids:[
-        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover'] },
+        'm4-sphere','m4-cardinal','m4-overlap','m4-glob','m4-cover','m4-code-sphere'] },
     { n:'4.2', title:'Single-qubit gates as rotations',   ids:[
-        'm4-rot','m4-pauli','m4-had','m4-phase'] },
+        'm4-rot','m4-pauli','m4-had','m4-phase','m4-code-rotations'] },
     { n:'4.3', title:'Composing gates',                   ids:[
-        'm4-time','m4-euler','m4-ugate','m4-lab-g'] },
-    { n:'4.4', title:'Reversible embeddings',             ids:['m4-rev','m4-toffoli'] },
+        'm4-time','m4-euler','m4-ugate','m4-lab-g','m4-code-compose'] },
+    { n:'4.4', title:'Reversible embeddings',             ids:['m4-rev','m4-toffoli','m4-code-reversible'] },
     { n:'4.5', title:'Two-qubit gates',                   ids:[
-        'm4-order','m4-cnot','m4-cz','m4-swap'] },
-    { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h'] },
-    { n:'4.7', title:'Universality',                      ids:['m4-univ'] },
+        'm4-order','m4-cnot','m4-cz','m4-swap','m4-code-twoqubit'] },
+    { n:'4.6', title:'Entanglement from a gate',          ids:['m4-entangle','m4-lab-h','m4-code-entangle'] },
+    { n:'4.7', title:'Universality',                      ids:['m4-univ','m4-code-univ'] },
     { n:'4.8', title:'Summary and practice',              ids:['m4-synth','m4-shapes'] }
   ],
 
@@ -402,6 +402,17 @@ CONTENT.BOOK = {
   'm4-swap':'1.3.4',
   'm4-entangle':'1.3.6',
   'm4-univ':'4.5',
+  /* The code pages take the anchor most scenes of their section carry. 4.3
+     takes 4.2 from `m4-euler`, since `m4-time` has 1.3.4 and `m4-ugate` has
+     none. 4.5 carries four different anchors, one a scene; its code page
+     takes the first, 2.2.8, because it opens on the ordering convention. */
+  'm4-code-sphere':'1.2',
+  'm4-code-rotations':'4.2',
+  'm4-code-compose':'4.2',
+  'm4-code-reversible':'3.2.5',
+  'm4-code-twoqubit':'2.2.8',
+  'm4-code-entangle':'1.3.6',
+  'm4-code-univ':'4.5',
 
   /* Chapter 5 rests on three places in the book and one of them is a surprise.
      The circuit notation is 1.3.4 and the model as a whole is 4.6, which is

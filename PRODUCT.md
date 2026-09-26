@@ -17,7 +17,7 @@ room and needs each scene to work as a lecture slide.
 ## Product Purpose
 
 A first course in quantum computing in four documents built from one set of sources: the interactive
-artifact (202 scenes, 11 laboratories, 120 practice questions with worked solutions), the lecture
+artifact (209 scenes, 11 laboratories, 120 practice questions with worked solutions), the lecture
 notes, the student workbook, and the formula reference. It is published as a static site behind a
 cover page at https://quantum-computing-tedu.vercel.app.
 

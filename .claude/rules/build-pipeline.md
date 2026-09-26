@@ -72,7 +72,7 @@ cd build && node pw.js mathscan.js           # SCENES WITH MATH DAMAGE: 0 / N
 cd build && node pw.js labwalk.js            # PROBLEMS: none
 cd build && node pw.js seccheck.js           # PROBLEMS: none
 .venv/bin/python tools/rule_check.py "build/src/8[1-9]_scenes*.js" \
-  "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7[0-9]_code*.js" \
+  "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7*_code*.js" \
   "notes/src/*.js" "web/index.html"
 .venv/bin/python verify/verify_scenes.py     # N passed, 0 failed
 .venv/bin/python verify/verify_drills.py     # N passed, 0 failed
