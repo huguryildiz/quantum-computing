@@ -261,9 +261,14 @@ stroked circle.
 
 Cards, card tones, title icons, equations, worked examples, the drill pager with its typed question
 number, the question-id pill and worked solutions as cards are the reference's (its `DESIGN.md`,
-*Components*). The prediction card, sliders, frames, sound, sketch, the recall deck and code pages are
+*Components*). The prediction card and code pages are used (Module 1). Sliders, frames, sound, sketch and the recall deck are
 present in the renderer and unused by this course's content; a scene opts into one by the fields the
 reference documents.
+
+A code page here has two tabs, **Qiskit** and **NumPy**, where the reference has MATLAB and Python.
+Qiskit does not run in the browser (it is not a Pyodide package), so the Qiskit tab offers Copy and
+the NumPy tab, which prints the same lines, runs on the page. `CODE_LANGS` in `build/src/90_app.js`
+is the course-specific part; the rest of the code page is the reference's.
 
 Two blocks are this course's own: `drilltypes`, the question-type grid on the `m*-shapes` pages, and
 the question type carried in the question id.

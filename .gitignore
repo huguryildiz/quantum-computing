@@ -80,3 +80,8 @@ site/
 
 # Working TODO: local working document, not tracked.
 TODO.md
+
+# web/pyodide.js keeps the fetched Python runtime here between builds.
+web/.cache/
+# Qiskit, installed only to run verify/code_check.py on the Qiskit listings.
+.venv-qiskit/

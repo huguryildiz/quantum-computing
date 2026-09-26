@@ -38,6 +38,9 @@ jobs:
           python verify/verify_drills.py
           python -m pytest verify/ .claude/hooks/ -q
 
+      - name: Code pages (NumPy half; the Qiskit half runs locally)
+        run: python verify/code_check.py
+
       - name: Text rules
         run: |
-          python tools/rule_check.py "build/src/8[1-9]_scenes*.js" "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "notes/src/*.js" "web/index.html"
+          python tools/rule_check.py "build/src/8[1-9]_scenes*.js" "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7[0-9]_code*.js" "notes/src/*.js" "web/index.html"

@@ -102,3 +102,17 @@ The ones that get broken:
 - The numerical gates in `verify/` are written independently of the artifact. Porting the
   artifact's own arithmetic into the gate makes the gate verify itself.
 - Commit sources and any rebuilt `dist/` file together, never in separate commits.
+
+## Code pages
+
+- Every teaching section closes with a code page, after its laboratory if it has one. The scene id
+  is `m<N>-code-<name>`, which takes the address `<section>.C`; list it last in its section in
+  `CONTENT.SECTIONS` and give it a `CONTENT.BOOK` anchor. Module 1 (`build/src/77_code_m1.js`) is the
+  model.
+- A page holds three to five programs. Each is written twice: `qk`, a Qiskit listing that uses
+  `qiskit.quantum_info` and the circuit library, and `py`, a NumPy-only version that runs in the
+  browser. Both print the same lines, which are the entry's `out`. Each has a `title`, one or two
+  sentences of `what`, and a `try` that asks the reader to change one thing and predict the result.
+- A program works its section's own states and numbers, keeps the course's qubit order (Qiskit's
+  `a.tensor(b)` and `Statevector.from_label('10')` already follow `|q1 q0>`), and is 10 to 21 lines.
+- Every entry passes `verify/code_check.py` in both forms before delivery.

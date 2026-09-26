@@ -629,6 +629,16 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-inner', module:'M1', nav:'Code · The inner product', title:'The inner product in code',
+  objective:'Normalise a state, take an inner product with the conjugate in place, and read coefficients in a basis.',
+  keywords:'code qiskit numpy program statevector inner product normalise conjugate basis coefficient run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Vectors, dual vectors and the inner product'},
+  {t:'title', text:'The inner product in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-inner')}
+]},
+
 /* ---------------------------------------------------------------- 1.2.1 -- */
 { id:'m1-amp', module:'M1', nav:'Modulus and phase', title:'What a complex amplitude carries: a size and an angle',
   objective:'Split a complex amplitude into modulus and phase and compute both without losing the quadrant.',
@@ -689,6 +699,16 @@ const SC = [
   {t:'body', html:'<p>The state is $|\\psi\\rangle = e^{i\\gamma}\\left[\\cos(\\theta/2)|0\\rangle + e^{i\\varphi}\\sin(\\theta/2)|1\\rangle\\right]$. Three controls set the mixing angle $\\theta$, the relative phase $\\varphi$ and the global phase $\\gamma$. The left plot draws the two amplitudes in the complex plane; the right one gives the outcome probabilities in the computational basis and in the $X$ basis, which is the basis a Hadamard measures in.</p>'},
   {t:'small', html:'One of the three controls changes nothing at all, and finding out which is the exercise. Move each one in turn and watch the two probability panels rather than the arrows.'},
   {t:'lab', id:'A'}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-phase', module:'M1', nav:'Code · Amplitude and phase', title:'Amplitude and phase in code',
+  objective:'Split an amplitude into modulus and phase, show that a global phase changes nothing, and read a relative phase with a Hadamard.',
+  keywords:'code qiskit numpy program phase global relative hadamard angle atan2 run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Amplitude, phase and interference'},
+  {t:'title', text:'Amplitude and phase in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-phase')}
 ]},
 
 /* ---------------------------------------------------------------- 1.3.1 -- */
@@ -766,6 +786,16 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-proj', module:'M1', nav:'Code · Outer products and projectors', title:'Outer products and projectors in code',
+  objective:'Build an outer product, split a state with a projector, and insert the resolution of the identity.',
+  keywords:'code qiskit numpy program outer product projector resolution identity run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Outer products and projectors'},
+  {t:'title', text:'Outer products and projectors in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-proj')}
+]},
+
 /* ---------------------------------------------------------------- 1.4.1 -- */
 { id:'m1-gs', module:'M1', nav:'Gram-Schmidt', title:'Gram-Schmidt: making an orthonormal basis out of what you have',
   objective:'Run the Gram-Schmidt recursion by hand and say what makes it fail numerically.',
@@ -800,6 +830,16 @@ const SC = [
   {t:'title', text:'Laboratory B · Gram-Schmidt, one step at a time'},
   {t:'small', html:'Three vectors in space. One control sets the angle between the first two, one sets the height of the third above their plane, both over nine decades. The step control runs the recursion one vector at a time: amber is the piece being removed, green is the orthonormal set so far. The right-hand plot counts how many digits of $\\langle e_{i}|e_{j}\\rangle=\\delta_{ij}$ survive, for the recursion of the last scene and for the <b>modified</b> one, which subtracts each projection from what is left rather than from the original vector. Bring both controls down together and watch the two part company.'},
   {t:'lab', id:'B'}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-gs', module:'M1', nav:'Code · Gram-Schmidt', title:'Gram-Schmidt in code',
+  objective:'Run Gram-Schmidt by hand, compare it with QR, and watch the classical recursion lose orthogonality.',
+  keywords:'code qiskit numpy program gram schmidt qr modified orthonormal run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Building an orthonormal basis'},
+  {t:'title', text:'Gram-Schmidt in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-gs')}
 ]},
 
 /* ---------------------------------------------------------------- 1.5.1 -- */
@@ -848,6 +888,16 @@ const SC = [
         ask:{key:'m1-expo', choices:['$40$','$400$','$1\\,048\\,576$'], answer:2,
           why:'$2^{20}=1\\,048\\,576$. The dimensions multiply; they do not add.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-tensor', module:'M1', nav:'Code · The tensor product', title:'The tensor product in code',
+  objective:'Form tensor products of states and operators in the course bit order and count the amplitudes of a register.',
+  keywords:'code qiskit numpy program tensor kron bit order register dimension run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · The tensor product'},
+  {t:'title', text:'The tensor product in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-tensor')}
 ]},
 
 /* ---------------------------------------------------------------- 1.6.1 -- */
@@ -977,6 +1027,16 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-herm', module:'M1', nav:'Code · Hermitian and unitary operators', title:'Hermitian and unitary operators in code',
+  objective:'Test for Hermiticity and unitarity, and build a rotation from its Hermitian generator.',
+  keywords:'code qiskit numpy program adjoint hermitian unitary generator rotation rx run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Hermitian and unitary operators'},
+  {t:'title', text:'Hermitian and unitary operators in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-herm')}
+]},
+
 /* ---------------------------------------------------------------- 1.7.1 -- */
 { id:'m1-eig', module:'M1', nav:'Eigenvectors', title:'Eigenvectors: the directions an operator leaves alone',
   objective:'Solve a two-by-two eigenvalue problem and say what an eigenvector is determined up to.',
@@ -1053,6 +1113,16 @@ const SC = [
   ]}
 ]},
 
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-spectral', module:'M1', nav:'Code · The spectral theorem', title:'The spectral theorem in code',
+  objective:'Diagonalise a Hermitian matrix, rebuild it from its projectors, and evaluate a function of it.',
+  keywords:'code qiskit numpy program eigh eigenvalue spectral projector exponential function run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · The spectral theorem and functions of an operator'},
+  {t:'title', text:'The spectral theorem in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-spectral')}
+]},
+
 /* ---------------------------------------------------------------- 1.8.1 -- */
 { id:'m1-dirac', module:'M1', nav:'Dirac notation', title:'Dirac notation is a way of writing what is already there',
   objective:'Translate between Dirac notation and matrix notation in both directions and read a product right to left.',
@@ -1076,6 +1146,16 @@ const SC = [
         ask:{key:'m1-dirac', choices:['A number','A column','A matrix'], answer:2,
           why:'Matrix times column is a column, and a column times a row is an $n\\times n$ matrix.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-dirac', module:'M1', nav:'Code · Dirac notation', title:'Dirac notation in code',
+  objective:'Compute expectation values and matrix elements, and read a circuit as a matrix product right to left.',
+  keywords:'code qiskit numpy program expectation value matrix element circuit order run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Dirac notation'},
+  {t:'title', text:'Dirac notation in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-dirac')}
 ]},
 
 /* ---------------------------------------------------------------- 1.9.1 -- */
@@ -1126,6 +1206,16 @@ const SC = [
         ask:{key:'m1-completeness', choices:['$0.2$','$0.8$','$0.5$'], answer:0,
           why:'The squared error is the sum of the omitted $|c_{n}|^{2}$, here only $|c_{3}|^{2}$.'}}]}
   ]}
+]},
+
+/* ---------------------------------------------------------------- code --- */
+{ id:'m1-code-functions', module:'M1', nav:'Code · Functions as vectors', title:'Functions as vectors in code',
+  objective:'Store sampled functions as states, check an orthonormal family, and measure what truncation loses.',
+  keywords:'code qiskit numpy program function amplitude encoding parseval truncation run',
+  slide:true, steps:0, budget:'a code page: the programs print their own results', blocks:[
+  {t:'eyebrow', text:'Module 1 · Function spaces'},
+  {t:'title', text:'Functions as vectors in code'},
+  {t:'raw', html:()=>CODEBANK.page('m1-code-functions')}
 ]},
 
 /* ---------------------------------------------------------------- 1.10.1 - */

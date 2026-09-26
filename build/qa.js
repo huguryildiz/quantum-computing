@@ -73,9 +73,10 @@ const fs = require('fs'), path = require('path');
   /* Two informational lists in the spirit of `scaled`: neither turns the sweep
      red. `wordy` names teaching scenes showing more than 220 words of prose at
      the last step; `nofig` names teaching scenes with no drawn figure at all.
-     Laboratories, question pages and worked examples are exempt — a laboratory
-     is its own figure and a worked example is a table by design. */
-  const teach = r => !r.isLab && !r.isDrill && !/-ex-|^title$/.test(r.id);
+     Laboratories, question pages, worked examples and code pages are exempt —
+     a laboratory is its own figure, a worked example is a table by design and
+     a code page prints its own results. */
+  const teach = r => !r.isLab && !r.isDrill && !/-ex-|-code-|^title$/.test(r.id);
   const wordy = report.filter(r => teach(r) && r.words > 220)
                       .map(r => [r.id, r.words]).sort((a,b)=>b[1]-a[1]);
   const nofig = report.filter(r => teach(r) && !r.hasFig).map(r => r.id);

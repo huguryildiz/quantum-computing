@@ -65,19 +65,19 @@ CONTENT.SECTIONS = {
   M1: [
     { n:'1.0', title:'Opening',                          ids:['m1-open'] },
     { n:'1.1', title:'Vectors, dual vectors and the inner product', ids:[
-        'm1-ket','m1-bra','m1-overlap','m1-basis'] },
+        'm1-ket','m1-bra','m1-overlap','m1-basis','m1-code-inner'] },
     { n:'1.2', title:'Amplitude, phase and interference', ids:[
-        'm1-amp','m1-phase','m1-lab-a'] },
+        'm1-amp','m1-phase','m1-lab-a','m1-code-phase'] },
     { n:'1.3', title:'Outer products and projectors',     ids:[
-        'm1-outer','m1-proj','m1-resid'] },
-    { n:'1.4', title:'Building an orthonormal basis',     ids:['m1-gs','m1-lab-b'] },
-    { n:'1.5', title:'The tensor product',                ids:['m1-tensor','m1-expo'] },
+        'm1-outer','m1-proj','m1-resid','m1-code-proj'] },
+    { n:'1.4', title:'Building an orthonormal basis',     ids:['m1-gs','m1-lab-b','m1-code-gs'] },
+    { n:'1.5', title:'The tensor product',                ids:['m1-tensor','m1-expo','m1-code-tensor'] },
     { n:'1.6', title:'Hermitian and unitary operators',   ids:[
-        'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle'] },
+        'm1-adjoint','m1-herm','m1-unit','m1-gen','m1-halfangle','m1-code-herm'] },
     { n:'1.7', title:'The spectral theorem and functions of an operator', ids:[
-        'm1-eig','m1-spectral','m1-fofa'] },
-    { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac'] },
-    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness'] },
+        'm1-eig','m1-spectral','m1-fofa','m1-code-spectral'] },
+    { n:'1.8', title:'Dirac notation',                    ids:['m1-dirac','m1-code-dirac'] },
+    { n:'1.9', title:'Functions as vectors',              ids:['m1-wavefunctions','m1-completeness','m1-code-functions'] },
     { n:'1.10', title:'Summary and practice',             ids:['m1-synth','m1-shapes'] }
   ],
 
@@ -270,6 +270,18 @@ CONTENT.BOOK = {
   'm1-spectral':'2.1.6',
   'm1-fofa':'2.1.8',
   'm1-dirac':'2.1',
+  /* The code pages take the anchor of the material their programs work: the
+     inner product (2.1.4) for the vector and function pages, and the section
+     of each scene they close for the rest. */
+  'm1-code-inner':'2.1.4',
+  'm1-code-phase':'2.2.7',
+  'm1-code-proj':'2.1.4',
+  'm1-code-gs':'2.1.4',
+  'm1-code-tensor':'2.1.7',
+  'm1-code-herm':'2.1.6',
+  'm1-code-spectral':'2.1.6',
+  'm1-code-dirac':'2.1',
+  'm1-code-functions':'2.1.4',
 
   /* Chapter 2 is the book's section 2.2, the postulates, with three excursions
      back into 2.1: the Pauli matrices are defined there, and so are the
@@ -483,10 +495,10 @@ CONTENT.BOOK = {
    written down twice, so a section that gains a scene renumbers by itself and
    cannot drift out of step with the declaration.
 
-   Two id shapes take a space of their own rather than an ordinal, because
-   they are not teaching scenes: a laboratory (`*-lab-*`) takes `L`, and the
-   question scene of a module takes `Q1`. Each counts from 1 within its
-   chapter. */
+   Three id shapes take a space of their own rather than an ordinal, because
+   they are not teaching scenes: a laboratory (`*-lab-*`) takes `L`, counted
+   from 1 within its chapter; a code page (`*-code-*`) takes `C` after its
+   section's number; and the question scene of a module takes `Q1`. */
 window.applyNumbering = function(scenes){
   const byId = {};
   scenes.forEach(s=>{ byId[s.id] = s; });
@@ -509,6 +521,7 @@ window.applyNumbering = function(scenes){
         const s = byId[id];
         if(!s){ console.error('numbering: no scene with id '+id); return; }
         s.sec  = /-lab-/.test(id) ? ch.n+'.L'+(++labN)
+               : /-code-/.test(id) ? sec.n+'.C'
                : ch.flat          ? ch.n+'.'+(++ord)
                :                    sec.n+'.'+(++ord);
         s.book = CONTENT.BOOK[id];

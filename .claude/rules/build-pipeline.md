@@ -72,11 +72,12 @@ cd build && node pw.js mathscan.js           # SCENES WITH MATH DAMAGE: 0 / N
 cd build && node pw.js labwalk.js            # PROBLEMS: none
 cd build && node pw.js seccheck.js           # PROBLEMS: none
 .venv/bin/python tools/rule_check.py "build/src/8[1-9]_scenes*.js" \
-  "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "notes/src/*.js" \
-  "web/index.html"
+  "build/src/9[2-8]_drill_m*.js" "build/src/7[0-9]_labs*.js" "build/src/7[0-9]_code*.js" \
+  "notes/src/*.js" "web/index.html"
 .venv/bin/python verify/verify_scenes.py     # N passed, 0 failed
 .venv/bin/python verify/verify_drills.py     # N passed, 0 failed
 .venv/bin/python -m pytest verify/ -q        # the runner's own tests
+.venv/bin/python verify/code_check.py         # N passed, 0 failed, 0 skipped
 cd build && node pw.js ../notes/mathscan.js  # LITERAL MATH IN NOTES: 0, KATEX ERRORS: 0
 cd build && node pw.js ../web/sitecheck.js   # SITE: no problems
 ```
@@ -101,6 +102,12 @@ existing container-path `require('/home/claude/.npm-global/lib/node_modules/play
 rewrite that line. `build/pw.js` redirects resolution to the available local Playwright
 installation.
 
+`verify/code_check.py` runs every code-page program in both forms and compares what each prints
+with its `out`. The NumPy half runs with `.venv/`. The Qiskit half needs Qiskit, which is not in
+`requirements.txt`: it runs with `.venv-qiskit/` (gitignored), built once with
+`/opt/homebrew/bin/python3.12 -m venv .venv-qiskit && .venv-qiskit/bin/pip install qiskit`, or with
+`$QISKIT_PYTHON`. Without either the Qiskit half reports SKIP, which is what CI does.
+
 ## Deployment
 
 `https://quantum-computing-tedu.vercel.app` is the published address. The page in `web/`, built
@@ -115,6 +122,12 @@ to happen without a commit. Two things it needs and neither is obvious: `require
 excluded, because the platform reads it as a Python application and fails looking for an
 entrypoint, and `vercel.json` says `framework: null` with `outputDirectory: "site"`, because this
 is a directory of static files and nothing is built on the host beyond `node web/build-site.js`.
+
+`node web/build-site.js` also places the Python runtime for the code pages' Run button in
+`site/pyodide/`: `web/pyodide.js` fetches Pyodide and the NumPy and Matplotlib packages from
+jsDelivr and checks each file against a pinned SHA-256. Files are cached in `web/.cache/`;
+`SKIP_PYODIDE=1` skips the step for an offline build, and Run then reports that Python could not be
+loaded. A code page opened from `file://` offers Copy only.
 
 ## Traps
 

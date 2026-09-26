@@ -371,8 +371,11 @@ const RENDER = (() => {
     if(typeof CODE_M7!=='undefined') Object.assign(CODE_LIB, CODE_M7);
     if(typeof CODE_BANKS_M7!=='undefined') Object.assign(CODE_BANKS, CODE_BANKS_M7);
   }
-  const CODE_LANGS = [['m','MATLAB'],['py','Python']];
-  let codeLang = (()=>{ try{ return localStorage.getItem('ss-code-lang')==='py'?'py':'m'; }catch(e){ return 'm'; } })();
+  /* This course writes each program twice: a Qiskit listing to copy and run
+     where Qiskit is installed, and a NumPy version that prints the same lines
+     and runs here, because Qiskit is not available in the browser runtime. */
+  const CODE_LANGS = [['qk','Qiskit'],['py','NumPy']];
+  let codeLang = (()=>{ try{ return localStorage.getItem('qc-code-lang')==='py'?'py':'qk'; }catch(e){ return 'qk'; } })();
   const CODE_AT = {}, DRAFT = {}, OUTPUT = {};
   const escH = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   /* A small highlighter: comments, strings, keywords and numbers. The code
@@ -381,6 +384,7 @@ const RENDER = (() => {
     m:  /(%.*$)|('(?:[^'\n]|'')*'|"[^"\n]*")|\b(for|end|if|elseif|else|while|break|continue|function|return|switch|case|otherwise|try|catch)\b|(\b\d+\.?\d*(?:e[+-]?\d+)?\b)/gm,
     py: /(#.*$)|((?:\b[rf]{1,2})?'[^'\n]*'|(?:\b[rf]{1,2})?"[^"\n]*")|\b(import|as|from|def|return|for|in|if|elif|else|while|break|continue|lambda|and|or|not|None|True|False|with)\b|(\b\d+\.?\d*(?:e[+-]?\d+)?\b)/gm
   };
+  CODE_RE.qk = CODE_RE.py;
   function codeHL(src, lang){
     let out = '', i = 0;
     src.replace(CODE_RE[lang], (m, c, s, k, n, at)=>{
@@ -475,9 +479,9 @@ def _ss_figs():
     const out = run ? (OUTPUT[key] || `<div class="run-status">Output</div>
           <p class="run-idle">Press Run. The first run loads Python, which takes a few seconds.</p>`)
       : `<div class="run-status">It prints</div><pre class="run-text">${escH(c.out||'')}</pre>
-          <p class="run-idle">${codeLang==='m'
-            ? 'Paste it into the MATLAB command window, or save it as a <code>.m</code> file and run it. No toolbox is needed.'
-            : 'Save it as a <code>.py</code> file and run it, or paste it into a notebook cell. It needs NumPy and Matplotlib.'}</p>`;
+          <p class="run-idle">${codeLang==='qk'
+            ? 'Save it as a <code>.py</code> file and run it where Qiskit is installed (<code>pip install qiskit</code>). The NumPy tab prints the same lines and runs on this page.'
+            : 'Save it as a <code>.py</code> file and run it, or paste it into a notebook cell. It needs NumPy only.'}</p>`;
     return `<div class="cpage" data-cpage="${bank}" data-key="${key}">
       <div class="cp-nav" role="tablist" aria-label="Programs">${keys.map((k,j)=>
         `<button type="button" role="tab" class="cp-ex" data-cp-go="${j}" aria-selected="${j===i}"><span class="cp-n">${j+1}</span>${md(CODE_LIB[k].title)}</button>`).join('')}</div>
@@ -714,7 +718,7 @@ def _ss_figs():
       return; }
     const cl = e.target.closest('[data-code-lang]');
     if(cl){ codeLang = cl.dataset.codeLang;
-      try{ localStorage.setItem('ss-code-lang', codeLang); }catch(e){}
+      try{ localStorage.setItem('qc-code-lang', codeLang); }catch(e){}
       draw(); return; }
     const fb = e.target.closest('[data-frame]');
     if(fb){ const fig = fb.closest('figure[data-fx]'), b = fig && FX[+fig.dataset.fx];
