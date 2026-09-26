@@ -89,16 +89,17 @@ CONTENT.SECTIONS = {
   M2: [
     { n:'2.0', title:'Opening',                           ids:['m2-open'] },
     { n:'2.1', title:'The Born rule',                     ids:[
-        'm2-born','m2-bases','m2-distinguish','m2-lab-c'] },
+        'm2-born','m2-bases','m2-distinguish','m2-lab-c','m2-code-born'] },
     { n:'2.2', title:'Projective measurement',            ids:[
-        'm2-proj','m2-collapse','m2-povm'] },
-    { n:'2.3', title:'Observables',                       ids:['m2-obs','m2-var'] },
-    { n:'2.4', title:'Compatibility and uncertainty',     ids:['m2-comm','m2-uncert'] },
+        'm2-proj','m2-collapse','m2-povm','m2-code-measure'] },
+    { n:'2.3', title:'Observables',                       ids:['m2-obs','m2-var','m2-code-obs'] },
+    { n:'2.4', title:'Compatibility and uncertainty',     ids:['m2-comm','m2-uncert','m2-code-comm'] },
     { n:'2.5', title:'The Pauli algebra',                 ids:[
-        'm2-pauli','m2-paulialg','m2-ndotsigma'] },
+        'm2-pauli','m2-paulialg','m2-ndotsigma','m2-code-pauli'] },
     { n:'2.6', title:'Dynamics',                          ids:[
-        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d'] },
-    { n:'2.7', title:'Finite shots',                      ids:['m2-shots'] },
+        'm2-position','m2-schrod','m2-stationary','m2-well','m2-gate','m2-lab-d',
+        'm2-code-dynamics'] },
+    { n:'2.7', title:'Finite shots',                      ids:['m2-shots','m2-code-shots'] },
     { n:'2.8', title:'Summary and practice',              ids:['m2-synth','m2-shapes'] }
   ],
 
@@ -307,6 +308,14 @@ CONTENT.BOOK = {
   'm2-schrod':'2.2.2',
   'm2-stationary':'2.2.2',
   'm2-gate':'2.2.2',
+  /* The code pages take the anchor of the section they close. The finite-shot
+     page has none, for the reason `m2-shots` has none. */
+  'm2-code-born':'2.2.3',
+  'm2-code-measure':'2.2.5',
+  'm2-code-obs':'2.2.5',
+  'm2-code-comm':'2.1.9',
+  'm2-code-pauli':'2.1.3',
+  'm2-code-dynamics':'2.2.2',
 
   /* Chapter 3 rests on the book's sections 2.4 to 2.6, which is where the
      density operator, the Schmidt decomposition and the Bell inequality are

@@ -213,7 +213,7 @@ uppercased by the style sheet, so Greek letters and TeX macros never go in it.
 The fixed 1920×1080 stage, scaled to the window; `fitScene()` and its floor; the fit rule that a
 scene needing below about 0.90 is split. These are the reference's.
 
-### Slides — Module 1 converted, Modules 2 to 6 owed
+### Slides — Modules 1 and 2 converted, Modules 3 to 6 owed
 
 Every scene carries `slide:true` except the title, the chapter openings, the summaries, the
 question-type pages (`m*-shapes`) and the practice questions. That is the reference's rule.
@@ -226,8 +226,13 @@ number a prediction states has a PASS line in `verify/verify_scenes.py`. A worke
 labelled `Example` equation, and the card the right column had no room for sits under the figure. A
 box diagram cannot stretch like a plot, so `growBlocks()` in `82_scenes_m1.js` centres it in the
 taller frame when the slide grows its figure. The two laboratories keep their layout; Laboratory A
-still fits only at 0.82 and waits for the laboratory pass. Modules 2 to 6 are not converted yet and
-`build/qa.js` still lists many of their scenes under `dense`; `TODO.md` holds the state.
+still fits only at 0.82 and waits for the laboratory pass. Module 2 followed on the same day with the
+same recipe: 19 teaching slides, 3 new figures (the state before and after a reading, the readout line,
+the turning relative phase), and none of its scenes under `dense`. A figure drawn with equal pixels to
+the unit on both axes does not take `grow:true`, because growing redraws it taller and breaks the
+isotropy; its card sits under it instead. `growBlocks()` in `83_scenes_m2.js` also moves a `line`
+item. Modules 3 to 6 are not converted yet and `build/qa.js` still lists many of their scenes under
+`dense`; `TODO.md` holds the state.
 
 ### Phone and portrait tablet — REFERENCE
 

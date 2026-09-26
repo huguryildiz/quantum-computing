@@ -36,6 +36,7 @@ import sys
 import numpy as np
 import sympy as sp
 from scipy.linalg import expm, sqrtm
+from scipy.stats import binom
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -437,6 +438,96 @@ def _m2_plane_wave_operator_dev(k):
          + float(abs(complex(h_residual.subs(x, 0))))
 
 
+
+def _m2_degenerate_probability():
+    """p(+1) for a rank-two projector, as the norm of the projected state
+    rather than as a sum of two squared amplitudes."""
+    A = np.diag([1.0, 1.0, -1.0])
+    psi = np.ones(3, dtype=complex) / math.sqrt(3)
+    vals, vecs = np.linalg.eigh(A)
+    P = sum(np.outer(vecs[:, k], vecs[:, k].conj())
+            for k in range(3) if abs(vals[k] - 1.0) < 1e-12)
+    return float(np.linalg.norm(P @ psi) ** 2)
+
+
+def _m2_repeat_probability(psi, ket):
+    """Apply the update rule for the reading `ket`, then ask for it again."""
+    P = outer(ket, ket)
+    after = P @ psi / math.sqrt(float(np.real(np.vdot(psi, P @ psi))))
+    return float(np.real(np.vdot(after, P @ after)))
+
+
+# ── Chapter 2 prediction cards ──────────────────────────────────────────────
+# Every teaching slide of chapter 2 ends on a prediction card. Each number it
+# states is re-derived here by a route the card does not state.
+
+
+def _m2p_born_quarter():
+    c1 = sp.I / 2
+    return float(sp.simplify(c1 * sp.conjugate(c1)))
+
+
+def _m2p_helstrom(a, b):
+    """Half of (1 + half the trace norm of rho_a - rho_b): the Helstrom
+    bound, computed from eigenvalues rather than from (1 + sin theta)/2."""
+    D = outer(a, a) - outer(b, b)
+    return 0.5 * (1 + 0.5 * float(np.abs(np.linalg.eigvalsh(D)).sum()))
+
+
+def _m2p_eigen_probability(A, psi, a):
+    vals, vecs = np.linalg.eigh(A)
+    return sum(abs(np.vdot(vecs[:, k], psi)) ** 2
+               for k in range(len(vals)) if abs(vals[k] - a) < 1e-12)
+
+
+def _m2p_eigen_mean(A, psi):
+    vals, vecs = np.linalg.eigh(A)
+    return float(sum(v * abs(np.vdot(vecs[:, k], psi)) ** 2
+                     for k, v in enumerate(vals)))
+
+
+def _m2p_eigen_variance(A, psi):
+    vals, vecs = np.linalg.eigh(A)
+    p = [abs(np.vdot(vecs[:, k], psi)) ** 2 for k in range(len(vals))]
+    mean = sum(v * pk for v, pk in zip(vals, p))
+    return float(sum((v - mean) ** 2 * pk for v, pk in zip(vals, p)))
+
+
+def _m2p_momentum_of_plane_wave():
+    x = sp.symbols("x", real=True)
+    wave = sp.exp(3 * sp.I * x)
+    return float(sp.simplify(-sp.I * sp.diff(wave, x) / wave))
+
+
+def _m2p_energy_shift_dev():
+    Hm = 0.5 * (X + Z)
+    psi = np.array([0.6, 0.8j], dtype=complex)
+    worst = 0.0
+    for t in (0.3, 1.1, 2.9):
+        a = _m2_evolve(Hm, psi, t)
+        b = _m2_evolve(Hm + 5 * I2, psi, t)
+        worst = max(worst, abs(abs(a[0]) ** 2 - abs(b[0]) ** 2))
+    return worst
+
+
+def _m2p_beat_frequency():
+    """The rate of the relative phase, read off the evolved amplitudes."""
+    Hm = np.diag([2.0, 5.0])
+    psi = np.array([1, 1], dtype=complex) / math.sqrt(2)
+    t = 0.1
+    out = _m2_evolve(Hm, psi, t)
+    return -float(np.angle(out[1] / out[0])) / t
+
+
+def _m2p_well_ratio():
+    """E3/E1 from the three lowest eigenvalues of -d^2/dx^2 on a grid with
+    the wavefunction pinned to zero at both walls."""
+    n = 1200
+    h = 1.0 / (n + 1)
+    main = np.full(n, 2.0 / h ** 2)
+    off = np.full(n - 1, -1.0 / h ** 2)
+    E = np.linalg.eigvalsh(np.diag(main) + np.diag(off, 1) + np.diag(off, -1))
+    return float(E[2] / E[0])
 
 # ── chapter 3 · mixed states and entanglement ───────────────────────────────
 #
@@ -979,18 +1070,27 @@ CHECKS = [
     {"name": "2.1.1 the two probabilities add to one", "stated": 1.0,
      "derive": lambda: sum(_m2_born(np.array([3, 4j], dtype=complex) / 5, k)
                            for k in (KET0, KET1)), "rtol": 1e-12},
+    {"name": "2.1.2 |+> measured in Z is a coin", "stated": 0.5,
+     "derive": lambda: _m2_born(KETP, KET0), "rtol": 1e-12},
+    {"name": "2.1.2 |+> measured in X is certain", "stated": 1.0,
+     "derive": lambda: abs((H @ KETP)[0]) ** 2, "rtol": 1e-12},
     {"name": "2.1.3 best guess probability for orthogonal states", "stated": 1.0,
      "derive": lambda: 0.5 * (1 + math.sin(math.pi / 2)), "rtol": 1e-12},
     {"name": "2.1.3 and for identical states", "stated": 0.5,
      "derive": lambda: 0.5 * (1 + math.sin(0.0)), "rtol": 1e-12},
 
     # ---- 2.2 -----------------------------------------------------------
-    {"name": "2.2.2 p(0) for (1, 2)/sqrt5", "stated": 0.2,
+    {"name": "2.2.1 degenerate outcome: p(+1) for diag(1,1,-1) on (1,1,1)/sqrt3",
+     "stated": 2 / 3, "derive": _m2_degenerate_probability, "rtol": 1e-12},
+    {"name": "2.2.2 p(1) for (1, 2)/sqrt5", "stated": 0.8,
      "derive": lambda: _m2_born(np.array([1, 2], dtype=complex) / math.sqrt(5),
-                                KET0), "rtol": 1e-12},
-    {"name": "2.2.2 the update rule lands on |0> exactly", "stated": 0.0,
+                                KET1), "rtol": 1e-12},
+    {"name": "2.2.2 the update rule lands on |1> exactly", "stated": 0.0,
      "derive": lambda: _m2_post_measurement(
-         np.array([1, 2], dtype=complex) / math.sqrt(5), KET0), "atol": 1e-14},
+         np.array([1, 2], dtype=complex) / math.sqrt(5), KET1), "atol": 1e-14},
+    {"name": "2.2.2 a repeat after the reading 1 is certain", "stated": 1.0,
+     "derive": lambda: _m2_repeat_probability(
+         np.array([1, 2], dtype=complex) / math.sqrt(5), KET1), "rtol": 1e-12},
     {"name": "2.2.3 a perfect readout reports the truth", "stated": 0.7,
      "derive": lambda: _m2_readout(0.7, 0.0), "rtol": 1e-12},
     {"name": "2.2.3 a readout at eps = 0.05 on q = 0.7", "stated": 0.05 + 0.9 * 0.7,
@@ -1039,6 +1139,8 @@ CHECKS = [
                            for l in np.linalg.eigvalsh(M)), "atol": 1e-14},
     {"name": "2.5.2 the cyclic product rule, on all nine ordered pairs",
      "stated": 0.0, "derive": _m2_pauli_product_dev, "atol": 1e-15},
+    {"name": "2.5.2 X and Y anticommute", "stated": 0.0,
+     "derive": lambda: dev(X @ Y + Y @ X, np.zeros((2, 2))), "atol": 1e-15},
     {"name": "2.5.3 (I + n.sigma)/2 is a projector", "stated": 0.0,
      "derive": lambda: _m2_axis_projector_dev(
          np.array([0.6, 0.0, 0.8])), "atol": 1e-15},
@@ -1082,6 +1184,57 @@ CHECKS = [
     {"name": "2.7.1 the worst case is 1/(2 sqrt N)", "stated": 0.0,
      "derive": lambda: abs(_m2_standard_error(0.5, 4096) - 1 / (2 * 64)),
      "atol": 1e-15},
+
+    # ---- chapter 2 prediction cards --------------------------------------
+    {"name": "2.1.1 prediction: p(1) for (sqrt3|0> + i|1>)/2", "stated": 0.25,
+     "derive": _m2p_born_quarter, "rtol": 1e-12},
+    {"name": "2.1.2 prediction: |0> measured in X gives + half the time",
+     "stated": 0.5, "derive": lambda: abs((H @ KET0)[0]) ** 2, "rtol": 1e-12},
+    # The card prints three significant figures.
+    {"name": "2.1.3 prediction: best guess between |0> and |+>", "stated": 0.854,
+     "derive": lambda: _m2p_helstrom(KET0, KETP), "rtol": 1e-3},
+    {"name": "2.2.1 prediction: p(-1) of Z on (3|0> + |1>)/sqrt10", "stated": 0.1,
+     "derive": lambda: _m2p_eigen_probability(
+         Z, np.array([3, 1], dtype=complex) / math.sqrt(10), -1.0), "rtol": 1e-12},
+    {"name": "2.2.2 prediction: |+> read as 0, then Z again", "stated": 1.0,
+     "derive": lambda: _m2_repeat_probability(KETP, KET0), "rtol": 1e-12},
+    {"name": "2.2.3 prediction: eps = 0.1 on |0> reports 0.9", "stated": 0.9,
+     "derive": lambda: _m2_readout(1.0, 0.1), "rtol": 1e-12},
+    {"name": "2.3.1 prediction: <X> on |0>", "stated": 0.0,
+     "derive": lambda: _m2p_eigen_mean(X, KET0), "atol": 1e-15},
+    {"name": "2.3.2 prediction: Var(Z) on (|0> + sqrt3|1>)/2", "stated": 0.75,
+     "derive": lambda: _m2p_eigen_variance(
+         Z, np.array([1, math.sqrt(3)], dtype=complex) / 2), "rtol": 1e-12},
+    {"name": "2.4.1 prediction: [Y, Z] = 2iX", "stated": 0.0,
+     "derive": lambda: _m2_commutator_dev(Y, Z, 2j * X), "atol": 1e-15},
+    {"name": "2.4.2 prediction: the bound on |+i> is |<Y>| = 1", "stated": 1.0,
+     "derive": lambda: abs(_m2_expectation(Y, (KET0 + 1j * KET1) / math.sqrt(2))),
+     "rtol": 1e-12},
+    {"name": "2.4.2 and dX dZ on |+i> meets it", "stated": 1.0,
+     "derive": lambda: math.sqrt(
+         _m2_variance(X, (KET0 + 1j * KET1) / math.sqrt(2))
+         * _m2_variance(Z, (KET0 + 1j * KET1) / math.sqrt(2))), "rtol": 1e-12},
+    {"name": "2.5.1 prediction: Y|0> = i|1>", "stated": 0.0,
+     "derive": lambda: dev(Y @ KET0, 1j * KET1), "atol": 1e-15},
+    {"name": "2.5.2 prediction: ZX = iY", "stated": 0.0,
+     "derive": lambda: dev(Z @ X, 1j * Y), "atol": 1e-15},
+    {"name": "2.5.3 prediction: p(+) along x on |0>", "stated": 0.5,
+     "derive": lambda: _m2_axis_probability(np.array([1.0, 0.0, 0.0]), 0.0, 0.0),
+     "rtol": 1e-12},
+    {"name": "2.6.1 prediction: momentum of exp(3ix)", "stated": 3.0,
+     "derive": _m2p_momentum_of_plane_wave, "rtol": 1e-12},
+    {"name": "2.6.2 prediction: H + 5I leaves P(0) unchanged", "stated": 0.0,
+     "derive": _m2p_energy_shift_dev, "atol": 1e-12},
+    {"name": "2.6.3 prediction: E1 = 2, E2 = 5 beat at 3", "stated": 3.0,
+     "derive": _m2p_beat_frequency, "rtol": 1e-9},
+    # A finite-difference box converges to the ratio as the grid is refined.
+    {"name": "2.6.4 prediction: E3/E1 in the square well", "stated": 9.0,
+     "derive": _m2p_well_ratio, "rtol": 1e-3},
+    {"name": "2.6.5 prediction: a resonant pi/2 pulse gives P(1) = 1/2",
+     "stated": 0.5, "derive": lambda: _m2_driven_population(1.0, 0.0, math.pi / 2),
+     "rtol": 1e-12},
+    {"name": "2.7.1 prediction: SE at N = 10000, p = 1/2", "stated": 0.005,
+     "derive": lambda: float(binom.std(10000, 0.5)) / 10000, "rtol": 1e-12},
 
     # ---- 3.1 -----------------------------------------------------------
     {"name": "3.1.1 the coherence of (|0> + i|1>)/sqrt2 is -i/2", "stated": -0.5,
