@@ -386,12 +386,12 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
 window.DRILL_M1 = [
 
 { id:'m1-drill', module:'M1', nav:'Module 1 · practice questions',
-  title:'Module 1 — practice questions',
+  title:'Module 1 — Practice Questions',
   objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
   keywords:'practice questions module 1 inner product basis phase operator hermitian unitary spectral tensor',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 1 · Practice D1-01 … D1-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: $\\langle a|a\\rangle$ is real and never negative, the squared coefficients in any orthonormal basis add to one, the eigenvalues of a Hermitian matrix are real and add to the trace, the projectors of a spectral decomposition add to the identity, and a unitary sends a normalised state to a normalised state.'},
   {t:'rule', short:true},
   {t:'drill', module:'M1'}

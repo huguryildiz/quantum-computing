@@ -384,7 +384,7 @@ window.DRILL_M6 = [
   keywords:'practice questions module 6 kickback deutsch jozsa fourier transform phase estimation order finding factoring resource claim',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 6 \u00b7 Practice D6-01 \u2026 D6-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: probabilities that add to one, a balanced function whose signs average to exactly zero, a phase-estimation distribution with at least $8/\\pi^{2}$ on the two nearest outcomes, a candidate order confirmed by one modular exponentiation, and two factors that multiply back to $N$.'},
   {t:'rule', short:true},
   {t:'drill', module:'M6'}

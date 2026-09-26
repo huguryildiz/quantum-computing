@@ -380,12 +380,12 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
 window.DRILL_M5 = [
 
 { id:'m5-drill', module:'M5', nav:'Module 5 · practice questions',
-  title:'Module 5 — practice questions',
+  title:'Module 5 — Practice Questions',
   objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
   keywords:'practice questions module 5 circuit depth shots transpilation teleportation grover resource claim query runtime',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 5 · Practice D5-01 … D5-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: probabilities that add to one, a depth no larger than a gate count, an estimated probability quoted with $\\sqrt{p(1-p)/N}$ beside it, a teleported branch whose probability is exactly one quarter, and a Grover probability that is a sine squared and therefore never above one.'},
   {t:'rule', short:true},
   {t:'drill', module:'M5'}

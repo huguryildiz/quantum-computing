@@ -379,12 +379,12 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
 window.DRILL_M4 = [
 
 { id:'m4-drill', module:'M4', nav:'Module 4 · practice questions',
-  title:'Module 4 — practice questions',
+  title:'Module 4 — Practice Questions',
   objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
   keywords:'practice questions module 4 bloch sphere rotation gate sequence decomposition two qubit cnot universality',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 4 · Practice D4-01 … D4-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: a Bloch vector of length one, a probability found both from an amplitude and from $\\tfrac12(1+\\mathbf{n}\\cdot\\mathbf{r})$, a gate matrix whose columns are orthonormal, probabilities that add to one, and an entanglement entropy that no one-qubit gate has moved.'},
   {t:'rule', short:true},
   {t:'drill', module:'M4'}

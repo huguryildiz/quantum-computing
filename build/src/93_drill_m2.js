@@ -385,12 +385,12 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
 window.DRILL_M2 = [
 
 { id:'m2-drill', module:'M2', nav:'Module 2 · practice questions',
-  title:'Module 2 — practice questions',
+  title:'Module 2 — Practice Questions',
   objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
   keywords:'practice questions module 2 born rule measurement update expectation variance commutator evolution shots',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 2 · Practice D2-01 … D2-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: probabilities add to one, a variance is never negative, the mean of a $\\pm1$ observable lies in $[-1,1]$, the Bloch vector of a pure state has length one, and adding a multiple of the identity to a Hamiltonian changes nothing.'},
   {t:'rule', short:true},
   {t:'drill', module:'M2'}

@@ -371,12 +371,12 @@ CONTENT.DRILL = CONTENT.DRILL.concat([
 window.DRILL_M3 = [
 
 { id:'m3-drill', module:'M3', nav:'Module 3 · practice questions',
-  title:'Module 3 — practice questions',
+  title:'Module 3 — Practice Questions',
   objective:'Twenty open-ended questions with worked solutions, in the shapes the chapter sets.',
   keywords:'practice questions module 3 density operator purity channel partial trace schmidt entropy bell chsh',
   steps:0, blocks:[
   {t:'eyebrow', text:'Module 3 · Practice D3-01 … D3-20'},
-  {t:'title', text:'Practice questions'},
+  {t:'title', text:'Practice Questions'},
   {t:'small', html:'Work each question on paper before opening its solution. Every solution ends with a <b>Check</b> step that reaches the answer a second way. In this chapter the cheap checks are: a trace of one, eigenvalues in $[0,1]$, a purity between $1/d$ and one computed both from the entries and from $|\\mathbf{r}|$, Schmidt coefficients that add to one, an entropy that is never negative, and a correlation of two $\\pm1$ observables inside $[-1,1]$.'},
   {t:'rule', short:true},
   {t:'drill', module:'M3'}
