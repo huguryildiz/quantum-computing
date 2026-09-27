@@ -669,9 +669,9 @@ for a, N in [(3, 7), (5, 9), (7, 12)]:
 
 'order-finding-reading': {
   title:'The counting register peaks near multiples of $Q/r$',
-  what:'Simulates order finding for $a=3$, $N=7$ (order $r=6$) by averaging the inverse-QFT readout over the $r$ possible phases $s/r$, with the work register already traced out, and reads the top readings.',
+  what:'Simulates order finding for $a=3$, $N=7$ (order $r=6$) by averaging the inverse-QFT readout over the $r$ possible phases $s/r$, with the work register already traced out, and lists every reading above $0.1$: one near $Qs/r$ for each $s$.',
   try:'Use $a=5$, $N=9$ (order $r=6$ as well) instead. Predict whether the top readings move.',
-  out:'a = 3, N = 7, order r = 6, t = 6 counting qubits, Q = 64\ntop readings k: [0, 21, 32, 53]\ntheir probabilities: [0.167, 0.1142, 0.167, 0.1142]',
+  out:'a = 3, N = 7, order r = 6, t = 6 counting qubits, Q = 64\ntop readings k: [0, 11, 21, 32, 43, 53]\ntheir probabilities: [0.167, 0.1142, 0.1142, 0.167, 0.1142, 0.1142]',
   qk:`import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import QFTGate
@@ -688,7 +688,7 @@ for s in range(r):
     probs_sum += np.round(Statevector.from_label('0'*t).evolve(qc).probabilities(), 9)
 probs_avg = np.round(probs_sum / r, 9)
 
-top = sorted(np.argsort(probs_avg)[::-1][:4].tolist())
+top = [k for k in range(len(probs_avg)) if probs_avg[k] > 0.1]
 print(f'a = {a}, N = {N_mod}, order r = {r}, t = {t} counting qubits, Q = {Q}')
 print(f'top readings k: {top}')
 print(f'their probabilities: {[float(round(probs_avg[k], 4)) for k in top]}')`,
@@ -706,7 +706,7 @@ for s in range(r):
     probs_sum += np.round(np.abs(F.conj().T @ reg)**2, 9)
 probs_avg = np.round(probs_sum / r, 9)
 
-top = sorted(np.argsort(probs_avg)[::-1][:4].tolist())
+top = [k for k in range(len(probs_avg)) if probs_avg[k] > 0.1]
 print(f'a = {a}, N = {N_mod}, order r = {r}, t = {t} counting qubits, Q = {Q}')
 print(f'top readings k: {top}')
 print(f'their probabilities: {[float(round(probs_avg[k], 4)) for k in top]}')`},
