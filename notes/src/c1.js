@@ -158,25 +158,9 @@ function halfangle(){
 window.C1 = [
 
 /* ---------------- front matter ---------------- */
-{t:'title', kicker:'Quantum Computing', text:'Quantum Computing',
- sub:'Lecture notes for the software half of the course: what a quantum state is, what can be done to it, what a measurement returns, and what an algorithm has to arrange before that measurement is worth making.',
- meta:[['Covers','Chapters 1 to 6, and Appendix A'],['Level','Undergraduate'],
-       ['Assumed background','Linear algebra over the real numbers, and some Python']]},
-
-/* The credit CC BY 4.0 asks for. It sits in the front matter rather than in a
-   colophon at the back, because a reader who never reaches the last page has
-   still been told. The artifact prints the same sentence from
-   `CONTENT.META.adapted`; this pipeline does not load that file, so the two
-   are kept in step by hand. */
-{t:'p', text:'These notes are an adaptation. Their syllabus and the sequence of topics they teach derive from <b>Quantum Computing Lectures</b> by Aleksandr Krasnok, <i class="url">github.com/AlexKrasnok/quantum-computing-lectures</i>, used under CC BY 4.0. Every page here — the prose, the figures, the worked examples and the questions — is written for this edition.'},
-
-{t:'h3', text:'How to read these notes'},
-{t:'p', text:'Each idea arrives in the same order: what it is for, a definition, an equation, a short derivation with every step shown, a worked example, and the mistake that is easiest to make. Worked examples use five headings — Given, Find, Method, Solution, Check. Do the Check step yourself before reading it; it is where a wrong answer is most likely to survive, because a calculation that goes wrong in the middle usually goes wrong in the check as well and agrees with itself.'},
-{t:'p', text:'Four conventions apply everywhere, and the first two are worth fixing now because getting either wrong costs an error that nothing on the page reveals. A register of $n$ qubits is written $|q_{n-1}\\ldots q_1q_0\\rangle$, and entry $x$ of its column of amplitudes is the amplitude of $|x\\rangle$ with $x$ read as a binary number. A phase on the whole state is not physical and may be dropped; a phase between two terms is physical and may never be dropped. The inner product conjugates its first argument, $\\langle u|v\\rangle=\\sum_k u_k^{*}v_k$, which in NumPy is <code>np.vdot(u, v)</code> and never <code>np.dot</code>. And $\\hbar=1$, so a Hamiltonian is measured in angular frequency and evolution is $U(t)=e^{-iHt}$.'},
-{t:'p', text:'The contents below carries a third column. An entry such as <b>NC CH2.1.4</b> points into the course textbook, Nielsen and Chuang, <i>Quantum Computation and Quantum Information</i>, tenth anniversary edition, where the same material is developed at length. The <b>NC</b> marker is what tells the two numbering systems apart, and it is not decorative: this chapter is chapter 1 here and section 2.1 there, and every later chapter disagrees with the book by a different amount.'},
-
-{t:'box', kind:'def', hd:'The engineering regime these notes assume', html:'Semiconductor scaling made quantum effects unavoidable at small dimensions. Quantum engineering asks when selected effects can instead be controlled as resources. The field then added a general computational model, algorithms with proved advantages under stated resource models, and today\u2019s noisy intermediate-scale quantum (NISQ) processors. NISQ hardware supports calibration studies, small demonstrations and experiments with noise. It is not fault-tolerant hardware, and error mitigation is not error correction. A defensible result names the task, classical baseline, hardware conditions, shot count, uncertainty and mitigation cost.'},
-
+/* Contents on a page of its own, straight after the cover, then the reading
+   notes, as in the signals-and-systems notes. */
+{t:'h1', text:'Contents', rule:false},
 {t:'toc', items:[
  ['1','The mathematics of quantum states',
   'States as complex columns; bras and the inner product; length, orthogonality and overlap; orthonormal bases. Amplitude and phase, and the difference between a global and a relative one. Outer products, projectors and the resolution of the identity. Gram–Schmidt. The tensor product and where the exponential comes from. The adjoint, Hermitian and unitary operators, and the exponential that joins them. Eigenvectors, the spectral theorem and functions of an operator. Dirac notation. Square-integrable functions as vectors, complete bases, Parseval and truncation.',
@@ -200,6 +184,21 @@ window.C1 = [
   'Every formula the six chapters establish, in the order they establish it, each entry naming the section that develops it. Nothing is derived there.',
   '']
 ]},
+
+{t:'h3', text:'How to read these notes'},
+{t:'p', text:'These notes cover the software half of the course: what a quantum state is, what can be done to it, what a measurement returns, and what an algorithm has to arrange before that measurement is worth making. They assume linear algebra over the real numbers and some Python.'},
+{t:'p', text:'Each idea arrives in the same order: what it is for, a definition, an equation, a short derivation with every step shown, a worked example, and the mistake that is easiest to make. Worked examples use five headings — Given, Find, Method, Solution, Check. Do the Check step yourself before reading it; it is where a wrong answer is most likely to survive, because a calculation that goes wrong in the middle usually goes wrong in the check as well and agrees with itself.'},
+{t:'p', text:'Four conventions apply everywhere, and the first two are worth fixing now because getting either wrong costs an error that nothing on the page reveals. A register of $n$ qubits is written $|q_{n-1}\\ldots q_1q_0\\rangle$, and entry $x$ of its column of amplitudes is the amplitude of $|x\\rangle$ with $x$ read as a binary number. A phase on the whole state is not physical and may be dropped; a phase between two terms is physical and may never be dropped. The inner product conjugates its first argument, $\\langle u|v\\rangle=\\sum_k u_k^{*}v_k$, which in NumPy is <code>np.vdot(u, v)</code> and never <code>np.dot</code>. And $\\hbar=1$, so a Hamiltonian is measured in angular frequency and evolution is $U(t)=e^{-iHt}$.'},
+{t:'p', text:'The contents above carries a third column. An entry such as <b>NC CH2.1.4</b> points into the course textbook, Nielsen and Chuang, <i>Quantum Computation and Quantum Information</i>, tenth anniversary edition, where the same material is developed at length. The <b>NC</b> marker is what tells the two numbering systems apart, and it is not decorative: this chapter is chapter 1 here and section 2.1 there, and every later chapter disagrees with the book by a different amount.'},
+
+{t:'box', kind:'def', hd:'The engineering regime these notes assume', html:'Semiconductor scaling made quantum effects unavoidable at small dimensions. Quantum engineering asks when selected effects can instead be controlled as resources. The field then added a general computational model, algorithms with proved advantages under stated resource models, and today\u2019s noisy intermediate-scale quantum (NISQ) processors. NISQ hardware supports calibration studies, small demonstrations and experiments with noise. It is not fault-tolerant hardware, and error mitigation is not error correction. A defensible result names the task, classical baseline, hardware conditions, shot count, uncertainty and mitigation cost.'},
+
+/* The credit CC BY 4.0 asks for. It sits in the front matter rather than in a
+   colophon at the back, because a reader who never reaches the last page has
+   still been told. The artifact prints the same sentence from
+   `CONTENT.META.adapted`; this pipeline does not load that file, so the two
+   are kept in step by hand. */
+{t:'p', text:'These notes are an adaptation. Their syllabus and the sequence of topics they teach derive from <b>Quantum Computing Lectures</b> by Aleksandr Krasnok, <i class="url">github.com/AlexKrasnok/quantum-computing-lectures</i>, used under CC BY 4.0. Every page here — the prose, the figures, the worked examples and the questions — is written for this edition.'},
 
 {t:'page'},
 
