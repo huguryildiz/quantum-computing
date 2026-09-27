@@ -25,59 +25,66 @@
      made this page. One drawing, every document. */
   const LOGO = window.ICON_SVG || '';
 
-  /* Cover artwork in page millimetres (210 x 297). Baseline at y0. The teal
-     curve is the fringe p(0) = cos^2(phi/2) of Figure 1 of the course, with a
-     full fringe every P; the coral stems are its values at spacing P/8, so
-     every dot sits on the teal curve; the amber curve behind is the other
-     outcome, p(1) = sin^2(phi/2), drawn at a little over half height. */
+  /* Cover artwork in page millimetres (210 x 297). A Bloch sphere of the
+     course, seen from a little above the equator: five latitudes and six
+     meridians, front halves bright and back halves faint, the z axis through
+     |0> and |1>, and one state vector (coral) at theta = 58 deg, phi = 35 deg.
+     The amber trail is the tip precessing down from near |0> to that state,
+     with a dot at every equal step of time, as the old fringe carried stems. */
   const COVER_ART = ()=>{
-    const y0=222, xc=105, T=5, P=8*T, A=58, f=v=>v.toFixed(2), f3=v=>v.toFixed(3);
-    const c2=u=>{ const c=Math.cos(Math.PI*u); return c*c; };
-    const sy=x=>y0-A*c2((x-xc)/P);
-    const dy=x=>y0-A*.55*(1-c2((x-xc)/P));
+    const f=v=>v.toFixed(2), f3=v=>v.toFixed(3), D=Math.PI/180;
+    const xc=105, yc=171, R=52, el=20*D, ce=Math.cos(el), se=Math.sin(el);
+    /* orthographic view: x to the right, z up, y toward the reader, tilted by el */
+    const P=(x,y,z)=>[xc+x, yc+y*se-z*ce, y*ce+z*se];
+    const onS=(th,ph)=>P(R*Math.sin(th)*Math.cos(ph), R*Math.sin(th)*Math.sin(ph), R*Math.cos(th));
     /* Everything is plain vector with constant-opacity strokes, so PDF viewers
-       draw the cover at once. Masks, blur filters and translucent gradients all
-       make Chrome's print path emit bitmaps or soft masks that render slowly.
-       So the fades are stepped opacities and the glow is a stack of wide strokes. */
-    const lerp=(st,t)=>{ for(let i=1;i<st.length;i++) if(t<=st[i][0]){ const [t0,v0]=st[i-1],[t1,v1]=st[i];
-      return v0+(v1-v0)*(t-t0)/(t1-t0); } return st[st.length-1][1]; };
-    const hw=x=>lerp([[0,0],[29.4,1],[180.6,1],[210,0]],Math.min(210,Math.max(0,x)));  /* side fade */
-    const vw=y=>lerp([[0,.25],[148.5,.6],[237.6,1],[297,.2]],y);                       /* grid fade */
-    const bins=[]; for(let x=0;x<29.4-1e-6;x+=2.1) bins.push([x,x+2.1]);
-    bins.push([29.4,180.6]); for(let x=180.6;x<210-1e-6;x+=2.1) bins.push([x,x+2.1]);
-    /* one path per bin, each with the fade weight at its centre (mid bin weight 1) */
-    /* the first and last edge of each piece is 0.01 mm long, so neighbouring
-       butt ends meet at the same angle and wide strokes leave no wedge between them */
-    const pieces=g=>bins.map(([a,z])=>{ const n=Math.max(2,Math.ceil((z-a)/0.5)); const xs=[a,a+.01];
-      for(let i=1;i<n;i++) xs.push(a+(z-a)*i/n); xs.push(z-.01,z);
-      return [xs.map((x,i)=>(i?'L':'M')+f3(x)+' '+f3(g(x))).join(''),hw((a+z)/2)]; });
-    /* The glow is wider than the curve's bend at its peaks, so cutting it into
-       pieces would fold neighbouring pieces over each other. Each fade bin draws
-       it whole (padded past the bin) and clips it to the bin's strip instead. */
-    const clips=bins.map(([a,z],i)=>`<clipPath id="cv-c${i}"><rect x="${a}" y="0" width="${f(z-a)}" height="297"/></clipPath>`).join('');
-    const glowd=(g,a,z)=>{ let d=''; for(let x=a;x<=z+1e-6;x+=.5) d+=(d?'L':'M')+f(x)+' '+f(g(x)); return d; };
-    const trace=(g,c,o,w,glow)=>{ let s='';
-      if(glow) s+=bins.map(([a,z],i)=>{ const d=glowd(g,a-4,z+4), h=hw((a+z)/2);
-        return `<g clip-path="url(#cv-c${i})">`+[[7,.06],[6,.07],[5,.08],[4.2,.09],[3.4,.1],[2.6,.11],[1.9,.12],[1.3,.13]]
-          .map(([gw,k])=>`<path d="${d}" stroke="${c[1]}" stroke-opacity="${f3(glow*k*h)}" stroke-width="${gw}"/>`).join('')+'</g>'; }).join('');
-      return s+pieces(g).map(([d,h])=>`<path d="${d}" stroke="${c[0]}" stroke-opacity="${f3(o*h)}" stroke-width="${w}"/>`).join(''); };
-    let grid='', stems='';
+       draw the cover at once (no masks, blur filters or translucent gradients).
+       A curve is split where it passes behind the sphere; the glow is a stack
+       of wide faint strokes. */
+    const runs=pts=>{ const out=[]; let cur=null;
+      pts.forEach(q=>{ const fr=q[2]>=0; if(!cur||cur.fr!==fr){ if(cur) cur.p.push(q); cur={fr,p:cur?[cur.p[cur.p.length-1],q]:[q]}; out.push(cur); } else cur.p.push(q); });
+      return out; };
+    const d=p=>p.map((q,k)=>(k?'L':'M')+f3(q[0])+' '+f3(q[1])).join('');
+    const GLOW=[[5,.05],[3.8,.07],[2.8,.09],[1.9,.11],[1.2,.13]];
+    const curve=(pts,col,w,oF,oB,glow)=>runs(pts).map(r=>{ const o=r.fr?oF:oB, g=r.fr?glow:0;
+      return (g?GLOW.map(([gw,k])=>`<path d="${d(r.p)}" stroke="${col}" stroke-opacity="${f3(g*k)}" stroke-width="${gw}"/>`).join(''):'')+
+        `<path d="${d(r.p)}" stroke="${col}" stroke-opacity="${f3(o)}" stroke-width="${w}"${r.fr?'':' stroke-dasharray="1.2 1.4"'}/>`; }).join('');
+    const ring=g=>{ const a=[]; for(let k=0;k<=240;k++) a.push(g(2*Math.PI*k/240)); return a; };
+    let art='';
+    /* the outline is the silhouette, always in front */
+    const rim=ring(t=>[xc+R*Math.cos(t), yc+R*Math.sin(t), 1]);
+    art+=curve(rim,'#8AD6E0',.5,.95,.95,.55);
+    for(const th of [30,60,90,120,150]) art+=curve(ring(ph=>onS(th*D,ph)),'#8AD6E0',th===90?.42:.26,th===90?.8:.5,.16,th===90?.25:0);
+    for(const ph of [0,30,60,90,120,150]) art+=curve(ring(t=>onS(t,ph*D)),'#8AD6E0',.24,.42,.14,0);
+    /* the z axis, past both poles */
+    const z1=P(0,0,1.16*R), z0=P(0,0,-1.16*R), n=P(0,0,R), s_=P(0,0,-R);
+    art+=`<path d="M${f(z0[0])} ${f(z0[1])}L${f(z1[0])} ${f(z1[1])}" stroke="#C9D4DE" stroke-opacity=".35" stroke-width=".25" stroke-dasharray="1.6 1.6"/>`;
+    art+=`<circle cx="${f(n[0])}" cy="${f(n[1])}" r="1.3" fill="#8AD6E0"/><circle cx="${f(s_[0])}" cy="${f(s_[1])}" r="1.1" fill="#8AD6E0" fill-opacity=".45"/>`;
+    /* the precession trail: theta from 6 deg to 58 deg while phi makes three turns */
+    const thS=58*D, phS=35*D, trail=[], dots=[];
+    for(let k=0;k<=360;k++){ const t=k/360; trail.push(onS(6*D+(thS-6*D)*t, phS-6*Math.PI*(1-t))); }
+    for(let k=0;k<=36;k++){ const t=k/36; dots.push([onS(6*D+(thS-6*D)*t, phS-6*Math.PI*(1-t)),t]); }
+    art+=curve(trail,'#E0B070',.36,.78,.26,.3);
+    art+=dots.map(([q,t])=>`<circle cx="${f(q[0])}" cy="${f(q[1])}" r="${q[2]>=0?.75:.55}" fill="#F2B48A" fill-opacity="${f3((q[2]>=0?.35:.15)+.6*t*(q[2]>=0?1:.4))}"/>`).join('');
+    /* the state vector, from the centre to the tip */
+    const tip=onS(thS,phS), o=P(0,0,0);
+    art+=GLOW.map(([gw,k])=>`<path d="M${f(o[0])} ${f(o[1])}L${f(tip[0])} ${f(tip[1])}" stroke="#E09A6A" stroke-opacity="${f3(.6*k)}" stroke-width="${gw}" stroke-linecap="round"/>`).join('');
+    art+=`<path d="M${f(o[0])} ${f(o[1])}L${f(tip[0])} ${f(tip[1])}" stroke="#F2B48A" stroke-width=".7" stroke-linecap="round"/>`;
+    art+=`<circle cx="${f(o[0])}" cy="${f(o[1])}" r=".9" fill="#F2B48A"/><circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="3.2" fill="#E09A6A" fill-opacity=".18"/><circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="1.7" fill="#F7D2B6"/>`;
+    /* the background grid, fading toward the edges of the page */
+    const vw=y=>{ const st=[[0,.25],[148.5,.6],[237.6,1],[297,.2]]; for(let i=1;i<st.length;i++) if(y<=st[i][0]){ const [t0,v0]=st[i-1],[t1,v1]=st[i]; return v0+(v1-v0)*(y-t0)/(t1-t0); } return .2; };
+    let grid='';
     for(let x=0;x<=210;x+=7.5) for(let y=0;y<297;y+=15)
       grid+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${Math.min(297,y+15)}" stroke-opacity="${f3(.075*vw(y+7.5))}"/>`;
-    for(let y=y0%7.5;y<=297;y+=7.5) grid+=`<line x1="0" y1="${f(y)}" x2="210" y2="${f(y)}" stroke-opacity="${f3(.075*vw(y))}"/>`;
-    for(let x=xc-13*T;x<=xc+13*T+1e-6;x+=T){ const y=sy(x), h=hw(x);
-      stems+=`<line x1="${f(x)}" y1="${y0}" x2="${f(x)}" y2="${f(y)}" stroke-opacity="${f3(.85*h)}"/><circle cx="${f(x)}" cy="${f(y)}" r="0.9" fill-opacity="${f3(h)}" stroke-opacity="${f3(.85*h)}"/>`; }
+    for(let y=0;y<=297;y+=7.5) grid+=`<line x1="0" y1="${f(y)}" x2="210" y2="${f(y)}" stroke-opacity="${f3(.075*vw(y))}"/>`;
     return `<svg class="cv-art" viewBox="0 0 210 297" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
 <defs>
-<radialGradient id="cv-bg" cx="50%" cy="68%" r="75%"><stop offset="0" stop-color="#173C5E"/><stop offset=".55" stop-color="#0F2640"/><stop offset="1" stop-color="#08121E"/></radialGradient>${clips}
+<radialGradient id="cv-bg" cx="50%" cy="56%" r="75%"><stop offset="0" stop-color="#173C5E"/><stop offset=".55" stop-color="#0F2640"/><stop offset="1" stop-color="#08121E"/></radialGradient>
 </defs>
 <rect width="210" height="297" fill="url(#cv-bg)"/>
 <g stroke="#9FB6CC" stroke-width=".18">${grid}</g>
-<g fill="none" stroke-linejoin="round">
-${trace(()=>y0,['#C9D4DE'],.32,.25)}
-${trace(dy,['#E0B070','#E0B070'],.78,.42,.35)}
-<g stroke="#E09A6A" stroke-width=".38" fill="#F2B48A">${stems}</g>
-${trace(sy,['#8AD6E0','#6FC3CF'],1,.55,.45)}
+<g fill="none" stroke-linejoin="round" stroke-linecap="round">
+${art}
 </g>
 </svg>`;
   };
