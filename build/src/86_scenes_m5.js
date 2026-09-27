@@ -1519,7 +1519,7 @@ realGallery({ id:'m5-real-ramsey', nav:'Interference Around Us',
         note:'Twenty times fewer queries, and fifty times slower. Both ratios are correct and they point in opposite directions. The honest question is the $N$ at which $\\sqrt{N}$ slow queries beat $N/2$ fast ones.'}]},
     {t:'reveal', at:3, items:[
       {t:'note', kind:'def', head:'Given', html:'The same query times, $10\\,\\mu\\text{s}$ and $10\\,\\text{ns}$, at $N=2^{20}$ with one marked item.<div class="nsep"></div>Which run finishes first?',
-        ask:{key:'m5-claim', choices:['classical: $5.2\\,\\text{ms}$ against $8.0\\,\\text{ms}$','quantum: $8.0\\,\\text{ms}$ against $5.2\\,\\text{s}$','they tie'], answer:0,
+        ask:{key:'m5-claim', choices:['classical, $5.2$ vs $8.0\\,\\text{ms}$','quantum, $8.0\\,\\text{ms}$ vs $5.2\\,\\text{s}$','they tie'], answer:0,
           why:'Grover needs $804$ queries, $8.0\\,\\text{ms}$. The classical scan needs $2^{19}=524{,}288$ queries, $5.2\\,\\text{ms}$. The crossing is near $N=2.5\\times10^{6}$.'}}]}
   ]}
 ]},
