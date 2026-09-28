@@ -4,6 +4,9 @@
   "outputDirectory": "site",
   "installCommand": "echo \"no dependencies\"",
   "framework": null,
+  "git": {
+    "deploymentEnabled": { "main": true, "**": false }
+  },
   "rewrites": [
     { "source": "/artifact", "destination": "/Quantum_Computing.html" },
     { "source": "/notes", "destination": "/Lecture_Notes.pdf" },
