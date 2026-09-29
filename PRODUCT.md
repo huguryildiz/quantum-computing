@@ -19,7 +19,7 @@ room and needs each scene to work as a lecture slide.
 A first course in quantum computing in four documents built from one set of sources: the interactive
 artifact (272 scenes, 31 laboratories, 120 practice questions with worked solutions), the lecture
 notes, the student workbook, and the formula reference. It is published as a static site behind a
-cover page at https://quantum-computing-tedu.vercel.app.
+cover page at https://quantum-computing.huguryildiz.com.
 
 The course is an adaptation of Aleksandr Krasnok's *Quantum Computing Lectures*, used under
 CC BY 4.0. `NOTICE` carries the full attribution, and the credit line is printed in every published

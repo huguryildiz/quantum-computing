@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/KaTeX-0b1220?style=for-the-badge&logo=latex&logoColor=4FBECE" alt="KaTeX">
   <img src="https://img.shields.io/badge/NumPy_%C2%B7_SciPy_%C2%B7_SymPy-0b1220?style=for-the-badge&logo=numpy&logoColor=4DABCF" alt="NumPy, SciPy and SymPy">
   <img src="https://img.shields.io/badge/Playwright-0b1220?style=for-the-badge&logo=playwright&logoColor=45BA4B" alt="Playwright">
-  <a href="https://quantum-computing-tedu.vercel.app"><img src="https://img.shields.io/badge/quantum--computing--tedu.vercel.app-0b1220?style=for-the-badge&logo=vercel&logoColor=white" alt="Live"></a>
+  <a href="https://quantum-computing.huguryildiz.com"><img src="https://img.shields.io/badge/quantum--computing.huguryildiz.com-0b1220?style=for-the-badge&logo=vercel&logoColor=white" alt="Live"></a>
   <a href="https://github.com/huguryildiz/quantum-computing/actions/workflows/checks.yml"><img src="https://img.shields.io/github/actions/workflow/status/huguryildiz/quantum-computing/checks.yml?branch=main&style=for-the-badge&label=checks" alt="Checks"></a>
 </p>
 
@@ -168,7 +168,7 @@ gives it in APA and BibTeX. In BibTeX:
   title        = {Quantum Computing: An Interactive Lecture Artifact},
   year         = {2026},
   version      = {1.0},
-  howpublished = {\url{https://quantum-computing-tedu.vercel.app}},
+  howpublished = {\url{https://quantum-computing.huguryildiz.com}},
   note         = {Source: \url{https://github.com/huguryildiz/quantum-computing}}
 }
 ```
@@ -194,5 +194,5 @@ Material in `source/` is third-party and is covered by neither project license.
 
 Suggested attribution:
 
-> Hüseyin Uğur Yıldız, *Quantum Computing*, https://huguryildiz.com/, adapted from Aleksandr Krasnok,
+> Hüseyin Uğur Yıldız, *Quantum Computing*, https://quantum-computing.huguryildiz.com, adapted from Aleksandr Krasnok,
 > *Quantum Computing Lectures*, CC BY 4.0.

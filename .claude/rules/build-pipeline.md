@@ -128,7 +128,7 @@ with its `out`. The NumPy half runs with `.venv/`. The Qiskit half needs Qiskit,
 
 ## Deployment
 
-`https://quantum-computing-tedu.vercel.app` is the published address. The page in `web/`, built
+`https://quantum-computing.huguryildiz.com` is the published address. The page in `web/`, built
 into `site/` by `node web/build-site.js`, with `/artifact`, `/notes`, `/workbook` and `/reference`
 rewritten onto the four files by `vercel.json`. The instructor edition is not on the host:
 `.vercelignore` excludes it, and `/dist/Instructor_Solutions.pdf` answers 404.
