@@ -39,7 +39,8 @@ full argument reads the notes; a student in the room reads the slide and listens
 
 ## Capabilities and Constraints
 
-- One HTML file, served by the site. It makes no network request of its own. No analytics. Progress
+- One HTML file, served by the site. It makes no network request of its own. No analytics in the artifact or the notes; the site cover page alone
+  counts visits with cookieless GoatCounter. Progress
   is stored on the device only.
 - Fixed 1920×1080 stage, scaled to the window.
 - Every number on a page is recomputed by a script in `verify/`, written independently of the
