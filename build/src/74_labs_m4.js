@@ -130,7 +130,7 @@ Object.assign(LABS, (function(){
       a.note(q[0], q[1], s, {fs:12.5, color:P.COL.muted, tex:true,
         anchor: q[0] > 0.25 ? 'start' : q[0] < -0.25 ? 'end' : 'middle',
         dx: q[0] > 0.25 ? 5 : q[0] < -0.25 ? -5 : 0,
-        dy: q[1] < 0 ? 15 : -5}); };
+        dy: q[1] < 0 ? 15*P.labelScale() : -5}); };
     tag(pj(0,0, 1.32),'|0\\rangle');
     tag(pj(0,0,-1.32),'|1\\rangle');
     tag(pj(1.32,0,0),'x');
@@ -254,7 +254,9 @@ Object.assign(LABS, (function(){
 
       /* ---- the three components against the step number ---- */
       const n = states.length - 1;
-      const b = P.Axes({w:430,h:280,xr:[-0.35, Math.max(1,n)+0.35],yr:[-1.18,1.18],
+      /* the right margin leaves the axis name clear of the step marker when it
+         stands on the last step, also with the larger names of the lecture view */
+      const b = P.Axes({w:430,h:280,xr:[-0.35, Math.max(1,n)+(P.labelScale()>1?0.7:0.35)],yr:[-1.18,1.18],
         xlabel:'\\text{step}', ylabel:'\\text{component}',
         pad:{l:60,r:24,t:30,b:46},
         xticksOverride:Array.from({length:n+1},(_,i)=>i), ytarget:4});
@@ -638,7 +640,7 @@ Object.assign(LABS, (function(){
       a.note(q[0], q[1], s, {fs:12.5, color:P.COL.muted, tex:true,
         anchor: q[0] > 0.25 ? 'start' : q[0] < -0.25 ? 'end' : 'middle',
         dx: q[0] > 0.25 ? 5 : q[0] < -0.25 ? -5 : 0,
-        dy: q[1] < 0 ? 15 : -5}); };
+        dy: q[1] < 0 ? 15*P.labelScale() : -5}); };
     tag(pj(0,0, 1.32),'|0\\rangle');
     tag(pj(0,0,-1.32),'|1\\rangle');
     tag(pj(1.32,0,0),'x');
@@ -684,7 +686,7 @@ Object.assign(LABS, (function(){
       const qc = pj(rc[0],rc[1],rc[2]);
       a.poly([[0,0],qc],{color:P.COL.mid,width:2.2,dash:'4 4'});
       a.point(qc[0],qc[1],{color:P.COL.mid,r:6});
-      a.note(qc[0],qc[1],chi.name,{fs:12.5,color:P.COL.mid,tex:true,dx:8,dy:-8});
+      a.note(qc[0],qc[1],chi.name,{fs:12.5,color:P.COL.mid,tex:true,dx:8*P.labelScale(),dy:-8*P.labelScale()});
       const q = pj(r[0],r[1],r[2]);
       a.poly([[0,0],q],{color:P.COL.in,width:2.8});
       a.point(q[0],q[1],{color:P.COL.in,r:7});
@@ -816,11 +818,11 @@ Object.assign(LABS, (function(){
       const qi = pj(rin[0],rin[1],rin[2]);
       a.poly([[0,0],qi],{color:P.COL.in,width:2.2});
       a.point(qi[0],qi[1],{color:P.COL.in,r:6});
-      a.note(qi[0],qi[1],'\\text{in}',{fs:12.5,color:P.COL.in,tex:true,dx:-8,dy:-8,anchor:'end'});
+      a.note(qi[0],qi[1],'\\text{in}',{fs:12.5,color:P.COL.in,tex:true,dx:-8*P.labelScale(),dy:-8*P.labelScale(),anchor:'end'});
       const qo = pj(rout[0],rout[1],rout[2]);
       a.poly([[0,0],qo],{color:P.COL.out,width:2.8});
       a.point(qo[0],qo[1],{color:P.COL.out,r:7});
-      a.note(qo[0],qo[1],'\\text{out}',{fs:12.5,color:P.COL.out,tex:true,dx:8,dy:-8});
+      a.note(qo[0],qo[1],'\\text{out}',{fs:12.5,color:P.COL.out,tex:true,dx:8*P.labelScale(),dy:-8*P.labelScale()});
 
       const b = P.Axes({w:430,h:280,xr:[-0.35,2.35],yr:[-1.18,1.18],
         xlabel:'\\text{step}', ylabel:'\\text{component}',

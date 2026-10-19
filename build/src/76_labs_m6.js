@@ -233,7 +233,10 @@ Object.assign(LABS, (function(){
       const pts = []; for(let x=0;x<Q;x++) pts.push([x, s[x]]);
       a.stem(pts,{color:P.COL.in,r:Q>32?2.2:4.2,width:1.8,showZero:true});
       a.hline(a0,{color:P.COL.err,width:1.6,dash:'4 4'});
-      a.note(Q-0.5,a0+(a0>=0?0.16:-0.28),'\\text{mean}='+fmt(a0,4),{fs:12,color:P.COL.err,anchor:'end',tex:true});
+      /* In projector mode the grown name would cross the stems beside the
+         line, so it moves to the upper right corner, above every stem. */
+      if(P.labelScale()>1) a.note(Q-0.5,1.25,'\\text{mean}='+fmt(a0,4),{fs:12,color:P.COL.err,anchor:'end',tex:true});
+      else a.note(Q-0.5,a0+(a0>=0?0.16:-0.28),'\\text{mean}='+fmt(a0,4),{fs:12,color:P.COL.err,anchor:'end',tex:true});
 
       /* ---- the same mean, squared, against every possible split ---- */
       /* A function need not be constant or balanced: this panel walks every

@@ -287,7 +287,8 @@ Object.assign(LABS, (function(){
            the page, so a label pushed out along the arrow lands on whatever
            else happens to point that way; a step sideways cannot. */
         const L = Math.hypot(q[0],q[1]) || 1;
-        ax.note(q[0],q[1],'e_{'+(i+1)+'}',{fs:13,color:P.COL.out,dx:-q[1]/L*22,dy:-q[0]/L*22,tex:true});
+        const off = 22*P.labelScale();
+        ax.note(q[0],q[1],'e_{'+(i+1)+'}',{fs:13,color:P.COL.out,dx:-q[1]/L*off,dy:-q[0]/L*off,tex:true});
       });
 
       /* ---- the defect of both recursions, over the whole slider range ---- */

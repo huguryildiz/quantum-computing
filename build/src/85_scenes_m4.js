@@ -28,6 +28,9 @@
 const P = PLOT, C = P.COL;
 const R2 = Math.SQRT1_2;
 const D2R = Math.PI/180;
+/* A name set a few pixels off a point keeps its clearance in the lecture view,
+   where it is drawn 1.36 times larger, only if the offset grows with it. */
+const LS = () => P.labelScale();
 
 /* ---- the drawing convention every sphere in this chapter uses -------------
    A point of the ball is drawn at
@@ -98,9 +101,13 @@ function figOpen(){
    figure fills its whole column and squeezes the text beside it; three scenes
    of chapter 3 fell below the layout floor for exactly that reason. The ball
    sits at the left of the frame and the space to its right is empty. */
-const sph = () => P.Axes({w:492,h:268,xr:[-1.85,3.65],yr:[-1.35,1.35],
+/* In the lecture view every name is 1.36 times larger, and the margin notes
+   to the right of the ball would run past the frame, so the frame gains 0.8
+   of a unit on the right, at the same 80 px to the unit. */
+const sph = () => { const xw = P.labelScale()>1 ? 0.8 : 0;
+  return P.Axes({w:492+80*xw,h:268,xr:[-1.85,3.65+xw],yr:[-1.35,1.35],
   pad:{l:26,r:26,t:26,b:26}, xticksOverride:[], yticksOverride:[],
-  grid:false, zeroAxes:false, arrows:false});
+  grid:false, zeroAxes:false, arrows:false}); };
 
 /* A flat disc for a view down the z axis, in the same frame and at the same
    80 px to the unit, so the circle is round there as well. */
@@ -164,7 +171,7 @@ function figCardinal(){
     const q = pj(v[0],v[1],v[2]);
     a.poly([[0,0],q],{color:col,width:1.8});
     a.point(q[0],q[1],{color:col,r:6});
-    a.note(q[0],q[1],l,{fs:13.5,color:col,dx,dy,anchor:an,tex:true});
+    a.note(q[0],q[1],l,{fs:13.5,color:col,dx,dy:dy>0?dy*LS():dy,anchor:an,tex:true});
   });
   a.note(1.80,0.70,'\\pm\\hat{z}: \\text{ the }Z\\text{ basis}',{fs:12.5,color:C.in,tex:true});
   a.note(1.80,0.30,'\\pm\\hat{x}: \\text{ the }X\\text{ basis}',{fs:12.5,color:C.out,tex:true});
@@ -220,7 +227,7 @@ function figCover(){
     pad:{l:78,r:24,t:30,b:46}, xtarget:4, ytarget:4});
   a.curve(u => Math.cos(Math.PI*u/2), {color:C.in, width:2.4});
   a.point(2,-1,{color:C.err,r:6});
-  a.note(2.08,-1,'\\text{a full turn gives } -I',{fs:12.5,color:C.err,dy:18,tex:true});
+  a.note(2,-1,'\\text{a full turn gives } -I',{fs:12.5,color:C.err,dx:10*LS(),dy:18*LS(),tex:true});
   a.point(4,1,{color:C.out,r:6});
   a.note(3.92,1,'\\text{two turns give } I',{fs:12.5,color:C.out,dy:-10,anchor:'end',tex:true});
   return a.svg();
@@ -267,8 +274,8 @@ function figPauli(){
   a.point(1,0,{color:C.out,r:6});
   a.poly([[0,0],[-1,0]],{color:C.out,width:2.4,dash:'5 4'});
   a.point(-1,0,{color:C.out,r:6});
-  a.note(1,0,'|{+}\\rangle',{fs:13,color:C.out,dx:8,dy:22,tex:true});
-  a.note(-1,0,'|{-}\\rangle',{fs:13,color:C.out,dx:-8,dy:22,anchor:'end',tex:true});
+  a.note(1,0,'|{+}\\rangle',{fs:13,color:C.out,dx:8*LS(),dy:22*LS(),tex:true});
+  a.note(-1,0,'|{-}\\rangle',{fs:13,color:C.out,dx:-8*LS(),dy:22*LS(),anchor:'end',tex:true});
   /* X is the half turn about x: it fixes |+> and |-> and swaps the poles. */
   a.poly([[0,0],[0,1]],{color:C.in,width:2.4});
   a.point(0,1,{color:C.in,r:6});
@@ -297,7 +304,7 @@ function figHad(){
   a.note(0,1.28,'|0\\rangle',{fs:13,color:C.in,anchor:'middle',tex:true});
   a.poly([[0,0],[1,0]],{color:C.out,width:2.6});
   a.point(1,0,{color:C.out,r:6});
-  a.note(1,0,'|{+}\\rangle',{fs:13,color:C.out,dx:8,dy:24,tex:true});
+  a.note(1,0,'|{+}\\rangle',{fs:13,color:C.out,dx:8*LS(),dy:24*LS(),tex:true});
   /* the half turn takes the top of the circle round to the right of it */
   const sw=[]; for(let i=0;i<=40;i++){ const t=Math.PI/2*(1-i/40);
     sw.push([1.12*Math.cos(t),1.12*Math.sin(t)]); }
@@ -315,7 +322,7 @@ function figPhaseGate(){
     const t = deg*D2R, x = Math.cos(t), y = Math.sin(t);
     a.poly([[0,0],[x,y]],{color:col,width:2.4});
     a.point(x,y,{color:col,r:6});
-    a.note(x,y,lab,{fs:13,color:col,dx,dy,anchor:an,tex:true});
+    a.note(x,y,lab,{fs:13,color:col,dx,dy:dy*LS(),anchor:an,tex:true});
   };
   put(0,   '|{+}\\rangle',    C.in,  10, 24,'start');
   put(45,  'T|{+}\\rangle',   C.mid, 10, -6,'start');
@@ -444,20 +451,25 @@ function figUncompute(){
 function figOrder(){
   const rows = [['|00\\rangle','c_{0}'],['|01\\rangle','c_{1}'],
                 ['|10\\rangle','c_{2}'],['|11\\rangle','c_{3}']];
+  /* In the lecture view the names are 1.36 times larger, so the boxes, the
+     gap above them and the rows on the right open out with them. */
+  const k = P.labelScale(), bh = 38 + 30*(k-1), pitch = bh + 6, top = 30 + 24*(k-1);
+  const mid = top + (3*pitch + bh)/2, ry = y => mid + (y - 109)*k;
   const items = [];
-  rows.forEach(([k,c],i)=>{
-    const y = 30 + i*44;
-    items.push({t:'text',x:90,y:y+28,anchor:'end',label:k,tex:true,fs:15});
-    items.push({t:'box',x:104,y:y,w:86,h:38,label:c,tex:true,fs:15,
+  rows.forEach(([lab,c],i)=>{
+    const y = top + i*pitch;
+    items.push({t:'text',x:90,y:y+bh/2+9,anchor:'end',label:lab,tex:true,fs:15});
+    items.push({t:'box',x:104,y:y,w:86,h:bh,label:c,tex:true,fs:15,
       color:i===2?C.out:C.mid});
   });
-  items.push({t:'text',x:147,y:20,label:'x = 2q_{1}+q_{0}',tex:true,fs:14});
-  items.push({t:'text',x:390,y:52,label:'\\left(I\\otimes X\\right)|10\\rangle = |11\\rangle',tex:true,fs:16});
-  items.push({t:'text',x:390,y:82,label:'acts on the right qubit',fs:13});
-  items.push({t:'text',x:390,y:136,label:'\\left(X\\otimes I\\right)|10\\rangle = |00\\rangle',tex:true,fs:16});
-  items.push({t:'text',x:390,y:166,label:'acts on the left qubit',fs:13});
-  items.push({t:'text',x:280,y:228,label:'same gate, two different states',fs:13,color:C.err});
-  return growBlocks({w:560,h:244,items});
+  const bot = top + 3*pitch + bh;
+  items.push({t:'text',x:147,y:top-10,label:'x = 2q_{1}+q_{0}',tex:true,fs:14});
+  items.push({t:'text',x:390,y:ry(52),label:'\\left(I\\otimes X\\right)|10\\rangle = |11\\rangle',tex:true,fs:16});
+  items.push({t:'text',x:390,y:ry(82),label:'acts on the right qubit',fs:13});
+  items.push({t:'text',x:390,y:ry(136),label:'\\left(X\\otimes I\\right)|10\\rangle = |00\\rangle',tex:true,fs:16});
+  items.push({t:'text',x:390,y:ry(166),label:'acts on the left qubit',fs:13});
+  items.push({t:'text',x:280,y:bot+28*k,label:'same gate, two different states',fs:13,color:C.err});
+  return growBlocks({w:560,h:Math.round(bot+44*k),items});
 }
 
 /* The controlled-NOT: the circuit symbol, and the permutation it performs. */
@@ -533,7 +545,7 @@ function figEntangle(){
   a.point(0,0,{color:C.out,r:6});
   a.point(180,0,{color:C.out,r:6});
   a.point(90,1,{color:C.h,r:6});
-  a.note(90,1,'\\text{one ebit}',{fs:12.5,color:C.h,anchor:'middle',dy:-12,tex:true});
+  a.note(90,1,'\\text{one ebit}',{fs:12.5,color:C.h,anchor:'middle',dy:-12*LS(),tex:true});
   /* The curve is below 0.36 for every angle under 30 degrees, so the strip
      the name sits in is empty. */
   a.note(6,0.56,'\\text{a product}',{fs:12,color:C.out,tex:true});
@@ -639,10 +651,15 @@ function figLarmor(){
 }
 function figLarmorSignal(){
   const GAMMA = 42.577, B = 3.0, f = GAMMA*B; // MHz, so the period is in ns
-  const a = P.Axes({w:270,h:230,xr:[0,30],yr:[-1.7,1.25],pad:{l:38,r:14,t:16,b:38},
+  /* In the lecture view the name over the span is taller, so the frame
+     reaches lower and the span with it, keeping the name off the troughs. */
+  const yb = P.labelScale()>1 ? -2.0 : -1.7;
+  const a = P.Axes({w:270,h:230,xr:[0,30],yr:[yb,1.25],pad:{l:38,r:14,t:16,b:38},
     xlabel:'t\\;(\\text{ns})',ylabel:'\\langle X\\rangle(t)',xstep:10,ytarget:3});
   a.curve(t=>Math.cos(2*Math.PI*f*t/1000),{color:C.in,n:900});
-  a.span(0,1000/f,-1.55,'T=7.83\\,\\text{ns}',{tex:true,fs:12});
+  /* the lecture view marks the third period, so the larger name stays clear of the y numbers */
+  const s0 = P.labelScale()>1 ? 2*1000/f : 0;
+  a.span(s0,s0+1000/f,yb+0.15,'T=7.83\\,\\text{ns}',{tex:true,fs:12});
   return a.svg();
 }
 
@@ -667,8 +684,8 @@ function figRabiAngle(){
     xlabel:'t\\;(\\mu\\text{s})',ylabel:'\\theta\\;(^{\\circ})',xstep:2,ytarget:4});
   a.curve(t=>(OMEGA*t)*180/Math.PI,{color:C.mid});
   a.hline(90,{color:C.mid,dash:'3 4'}); a.hline(180,{color:C.h,dash:'3 4'});
-  a.note(7.6,100,'90^{\\circ}',{tex:true,color:C.mid,fs:12});
-  a.note(7.6,172,'180^{\\circ}',{tex:true,color:C.h,fs:12});
+  a.note(7.6,90,'90^{\\circ}',{tex:true,color:C.mid,fs:12,dy:17*LS()});
+  a.note(7.6,180,'180^{\\circ}',{tex:true,color:C.h,fs:12,dy:17*LS()});
   return a.svg();
 }
 

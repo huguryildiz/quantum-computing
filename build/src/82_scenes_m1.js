@@ -38,6 +38,22 @@ function growBlocks(spec){
   return P.blocks({w:spec.w, h:h1, items:items});
 }
 
+/* A typeset box label is set on a fixed baseline, so in the lecture view,
+   where it is drawn 1.36 times larger, it rises into the top edge of its box.
+   There the label is drawn as a separate text item centred on the box. */
+function boxLabelsCentred(items){
+  const s = P.labelScale();
+  if(s <= 1) return items;
+  const out = [];
+  items.forEach(it => {
+    if(it.t !== 'box' || !it.tex || !it.label){ out.push(it); return; }
+    out.push(Object.assign({}, it, {label:''}));
+    out.push({t:'text', x:it.x + it.w/2, y:it.y + it.h/2 + 0.7*(it.fs||16)*s - 3,
+              label:it.label, tex:true, fs:it.fs||16, color:P.COL.ink});
+  });
+  return out;
+}
+
 /* The three translations this chapter installs. Drawn as a table of arrows
    rather than written as a list, because the point is that the left column and
    the right column are the same objects and not two subjects. */
@@ -66,13 +82,14 @@ function figKet(){
   a.poly([[0,0],[1,0]],{color:C.grid,width:2.2});
   a.poly([[0,0],[0,1]],{color:C.grid,width:2.2});
   a.point(1,0,{color:C.grid,r:5}); a.point(0,1,{color:C.grid,r:5});
-  a.note(1,0,'|0\\rangle',{fs:15,color:C.muted,anchor:'middle',dy:28,tex:true});
+  const big = P.labelScale() > 1;
+  a.note(1,0,'|0\\rangle',{fs:15,color:C.muted,anchor:'middle',dy:big?34:28,tex:true});
   a.note(0,1,'|1\\rangle',{fs:15,color:C.muted,dx:14,dy:-6,tex:true});
   a.poly([[0,0],[0.6,0.8]],{color:C.in,width:2.6});
   a.point(0.6,0.8,{color:C.in,r:6});
   a.poly([[0.6,0],[0.6,0.8]],{color:C.grid,width:1.2,dash:'3 4'});
   a.poly([[0,0.8],[0.6,0.8]],{color:C.grid,width:1.2,dash:'3 4'});
-  a.note(0.63,0.86,'|\\psi\\rangle',{fs:15,color:C.in,tex:true});
+  a.note(0.63,0.86,'|\\psi\\rangle',{fs:15,color:C.in,tex:true,dx:big?5:0,dy:big?-4:0});
   a.note(0.6,-0.13,'\\alpha',{fs:14,color:C.muted,anchor:'middle',tex:true});
   a.note(-0.05,0.8,'\\beta',{fs:14,color:C.muted,anchor:'end',tex:true});
   return a.svg();
@@ -82,14 +99,17 @@ function figKet(){
    in the two possible orders, and the shapes say why one is a number and the
    other an operator. */
 function figShapes(){
+  /* In the lecture view the bra and ket names drop to the middle of the gap
+     between the two rows of boxes, clear of the row above. */
+  const yb = P.labelScale() > 1 ? 120 : 110;
   return growBlocks({w:700,h:210,items:[
     {t:'box',x:40,y:34,w:120,h:52,label:'1\\times n',tex:true,fs:15},
     {t:'box',x:172,y:34,w:120,h:52,label:'n\\times 1',tex:true,fs:15},
     {t:'arrow',x1:300,y1:60,x2:400,y2:60},
     {t:'box',x:400,y:34,w:110,h:52,label:'1\\times 1',tex:true,fs:15},
     {t:'text',x:530,y:64,label:'a number',fs:13,anchor:'start'},
-    {t:'text',x:100,y:110,label:'\\langle a|',tex:true,fs:14},
-    {t:'text',x:232,y:110,label:'|b\\rangle',tex:true,fs:14},
+    {t:'text',x:100,y:yb,label:'\\langle a|',tex:true,fs:14},
+    {t:'text',x:232,y:yb,label:'|b\\rangle',tex:true,fs:14},
     {t:'box',x:40,y:134,w:120,h:52,label:'n\\times 1',tex:true,fs:15},
     {t:'box',x:172,y:134,w:120,h:52,label:'1\\times n',tex:true,fs:15},
     {t:'arrow',x1:300,y1:160,x2:400,y2:160},
@@ -144,7 +164,10 @@ function figComplex(){
   a.poly([[0,1.5],[2,1.5]],{color:C.grid,width:1.2,dash:'3 4'});
   a.note(2,1.5,'z=x+iy',{fs:14,color:C.in,dx:14,dy:-10,tex:true});
   a.point(2,-1.5,{color:C.mid,r:6});
-  a.note(2,-1.5,'z^{*}=x-iy',{fs:14,color:C.mid,dx:14,dy:28,tex:true});
+  /* In the lecture view the conjugate's name sits level with its point, so it
+     stays above the horizontal axis name. */
+  const big = P.labelScale() > 1;
+  a.note(2,-1.5,'z^{*}=x-iy',{fs:14,color:C.mid,dx:big?16:14,dy:big?12:28,tex:true});
   a.poly([[0,0],[2,-1.5]],{color:C.mid,width:1.6,dash:'4 4'});
   a.note(1.0,0.75,'r=|z|',{fs:13.5,color:C.muted,dx:-52,dy:-12,tex:true});
   a.note(0.42,0.14,'\\varphi',{fs:14,color:C.muted,tex:true});
@@ -213,7 +236,8 @@ function figResolve(){
   a.point(0.8,0.6,{color:C.out,r:6});
   a.poly([[0.8,0],[0.8,0.6]],{color:C.grid,width:1.2,dash:'3 4'});
   a.poly([[0,0.6],[0.8,0.6]],{color:C.grid,width:1.2,dash:'3 4'});
-  a.note(0.82,0.66,'|v\\rangle',{fs:14,color:C.out,tex:true});
+  const big = P.labelScale() > 1;
+  a.note(0.82,0.66,'|v\\rangle',{fs:14,color:C.out,tex:true,dx:big?6:0,dy:big?-4:0});
   a.note(0.40,-0.13,'\\langle 0|v\\rangle\\,|0\\rangle',{fs:13,color:C.in,anchor:'middle',tex:true});
   a.note(-0.03,0.66,'\\langle 1|v\\rangle\\,|1\\rangle',{fs:13,color:C.in,anchor:'end',tex:true});
   return a.svg();
@@ -261,7 +285,10 @@ function figTree(){
   levels.forEach((ys,k)=> ys.forEach(y=> a.point(k,y,{color:hue[k],r:k===3?4:5})));
   [['1',0],['2',1],['4',2],['8',3]].forEach(([t,k])=>
     a.note(k,-0.5,t,{fs:14,color:hue[k],anchor:'middle'}));
-  a.note(1.75,-1.35,'basis strings of the register',{fs:13,color:C.muted,anchor:'middle'});
+  /* The caption line is spaced from the counts in pixels in the lecture view,
+     where both grow. */
+  const yc = P.labelScale() > 1 ? -0.5 - 27/(a.sy(0)-a.sy(1)) : -1.35;
+  a.note(1.75,yc,'basis strings of the register',{fs:13,color:C.muted,anchor:'middle'});
   return a.svg();
 }
 
@@ -318,7 +345,9 @@ function figHalfAngle(){
      which never reach past one in modulus. Anywhere inside that range a label
      sits on one of the two curves at some point of its width. */
   a.note(2.6,1.14,'\\cos(\\theta/2)',{fs:13.5,color:C.in,tex:true});
-  a.note(5.0,-1.30,'\\sin(\\theta/2)',{fs:13.5,color:C.mid,tex:true});
+  /* In the lecture view the wider label moves left, where the cosine has not
+     yet come down to the lower band and the dashed line at one turn is not. */
+  a.note(P.labelScale() > 1 ? 3.0 : 5.0,-1.30,'\\sin(\\theta/2)',{fs:13.5,color:C.mid,tex:true});
   a.note(2*Math.PI+0.35,1.14,'\\theta=2\\pi:\\; U=-I',{fs:13,color:C.err,tex:true});
   return a.svg();
 }
@@ -341,10 +370,11 @@ function figEigen(){
   a.poly([[0,0],e1],{color:C.h,width:2.6});
   a.poly([[0,0],[3*e1[0],3*e1[1]]],{color:C.h,width:1.8,dash:'4 3'});
   a.point(3*e1[0],3*e1[1],{color:C.h,r:5});
-  a.note(3*e1[0]+0.1,3*e1[1],'\\lambda=3',{fs:13.5,color:C.h,tex:true});
+  const big = P.labelScale() > 1;
+  a.note(3*e1[0]+0.1,3*e1[1],'\\lambda=3',{fs:13.5,color:C.h,tex:true,dx:big?6:0});
   a.poly([[0,0],e2],{color:C.out,width:2.6});
   a.point(e2[0],e2[1],{color:C.out,r:5});
-  a.note(e2[0]+0.12,e2[1]-0.28,'\\lambda=1',{fs:13.5,color:C.out,tex:true});
+  a.note(e2[0]+0.12,e2[1]-0.28,'\\lambda=1',{fs:13.5,color:C.out,tex:true,dx:big?24:0});
   return a.svg();
 }
 
@@ -352,15 +382,16 @@ function figEigen(){
    projector is an operator, and the sum of the products is the operator back
    again. */
 function figSpectral(){
-  return growBlocks({w:700,h:150,items:[
+  const big = P.labelScale() > 1;
+  return growBlocks({w:700,h:150,items:boxLabelsCentred([
     {t:'box',x:40,y:46,w:110,h:56,label:'A',tex:true,fs:17},
     {t:'arrow',x1:150,y1:74,x2:250,y2:74},
     {t:'box',x:250,y:46,w:170,h:56,label:'\\lambda_{1}P_{1}',tex:true,fs:16},
     {t:'text',x:440,y:80,label:'+',fs:20},
     {t:'box',x:470,y:46,w:170,h:56,label:'\\lambda_{2}P_{2}',tex:true,fs:16},
-    {t:'text',x:335,y:126,label:'\\sum_{k}P_{k}=I',tex:true,fs:14},
+    {t:'text',x:335,y:big?132:126,label:'\\sum_{k}P_{k}=I',tex:true,fs:14},
     {t:'text',x:200,y:36,label:'diagonalise',fs:12}
-  ]});
+  ])});
 }
 
 /* A function of an operator, drawn on the two eigenvalues it acts on. The
@@ -380,8 +411,10 @@ function figFunction(){
     a.point(lam,0,{color:col,r:6});
     a.point(Math.cos(lam*t0),-Math.sin(lam*t0),{color:col,r:6});
   });
-  a.note(3.0,0.18,'\\lambda=3',{fs:13,color:C.h,anchor:'middle',tex:true});
-  a.note(1.05,0.20,'\\lambda=1',{fs:13,color:C.out,anchor:'start',tex:true});
+  /* Lifted a few pixels in the lecture view, clear of the larger points. */
+  const ly = P.labelScale() > 1 ? -10 : 0;
+  a.note(3.0,0.18,'\\lambda=3',{fs:13,color:C.h,anchor:'middle',tex:true,dy:ly});
+  a.note(1.05,0.20,'\\lambda=1',{fs:13,color:C.out,anchor:'start',tex:true,dy:ly});
   a.note(Math.cos(3*t0),-Math.sin(3*t0),'e^{-3it}',{fs:13,color:C.h,anchor:'end',dx:-12,dy:26,tex:true});
   a.note(Math.cos(t0),-Math.sin(t0),'e^{-it}',{fs:13,color:C.out,dx:12,dy:28,tex:true});
   return a.svg();
@@ -474,7 +507,7 @@ function figTensor(){
     {t:'text',x:186,y:62,label:'q_{0}',tex:true,fs:14,color:C.in},
     b(156,76,'b_{1}',C.in), b(156,116,'b_{2}',C.in),
     {t:'text',x:250,y:140,label:'=',tex:true,fs:22,color:C.ink},
-    {t:'text',x:326,y:14,label:'entry',fs:12,anchor:'end'}
+    {t:'text',x:326,y:P.labelScale() > 1 ? 19 : 14,label:'entry',fs:12,anchor:'end'}
   ];
   rows.forEach(([t,s,k],i)=>{
     const y = 26 + i*46;
@@ -482,22 +515,24 @@ function figTensor(){
     items.push(b(340,y,t,C.out,92));
     items.push({t:'text',x:448,y:y+24,label:s,tex:true,fs:14,anchor:'start',color:C.out});
   });
-  return growBlocks({w:520,h:216,items:items});
+  return growBlocks({w:520,h:216,items:boxLabelsCentred(items)});
 }
 
 /* Why the exponential of a Hermitian operator is unitary, drawn as what it
    does to the eigenvalues: a real number goes in, a number of modulus one
    comes out. */
 function figGenerator(){
+  /* The two lines under each box are spread apart in the lecture view. */
+  const big = P.labelScale() > 1, y1 = big ? 126 : 132, y2 = big ? 162 : 156;
   return growBlocks({w:640,h:170,items:[
     {t:'box',x:30,y:44,w:190,h:56,label:'G=G^{\\dagger}',tex:true,fs:17},
     {t:'arrow',x1:220,y1:72,x2:410,y2:72,color:C.h},
     {t:'text',x:315,y:52,label:'e^{-i\\theta G}',tex:true,fs:16,color:C.h},
     {t:'box',x:410,y:44,w:200,h:56,label:'U^{\\dagger}U=I',tex:true,fs:17},
-    {t:'text',x:125,y:132,label:'real eigenvalues',fs:13},
-    {t:'text',x:125,y:156,label:'\\lambda\\in\\mathbb{R}',tex:true,fs:14},
-    {t:'text',x:510,y:132,label:'eigenvalues on the unit circle',fs:13},
-    {t:'text',x:510,y:156,label:'|e^{-i\\theta\\lambda}|=1',tex:true,fs:14}
+    {t:'text',x:125,y:y1,label:'real eigenvalues',fs:13},
+    {t:'text',x:125,y:y2,label:'\\lambda\\in\\mathbb{R}',tex:true,fs:14},
+    {t:'text',x:510,y:y1,label:'eigenvalues on the unit circle',fs:13},
+    {t:'text',x:510,y:y2,label:'|e^{-i\\theta\\lambda}|=1',tex:true,fs:14}
   ]});
 }
 
@@ -545,9 +580,10 @@ function figMalusBars(){
     ylabel:'I/I_{0}', pad:{l:56,r:20,t:24,b:46}, xticksOverride:[], ytarget:4});
   const vals=[[0,1,C.out],[1,0.5,C.mid],[2,0,C.err]];
   vals.forEach(([x,v,col])=> a.rect(x-0.32,0,x+0.32,v,{fill:col}));
-  a.note(0,-0.10,'0^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
-  a.note(1,-0.10,'45^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
-  a.note(2,-0.10,'90^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  const dy = P.labelScale() > 1 ? 9 : 0;
+  a.note(0,-0.10,'0^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true,dy});
+  a.note(1,-0.10,'45^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true,dy});
+  a.note(2,-0.10,'90^{\\circ}',{fs:13,color:C.muted,anchor:'middle',tex:true,dy});
   return a.svg();
 }
 

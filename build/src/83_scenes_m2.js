@@ -63,6 +63,7 @@ function figPostulates(){
 /* What one shot is. The circuit returns one string, and the amplitudes decide
    only how often each string comes back. */
 function figShot(){
+  const big = P.labelScale()>1;
   return growBlocks({w:700,h:206,items:[
     {t:'box',x:30,y:52,w:150,h:60,label:'|\\psi\\rangle',tex:true,fs:17},
     {t:'arrow',x1:180,y1:82,x2:280,y2:82},
@@ -71,8 +72,8 @@ function figShot(){
     {t:'arrow',x1:430,y1:104,x2:530,y2:128},
     {t:'box',x:530,y:12,w:130,h:48,label:'0',fs:16,color:C.out},
     {t:'box',x:530,y:104,w:130,h:48,label:'1',fs:16,color:C.err},
-    {t:'text',x:595,y:82,label:'p=|\\langle 0|\\psi\\rangle|^{2}',tex:true,fs:13},
-    {t:'text',x:595,y:180,label:'p=|\\langle 1|\\psi\\rangle|^{2}',tex:true,fs:13},
+    {t:'text',x:595,y:big?88:82,label:'p=|\\langle 0|\\psi\\rangle|^{2}',tex:true,fs:13},
+    {t:'text',x:595,y:big?186:180,label:'p=|\\langle 1|\\psi\\rangle|^{2}',tex:true,fs:13},
     {t:'text',x:230,y:192,label:'one shot returns one of them, and nothing else',fs:12}
   ]});
 }
@@ -160,9 +161,10 @@ function figExpectation(){
    eigenstate the spread is zero and the mean is the eigenvalue; between them
    the mean is a number no instrument ever returns. */
 function figVariance(){
+  const big = P.labelScale()>1;
   const a = P.Axes({w:560,h:250,xr:[0,Math.PI],yr:[-1.15,1.15],
-    xlabel:'\\theta', ylabel:'\\text{value}',
-    pad:{l:60,r:24,t:26,b:46}, xtarget:4, ytarget:5});
+    xlabel:'\\theta', ylabel:'\\text{value}', xnameRight:big?24:8,
+    pad:{l:60,r:big?40:24,t:26,b:46}, xtarget:4, ytarget:5});
   a.curve(t => Math.cos(t), {color:C.in, width:2.4});
   a.curve(t => Math.abs(Math.sin(t)), {color:C.err, width:2.2, dash:'5 4'});
   a.note(0.30,-0.72,'\\langle Z\\rangle',{fs:13.5,color:C.in,tex:true});
@@ -199,7 +201,7 @@ function figUncertainty(){
     {color:C.in, width:2.4});
   a.curve(t => Math.abs(Math.sin(t)*sp), {color:C.err, width:2.2, dash:'5 4'});
   a.note(0.34,0.74,'\\Delta X\\,\\Delta Z',{fs:13,color:C.in,tex:true});
-  a.note(1.95,0.26,'\\tfrac12|\\langle[X,Z]\\rangle|',{fs:13,color:C.err,tex:true});
+  a.note(1.95,0.26,'\\tfrac12|\\langle[X,Z]\\rangle|',{fs:13,color:C.err,dy:28*(P.labelScale()-1),tex:true});
   return a.svg();
 }
 
@@ -315,6 +317,7 @@ function figShots(){
 
 /* What the chapter licenses, in the order a run uses it. */
 function figLoop(){
+  const big = P.labelScale()>1;
   return P.blocks({w:740,h:150,items:[
     {t:'box',x:24,y:44,w:150,h:60,label:'prepare',fs:14},
     {t:'arrow',x1:174,y1:74,x2:222,y2:74},
@@ -324,8 +327,8 @@ function figLoop(){
     {t:'arrow',x1:570,y1:74,x2:618,y2:74},
     {t:'box',x:618,y:44,w:100,h:60,label:'count',fs:14},
     {t:'text',x:99,y:128,label:'a normalised vector',fs:12},
-    {t:'text',x:297,y:128,label:'e^{-iHt}',tex:true,fs:13},
-    {t:'text',x:495,y:128,label:'\\langle\\psi|P_{a}|\\psi\\rangle',tex:true,fs:13},
+    {t:'text',x:297,y:big?134:128,label:'e^{-iHt}',tex:true,fs:13},
+    {t:'text',x:495,y:big?134:128,label:'\\langle\\psi|P_{a}|\\psi\\rangle',tex:true,fs:13},
     {t:'text',x:668,y:128,label:'N shots',fs:12}
   ]});
 }
@@ -375,14 +378,14 @@ function figCollapse(){
 /* The reported probability of 0 against the true one, for three symmetric
    error rates. All three lines pass through (1/2, 1/2); the slope is 1-2 eps. */
 function figReadout(){
-  const a = P.Axes({w:540,h:260,xr:[0,1],yr:[0,1.08],
+  const a = P.Axes({w:540,h:P.labelScale()>1?320:260,xr:[0,1],yr:[0,1.08],
     xlabel:'q', ylabel:'p_{\\text{rep}}(0)',
     pad:{l:66,r:24,t:26,b:46}, xtarget:5, ytarget:4});
   a.curve(q => q, {color:C.in, width:2.4});
   a.curve(q => 0.1 + 0.8*q, {color:C.err, width:2.2});
   a.curve(q => 0.5, {color:C.muted, width:1.8, dash:'5 4'});
   a.note(0.95,0.95,'\\epsilon=0',{fs:13,color:C.in,anchor:'end',dx:-14,dy:-4,tex:true});
-  a.note(0.97,0.876,'\\epsilon=0.1',{fs:13,color:C.err,anchor:'end',dy:36,tex:true});
+  a.note(0.97,0.876,'\\epsilon=0.1',{fs:13,color:C.err,anchor:'end',dy:36+50*(P.labelScale()-1),tex:true});
   a.note(0.03,0.5,'\\epsilon=\\tfrac12',{fs:13,color:C.muted,dy:-12,tex:true});
   return a.svg();
 }

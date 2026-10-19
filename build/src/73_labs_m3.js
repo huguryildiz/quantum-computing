@@ -106,7 +106,7 @@ Object.assign(LABS, (function(){
       a.note(ix,iz,'\\text{in}',{fs:13,color:P.COL.in,dx:9,dy:-6,tex:true});
       a.poly([[0,0],[ox,oz]],{color:P.COL.out,width:2.6});
       a.point(ox,oz,{color:P.COL.out,r:6});
-      a.note(ox,oz,'\\text{out}',{fs:13,color:P.COL.out,dx:9,dy:16,tex:true});
+      a.note(ox,oz,'\\text{out}',{fs:13,color:P.COL.out,dx:9*P.labelScale(),dy:16*P.labelScale(),tex:true});
       a.point(0,0,{color:P.COL.err,r:4});
 
       /* ---- purity against the strength, for this input and this channel ---- */
@@ -687,7 +687,7 @@ Object.assign(LABS, (function(){
       b.vline(st.theta,{color:P.COL.h,width:1.4,dash:'3 4'});
       b.note(12,1.02,'\\lambda_{1}',{fs:12,color:P.COL.in,anchor:'middle',tex:true});
       b.note(78,1.02,'\\lambda_{2}',{fs:12,color:P.COL.mid,anchor:'middle',tex:true});
-      b.note(45,0.30,'\\operatorname{Tr}\\rho_{A}^{2}',{fs:12,color:P.COL.out,anchor:'middle',dx:70,tex:true});
+      b.note(45,0.30,'\\operatorname{Tr}\\rho_{A}^{2}',{fs:12,color:P.COL.out,anchor:'middle',dx:70*P.labelScale(),tex:true});
 
       root.querySelector('.plots').innerHTML =
         `<div class="labgrid">${a.svg()}${b.svg()}</div>`;

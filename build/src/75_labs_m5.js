@@ -287,7 +287,7 @@ Object.assign(LABS, (function(){
       const qi = pj(rin[0],rin[1],rin[2]);
       a.poly([[0,0],qi],{color:P.COL.in,width:1.6,dash:'4 4'});
       a.point(qi[0],qi[1],{color:P.COL.in,r:5});
-      a.note(qi[0],qi[1],'|\\psi\\rangle',{fs:12.5,color:P.COL.in,dx:-8,dy:-8,anchor:'end',tex:true});
+      a.note(qi[0],qi[1],'|\\psi\\rangle',{fs:12.5,color:P.COL.in,dx:-8*P.labelScale(),dy:-8*P.labelScale(),anchor:'end',tex:true});
       const len = Math.hypot(rb[0],rb[1],rb[2]);
       if(len < 1e-9){
         a.point(0,0,{color:P.COL.err,r:8});

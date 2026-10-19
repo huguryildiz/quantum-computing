@@ -616,7 +616,12 @@ def _ss_figs():
     const holder = document.createElement('div');
     holder.innerHTML = markup || '';
     const next = holder.querySelector('svg');
-    if(next) old.replaceWith(next);
+    if(next){
+      /* fitScene may have capped the figure to make the scene fit; the
+         redrawn svg keeps that cap, or it overflows its column */
+      next.style.maxHeight = old.style.maxHeight;
+      old.replaceWith(next);
+    }
   }
 
   function blocks(list){

@@ -41,7 +41,19 @@ const TAU = 2*Math.PI;
 function wire(y,x0,x1,col){ return {t:'line',d:`M${x0},${y} H${x1}`,color:col||C.rule}; }
 function cwire(y,x0,x1){ return [{t:'line',d:`M${x0},${y-2} H${x1}`,color:C.out},
                                  {t:'line',d:`M${x0},${y+2} H${x1}`,color:C.out}]; }
-function gate(x,y,label,tex,w,col){ return {t:'box',x:x-(w||34)/2,y:y-17,w:w||34,h:34,
+/* In projector mode the labels grow from a fixed baseline, so a gate and a
+   meter grow with them: taller, so a label clears the control line that ends
+   on the box, and the meter wider, so its word stays inside. GH2() is half
+   the gate height, the offset every control line stops at. */
+const BIG = () => P.labelScale() > 1;
+const GH2 = () => BIG() ? 20 : 17;
+function gate(x,y,label,tex,w,col){ const h=2*GH2();
+  /* A box label's baseline does not move as the label grows, so in projector
+     mode the grown label rode up into the top edge; there the label is drawn
+     as its own item, lower, and the box carries none. */
+  if(BIG()) return [{t:'box',x:x-(w||34)/2,y:y-h/2,w:w||34,h,label:'',color:col||C.h},
+    {t:'text',x,y:y+11,label,tex:!!tex,fs:15,color:C.ink}];
+  return {t:'box',x:x-(w||34)/2,y:y-h/2,w:w||34,h,
   label,tex:!!tex,fs:15,color:col||C.h}; }
 function ctrl(x,y,col){ return {t:'dot',x,y,r:6.5,color:col||C.h}; }
 function targ(x,y,col){ const k=col||C.h; return [
@@ -49,7 +61,7 @@ function targ(x,y,col){ const k=col||C.h; return [
   {t:'line',d:`M${x},${y-13} V${y+13}`,color:k},
   {t:'line',d:`M${x-13},${y} H${x+13}`,color:k}]; }
 /* A meter carries a plain word, so it takes no TeX and no `\text{}` wrapper. */
-function meter(x,y,col){ return {t:'box',x:x-24,y:y-17,w:48,h:34,label:'measure',fs:11,
+function meter(x,y,col){ const w=BIG()?64:48, h=2*GH2(); return {t:'box',x:x-w/2,y:y-h/2,w,h,label:'measure',fs:11,
   color:col||C.out}; }
 
 /* A swap is drawn as the two crosses joined by a line, the standard mark. Two
@@ -68,9 +80,11 @@ function swapMark(x,y0,y1,col){ const k=col||C.mid, c=(y)=>[
    commands are relative and need nothing. */
 function growBlocks(spec){
   const h1 = P.hOverride;
-  if(!h1 || h1 <= spec.h) return P.blocks(spec);
+  /* A gate may be two items (box and label), so the list is flattened first. */
+  const flat = spec.items.flat();
+  if(!h1 || h1 <= spec.h) return P.blocks({w:spec.w, h:spec.h, items:flat});
   const dy = (h1 - spec.h) / 2;
-  const items = spec.items.map(it => {
+  const items = flat.map(it => {
     const o = Object.assign({}, it);
     ['y','y1','y2'].forEach(k => { if(o[k] != null) o[k] += dy; });
     if(o.t === 'line' && o.d) o.d = o.d
@@ -106,7 +120,15 @@ function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ const t=a%b; a=b; b=t
 
 /* The chapter as one mechanism with four uses. */
 function figOpen(){
-  return P.blocks({w:760,h:250,items:[
+  /* In projector mode the captions under the boxes and the long sentence are
+     wider than their columns and the frame, so each breaks over two lines at
+     a phrase boundary and everything below moves down by the extra lines. */
+  const s = P.labelScale(), big = s > 1, L = 18*s;
+  const cap = (x,a,b) => big
+    ? [{t:'text',x,y:116,label:a,fs:12},{t:'text',x,y:116+L,label:b,fs:12}]
+    : [{t:'text',x,y:116,label:a+' '+b,fs:12}];
+  const d1 = big ? L : 0, d2 = big ? 2*L : 0;
+  return P.blocks({w:760,h:250+d2,items:[
     {t:'box',x:26,y:36,w:150,h:58,label:'a superposition',fs:13,color:C.in},
     {t:'arrow',x1:176,y1:65,x2:218,y2:65},
     {t:'box',x:218,y:36,w:150,h:58,label:'one query',fs:13,color:C.h},
@@ -114,17 +136,20 @@ function figOpen(){
     {t:'box',x:410,y:36,w:150,h:58,label:'interference',fs:13,color:C.mid},
     {t:'arrow',x1:560,y1:65,x2:602,y2:65},
     {t:'box',x:602,y:36,w:132,h:58,label:'n bits',fs:13,color:C.out},
-    {t:'text',x:101,y:116,label:'free, and worth nothing on its own',fs:12},
-    {t:'text',x:293,y:116,label:'writes a phase, not a bit',fs:12},
-    {t:'text',x:485,y:116,label:'this step is the algorithm',fs:12},
-    {t:'text',x:668,y:116,label:'all anyone ever sees',fs:12},
-    {t:'line',d:'M26,146 H734',color:C.rule},
+    ...cap(101,'free, and worth','nothing on its own'),
+    ...cap(293,'writes a phase,','not a bit'),
+    ...cap(485,'this step is','the algorithm'),
+    ...cap(668,'all anyone','ever sees'),
+    {t:'line',d:`M26,${146+d1} H734`,color:C.rule},
     /* One centred line, not four names spaced under the four boxes: names
        laid under the boxes would read as labels for them, and they are not.
        That pairing is the mistake chapter 4's Pauli figure shipped. */
-    {t:'text',x:380,y:180,label:'the four algorithms: Deutsch-Jozsa, phase estimation, order finding, Grover',fs:13,color:C.h},
-    {t:'text',x:380,y:216,label:'Four algorithms and one move. Each writes a different question into the phases and then makes the wrong answers cancel.',fs:12.5},
-    {t:'text',x:380,y:240,label:'A superposition that is never made to interfere has bought nothing at all.',fs:12.5,color:C.err}
+    {t:'text',x:380,y:180+d1,label:'the four algorithms: Deutsch-Jozsa, phase estimation, order finding, Grover',fs:13,color:C.h},
+    ...(big
+      ? [{t:'text',x:380,y:216+d1,label:'Four algorithms and one move.',fs:12.5},
+         {t:'text',x:380,y:216+d1+L,label:'Each writes a different question into the phases and then makes the wrong answers cancel.',fs:12.5}]
+      : [{t:'text',x:380,y:216,label:'Four algorithms and one move. Each writes a different question into the phases and then makes the wrong answers cancel.',fs:12.5}]),
+    {t:'text',x:380,y:240+d2,label:'A superposition that is never made to interfere has bought nothing at all.',fs:12.5,color:C.err}
   ]});
 }
 
@@ -161,8 +186,11 @@ function figClasses(){
   ];
   const items = [];
   cols.forEach(([k,v,col,x])=>{
-    items.push({t:'box',x,y:22,w:112,h:50,label:k,tex:true,fs:19,color:col});
-    items.push({t:'text',x:x+56,y:96,label:v,fs:14});
+    /* Taller in projector mode, about the same centre, so the grown name
+       clears the top edge, and the word under it a little lower. */
+    items.push(BIG() ? {t:'box',x,y:17,w:112,h:58,label:k,tex:true,fs:19,color:col}
+                     : {t:'box',x,y:22,w:112,h:50,label:k,tex:true,fs:19,color:col});
+    items.push({t:'text',x:x+56,y:BIG()?101:96,label:v,fs:14});
   });
   items.push({t:'arrow',x1:124,y1:47,x2:142,y2:47});
   items.push({t:'arrow',x1:254,y1:47,x2:272,y2:47});
@@ -197,7 +225,7 @@ function figEigen(){
     wire(Y0,88,322), wire(Y1,88,322),
     {t:'text',x:78,y:Y0+5,anchor:'end',label:'|{+}\\rangle',tex:true,fs:16},
     {t:'text',x:78,y:Y1+5,anchor:'end',label:'|u\\rangle',tex:true,fs:16},
-    {t:'line',d:`M200,${Y0} V${Y1-17}`,color:C.h},
+    {t:'line',d:`M200,${Y0} V${Y1-GH2()}`,color:C.h},
     ctrl(200,Y0),
     gate(200,Y1,'U',true,44),
     {t:'text',x:334,y:Y0+5,anchor:'start',label:'\\tfrac{1}{\\sqrt2}\\big(|0\\rangle+e^{2\\pi i\\varphi}|1\\rangle\\big)',tex:true,fs:15,color:C.out},
@@ -232,7 +260,10 @@ function figCancel(){
   a.stem(before,{color:C.in,r:3.4,width:1.6});
   a.stem(after,{color:C.out,r:5.0,width:2.4});
   a.note(-0.2,1.24,'\\text{before the last layer: sixteen of size }1/4',{fs:13,color:C.in,anchor:'start',tex:true});
-  a.note(-0.2,-0.50,'\\text{after it: one of size }1',{fs:13,color:C.out,anchor:'start',tex:true});
+  /* In projector mode the note under the axis meets the grown tick numbers,
+     so it moves beside the one stem it names, in the empty upper right. */
+  if(BIG()) a.note(14.4,0.94,'\\text{after it: one of size }1',{fs:13,color:C.out,anchor:'end',tex:true});
+  else a.note(-0.2,-0.50,'\\text{after it: one of size }1',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -240,26 +271,31 @@ function figCancel(){
    one bit the circuit returns for each. */
 function figDeutsch(){
   const Y0 = 50, Y1 = 112;
+  /* Projector mode: the grown table needs more room, so the circuit closes
+     up to the left (a narrower oracle box, the gates nearer to it) and the
+     divider and the three columns follow it. */
+  const big = BIG(), XH1 = big?86:92, XU = big?112:126, WU = big?58:64, XH2 = big?194:220,
+        XM = big?246:266, XW = big?282:290, XD = big?292:306, XF = 360, XC = big?465:452, XR = big?535:526;
   const items = [
-    wire(Y0,60,290), wire(Y1,60,290),
+    wire(Y0,60,XW), wire(Y1,60,XW),
     {t:'text',x:52,y:Y0+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
     {t:'text',x:52,y:Y1+5,anchor:'end',label:'|1\\rangle',tex:true,fs:15},
-    gate(92,Y0,'H',true), gate(92,Y1,'H',true),
-    {t:'box',x:126,y:28,w:64,h:106,label:'U_{f}',tex:true,fs:19,color:C.h},
-    gate(220,Y0,'H',true),
-    meter(266,Y0),
-    {t:'text',x:158,y:166,label:'one query',fs:14},
-    {t:'line',d:'M306,18 V172',color:C.rule},
-    {t:'text',x:360,y:34,label:'f',tex:true,fs:15},
-    {t:'text',x:452,y:34,label:'class',fs:14},
-    {t:'text',x:526,y:34,label:'reads',fs:14}
+    gate(XH1,Y0,'H',true), gate(XH1,Y1,'H',true),
+    {t:'box',x:XU,y:28,w:WU,h:106,label:'U_{f}',tex:true,fs:19,color:C.h},
+    gate(XH2,Y0,'H',true),
+    meter(XM,Y0),
+    {t:'text',x:XU+WU/2,y:166,label:'one query',fs:14},
+    {t:'line',d:`M${XD},18 V172`,color:C.rule},
+    {t:'text',x:XF,y:34,label:'f',tex:true,fs:15},
+    {t:'text',x:XC,y:34,label:'class',fs:14},
+    {t:'text',x:XR,y:34,label:'reads',fs:14}
   ];
   [['f(x)=0','constant','0'],['f(x)=1','constant','0'],
    ['f(x)=x','balanced','1'],['f(x)=1\\oplus x','balanced','1']].forEach(([f,cls,out],i)=>{
     const y = 70 + i*32, col = i<2 ? C.in : C.out;
-    items.push({t:'text',x:360,y,anchor:'middle',label:f,tex:true,fs:15});
-    items.push({t:'text',x:452,y,anchor:'middle',label:cls,fs:14,color:col});
-    items.push({t:'text',x:526,y,anchor:'middle',label:out,fs:16,color:col});
+    items.push({t:'text',x:XF,y,anchor:'middle',label:f,tex:true,fs:15});
+    items.push({t:'text',x:XC,y,anchor:'middle',label:cls,fs:14,color:col});
+    items.push({t:'text',x:XR,y,anchor:'middle',label:out,fs:16,color:col});
   });
   return growBlocks({w:560,h:186,items});
 }
@@ -297,9 +333,13 @@ function figDJcost(){
   /* The three names stack in a band above the highest curve, which reaches
      5.72 at twenty bits, and each is drawn in the colour of the curve it
      names rather than in the colour of anything it mentions. */
-  a.note(1.4,7.9,'\\text{classical, exact: }2^{n-1}+1',{fs:13,color:C.err,anchor:'start',tex:true});
-  a.note(1.4,7.0,'\\text{classical, wrong once in a million: }21',{fs:13,color:C.h,anchor:'start',tex:true});
-  a.note(1.4,6.1,'\\text{quantum, exact: }1',{fs:13,color:C.out,anchor:'start',tex:true});
+  /* In projector mode the band is laid out in pixels: the first name clear of
+     the frame's top edge, the next two one grown line apart. */
+  const py = 1/(a.sy(0)-a.sy(1)), s = P.labelScale(), big = s > 1;
+  const y1 = big ? 8.6 - 26*s*py : 7.9, dy = big ? 21*s*py : 0.9;
+  a.note(1.4,y1,'\\text{classical, exact: }2^{n-1}+1',{fs:13,color:C.err,anchor:'start',tex:true});
+  a.note(1.4,y1-dy,'\\text{classical, wrong once in a million: }21',{fs:13,color:C.h,anchor:'start',tex:true});
+  a.note(1.4,y1-2*dy,'\\text{quantum, exact: }1',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -343,13 +383,13 @@ function figQFTcirc(){
     {t:'text',x:52,y:Y[1]+5,anchor:'end',label:'q_{1}',tex:true,fs:15},
     {t:'text',x:52,y:Y[2]+5,anchor:'end',label:'q_{2}',tex:true,fs:15},
     gate(96,Y[2],'H',true),
-    {t:'line',d:`M158,${Y[1]} V${Y[2]-17}`,color:C.h}, ctrl(158,Y[1]),
-    gate(158,Y[2],'R_{2}',true,44),
-    {t:'line',d:`M226,${Y[0]} V${Y[2]-17}`,color:C.h}, ctrl(226,Y[0]),
-    gate(226,Y[2],'R_{3}',true,44),
+    {t:'line',d:`M158,${Y[1]} V${Y[2]-GH2()}`,color:C.h}, ctrl(158,Y[1]),
+    gate(158,Y[2],'R_{2}',true,BIG()?52:44),
+    {t:'line',d:`M226,${Y[0]} V${Y[2]-GH2()}`,color:C.h}, ctrl(226,Y[0]),
+    gate(226,Y[2],'R_{3}',true,BIG()?52:44),
     gate(292,Y[1],'H',true),
-    {t:'line',d:`M354,${Y[0]} V${Y[1]-17}`,color:C.h}, ctrl(354,Y[0]),
-    gate(354,Y[1],'R_{2}',true,44),
+    {t:'line',d:`M354,${Y[0]} V${Y[1]-GH2()}`,color:C.h}, ctrl(354,Y[0]),
+    gate(354,Y[1],'R_{2}',true,BIG()?52:44),
     gate(418,Y[0],'H',true)
   ].concat(swapMark(484,Y[0],Y[2])).concat([
     {t:'text',x:484,y:186,label:'swap',fs:14,color:C.mid}
@@ -392,11 +432,11 @@ function figQPE(){
     {t:'text',x:52,y:Y[2]+5,anchor:'end',label:'|0\\rangle',tex:true,fs:15},
     {t:'text',x:52,y:Y[3]+5,anchor:'end',label:'|u\\rangle',tex:true,fs:15},
     gate(92,Y[0],'H',true), gate(92,Y[1],'H',true), gate(92,Y[2],'H',true),
-    {t:'line',d:`M148,${Y[0]} V${Y[3]-17}`,color:C.h}, ctrl(148,Y[0]),
+    {t:'line',d:`M148,${Y[0]} V${Y[3]-GH2()}`,color:C.h}, ctrl(148,Y[0]),
     gate(148,Y[3],'U',true,40),
-    {t:'line',d:`M206,${Y[1]} V${Y[3]-17}`,color:C.h}, ctrl(206,Y[1]),
+    {t:'line',d:`M206,${Y[1]} V${Y[3]-GH2()}`,color:C.h}, ctrl(206,Y[1]),
     gate(206,Y[3],'U^{2}',true,48),
-    {t:'line',d:`M266,${Y[2]} V${Y[3]-17}`,color:C.h}, ctrl(266,Y[2]),
+    {t:'line',d:`M266,${Y[2]} V${Y[3]-GH2()}`,color:C.h}, ctrl(266,Y[2]),
     gate(266,Y[3],'U^{4}',true,48),
     {t:'box',x:308,y:20,w:62,h:136,label:'F^{\\dagger}',tex:true,fs:19,color:C.mid},
     meter(420,Y[0]), meter(420,Y[1]), meter(420,Y[2]),
@@ -438,8 +478,11 @@ function figQPEprec(){
   draw(6,C.out,3.0);
   a.vline(phi,{color:C.err,width:1.6,dash:'4 4'});
   a.note(0.32,1.06,'\\varphi = 0.3',{fs:13,color:C.err,anchor:'start',tex:true});
-  a.note(0.50,1.30,'t=3\\text{: coarse}',{fs:13,color:C.in,anchor:'start',tex:true});
-  a.note(0.50,1.14,'t=6\\text{: tighter, still spread}',{fs:13,color:C.out,anchor:'start',tex:true});
+  /* The two names are one grown line apart in projector mode, in pixels. */
+  const py = 1/(a.sy(0)-a.sy(1)), s = P.labelScale(), big = s > 1;
+  const y1 = big ? 1.26 : 1.30, y2 = big ? y1 - 22*s*py : 1.14;
+  a.note(0.50,y1,'t=3\\text{: coarse}',{fs:13,color:C.in,anchor:'start',tex:true});
+  a.note(0.50,y2,'t=6\\text{: tighter, still spread}',{fs:13,color:C.out,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -454,7 +497,7 @@ function figQPEcost(){
   a.curve(t => Math.log10(Math.pow(2,t)-1), {color:C.err,width:2.6});
   a.curve(t => Math.log10(t*(t+1)/2), {color:C.out,width:2.6});
   a.note(5.6,3.9,'\\text{uses of } U:\\; 2^{t}-1',{fs:13,color:C.err,anchor:'start',tex:true});
-  a.note(6.4,0.66,'\\text{gates in } F^{\\dagger}:\\; \\tfrac12 t(t+1)',{fs:13,color:C.out,anchor:'start',tex:true});
+  a.note(6.4,BIG()?0.5:0.66,'\\text{gates in } F^{\\dagger}:\\; \\tfrac12 t(t+1)',{fs:13,color:C.out,anchor:'start',tex:true});
   a.point(10,Math.log10(1023),{color:C.err,r:6});
   a.point(10,Math.log10(55),{color:C.out,r:6});
   a.note(10.3,2.72,'1023',{fs:13,color:C.err,anchor:'start'});
@@ -465,15 +508,17 @@ function figQPEcost(){
 /* Quantum counting: the same estimator pointed at the Grover iteration, so
    that the number of marked candidates comes out before the search is run. */
 function figCount(){
+  /* Projector mode: wider boxes and shorter arrows, so the grown names stay inside. */
+  const big = BIG(), W = big?170:150, X = big?[6,195,384]:[12,205,398];
   return growBlocks({w:560,h:150,items:[
-    {t:'box',x:12,y:30,w:150,h:54,label:'the Grover step',fs:14,color:C.h},
-    {t:'arrow',x1:162,y1:57,x2:205,y2:57},
-    {t:'box',x:205,y:30,w:150,h:54,label:'phase estimation',fs:14,color:C.mid},
-    {t:'arrow',x1:355,y1:57,x2:398,y2:57},
-    {t:'box',x:398,y:30,w:150,h:54,label:'\\text{an estimate of }M',tex:true,fs:14,color:C.out},
-    {t:'text',x:87,y:116,label:'e^{\\pm 2i\\theta}',tex:true,fs:16},
-    {t:'text',x:280,y:116,label:'\\text{reads }\\theta',tex:true,fs:15},
-    {t:'text',x:473,y:116,label:'M = N\\sin^{2}\\theta',tex:true,fs:15}
+    {t:'box',x:X[0],y:30,w:W,h:54,label:'the Grover step',fs:14,color:C.h},
+    {t:'arrow',x1:X[0]+W,y1:57,x2:X[1],y2:57},
+    {t:'box',x:X[1],y:30,w:W,h:54,label:'phase estimation',fs:14,color:C.mid},
+    {t:'arrow',x1:X[1]+W,y1:57,x2:X[2],y2:57},
+    {t:'box',x:X[2],y:30,w:W,h:54,label:'\\text{an estimate of }M',tex:true,fs:14,color:C.out},
+    {t:'text',x:X[0]+W/2,y:116,label:'e^{\\pm 2i\\theta}',tex:true,fs:16},
+    {t:'text',x:X[1]+W/2,y:116,label:'\\text{reads }\\theta',tex:true,fs:15},
+    {t:'text',x:X[2]+W/2,y:116,label:'M = N\\sin^{2}\\theta',tex:true,fs:15}
   ]});
 }
 
@@ -522,9 +567,9 @@ function figModexp(){
   /* Both names sit clear of the curves: the arithmetic tops out at 10.8 and
      the frame reaches 13.4, and the transform's name sits under its curve. */
   a.note(120,12.2,'\\text{modular exponentiation: } L^{3}',{fs:13,color:C.err,anchor:'start',tex:true});
-  a.note(1180,5.2,'\\text{the transform: } L^{2}',{fs:13,color:C.out,anchor:'start',tex:true});
+  a.note(1180,BIG()?4.8:5.2,'\\text{the transform: } L^{2}',{fs:13,color:C.out,anchor:'start',tex:true});
   a.vline(2048,{color:C.rule,width:1.3,dash:'3 4'});
-  a.note(2048,2.9,'L=2048',{fs:13,color:C.muted,anchor:'middle',tex:true});
+  a.note(2048,BIG()?2.55:2.9,'L=2048',{fs:13,color:C.muted,anchor:'middle',tex:true});
   return a.svg();
 }
 
@@ -532,7 +577,7 @@ function figModexp(){
    into the small denominator hiding inside it. */
 function figCF(){
   const items = [
-    {t:'text',x:280,y:30,anchor:'middle',label:'\\frac{y}{Q} = \\frac{85}{512} = 0.166016\\ldots',tex:true,fs:18,color:C.in},
+    {t:'text',x:280,y:BIG()?40:30,anchor:'middle',label:'\\frac{y}{Q} = \\frac{85}{512} = 0.166016\\ldots',tex:true,fs:18,color:C.in},
     {t:'text',x:90,y:78,anchor:'middle',label:'step',fs:14},
     {t:'text',x:230,y:78,anchor:'middle',label:'quotient',fs:14},
     {t:'text',x:380,y:78,anchor:'middle',label:'convergent',fs:14},
@@ -716,7 +761,7 @@ function figForksFloor(){
     probs.sort((x,y)=>y-x); return probs[0]+probs[1];
   }, {color:C.in, n:400});
   a.hline(floor, {color:C.err,width:1.4,dash:'4 4'});
-  a.note(0.55,0.775,'8/\\pi^{2} = 0.811',{fs:12,color:C.err,anchor:'start',tex:true});
+  a.note(0.55,BIG()?0.763:0.775,'8/\\pi^{2} = 0.811',{fs:12,color:C.err,anchor:'start',tex:true});
   return a.svg();
 }
 
@@ -727,7 +772,8 @@ function figGearsCycle(){
   const N = 15, a0 = 7, r = orderOf(a0,N);
   const pts=[]; let x=1;
   for(let k=0;k<=10;k++){ pts.push([k,x]); x=(x*a0)%N; }
-  const a = P.Axes({w:520,h:260,xr:[0,10],yr:[0,15.8],
+  /* Projector mode: a taller range, so the span's grown name stays below the axis name. */
+  const a = P.Axes({w:520,h:260,xr:[0,10],yr:[0,BIG()?18:15.8],
     xlabel:'k', ylabel:'7^{k} \\bmod 15',
     pad:{l:64,r:20,t:26,b:44}, xtarget:5, yticksOverride:[0,4,8,12]});
   a.stem(pts,{color:C.in,r:4.6});

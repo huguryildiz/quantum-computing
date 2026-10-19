@@ -103,13 +103,13 @@ function figPhysical(){
 /* Purity against the mixing of two orthogonal states. One at the ends, one
    half in the middle, and never below it for a qubit. */
 function figPurity(){
-  const a = P.Axes({w:560,h:250,xr:[0,1],yr:[0.35,1.08],
+  const a = P.Axes({w:560,h:P.labelScale()>1?290:250,xr:[0,1],yr:[0.35,1.08],
     xlabel:'p', ylabel:'\\operatorname{Tr}\\rho^{2}',
     pad:{l:64,r:24,t:26,b:46}, xtarget:4, ytarget:4});
   a.curve(p => (1-p)*(1-p) + p*p, {color:C.in, width:2.4});
   a.hline(0.5,{color:C.err, width:1.4, dash:'4 4'});
   a.point(0.5,0.5,{color:C.err,r:6});
-  a.note(0.5,0.5,'\\text{maximally mixed}',{fs:12.5,color:C.err,anchor:'middle',dy:26,tex:true});
+  a.note(0.5,0.5,'\\text{maximally mixed}',{fs:12.5,color:C.err,anchor:'middle',dy:26+8*(P.labelScale()-1),tex:true});
   a.point(0,1,{color:C.out,r:6});
   a.point(1,1,{color:C.out,r:6});
   return a.svg();
@@ -216,16 +216,16 @@ function figOrder(){
                 ['|01\\rangle','c_{1}','q_{1}=0,\\,q_{0}=1'],
                 ['|10\\rangle','c_{2}','q_{1}=1,\\,q_{0}=0'],
                 ['|11\\rangle','c_{3}','q_{1}=1,\\,q_{0}=1']];
-  const items = [];
+  const items = [], big = P.labelScale()>1, bh = big ? 48 : 40, gap = bh + 6, dy = (bh - 40)/2;
   rows.forEach(([k,c,d],i)=>{
-    const y = 24 + i*46;
-    items.push({t:'text',x:150,y:y+30,anchor:'end',label:k,tex:true,fs:15});
-    items.push({t:'box',x:168,y:y,w:110,h:40,label:c,tex:true,fs:15,
+    const y = 24 + i*gap;
+    items.push({t:'text',x:150,y:y+30+dy,anchor:'end',label:k,tex:true,fs:15});
+    items.push({t:'box',x:168,y:y,w:110,h:bh,label:c,tex:true,fs:15,
       color:i===0?C.in:i===3?C.out:C.mid});
-    items.push({t:'text',x:300,y:y+28,anchor:'start',label:d,tex:true,fs:13});
+    items.push({t:'text',x:300,y:y+28+dy,anchor:'start',label:d,tex:true,fs:13});
   });
-  items.push({t:'text',x:280,y:236,label:'the left qubit is the most significant, so the index is two q1 plus q0',fs:12});
-  return growBlocks({w:560,h:252,items});
+  items.push({t:'text',x:280,y:236+3*(gap-46)+(bh-40),label:'the left qubit is the most significant, so the index is two q1 plus q0',fs:12});
+  return growBlocks({w:560,h:252+4*(gap-46),items});
 }
 
 /* The partial trace on two qubits, read off the block structure of the joint
@@ -284,12 +284,14 @@ function figSchmidt(){
 /* How the Schmidt coefficients are actually computed: reshape, then one
    singular value decomposition. */
 function figSVD(){
+  const big = P.labelScale()>1, by = big ? 46 : 56, bh = big ? 90 : 70;
   return growBlocks({w:740,h:220,items:[
-    {t:'box',x:20,y:56,w:150,h:70,label:'c_{0},c_{1},c_{2},c_{3}',tex:true,fs:14,color:C.in},
-    {t:'arrow',x1:170,y1:91,x2:250,y2:91,label:'reshape'},
-    {t:'box',x:250,y:56,w:170,h:70,label:'C=\\begin{bmatrix}c_{0}&c_{1}\\\\c_{2}&c_{3}\\end{bmatrix}',tex:true,fs:14,color:C.h},
+    {t:'box',x:20,y:by,w:150,h:bh,label:'c_{0},c_{1},c_{2},c_{3}',tex:true,fs:14,color:C.in},
+    {t:'arrow',x1:170,y1:91,x2:250,y2:91},
+    {t:'text',x:210,y:big?76:81,label:'reshape',fs:15,italic:true},
+    {t:'box',x:250,y:by,w:170,h:bh,label:'C=\\begin{bmatrix}c_{0}&c_{1}\\\\c_{2}&c_{3}\\end{bmatrix}',tex:true,fs:14,color:C.h},
     {t:'arrow',x1:420,y1:91,x2:500,y2:91,label:'SVD'},
-    {t:'box',x:500,y:56,w:210,h:70,label:'s_{1}\\ge s_{2}\\ge 0',tex:true,fs:15,color:C.out},
+    {t:'box',x:500,y:by,w:210,h:bh,label:'s_{1}\\ge s_{2}\\ge 0',tex:true,fs:15,color:C.out},
     {t:'text',x:95,y:160,label:'the amplitudes',fs:12},
     {t:'text',x:335,y:160,label:'rows are qubit 1, columns qubit 0',fs:12},
     {t:'text',x:605,y:160,label:'the Schmidt coefficients',fs:12},
@@ -306,7 +308,7 @@ function figEntropy(){
     pad:{l:64,r:24,t:30,b:46}, xtarget:4, ytarget:4});
   a.curve(h, {color:C.in, width:2.4});
   a.point(0.5,1,{color:C.out,r:6});
-  a.note(0.5,1,'\\text{one ebit}',{fs:12.5,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(0.5,1,'\\text{one ebit}',{fs:12.5,color:C.out,anchor:'middle',dy:-12*P.labelScale(),tex:true});
   a.point(0,0,{color:C.err,r:5});
   a.point(1,0,{color:C.err,r:5});
   a.note(0.86,0,'\\text{product}',{fs:12.5,color:C.err,anchor:'middle',dy:-12,tex:true});
@@ -363,7 +365,7 @@ function figCHSH(){
   a.hline(2,{color:C.err, width:1.8, dash:'5 4'});
   a.hline(2*Math.SQRT2,{color:C.out, width:1.4, dash:'2 4'});
   a.point(45,2*Math.SQRT2,{color:C.out,r:6});
-  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12*P.labelScale(),tex:true});
   a.note(8,1.28,'\\text{classical bound}',{fs:12.5,color:C.err,tex:true});
   return a.svg();
 }
@@ -371,8 +373,8 @@ function figCHSH(){
 /* What one party sees, for three settings of the other. Nothing moves, which
    is the whole content of no signalling. */
 function figNoSig(){
-  const a = P.Axes({w:560,h:250,xr:[0,6.4],yr:[0,1.12],
-    ylabel:'\\text{probability for A}', pad:{l:64,r:24,t:30,b:62},
+  const a = P.Axes({w:560,h:P.labelScale()>1?290:250,xr:[0,6.4],yr:[0,1.12],
+    ylabel:'\\text{probability for A}', pad:{l:64,r:24,t:30,b:62*P.labelScale()},
     xticksOverride:[], ytarget:4});
   /* The bars start at 0.7 so the vertical axis sits clear of the first one. */
   const bar=(k,f,l)=>{ const n = k + 0.7; a.rect(n-0.26,0,n+0.26,0.5,{fill:f});
@@ -381,10 +383,10 @@ function figNoSig(){
   [2,3].forEach(k=>bar(k,C.dec.mid,C.mid));
   [4,5].forEach(k=>bar(k,C.dec.out,C.out));
   [['+1',0],['-1',1],['+1',2],['-1',3],['+1',4],['-1',5]].forEach(([t,k])=>
-    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24}));
-  a.note(1.2,0,'B\\text{ measures }Z',{fs:12.5,color:C.in,anchor:'middle',dy:48,tex:true});
-  a.note(3.2,0,'B\\text{ measures }X',{fs:12.5,color:C.mid,anchor:'middle',dy:48,tex:true});
-  a.note(5.2,0,'B\\text{ does nothing}',{fs:12.5,color:C.out,anchor:'middle',dy:48,tex:true});
+    a.note(k+0.7,0,t,{fs:12,color:C.muted,anchor:'middle',dy:24*P.labelScale()}));
+  a.note(1.2,0,'B\\text{ measures }Z',{fs:12.5,color:C.in,anchor:'middle',dy:48*P.labelScale(),tex:true});
+  a.note(3.2,0,'B\\text{ measures }X',{fs:12.5,color:C.mid,anchor:'middle',dy:48*P.labelScale(),tex:true});
+  a.note(5.2,0,'B\\text{ does nothing}',{fs:12.5,color:C.out,anchor:'middle',dy:48*P.labelScale(),tex:true});
   return a.svg();
 }
 
@@ -411,8 +413,8 @@ function figLadder(){
    parts. In each group the first two bars are the mean inside each branch and
    the third is Tr(rho A); the third is the average of the first two. */
 function figExpect(){
-  const a = P.Axes({w:560,h:250,xr:[0,7.4],yr:[0,1.15],
-    ylabel:'\\text{mean}', pad:{l:62,r:24,t:26,b:56},
+  const a = P.Axes({w:560,h:P.labelScale()>1?290:250,xr:[0,7.4],yr:[0,1.15],
+    ylabel:'\\text{mean}', pad:{l:62,r:24,t:26,b:56*P.labelScale()},
     xticksOverride:[], ytarget:4});
   /* The bars start at 0.7 so the vertical axis sits clear of the first one. */
   const bar=(n,v,f,l)=>{ a.rect(n-0.28,0,n+0.28,v,{fill:f});
@@ -421,9 +423,9 @@ function figExpect(){
   bar(X[0],1,C.dec.in,C.in);    bar(X[1],0,C.dec.in,C.in);    bar(X[2],0.5,C.dec.out,C.out);
   bar(X[3],0,C.dec.in,C.in);    bar(X[4],1,C.dec.in,C.in);    bar(X[5],0.5,C.dec.out,C.out);
   ['|0\\rangle','|{+}\\rangle','\\operatorname{Tr}','|0\\rangle','|{+}\\rangle','\\operatorname{Tr}'].forEach((t,k)=>
-    a.note(X[k],0,t,{fs:12.5,color:C.muted,anchor:'middle',dy:24,tex:true}));
-  a.note(1.7,0,'\\langle Z\\rangle',{fs:14,color:C.in,anchor:'middle',dy:48,tex:true});
-  a.note(5.7,0,'\\langle X\\rangle',{fs:14,color:C.in,anchor:'middle',dy:48,tex:true});
+    a.note(X[k],0,t,{fs:12.5,color:C.muted,anchor:'middle',dy:24*P.labelScale(),tex:true}));
+  a.note(1.7,0,'\\langle Z\\rangle',{fs:14,color:C.in,anchor:'middle',dy:48*P.labelScale(),tex:true});
+  a.note(5.7,0,'\\langle X\\rangle',{fs:14,color:C.in,anchor:'middle',dy:48*P.labelScale(),tex:true});
   return a.svg();
 }
 
@@ -570,7 +572,7 @@ function figRealCHSH(){
   a.hline(2,{color:C.err, width:1.8, dash:'5 4'});
   a.hline(2*Math.SQRT2,{color:C.out, width:1.4, dash:'2 4'});
   a.point(45,2*Math.SQRT2,{color:C.out,r:6});
-  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12,tex:true});
+  a.note(45,2*Math.SQRT2,'2\\sqrt2',{fs:13,color:C.out,anchor:'middle',dy:-12*P.labelScale(),tex:true});
   a.note(8,1.28,'\\text{classical bound}',{fs:12.5,color:C.err,tex:true});
   return a.svg();
 }

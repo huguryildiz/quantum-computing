@@ -329,7 +329,7 @@ Object.assign(LABS, (function(){
       [[a,'a',P.COL.mid],[b,'b',P.COL.out]].forEach(([v,l,col])=>{
         const p = proj(v);
         ax.poly([[0,0],p],{color:col,width:2,dash:'4 4'});
-        ax.note(p[0],p[1],l,{fs:13,color:col,dx:p[0]>=0?8:-16,dy:p[1]>0?-6:16,tex:true});
+        ax.note(p[0],p[1],l,{fs:13,color:col,dx:(p[0]>=0?8:-16)*P.labelScale(),dy:(p[1]>0?-6:16)*P.labelScale(),tex:true});
       });
       const p0 = proj(r), p1 = proj(rPrime);
       ax.poly([[0,0],p0],{color:P.COL.in,width:2.6});
@@ -337,7 +337,7 @@ Object.assign(LABS, (function(){
       ax.note(p0[0],p0[1],'\\mathbf{r}',{fs:14,color:P.COL.in,dx:10,dy:-10,tex:true});
       ax.poly([[0,0],p1],{color:P.COL.err,width:2.6});
       ax.point(p1[0],p1[1],{color:P.COL.err,r:6});
-      ax.note(p1[0],p1[1],"\\mathbf{r}'",{fs:14,color:P.COL.err,dx:10,dy:14,tex:true});
+      ax.note(p1[0],p1[1],"\\mathbf{r}'",{fs:14,color:P.COL.err,dx:10*P.labelScale(),dy:14*P.labelScale(),tex:true});
 
       /* ---- the two probabilities that were actually asked for ---- */
       const bx = P.Axes({w:430,h:320,xr:[-0.7,1.7],yr:[0,1.12],

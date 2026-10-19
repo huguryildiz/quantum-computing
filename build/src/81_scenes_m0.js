@@ -37,6 +37,9 @@ function figMap(){
     ['5', 'Circuits and protocols',    C.in],
     ['6', 'Quantum algorithms',        C.out]
   ];
+  /* In the lecture view the discs grow with the labels, so each side title
+     steps a few pixels further out to keep clear of its disc. */
+  const tdx = (P.labelScale() > 1 ? 6 : 0) / (a.sx(1) - a.sx(0));
   items.forEach((it,i)=>{
     const th = Math.PI/2 - i*2*Math.PI/6;
     const x = R*Math.cos(th), y = R*Math.sin(th);
@@ -49,7 +52,7 @@ function figMap(){
        on which half of the ring the point is in. No point of a six-point ring
        lies on the horizontal axis, so there is no third case. */
     const out = 1.28;
-    a.note(x*out, y*out + (y > 0 ? 0.24 : -0.24), it[1],
+    a.note(x*out + Math.sign(Math.round(x*1e6))*tdx, y*out + (y > 0 ? 0.24 : -0.24), it[1],
       {fs:12.5, color:C.muted, anchor:'middle'});
   });
   a.point(0, 0, {color:C.ink, r:5});
@@ -61,6 +64,9 @@ function figMap(){
    in a reader's head is a coprocessor on the end of a loop, which is what
    every quantum program written today actually is. */
 function figCoprocessor(){
+  /* In the lecture view the line under the classical box is wider than the
+     space left of its centre, so it starts at the frame edge instead. */
+  const big = P.labelScale() > 1;
   return P.blocks({w:760,h:198,items:[
     {t:'box',x:40,y:62,w:180,h:70,label:'Classical computer',fs:14},
     {t:'arrow',x1:220,y1:84,x2:330,y2:84},
@@ -75,7 +81,8 @@ function figCoprocessor(){
     {t:'text',x:275,y:70,label:'\\text{a circuit}',tex:true,fs:14},
     {t:'text',x:670,y:180,label:'one bit string a shot',fs:12},
     {t:'text',x:425,y:174,label:'prepares, transforms, measures',fs:12},
-    {t:'text',x:130,y:158,label:'writes the circuit, reads the statistics',fs:12}
+    big ? {t:'text',x:8,y:158,anchor:'start',label:'writes the circuit, reads the statistics',fs:12}
+        : {t:'text',x:130,y:158,label:'writes the circuit, reads the statistics',fs:12}
   ]});
 }
 
@@ -101,8 +108,11 @@ function figMemory(){
   a.note(2.0, Math.log10(1e15) + 0.7, '1 PB — a large machine', {fs:12.5, color:C.muted});
   a.point(30, Math.log10(16) + 30*Math.log10(2), {color:C.h, r:6});
   a.point(46, Math.log10(16) + 46*Math.log10(2), {color:C.h, r:6});
-  a.note(31.5, Math.log10(16) + 30*Math.log10(2) - 1.5, 'n=30', {fs:12.5, color:C.h, tex:true});
-  a.note(47.5, Math.log10(16) + 46*Math.log10(2) - 1.5, 'n=46', {fs:12.5, color:C.h, tex:true});
+  /* In the lecture view the two names drop a few pixels further, below the
+     dashed mark each point sits on and clear of the rising curve. */
+  const big = P.labelScale() > 1;
+  a.note(31.5, Math.log10(16) + 30*Math.log10(2) - 1.5, 'n=30', {fs:12.5, color:C.h, tex:true, dy:big?16:0});
+  a.note(47.5, Math.log10(16) + 46*Math.log10(2) - 1.5, 'n=46', {fs:12.5, color:C.h, tex:true, dy:big?16:0});
   return a.svg();
 }
 
@@ -110,14 +120,17 @@ function figMemory(){
    the same expression the scene derives, so the picture cannot disagree with
    the algebra beside it. */
 function figInterferometer(){
+  const big = P.labelScale() > 1;
   return P.blocks({w:640,h:150,items:[
-    {t:'line',d:'M40,75 h520'},
+    /* In the lecture view the wire stops at each gate, so the larger gate names
+       inside the boxes are not drawn across it. */
+    {t:'line',d:big ? 'M40,75 H120 M176,75 H270 M374,75 H456 M512,75 H560' : 'M40,75 h520'},
     {t:'box',x:120,y:48,w:56,h:54,label:'H',tex:true,fs:16},
     {t:'box',x:270,y:48,w:104,h:54,label:'R_z(\\varphi)',tex:true,fs:15},
     {t:'box',x:456,y:48,w:56,h:54,label:'H',tex:true,fs:16},
     {t:'text',x:70,y:60,label:'|0\\rangle',tex:true,fs:16},
     {t:'text',x:225,y:60,label:'|+\\rangle',tex:true,fs:16},
-    {t:'text',x:545,y:60,label:'measure',fs:12}
+    {t:'text',x:big?552:545,y:60,label:'measure',fs:12}
   ]});
 }
 function figFringe(){
