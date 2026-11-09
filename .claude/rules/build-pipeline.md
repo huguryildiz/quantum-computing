@@ -108,8 +108,6 @@ cd build && node pw.js shelltest.js   # clip L/R/T/B and doc overflow of the sta
 cd build && node pw.js tocshot.js [outDir]   # the contents rail, the course map and the eyebrow chip, light and dark
 cd build && node pw.js modeshot.js    # a handful of named scenes in fixed theme/display combinations
 cd build && node pw.js darkshot.js    # one scene's heading color and background, plus a screenshot
-cd build && node pw.js projtest.js    # median and worst-case body text size in projector vs normal display
-cd build && node pw.js projover.js    # scenes whose content clips in projector display
 ```
 
 On a local machine, run every browser gate through `pw.js`, one per command: `qa.js`,

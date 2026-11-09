@@ -160,6 +160,20 @@ this course has met so far.
   name collided with the bar labels. Inset the drawing past every corner of the readout and set
   those numbers by looking at the rendered screen, not by guessing.
 
+## The toolbar is fixed, and so are the modes behind it
+
+The bar carries Search, Notation, Laser, the ink-duration slider, Board, Light and Help, and nothing
+else; there is no settings menu. The artifact has one display size, one mode (`lecture`) and one
+edition (`instructor`), set once in `build/src/40_core.js` and never from a control; the site build
+turns the edition over to the student copy for the published file. There is no motion control
+either: movement is reduced only by the reader's own `prefers-reduced-motion`, read where it is
+needed and in the stylesheet's own blocks. The Laser button is one control with three states in this
+order — off, the red dot alone, the dot that leaves ink behind it — and `P` steps through the same
+three; `T` swaps that ink between fading on its own and staying until `C` clears it, and the slider
+sets how long it waits before it fades. The dot fades with the ink once the pointer has been still,
+so no red mark is left on a slide, and comes straight back on any movement. Do not add a
+display-size toggle, a settings menu or a separate Trail button back.
+
 ## Laser and board on a touch screen
 
 Both live in `build/src/40_core.js`, which is byte-identical in signals-and-systems,

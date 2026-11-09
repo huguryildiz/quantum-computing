@@ -434,7 +434,7 @@ const SC = [
     ]}],
     [{t:'card', head:'Four ways to read it', items:[
       {t:'fig', svg:icoModes},
-      {t:'small', html:'<b>Normal</b>, <b>lecture</b>, <b>self-study</b>, and <b>student</b> or <b>instructor</b>. The controls are along the top, and the choice is remembered.'}
+      {t:'small', html:'Read it, work the laboratories, answer the practice questions, and follow a lecture given from the same pages. The controls are along the top.'}
     ]}],
     [{t:'card', head:'The conventions are fixed', items:[
       {t:'fig', svg:icoBloch},

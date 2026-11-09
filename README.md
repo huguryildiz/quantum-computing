@@ -52,7 +52,7 @@ Alongside the scenes, the artifact contains:
 
 - **Laboratories.** Each has controls for a state, a gate or a circuit; moving one updates the figure and every number beside it, such as a probability, a Bloch vector or a count of shots.
 - **Practice questions.** Open-ended questions for each module, each with a worked solution that shows every step.
-- **Laser pointer and whiteboard.** In projector mode the pointer becomes a red laser dot; holding the mouse button or pressing a pen draws strokes that fade after a pause or stay until cleared. Pressing `W` opens a whiteboard over the page, with four inks, three line widths and blank, squared or ruled paper. It takes a mouse, a finger or a pen such as the Apple Pencil, and its laser tool brings the pointer over the board. The board has no edge: a finger drags the paper in any direction, as does the wheel or a trackpad.
+- **Laser pointer and whiteboard.** The Laser button steps the pointer through three states — off, a red dot, and a dot that leaves ink behind it; holding the mouse button or pressing a pen draws strokes that fade after a pause or stay until cleared. Pressing `W` opens a whiteboard over the page, with four inks, three line widths and blank, squared or ruled paper. It takes a mouse, a finger or a pen such as the Apple Pencil, and its laser tool brings the pointer over the board. The board has no edge: a finger drags the paper in any direction, as does the wheel or a trackpad.
 
 The same content also produces a set of printable PDF editions: the lecture notes, a student workbook
 with the questions only, and a formula reference.
@@ -77,8 +77,8 @@ own browser and is not sent anywhere. The site has no sign-in. Its cover page co
 clicks on its links with GoatCounter, which sets no cookies and stores no personal data; the
 artifact and the notes send nothing.
 
-The artifact has a student edition and an instructor edition. The instructor solutions PDF is never
-published: `.vercelignore` keeps it off the host and the site build does not copy it.
+The artifact is built as the instructor copy and the published site carries the student one. The
+instructor solutions PDF is never published: `.vercelignore` keeps it off the host and the site build does not copy it.
 
 Press `?` inside the artifact for the keyboard shortcuts.
 

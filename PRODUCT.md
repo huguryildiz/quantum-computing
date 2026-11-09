@@ -30,7 +30,7 @@ full argument reads the notes; a student in the room reads the slide and listens
 
 ## Operating Context
 
-- Lecture room, 16:9 projector, read from the back row. `Lecture mode` raises the type scale.
+- Lecture room, 16:9 projector, read from the back row.
 - Laptop, independent study, either theme, any window shape.
 - Phone and portrait tablet: the one-column phone layout. A screen on its side gets the desktop stage.
 - Online, from the course site. Students open the course at its address and do not download it; only
@@ -103,6 +103,7 @@ this course is converted yet. The mechanics are in the sibling's `DESIGN.md`, "I
 
 ## Accessibility & Inclusion
 
-Keyboard access to every control. `Motion: reduced` and `prefers-reduced-motion` give a complete still
-frame, never a missing one. Text contrast of at least 4.5:1 in both themes, tab labels included. The
-five figure colours are never the only carrier of meaning: a curve, a state or a bar is also labelled.
+Keyboard access to every control. `prefers-reduced-motion` gives a complete still frame, never a
+missing one; there is no motion control of the artifact's own. Text contrast of at least 4.5:1 in
+both themes, tab labels included. The five figure colours are never the only carrier of meaning: a
+curve, a state or a bar is also labelled.

@@ -148,35 +148,22 @@ if (seen < 20) fail('found only ' + seen + ' content modules in the built artifa
 if (srcFields < 200) fail('found only ' + srcFields + ' src fields');
 if (teachFields < 50) fail('found only ' + teachFields + ' teaching notes');
 
-/* The edition control. Removing the data is what matters; removing the
-   control is what stops a reader from looking for it. */
-art = replaceExactly(art,
-  `      <button id="btn-edition" data-act="edition" title="Student / instructor (I)">Student</button>\n`,
-  '', 1, 'toolbar edition button');
-
-art = replaceExactly(art,
-  `        case 'i': case 'I': toggleEdition(); break;\n`,
-  '', 1, 'I keyboard shortcut');
-
 /* A reader whose device already holds `edition:'instructor'` from an earlier
    visit would otherwise come back into a mode that no longer has content. */
 art = replaceExactly(art,
-  `      edition: saved.edition || 'student',`,
+  `      edition: 'instructor',`,
   `      edition: 'student',`,
-  1, 'saved edition restore');
+  1, 'fixed edition');
+
+art = replaceExactly(art,
+  `    edition: 'instructor', // 'student' | 'instructor' — fixed; the published copy is built as the student one`,
+  `    edition: 'student',`,
+  1, 'edition state field');
 
 /* The `src` reference shown beside the pager in instructor mode, and the
    toolbar button's own label logic, now read a mode nothing can enter — left
    in place, since with the button gone and `S.edition` pinned to 'student'
    they are dead branches that never draw a character on the page. */
-
-/* With the button, the shortcut and the saved state gone, the toggle can
-   still be reached from a console. It is emptied so the mode cannot be
-   entered at all, rather than entered and found empty. */
-art = replaceExactly(art,
-  `  function toggleEdition(){ state.edition = state.edition==='student'?'instructor':'student'; applyBodyFlags(); persist(); onRender(); }`,
-  `  function toggleEdition(){ /* the published copy has one edition */ }`,
-  1, 'edition toggle');
 
 /* Belt and braces: this course's scene content carries no `{t:'instr'}`
    block, but the generic block renderer is registered all the same, shared
@@ -194,20 +181,6 @@ art = replaceExactly(art,
 art = replaceExactly(art,
   '${q.teach?`<div class="instr"><div class="instr-panel"><span class="note-h">Teaching note</span>${md(q.teach)}</div></div>`:\'\'}',
   '', 1, 'question teaching-note renderer');
-
-/* The "How to Use This Course" help scene named the edition among its four
-   ways to read the artifact. On the published copy there is one edition, so
-   the card says what is actually true of it. */
-art = replaceExactly(art,
-  `      {t:'small', html:'<b>Normal</b>, <b>lecture</b>, <b>self-study</b>, and <b>student</b> or <b>instructor</b>. The controls are along the top, and the choice is remembered.'}`,
-  `      {t:'small', html:'<b>Normal</b>, <b>lecture</b>, and <b>self-study</b>. The controls are along the top, and the choice is remembered.'}`,
-  1, 'help scene reading-modes card');
-
-/* The help overlay's shortcut list named the same removed toggle. */
-art = replaceExactly(art,
-  `['L','Lecture ⇄ self-study'],['I','Student ⇄ instructor edition'],['R','Reduced motion'],`,
-  `['L','Lecture ⇄ self-study'],['R','Reduced motion'],`,
-  1, 'help-screen shortcut line');
 
 /* Nothing that names the removed edition may survive as something a reader
    can see. What is left after the transforms above is code and comments —

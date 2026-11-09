@@ -125,7 +125,7 @@ what a state or an operator *is*, and the card colours say what a card *does*.
 - One slide, one figure, two to four tabbed cards. See "Slides" under Layout.
 - One idea a card, one or two short sentences a card.
 - The stage is full: nothing top-heavy, nothing clipped.
-- The same slide works in both themes and in lecture mode without a second design.
+- The same slide works in both themes without a second design.
 
 ## Colors
 
@@ -341,7 +341,7 @@ course's own:
 | Layer | Files | Taken from the reference | Kept from this course |
 | --- | --- | --- | --- |
 | Engine | `build/src/40_core.js` | verbatim | — |
-| Page shell | `build/src/00_head.html` | icon toolbar, settings menu, page box, arrows, help-screen credits | title, description, the atom mark, CC BY 4.0 credits |
+| Page shell | `build/src/00_head.html` | icon toolbar, page box, arrows, help-screen credits | title, description, the atom mark, CC BY 4.0 credits |
 | Stylesheet | `build/src/10_style.css` | the whole sheet, including the slide language | the mark, `runbar`, `labgrid`, the question-type grid, noise and decision-region tokens |
 | Renderer | `build/src/90_app.js` | cards, tones, title icons, drill pager, solution cards, recall deck, code pages, sliders, frames, sound, sketch | the `\Od` macro, backtick code spans, the `drilltypes` block, the question type in the question id |
 | Plotting | `build/src/60_plot.js` | back-row emphasis, `flatTeX`, lab growth, phone aspect cap | noise and decision-region colours, `dot`, `decade`/`decades` |
